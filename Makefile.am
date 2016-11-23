@@ -1,0 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
+EXTRA_DIST = NEWS.rst README.rst
+
+SUBDIRS = include src

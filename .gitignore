@@ -1,0 +1,10 @@
+aclocal.m4
+autom4te.cache/
+build-aux/
+config.hpp.in
+config.hpp.in~
+configure
+m4/*
+!m4/ax_cxx_compile_stdcxx.m4
+*Makefile
+*Makefile.in
