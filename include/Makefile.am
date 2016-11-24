@@ -1,5 +1,6 @@
 nobase_include_HEADERS = \
-	hep/ps.hpp
+	hep/ps.hpp \
+	hep/ps/p_type_jet_algorithm.hpp
 
 # create a timestamp file so we can depend on it instead of depending on every
 # single header

@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_P_TYPE_JET_ALGORITHM_HPP
+#define HEP_P_TYPE_JET_ALGORITHM_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,15 +19,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+#include <cstddef>
+#include <vector>
+
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+template <typename T>
+class p_type_jet_algorithm
+{
+public:
+	p_type_jet_algorithm(T p, T radius);
+
+	std::size_t recombine(
+		std::vector<T> const& phase_space,
+		std::vector<T>& recombined_phase_space,
+		std::vector<std::size_t> const& recombination_candidates,
+		std::size_t max_recombinations
+	) const;
+
+private:
+	T p_;
+	T radius_;
+};
 
 }
-
-#include "hep/ps/p_type_jet_algorithm.hpp"
 
 #endif
