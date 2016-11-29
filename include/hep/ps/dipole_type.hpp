@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_DIPOLE_TYPE_HPP
+#define HEP_PS_DIPOLE_TYPE_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,19 +19,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+/// Enumeration for the dipole types.
+enum class dipole_type
+{
+	/// Marks an initial-initial (II) dipole, i.e. a dipole with an initial
+	/// state emitter and an initial state spectator.
+	initial_initial,
+
+	/// Marks an initial-final (IF) dipole, i.e. a dipole with an initial state
+	/// emitter and a final state spectator.
+	initial_final,
+
+	/// Marks a final-initial (FI) dipole, i.e. a dipole with a final state
+	/// emitter and an initial state spectator.
+	final_initial,
+
+	/// Marks a final-final (FF) dipole, i.e. a dipole with a final state
+	/// emitter and a final state spectator.
+	final_final
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/dipole_type.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/scales.hpp"
 
 #endif
