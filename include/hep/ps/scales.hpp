@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_SCALES_HPP
+#define HEP_PS_SCALES_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,17 +19,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+/// Class that captures the factorization and renormalization scales.
+template <typename T>
+class scales
+{
+public:
+	/// Constructs a new object with \f$ \mu_\text{F} \f$ set to the value of
+	/// `factorization` and \f$ \mu_\text{R} \f$ set to the value of
+	/// `renormalization`.
+	scales(T factorization, T renormalization)
+		: factorization_(factorization)
+		, renormalization_(renormalization)
+	{
+	}
+
+	/// Returns the factorization scale \f$ \mu_\text{F} \f$.
+	T factorization() const
+	{
+		return factorization_;
+	}
+
+	/// Returns the renormalization scale \f$ \mu_\text{R} \f$.
+	T renormalization() const
+	{
+		return renormalization_;
+	}
+
+private:
+	T factorization_;
+	T renormalization_;
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/scales.hpp"
 
 #endif
