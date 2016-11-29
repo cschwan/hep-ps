@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_INITIAL_STATE_ARRAY_HPP
+#define HEP_PS_INITIAL_STATE_ARRAY_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,24 +19,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+#include "hep/ps/initial_state.hpp"
+
+#include <array>
+#include <cstddef>
+
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+template <typename T>
+class initial_state_array
+{
+public:
+	initial_state_array()
+		// ZERO-initialize the array (!?)
+		: array_{{}}
+	{
+		// TODO: is this really needed?
+		array_.fill(T());
+	}
+
+	T get(initial_state state) const
+	{
+		return array_[static_cast <std::size_t> (state)];
+	}
+
+	void set(initial_state state, T const& value)
+	{
+		array_[static_cast <std::size_t> (state)] = value;
+	}
+
+private:
+	initial_state_array_<T> array_;
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_invariants.hpp"
-#include "hep/ps/dipole_type.hpp"
-#include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_array.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/particle_type.hpp"
-#include "hep/ps/scales.hpp"
 
 #endif
