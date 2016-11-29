@@ -11,6 +11,7 @@ nobase_include_HEADERS = \
 	hep/ps/initial_state_set.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/particle_type.hpp \
+	hep/ps/real_minus_dipoles.hpp \
 	hep/ps/scales.hpp
 
 # create a timestamp file so we can depend on it instead of depending on every
