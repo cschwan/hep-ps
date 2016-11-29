@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_CUT_RESULT_HPP
+#define HEP_PS_CUT_RESULT_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,18 +19,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+class cut_result
+{
+public:
+	cut_result(bool neg_cutted, bool pos_cutted)
+		: neg_cutted_(neg_cutted)
+		, pos_cutted_(pos_cutted)
+	{
+	}
+
+	bool neg_cutted() const
+	{
+		return neg_cutted_;
+	}
+
+	bool pos_cutted() const
+	{
+		return pos_cutted_;
+	}
+
+private:
+	bool neg_cutted_;
+	bool pos_cutted_;
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/scales.hpp"
 
 #endif

@@ -1,6 +1,7 @@
 nobase_include_HEADERS = \
 	hep/ps.hpp \
 	hep/ps/constants.hpp \
+	hep/ps/cut_result.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/scales.hpp
 
