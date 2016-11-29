@@ -33,6 +33,7 @@ void find_hep_ps();
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
+#include "hep/ps/initial_state.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/scales.hpp"
