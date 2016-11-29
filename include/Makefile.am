@@ -3,6 +3,7 @@ nobase_include_HEADERS = \
 	hep/ps/constants.hpp \
 	hep/ps/cut_result.hpp \
 	hep/ps/dipole.hpp \
+	hep/ps/dipole_invariants.hpp \
 	hep/ps/dipole_type.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/particle_type.hpp \

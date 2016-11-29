@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_DIPOLE_INVARIANTS_HPP
+#define HEP_PS_DIPOLE_INVARIANTS_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,22 +19,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+template <typename T>
+struct dipole_invariants
+{
+	dipole_invariants() = default;
+
+	dipole_invariants(T one, T two, T sij, T adipole)
+		: one(one)
+		, two(two)
+		, sij(sij)
+		, adipole(adipole)
+	{
+	}
+
+	T one;
+	T two;
+	T sij;
+	T adipole;
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_invariants.hpp"
-#include "hep/ps/dipole_type.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/particle_type.hpp"
-#include "hep/ps/scales.hpp"
 
 #endif
