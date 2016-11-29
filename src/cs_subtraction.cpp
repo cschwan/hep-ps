@@ -223,7 +223,7 @@ T cs_subtraction<T>::fermion_function(
 	dipole_invariants<T> const& invariants
 ) {
 	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
-	T const factor = T(8.0) * std::acos(T(-1.0)) * cf;
+	T factor = T(8.0) * std::acos(T(-1.0)) * cf;
 
 	T dipole;
 	T propagator;
@@ -278,6 +278,7 @@ T cs_subtraction<T>::fermion_function(
 
 		if (dipole_info.unresolved_type() == particle_type::fermion)
 		{
+			factor = T(8.0) * std::acos(T(-1.0)) * tf_;
 			dipole = T(1.0) - T(2.0) * x * (T(1.0) - x);
 		}
 		else
