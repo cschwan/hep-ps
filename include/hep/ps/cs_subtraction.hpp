@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_CS_SUBTRACTION_HPP
+#define HEP_PS_CS_SUBTRACTION_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,26 +19,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
-{
-
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
-
-}
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/cs_subtraction.hpp"
-#include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
-#include "hep/ps/dipole_type.hpp"
-#include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_array.hpp"
-#include "hep/ps/initial_state_set.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/particle_type.hpp"
-#include "hep/ps/scales.hpp"
+
+#include <vector>
+
+namespace hep
+{
+
+template <typename T>
+class cs_subtraction
+{
+public:
+	cs_subtraction(T n, T tf);
+
+	dipole_invariants<T> map_phase_space(
+		std::vector<T> const& real_phase_space,
+		std::vector<T>& born_phase_space,
+		dipole const& dipole_info
+	);
+
+	T fermion_function(
+		dipole const& dipole_info,
+		dipole_invariants<T> const& invariants
+	);
+
+private:
+	T n_;
+	T tf_;
+};
+
+}
 
 #endif

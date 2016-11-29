@@ -1,6 +1,7 @@
 nobase_include_HEADERS = \
 	hep/ps.hpp \
 	hep/ps/constants.hpp \
+	hep/ps/cs_subtraction.hpp \
 	hep/ps/cut_result.hpp \
 	hep/ps/dipole.hpp \
 	hep/ps/dipole_invariants.hpp \
