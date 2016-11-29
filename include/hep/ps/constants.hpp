@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_CONSTANTS_HPP
+#define HEP_PS_CONSTANTS_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,16 +19,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+template <typename T>
+struct constants
+{
+	/// The value of \f$ ( \hbar c )^2 \f$ in \f$ \text{GeV}^2 \text{pbarn} \f$
+	/// from the 2016 edition of the PDG booklet.
+	static constexpr T hbarc2 = T(3.893793656e8);
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
 
 #endif
