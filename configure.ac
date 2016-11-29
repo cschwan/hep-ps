@@ -37,6 +37,7 @@ AC_CONFIG_FILES([
 	Makefile
 	include/Makefile
 	src/Makefile
+	tests/Makefile
 ])
 
 # write configure script
