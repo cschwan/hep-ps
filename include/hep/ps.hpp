@@ -38,6 +38,7 @@ void find_hep_ps();
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/observables_real.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/real_minus_dipoles.hpp"

@@ -22,6 +22,39 @@ namespace
 {
 
 template <typename T>
+class test_luminosities
+{
+public:
+	test_luminosities(hep::initial_state_set set)
+		: set_(set)
+	{
+	}
+
+	hep::initial_state_array<T> pdfs(T x1, T x2, T)
+	{
+		REQUIRE( x1 >= T() );
+		REQUIRE( x1 < T(1.0) );
+		REQUIRE( x2 >= T() );
+		REQUIRE( x2 < T(1.0) );
+
+		hep::initial_state_array<T> result;
+
+		for (auto const process : hep::initial_state_list())
+		{
+			if (set_.includes(process))
+			{
+				result.set(process, T(1.0));
+			}
+		}
+
+		return result;
+	}
+
+private:
+	hep::initial_state_set set_;
+};
+
+template <typename T>
 class test_matrix_elements
 {
 public:
@@ -93,6 +126,10 @@ public:
 		std::vector<std::size_t> indices(final_states_);
 		std::iota(indices.begin(), indices.end(), 2);
 		return indices;
+	}
+
+	void set_scales(hep::scales<T> const&, test_luminosities<T>&)
+	{
 	}
 
 private:
@@ -213,6 +250,18 @@ public:
 
 private:
 	std::size_t final_states_;
+};
+
+template <typename T>
+class test_scale_setter
+{
+public:
+	static constexpr T scale = T(1.0);
+
+	hep::scales<T> operator()(std::vector<T> const&)
+	{
+		return { scale , scale };
+	}
 };
 
 }

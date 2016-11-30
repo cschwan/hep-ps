@@ -1,5 +1,5 @@
-#ifndef HEP_PS_REAL_MINUS_DIPOLES_HPP
-#define HEP_PS_REAL_MINUS_DIPOLES_HPP
+#ifndef HEP_PS_OBSERVABLES_REAL_HPP
+#define HEP_PS_OBSERVABLES_REAL_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -73,20 +73,26 @@ inline bool cut_required(hep::initial_state state, hep::cut_result cut)
 namespace hep
 {
 
-template <typename T, typename M, typename S, typename C, typename R>
-class real_minus_dipoles
+template <typename T, typename M, typename S, typename C, typename R,
+	typename L, typename U>
+class observables_real
 {
 public:
 	template <
 		typename MatrixElements,
 		typename Subtraction,
 		typename Cuts,
-		typename Recombiner>
-	real_minus_dipoles(
+		typename Recombiner,
+		typename Luminosities,
+		typename ScaleSetter>
+	observables_real(
 		MatrixElements&& matrix_elements,
 		Subtraction&& subtraction,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
+		Luminosities&& luminosities,
+		ScaleSetter&& scale_setter,
+		T conversion_constant,
 		bool inclusive,
 		T alpha_min
 	)
@@ -94,19 +100,27 @@ public:
 		, subtraction_(std::forward<Subtraction>(subtraction))
 		, cuts_(std::forward<Cuts>(cuts))
 		, recombiner_(std::forward<Recombiner>(recombiner))
+		, luminosities_(std::forward<Luminosities>(luminosities))
+		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
+		, conversion_constant_(conversion_constant)
 		, inclusive_(inclusive)
 		, alpha_min_(alpha_min)
 	{
 	}
 
-	initial_state_array<T> operator()(
+	T operator()(
 		std::vector<T> const& real_phase_space,
 		luminosity_info<T> const& info,
 		initial_state_set set
 	) {
 		// TODO: generate distributions
+		// TODO: check if scale has changed from last time and avoid the
+		// potentially expansive `set_scales` call if not
 
-		initial_state_array<T> result;
+		auto const scales = scale_setter_(real_phase_space);
+		matrix_elements_.set_scales(scales, luminosities_);
+
+		initial_state_array<T> reals;
 		std::vector<T> aux_phase_phase(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -128,7 +142,7 @@ public:
 
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
-				result = matrix_elements_.reals(real_phase_space, set);
+				reals = matrix_elements_.reals(real_phase_space, set);
 
 				if (cut_result.neg_cutted() || cut_result.pos_cutted())
 				{
@@ -136,7 +150,7 @@ public:
 					{
 						if (cut_required(process, cut_result))
 						{
-							result.set(process, T());
+							reals.set(process, T());
 						}
 					}
 				}
@@ -159,7 +173,7 @@ public:
 
 				if (invariants.adipole < alpha_min_)
 				{
-					result.set(process, T());
+					reals.set(process, T());
 					break;
 				}
 
@@ -215,9 +229,23 @@ public:
 					dipole);
 				T const dipole_result = -function * me;
 
-				result.set(process, result.get(process) + dipole_result);
+				reals.set(process, reals.get(process) + dipole_result);
+
 			}
 		}
+
+		auto const pdfs = luminosities_.pdfs(info.x1(), info.x2(),
+			scales.factorization());
+
+		T result = T();
+
+		for (auto const process : set)
+		{
+			result += pdfs.get(process) * reals.get(process);
+		}
+
+		result *= T(0.5) / info.energy_squared();
+		result *= conversion_constant_;
 
 		return result;
 	}
@@ -237,24 +265,34 @@ private:
 	S subtraction_;
 	C cuts_;
 	R recombiner_;
+	L luminosities_;
+	U scale_setter_;
+	T conversion_constant_;
 	bool inclusive_;
 	T alpha_min_;
 };
 
-template <typename T, typename M, typename S, typename C, typename R>
-inline real_minus_dipoles<T, M, S, C, R> make_real_minus_dipoles(
+template <typename T, typename M, typename S, typename C, typename R,
+	typename L, typename U>
+inline observables_real<T, M, S, C, R, L, U> make_observables_real(
 	M&& matrix_elements,
 	S&& subtraction,
 	C&& cuts,
 	R&& recombiner,
+	L&& luminosities,
+	U&& scale_setter,
+	T conversion_constant,
 	bool inclusive,
 	T alpha_min = T()
 ) {
-	return real_minus_dipoles<T, M, S, C, R>(
+	return observables_real<T, M, S, C, R, L, U>(
 		std::forward<M>(matrix_elements),
 		std::forward<S>(subtraction),
 		std::forward<C>(cuts),
 		std::forward<R>(recombiner),
+		std::forward<L>(luminosities),
+		std::forward<U>(scale_setter),
+		conversion_constant,
 		inclusive,
 		alpha_min
 	);
