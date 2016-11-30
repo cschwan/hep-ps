@@ -9,6 +9,7 @@ nobase_include_HEADERS = \
 	hep/ps/initial_state.hpp \
 	hep/ps/initial_state_array.hpp \
 	hep/ps/initial_state_set.hpp \
+	hep/ps/luminosity_info.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/real_minus_dipoles.hpp \

@@ -22,6 +22,7 @@
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/particle_type.hpp"
 
 #include <algorithm>
@@ -101,7 +102,7 @@ public:
 	template <typename D1, typename D2>
 	initial_state_array<T> operator()(
 		std::vector<T> const& real_phase_space,
-		T rapidity_shift,
+		luminosity_info<T> const& info,
 		initial_state_set set,
 		D1&& real_differential_info,
 		D2&& dipole_differential_info
@@ -118,6 +119,8 @@ public:
 
 		bool const is_real = recombined == 1;
 		bool const is_inclusive = recombined == 0;
+
+		T const rapidity_shift = info.rapidity_shift();
 
 		if (is_real || (inclusive_ && is_inclusive))
 		{
@@ -224,12 +227,12 @@ public:
 
 	initial_state_array<T> operator()(
 		std::vector<T> const& real_phase_space,
-		T rapidity_shift,
+		luminosity_info<T> const& info,
 		initial_state_set set
 	) {
 		return operator()(
 			real_phase_space,
-			rapidity_shift,
+			info,
 			set,
 			[](std::vector<T> const&, initial_state_array<T> const&) {},
 			[](std::vector<T> const&, T) {}

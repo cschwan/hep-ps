@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_LUMINOSITY_INFO_HPP
+#define HEP_PS_LUMINOSITY_INFO_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,28 +19,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+template <typename T>
+class luminosity_info
+{
+public:
+	luminosity_info(T x1, T x2, T energy_squared, T rapidity_shift)
+		: x1_(x1)
+		, x2_(x2)
+		, energy_squared_(energy_squared)
+		, rapidity_shift_(rapidity_shift)
+	{
+	}
+
+	T x1() const
+	{
+		return x1_;
+	}
+
+	T x2() const
+	{
+		return x2_;
+	}
+
+	T energy_squared() const
+	{
+		return energy_squared_;
+	}
+
+	T rapidity_shift() const
+	{
+		return rapidity_shift_;
+	}
+
+private:
+	T x1_;
+	T x2_;
+	T energy_squared_;
+	T rapidity_shift_;
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/cs_subtraction.hpp"
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_invariants.hpp"
-#include "hep/ps/dipole_type.hpp"
-#include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_array.hpp"
-#include "hep/ps/initial_state_set.hpp"
-#include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/particle_type.hpp"
-#include "hep/ps/real_minus_dipoles.hpp"
-#include "hep/ps/scales.hpp"
 
 #endif

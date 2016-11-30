@@ -28,8 +28,9 @@ void test_real_minus_dipoles(
 
 	std::vector<T> phase_space(4 * (count + 2));
 
+	hep::luminosity_info<T> info{T(), T(), T(), T()};
 	T const test_result = T(inclusive ? 0.5 : -0.5);
-	auto result = real_minus_dipoles(phase_space, T(), set);
+	auto result = real_minus_dipoles(phase_space, info, set);
 
 	for (auto const process : hep::initial_state_list())
 	{
