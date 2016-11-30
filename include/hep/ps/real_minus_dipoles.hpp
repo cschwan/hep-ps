@@ -99,14 +99,13 @@ public:
 	{
 	}
 
-	template <typename D1, typename D2>
 	initial_state_array<T> operator()(
 		std::vector<T> const& real_phase_space,
 		luminosity_info<T> const& info,
-		initial_state_set set,
-		D1&& real_differential_info,
-		D2&& dipole_differential_info
+		initial_state_set set
 	) {
+		// TODO: generate distributions
+
 		initial_state_array<T> result;
 		std::vector<T> aux_phase_phase(real_phase_space.size());
 
@@ -130,7 +129,6 @@ public:
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
 				result = matrix_elements_.reals(real_phase_space, set);
-				real_differential_info(aux_phase_phase, result);
 
 				if (cut_result.neg_cutted() || cut_result.pos_cutted())
 				{
@@ -218,25 +216,10 @@ public:
 				T const dipole_result = -function * me;
 
 				result.set(process, result.get(process) + dipole_result);
-				dipole_differential_info(aux_phase_phase, dipole_result);
 			}
 		}
 
 		return result;
-	}
-
-	initial_state_array<T> operator()(
-		std::vector<T> const& real_phase_space,
-		luminosity_info<T> const& info,
-		initial_state_set set
-	) {
-		return operator()(
-			real_phase_space,
-			info,
-			set,
-			[](std::vector<T> const&, initial_state_array<T> const&) {},
-			[](std::vector<T> const&, T) {}
-		);
 	}
 
 	M const& matrix_elements() const
