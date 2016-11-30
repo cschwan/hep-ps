@@ -24,7 +24,9 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <limits>
+#include <numeric>
 #include <type_traits>
 #include <utility>
 
@@ -129,6 +131,14 @@ public:
 
 	initial_state_set()
 		: set_{}
+	{
+	}
+
+	initial_state_set(std::initializer_list<initial_state> list)
+		: set_(std::accumulate(list.begin(), list.end(), 0u,
+			[](std::size_t set, initial_state state) {
+				return set | (1 << static_cast <std::size_t> (state));
+		  }))
 	{
 	}
 
