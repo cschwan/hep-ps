@@ -113,7 +113,7 @@ public:
 			real_phase_space,
 			aux_phase_phase,
 			matrix_elements_.recombination_candidates(),
-			inclusive_
+			1
 		);
 
 		bool const is_real = recombined == 1;
