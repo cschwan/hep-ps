@@ -40,8 +40,7 @@ void test_observables_real(
 
 TEST_CASE("real_minus_dipoles", "[real_minus_dipoles]")
 {
-	hep::initial_state_set set;
-	set.add(hep::initial_state::q43_cu);
+	hep::initial_state_set set{hep::initial_state::q43_cu};
 
 	test_observables_real(set, 4, 2, 3, 0, true);
 	test_observables_real(set, 4, 2, 3, 0, false);
