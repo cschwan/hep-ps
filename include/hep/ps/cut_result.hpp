@@ -25,18 +25,18 @@ namespace hep
 class cut_result
 {
 public:
-	cut_result(bool neg_cutted, bool pos_cutted)
+	constexpr cut_result(bool neg_cutted, bool pos_cutted)
 		: neg_cutted_(neg_cutted)
 		, pos_cutted_(pos_cutted)
 	{
 	}
 
-	bool neg_cutted() const
+	constexpr bool neg_cutted() const
 	{
 		return neg_cutted_;
 	}
 
-	bool pos_cutted() const
+	constexpr bool pos_cutted() const
 	{
 		return pos_cutted_;
 	}
