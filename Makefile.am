@@ -2,4 +2,5 @@ ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = NEWS.rst README.rst
 
-SUBDIRS = include src tests
+# `doc` must be built after `include`
+SUBDIRS = include doc src tests
