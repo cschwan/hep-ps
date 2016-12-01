@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PS_HPP
-#define HEP_PS_PS_HPP
+#ifndef HEP_PS_NO_CUTTER_HPP
+#define HEP_PS_NO_CUTTER_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,31 +19,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
+#include "hep/ps/cut_result.hpp"
+
+#include <vector>
+
+namespace hep
 {
 
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
+/// Helper class that never cuts any phase space point. This is useful for
+/// testing.
+template <typename T>
+class no_cutter
+{
+public:
+	/// Always returns `false` for positive and negative rapidity shifts.
+	cut_result cut(
+		std::vector<T> const& phase_space,
+		T rapidity_shift,
+		bool inclusive_event
+	);
+};
 
 }
-
-#include "hep/ps/constants.hpp"
-#include "hep/ps/cs_subtraction.hpp"
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_invariants.hpp"
-#include "hep/ps/dipole_type.hpp"
-#include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_array.hpp"
-#include "hep/ps/initial_state_set.hpp"
-#include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/no_cutter.hpp"
-#include "hep/ps/observables_real.hpp"
-#include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/particle_type.hpp"
-#include "hep/ps/pp_luminosities.hpp"
-#include "hep/ps/real_minus_dipoles.hpp"
-#include "hep/ps/scales.hpp"
 
 #endif

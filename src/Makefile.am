@@ -4,5 +4,6 @@ lib_LTLIBRARIES = libhep-ps.la
 libhep_ps_la_SOURCES = \
 	cs_subtraction.cpp \
 	find_hep_ps.cpp \
+	no_cutter.cpp \
 	p_type_jet_algorithm.cpp \
 	pp_luminosities.cpp

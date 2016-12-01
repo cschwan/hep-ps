@@ -10,6 +10,7 @@ nobase_include_HEADERS = \
 	hep/ps/initial_state_array.hpp \
 	hep/ps/initial_state_set.hpp \
 	hep/ps/luminosity_info.hpp \
+	hep/ps/no_cutter.hpp \
 	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/pp_luminosities.hpp \
