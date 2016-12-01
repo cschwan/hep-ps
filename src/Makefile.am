@@ -5,5 +5,6 @@ libhep_ps_la_SOURCES = \
 	cs_subtraction.cpp \
 	find_hep_ps.cpp \
 	no_cutter.cpp \
+	no_recombiner.cpp \
 	p_type_jet_algorithm.cpp \
 	pp_luminosities.cpp
