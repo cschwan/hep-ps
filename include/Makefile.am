@@ -12,6 +12,7 @@ nobase_include_HEADERS = \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
+	hep/ps/pp_luminosities.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/scales.hpp
 

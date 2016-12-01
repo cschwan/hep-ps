@@ -32,6 +32,11 @@ AC_CONFIG_SRCDIR([src/find_hep_ps.cpp])
 # that we dont need
 AC_CONFIG_HEADERS([config.hpp])
 
+# find LHAPDF header and library
+AC_CHECK_HEADERS([LHAPDF/LHAPDF.h])
+AC_SEARCH_LIBS([_ZN6LHAPDF5mkPDFERKSsi], [LHAPDF], [],
+	AC_MSG_ERROR([LHAPDF is a required dependency]))
+
 # configure Makefiles and Doxyfile
 AC_CONFIG_FILES([
 	Makefile
