@@ -96,11 +96,6 @@ public:
 			hep::particle_type::fermion, hep::dipole_type::final_initial) };
 	}
 
-	std::array<hep::initial_state_set, 1> initial_state_sets() const
-	{
-		return { set_ };
-	}
-
 	hep::initial_state_array<T> reals(
 		std::vector<T> const& real_phase_space,
 		hep::initial_state_set set
