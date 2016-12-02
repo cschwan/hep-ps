@@ -114,6 +114,9 @@ public:
 		// TODO: check if scale has changed from last time and avoid the
 		// potentially expansive `set_scales` call if not
 
+		// is `true` if neither real matrix elements nor dipoles are active
+		bool zero_event = true;
+
 		auto const scales = scale_setter_(real_phase_space);
 		matrix_elements_.set_scales(scales, luminosities_);
 
@@ -139,6 +142,7 @@ public:
 
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
+				zero_event = false;
 				reals = matrix_elements_.reals(real_phase_space, set);
 
 				if (cut_result.neg_cutted() || cut_result.pos_cutted())
@@ -199,6 +203,8 @@ public:
 					continue;
 				}
 
+				zero_event = false;
+
 				bool const fermion_i = dipole.emitter_type() ==
 					particle_type::fermion;
 				bool const fermion_j = dipole.unresolved_type() ==
@@ -231,14 +237,20 @@ public:
 			}
 		}
 
-		auto const pdfs = luminosities_.pdfs(info.x1(), info.x2(),
+		// early exit to avoid the evaluation of luminosities
+		if (zero_event)
+		{
+			return T();
+		}
+
+		auto const lumis = luminosities_.pdfs(info.x1(), info.x2(),
 			scales.factorization());
 
 		T result = T();
 
 		for (auto const process : set)
 		{
-			result += pdfs.get(process) * reals.get(process);
+			result += lumis.get(process) * reals.get(process);
 		}
 
 		result *= T(0.5) / info.energy_squared();
