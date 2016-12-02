@@ -58,14 +58,11 @@ inline std::vector<std::size_t> adjust_indices(
 	return result;
 }
 
+// TODO: Make `constexpr` in C++14
 inline bool cut_required(hep::initial_state state, hep::cut_result cut)
 {
-	bool const neg = cut.neg_cutted();
-	bool const pos = cut.pos_cutted();
-
-	return (hep::same_initial_states(state) && neg && pos) ||
-		(hep::is_negative_ordering(state) && neg) ||
-		(hep::is_positive_ordering(state) && pos);
+	return (hep::state_has_neg_shift(state) && cut.neg_cutted()) ||
+		(hep::state_has_pos_shift(state) && cut.pos_cutted());
 }
 
 }

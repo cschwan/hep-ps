@@ -7,6 +7,7 @@ check_LTLIBRARIES = libcatch.la
 noinst_HEADERS = catch.hpp test_structures.hpp
 
 check_PROGRAMS = \
+	test_initial_state \
 	test_observables_real
 
 LDADD = $(check_LTLIBRARIES) $(top_builddir)/src/libhep-ps.la
