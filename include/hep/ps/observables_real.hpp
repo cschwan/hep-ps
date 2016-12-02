@@ -126,7 +126,7 @@ public:
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
 			aux_phase_phase,
-			matrix_elements_.recombination_candidates(),
+			matrix_elements_.real_recombination_candidates(),
 			1
 		);
 
@@ -178,8 +178,8 @@ public:
 					break;
 				}
 
-				auto const dipole_recombination_candidates =
-					adjust_indices(matrix_elements_.recombination_candidates(),
+				auto const dipole_recombination_candidates = adjust_indices(
+						matrix_elements_.real_recombination_candidates(),
 						dipole.unresolved());
 
 				auto const dipole_recombined = recombiner_.recombine(

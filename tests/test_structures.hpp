@@ -116,7 +116,7 @@ public:
 		return result;
 	}
 
-	std::vector<std::size_t> recombination_candidates() const
+	std::vector<std::size_t> real_recombination_candidates() const
 	{
 		std::vector<std::size_t> indices(final_states_);
 		std::iota(indices.begin(), indices.end(), 2);
