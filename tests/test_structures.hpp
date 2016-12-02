@@ -78,7 +78,7 @@ public:
 		hep::initial_state process,
 		hep::dipole const& dipole_info
 	) const {
-		REQUIRE( dipole_phase_space.size() == 4 * (final_states_ + 1) );
+		REQUIRE( dipole_phase_space.size() == 4 * (final_states_ + 2) );
 		REQUIRE( set_.includes(process) );
 		REQUIRE( dipole_info.emitter() == emitter_ );
 		REQUIRE( dipole_info.unresolved() == unresolved_ );
@@ -96,11 +96,11 @@ public:
 			hep::particle_type::fermion, hep::dipole_type::final_initial) };
 	}
 
-	hep::initial_state_array<T> reals(
-		std::vector<T> const& real_phase_space,
+	hep::initial_state_array<T> borns(
+		std::vector<T> const& phase_space,
 		hep::initial_state_set set
 	) const {
-		REQUIRE( real_phase_space.size() == 4 * (final_states_ + 2) );
+		REQUIRE( phase_space.size() == 4 * (final_states_ + 2) );
 		REQUIRE( set == set_ );
 
 		hep::initial_state_array<T> result;
@@ -116,9 +116,36 @@ public:
 		return result;
 	}
 
-	std::vector<std::size_t> real_recombination_candidates() const
+	hep::initial_state_array<T> reals(
+		std::vector<T> const& real_phase_space,
+		hep::initial_state_set set
+	) const {
+		REQUIRE( real_phase_space.size() == 4 * (final_states_ + 3) );
+		REQUIRE( set == set_ );
+
+		hep::initial_state_array<T> result;
+
+		for (auto const process : hep::initial_state_list())
+		{
+			if (set.includes(process))
+			{
+				result.set(process, T(1.0));
+			}
+		}
+
+		return result;
+	}
+
+	std::vector<std::size_t> born_recombination_candidates() const
 	{
 		std::vector<std::size_t> indices(final_states_);
+		std::iota(indices.begin(), indices.end(), 2);
+		return indices;
+	}
+
+	std::vector<std::size_t> real_recombination_candidates() const
+	{
+		std::vector<std::size_t> indices(final_states_ + 1);
 		std::iota(indices.begin(), indices.end(), 2);
 		return indices;
 	}
@@ -198,11 +225,11 @@ public:
 	{
 		if (inclusive_event)
 		{
-			REQUIRE( phase_space.size() == 4 * (final_states_ + 2) );
+			REQUIRE( phase_space.size() == 4 * (final_states_ + 3) );
 		}
 		else
 		{
-			REQUIRE( phase_space.size() == 4 * (final_states_ + 1) );
+			REQUIRE( phase_space.size() == 4 * (final_states_ + 2) );
 		}
 
 		return { false, false };
