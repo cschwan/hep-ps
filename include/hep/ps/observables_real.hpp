@@ -121,11 +121,11 @@ public:
 		matrix_elements_.set_scales(scales, luminosities_);
 
 		initial_state_array<T> reals;
-		std::vector<T> aux_phase_phase(real_phase_space.size());
+		std::vector<T> phase_phase(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
-			aux_phase_phase,
+			phase_phase,
 			matrix_elements_.real_recombination_candidates(),
 			1
 		);
@@ -133,12 +133,11 @@ public:
 		bool const is_real = recombined == 1;
 		bool const is_inclusive = recombined == 0;
 
-		T const rapidity_shift = info.rapidity_shift();
+		T const shift = info.rapidity_shift();
 
 		if (is_real || (inclusive_ && is_inclusive))
 		{
-			auto const cut_result = cuts_.cut(aux_phase_phase, rapidity_shift,
-				is_inclusive);
+			auto const cut_result = cuts_.cut(phase_phase, shift, is_inclusive);
 
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
@@ -158,7 +157,7 @@ public:
 			}
 		}
 
-		aux_phase_phase.resize(real_phase_space.size() - 4);
+		phase_phase.resize(real_phase_space.size() - 4);
 
 		// TODO: check for the same dipoles and calculate them only once
 
@@ -170,7 +169,7 @@ public:
 			{
 				// map the real phase space on the dipole phase space
 				auto const invariants = subtraction_.map_phase_space(
-					real_phase_space, aux_phase_phase, dipole);
+					real_phase_space, phase_phase, dipole);
 
 				if (invariants.adipole < alpha_min_)
 				{
@@ -183,8 +182,8 @@ public:
 						dipole.unresolved());
 
 				auto const dipole_recombined = recombiner_.recombine(
-					aux_phase_phase,
-					aux_phase_phase,
+					phase_phase,
+					phase_phase,
 					dipole_recombination_candidates,
 					0
 				);
@@ -195,8 +194,7 @@ public:
 					continue;
 				}
 
-				auto const cut_result = cuts_.cut(aux_phase_phase,
-					rapidity_shift, false);
+				auto const cut_result = cuts_.cut(phase_phase, shift, false);
 
 				if (cut_required(process, cut_result))
 				{
@@ -210,12 +208,11 @@ public:
 				bool const fermion_j = dipole.unresolved_type() ==
 					particle_type::fermion;
 
-				T function;
+				T factor;
 
 				if (fermion_i != fermion_j)
 				{
-					function = subtraction_.fermion_function(dipole,
-						invariants);
+					factor = subtraction_.fermion_function(dipole, invariants);
 				}
 				else if (fermion_i && fermion_j)
 				{
@@ -228,9 +225,9 @@ public:
 					assert( false );
 				}
 
-				T const me = matrix_elements_.dipole(aux_phase_phase, process,
+				T const me = matrix_elements_.dipole(phase_phase, process,
 					dipole);
-				T const dipole_result = -function * me;
+				T const dipole_result = -factor * me;
 
 				reals.set(process, reals.get(process) + dipole_result);
 
