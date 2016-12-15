@@ -94,6 +94,10 @@ private:
 	dipole_type type_;
 };
 
+bool operator<(dipole const& a, dipole const& b);
+
+bool operator==(dipole const& a, dipole const& b);
+
 }
 
 #endif
