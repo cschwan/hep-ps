@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <iterator>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 namespace
@@ -70,8 +71,7 @@ inline bool cut_required(hep::initial_state state, hep::cut_result cut)
 namespace hep
 {
 
-template <typename T, typename M, typename S, typename C, typename R,
-	typename L, typename U>
+template <class T, class M, class S, class C, class R, class L, class U>
 class observables_real
 {
 public:
@@ -278,9 +278,14 @@ private:
 	T alpha_min_;
 };
 
-template <typename T, typename M, typename S, typename C, typename R,
-	typename L, typename U>
-inline observables_real<T, M, S, C, R, L, U> make_observables_real(
+template <class T, class M, class S, class C, class R, class L, class U>
+using observables_real_type = observables_real<T,
+	typename std::decay<M>::type, typename std::decay<S>::type,
+	typename std::decay<C>::type, typename std::decay<R>::type,
+	typename std::decay<L>::type, typename std::decay<U>::type>;
+
+template <class T, class M, class S, class C, class R, class L, class U>
+inline observables_real_type<T, M, S, C, R, L, U> make_observables_real(
 	M&& matrix_elements,
 	S&& subtraction,
 	C&& cuts,
@@ -291,7 +296,7 @@ inline observables_real<T, M, S, C, R, L, U> make_observables_real(
 	bool inclusive,
 	T alpha_min = T()
 ) {
-	return observables_real<T, M, S, C, R, L, U>(
+	return observables_real_type<T, M, S, C, R, L, U>(
 		std::forward<M>(matrix_elements),
 		std::forward<S>(subtraction),
 		std::forward<C>(cuts),

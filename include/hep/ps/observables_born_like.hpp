@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <iterator>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 namespace
@@ -47,8 +48,7 @@ inline bool cut_required(hep::initial_state state, hep::cut_result cut)
 namespace hep
 {
 
-template <typename T, typename M, typename C, typename R, typename L,
-	typename S>
+template <class T, class M, class C, class R, class L, class S>
 class observables_born_like
 {
 public:
@@ -154,9 +154,14 @@ private:
 	T conversion_constant_;
 };
 
-template <typename T, typename M, typename C, typename R, typename L,
-	typename S>
-inline observables_born_like<T, M, C, R, L, S> make_observables_born_like(
+template <class T, class M, class C, class R, class L, class S>
+using observables_born_like_type = observables_born_like<T,
+	typename std::decay<M>::type, typename std::decay<C>::type,
+	typename std::decay<R>::type, typename std::decay<L>::type,
+	typename std::decay<S>::type>;
+
+template <class T, class M, class C, class R, class L, class S>
+inline observables_born_like_type <T, M, C, R, L, S> make_observables_born_like(
 	M&& matrix_elements,
 	C&& cuts,
 	R&& recombiner,
@@ -164,7 +169,7 @@ inline observables_born_like<T, M, C, R, L, S> make_observables_born_like(
 	S&& scale_setter,
 	T conversion_constant
 ) {
-	return observables_born_like<T, M, C, R, L, S>(
+	return observables_born_like_type<T, M, C, R, L, S>(
 		std::forward<M>(matrix_elements),
 		std::forward<C>(cuts),
 		std::forward<R>(recombiner),
