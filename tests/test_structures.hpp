@@ -150,7 +150,7 @@ public:
 		return indices;
 	}
 
-	void set_scales(hep::scales<T> const&, test_luminosities<T>&)
+	void scale(T, test_luminosities<T>&)
 	{
 	}
 

@@ -105,7 +105,14 @@ public:
 		}
 
 		auto const scales = scale_setter_(phase_space);
-		matrix_elements_.set_scales(scales, luminosities_);
+
+		// only set renormalization scale if it changed
+		if (scales.renormalization() != old_renormalization_scale_)
+		{
+			matrix_elements_.scale(scales.renormalization(), luminosities_);
+			old_renormalization_scale_ = scales.renormalization();
+		}
+
 		auto borns = matrix_elements_.borns(phase_space, set);
 
 		if (cut_result.neg_cutted() || cut_result.pos_cutted())
@@ -152,6 +159,8 @@ private:
 	L luminosities_;
 	S scale_setter_;
 	T conversion_constant_;
+
+	T old_renormalization_scale_;
 };
 
 template <class T, class M, class C, class R, class L, class S>

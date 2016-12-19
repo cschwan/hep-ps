@@ -111,14 +111,18 @@ public:
 		initial_state_set set
 	) {
 		// TODO: generate distributions
-		// TODO: check if scale has changed from last time and avoid the
-		// potentially expansive `set_scales` call if not
 
 		// is `true` if neither real matrix elements nor dipoles are active
 		bool zero_event = true;
 
 		auto const scales = scale_setter_(real_phase_space);
-		matrix_elements_.set_scales(scales, luminosities_);
+
+		// only set renormalization scale if it changed
+		if (scales.renormalization() != old_renormalization_scale_)
+		{
+			matrix_elements_.scale(scales.renormalization(), luminosities_);
+			old_renormalization_scale_ = scales.renormalization();
+		}
 
 		initial_state_array<T> reals;
 		std::vector<T> phase_phase(real_phase_space.size());
@@ -276,6 +280,8 @@ private:
 	T conversion_constant_;
 	bool inclusive_;
 	T alpha_min_;
+
+	T old_renormalization_scale_;
 };
 
 template <class T, class M, class S, class C, class R, class L, class U>
