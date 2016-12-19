@@ -64,14 +64,14 @@ public:
 		Recombiner&& recombiner,
 		Luminosities&& luminosities,
 		ScaleSetter&& scale_setter,
-		T conversion_constant
+		T hbarc2
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
 		, cuts_(std::forward<Cuts>(cuts))
 		, recombiner_(std::forward<Recombiner>(recombiner))
 		, luminosities_(std::forward<Luminosities>(luminosities))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
-		, conversion_constant_(conversion_constant)
+		, hbarc2_(hbarc2)
 	{
 	}
 
@@ -131,7 +131,7 @@ public:
 
 		T result = fold(pdfs, borns, set);
 		result *= T(0.5) / info.energy_squared();
-		result *= conversion_constant_;
+		result *= hbarc2_;
 
 		return result;
 	}
@@ -152,7 +152,7 @@ private:
 	R recombiner_;
 	L luminosities_;
 	S scale_setter_;
-	T conversion_constant_;
+	T hbarc2_;
 
 	T old_renormalization_scale_;
 };
@@ -170,7 +170,7 @@ inline observables_born_like_type <T, M, C, R, L, S> make_observables_born_like(
 	R&& recombiner,
 	L&& luminosities,
 	S&& scale_setter,
-	T conversion_constant
+	T hbarc2
 ) {
 	return observables_born_like_type<T, M, C, R, L, S>(
 		std::forward<M>(matrix_elements),
@@ -178,7 +178,7 @@ inline observables_born_like_type <T, M, C, R, L, S> make_observables_born_like(
 		std::forward<R>(recombiner),
 		std::forward<L>(luminosities),
 		std::forward<S>(scale_setter),
-		conversion_constant
+		hbarc2
 	);
 }
 

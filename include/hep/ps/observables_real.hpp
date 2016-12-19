@@ -89,7 +89,7 @@ public:
 		Recombiner&& recombiner,
 		Luminosities&& luminosities,
 		ScaleSetter&& scale_setter,
-		T conversion_constant,
+		T hbarc2,
 		bool inclusive,
 		T alpha_min
 	)
@@ -99,7 +99,7 @@ public:
 		, recombiner_(std::forward<Recombiner>(recombiner))
 		, luminosities_(std::forward<Luminosities>(luminosities))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
-		, conversion_constant_(conversion_constant)
+		, hbarc2_(hbarc2)
 		, inclusive_(inclusive)
 		, alpha_min_(alpha_min)
 	{
@@ -249,7 +249,7 @@ public:
 
 		T result = fold(lumis, reals, set);
 		result *= T(0.5) / info.energy_squared();
-		result *= conversion_constant_;
+		result *= hbarc2_;
 
 		return result;
 	}
@@ -271,7 +271,7 @@ private:
 	R recombiner_;
 	L luminosities_;
 	U scale_setter_;
-	T conversion_constant_;
+	T hbarc2_;
 	bool inclusive_;
 	T alpha_min_;
 
@@ -292,7 +292,7 @@ inline observables_real_type<T, M, S, C, R, L, U> make_observables_real(
 	R&& recombiner,
 	L&& luminosities,
 	U&& scale_setter,
-	T conversion_constant,
+	T hbarc2,
 	bool inclusive,
 	T alpha_min = T()
 ) {
@@ -303,7 +303,7 @@ inline observables_real_type<T, M, S, C, R, L, U> make_observables_real(
 		std::forward<R>(recombiner),
 		std::forward<L>(luminosities),
 		std::forward<U>(scale_setter),
-		conversion_constant,
+		hbarc2,
 		inclusive,
 		alpha_min
 	);
