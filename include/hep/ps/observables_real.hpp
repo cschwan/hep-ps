@@ -247,13 +247,7 @@ public:
 		auto const lumis = luminosities_.pdfs(info.x1(), info.x2(),
 			scales.factorization());
 
-		T result = T();
-
-		for (auto const process : set)
-		{
-			result += lumis.get(process) * reals.get(process);
-		}
-
+		T result = fold(lumis, reals, set);
 		result *= T(0.5) / info.energy_squared();
 		result *= conversion_constant_;
 

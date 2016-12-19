@@ -129,13 +129,7 @@ public:
 		auto const pdfs = luminosities_.pdfs(info.x1(), info.x2(),
 			scales.factorization());
 
-		T result = T();
-
-		for (auto const process : set)
-		{
-			result += pdfs.get(process) * borns.get(process);
-		}
-
+		T result = fold(pdfs, borns, set);
 		result *= T(0.5) / info.energy_squared();
 		result *= conversion_constant_;
 

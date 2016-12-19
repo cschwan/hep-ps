@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/initial_state.hpp"
+#include "hep/ps/initial_state_set.hpp"
 
 #include <array>
 #include <cstddef>
@@ -52,6 +53,22 @@ public:
 private:
 	initial_state_array_<T> array_;
 };
+
+template <typename T>
+inline T fold(
+	initial_state_array<T> const& a,
+	initial_state_array<T> const& b,
+	initial_state_set set
+) {
+	T result{};
+
+	for (auto const state : set)
+	{
+		result += a.get(state) * b.get(state);
+	}
+
+	return result;
+}
 
 }
 
