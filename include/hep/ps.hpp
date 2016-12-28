@@ -37,6 +37,7 @@ void find_hep_ps();
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/kaellen.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/no_cutter.hpp"
 #include "hep/ps/no_recombiner.h"

@@ -9,6 +9,7 @@ nobase_include_HEADERS = \
 	hep/ps/initial_state.hpp \
 	hep/ps/initial_state_array.hpp \
 	hep/ps/initial_state_set.hpp \
+	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/no_cutter.hpp \
 	hep/ps/no_recombiner.hpp \
