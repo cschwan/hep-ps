@@ -38,7 +38,7 @@ void test_observables_real(
 	REQUIRE( result == test_result );
 }
 
-TEST_CASE("real_minus_dipoles", "[real_minus_dipoles]")
+TEST_CASE("observables_real", "[observables_real]")
 {
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
