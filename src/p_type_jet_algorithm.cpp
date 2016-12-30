@@ -124,7 +124,8 @@ bool find_jet(
 	std::size_t j = 1;
 
 	// TODO: find a way to remove the loop
-	while ((distance - reconstruct_distance(n, i, j)) >= (n - i - 1))
+	while ((distance - reconstruct_distance(n, i, j)) >=
+		static_cast <std::ptrdiff_t> (n - i - 1))
 	{
 		++i;
 		++j;
