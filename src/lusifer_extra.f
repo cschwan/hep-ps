@@ -1,7 +1,7 @@
       subroutine generatormax(maxex,maxgen)
       implicit none
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       integer maxex,maxgen
 
       maxex = maxe
@@ -11,7 +11,7 @@
       subroutine generatordata(gen,nch)
       implicit none
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
       integer nchannel(maxg),nexternal(maxg),allbinary(maxg)
@@ -25,7 +25,7 @@
       subroutine generatorset(gen,nex,mw,gw,mz,gz,mh,gh,mt,gt)
       implicit none
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
       integer nchannel(maxg),nexternal(maxg),allbinary(maxg)

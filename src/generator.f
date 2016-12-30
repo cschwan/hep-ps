@@ -10,7 +10,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       real*8 random(3*maxe-10),k(maxe,0:3),kbeam(2,0:3),g
       real*8 mmin,mmax,smin,smax,x1,x2
       integer i1,i2,i3,i4,ns,nt,channel,generator,switch
@@ -184,7 +184,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       real*8 random(3*maxe-10),ginv(maxch),gprocess(maxch)
       real*8 gdecay(maxch),k(maxe,0:3),kbeam(2,0:3),x1,x2
       real*8 g(maxch),help,mmin,mmax,smin,smax,lambda,s1,s2
@@ -340,7 +340,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv,maxo
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40,maxo=20)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40,maxo=20)
       real*8 power(maxv),m2,m3,e2,e3,scutinv,pi,gamma
       integer idhep(maxe,maxe),binary(maxe,maxe),idhep2,idhep3
       integer i1,i2,i3,ns,nt,maxns,maxnt,binary1,binary2,binary3
@@ -985,7 +985,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv,maxo
-      parameter(maxe=8,maxch=20000,maxg=1)
+      parameter(maxe=9,maxch=20000,maxg=1)
       integer ns1,ns2,ch1,ch2,generator
       logical comparedecay
 c cdecay
@@ -1012,7 +1012,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv,maxo
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       integer ns1,ns2,ch1,ch2,generator,idhep1,idhep2
       logical compareprocess
 c general
@@ -1057,7 +1057,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv,maxo
-      parameter(maxe=8,maxch=20000,maxg=1,maxv=40)
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       integer i1,i2,ns1,ns2,ch1,ch2,generator,idhep1,idhep2
       logical compareinv,included
 c general
@@ -1723,248 +1723,3 @@ c local variables
         endif
       enddo
       end
-
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     adaptive optimization                                       c
-c                                                                 c
-c     written by Markus Roth                                      c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine optimization(weight,g,gsum,n,generator,nchannel)
-      implicit none
-c local variables
-      integer maxch,maxo,maxg
-      parameter(maxch=20000,maxo=20,maxg=1)
-      real*8 weight,g(maxch),gsum
-      integer n,nchannel,generator,i1
-c adaptopt
-      real*8 alphaopt(maxch,maxo,maxg),betaopt(0:maxch,maxg)
-      real*8 wi(maxch,maxg)
-      integer nopt(0:maxo,maxg),opt(maxg)
-c output
-      integer nout,numout,maxout
-      common/output/nout,numout,maxout
-      common/adaptopt/alphaopt,betaopt,wi,nopt,opt
-      if(n.le.nopt(opt(generator),generator))then
-        if(weight.ne.0d0.and.gsum.ne.0d0)then
-          do i1=1,nchannel
-            if(g(i1)*gsum.lt.0d0)then
-              if(numout.lt.maxout)then
-                write(nout,'(a)')' optimization: gi*gsum <= 0'
-                numout=numout+1
-              endif
-              return
-            else
-              wi(i1,generator)=wi(i1,generator)
-     *          +dsqrt(g(i1)*weight*weight/gsum)
-            endif
-          enddo
-        endif
-        if(n.eq.nopt(opt(generator),generator))then
-          do i1=1,nchannel
-            alphaopt(i1,opt(generator)+1,generator)=
-     *        alphaopt(i1,opt(generator),generator)
-     *          *dsqrt(wi(i1,generator))
-            betaopt(i1,generator)=betaopt(i1-1,generator)
-     *        +alphaopt(i1,opt(generator)+1,generator)
-            wi(i1,generator)=0d0
-          enddo
-          opt(generator)=opt(generator)+1
-          do i1=1,nchannel
-            alphaopt(i1,opt(generator),generator)=
-     *        alphaopt(i1,opt(generator),generator)
-     *        /betaopt(nchannel,generator)
-            betaopt(i1,generator)=betaopt(i1,generator)
-     *        /betaopt(nchannel,generator)
-          enddo
-        endif
-      endif
-      end
-
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     structure function for initial-state radiation              c
-c                                                                 c
-c     written by Markus Roth                                      c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine isr(random,x1,x2,wisr,switch)
-      implicit none
-c local variables
-      real*8 pi,omx,phi(2),random(2),wisr,phi1(2),x,x1,x2,gammae,dli2
-      integer i1,switch
-c cisr
-      real*8 gam,betae
-c output
-      integer nout,numout,maxout
-      common/cisr/gam,betae
-      common/output/nout,numout,maxout
-      parameter(gammae=0.5772156649015328606d0)
-      if(switch.eq.0)return
-      pi=4d0*datan(1d0)
-      do i1=1,2
-        omx=random(i1)**(2d0/betae)
-        x=1d0-omx
-        if(i1.eq.1)x1=x
-        if(i1.eq.2)x2=x
-        if(omx.ne.0d0)then
-          phi1(i1)=0.5d0*betae*omx**(0.5d0*betae-1d0)
-          phi(i1)=dexp(-0.5d0*betae*gammae+3d0/8d0*betae)/gam*phi1(i1)
-     *      -0.25d0*betae*(1d0+x)
-     *      -betae**2/32d0*((1d0+3d0*x*x)/omx*dlog(x)
-     *        +4d0*(1d0+x)*dlog(omx)+5d0+x)
-     *      -betae**3/384d0*((1d0+x)*(6d0*dli2(x)+12d0*dlog(omx)**2
-     *        -3d0*pi*pi)
-     *      +1d0/omx*(1.5d0*(1d0+8d0*x+3d0*x*x)*dlog(x)
-     *        +6d0*(x+5d0)*omx*dlog(omx)
-     *        +12d0*(1d0+x*x)*dlog(x)*dlog(omx)
-     *        -0.5d0*(1d0+7d0*x*x)*dlog(x)**2
-     *        +0.25d0*(39d0-24d0*x-15d0*x*x)))
-        else
-          if(numout.lt.maxout)then
-            write(nout,'(a)')' isr: x=1 '
-            numout=numout+1
-          endif
-          switch=0
-          wisr=0d0
-          return
-        endif
-      enddo
-      wisr=phi(1)*phi(2)/phi1(1)/phi1(2)/x1/x2
-      end
-
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     dilogarithmus with argument between 0 and 1                 c
-c                                                                 c
-c     written by Markus Roth                                      c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function dli2(x)
-      implicit none
-c local variables
-      real*8 x,dli2,dli2gen
-      if(x.ge.0d0.and.x.le.0.5d0)then 
-        dli2=dli2gen(x)
-      elseif(x.gt.0.5d0.and.x.lt.1d0)then 
-        dli2=-dli2gen(1d0-x)-dlog(x)*dlog(1d0-x)+8d0*datan(1d0)**2/3d0
-      elseif(x.eq.1d0)then
-        dli2=8d0*datan(1d0)**2/3d0
-      else
-        write(*,'(a21,d16.10)')' dli2: no case found: ',x
-      endif
-      end
-
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     dilogarithm                                                 c
-c                                                                 c
-c     written by Markus Roth                                      c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function dli2gen(x)
-      implicit none
-c local variables
-      integer n,nb
-      parameter(nb=22)
-      real*8 b(0:nb),error,x,dli2gen,x1,x2,xn,new,dli2new
-      save 
-c error is lower limit of the uncertainty, no message with error=0d0 
-      data error/0d0/
-      data b/1d0,-0.25d0,
-     *       2.7777777777777777777777777777777776d-2,0d0,
-     *       -2.7777777777777777777777777777777778d-4,0d0,
-     *       4.7241118669690098261526832955404383d-6,0d0,
-     *       -9.1857730746619635508524397413286296d-8,0d0,
-     *       1.8978869988970999072009173019274030d-9,0d0,
-     *       -4.0647616451442255268059093862919667d-11,0d0,
-     *       8.9216910204564525552179873167527489d-13,0d0,
-     *       -1.9939295860721075687236443477937898d-14,0d0,
-     *       4.5189800296199181916504765528555929d-16,0d0,
-     *       -1.0356517612181247014483411542218656d-17,0d0,
-     *       2.3952186210261867457402837430009803d-19/
-      x1=-dlog(1d0-x)
-      x2=x1*x1
-      xn=x2*x1
-      dli2gen=b(0)*x1+b(1)*x2+b(2)*xn
-      do n=4,nb,2
-        xn=xn*x2
-        new=b(n)*xn
-        dli2new=dli2gen+new
-        if(dli2new.eq.dli2gen)return
-        dli2gen=dli2new
-      enddo  
-      if(dabs(new/dli2gen).gt.error.and.error.ne.0d0)then
-        error=dabs(new/dli2gen)
-        write(*,'(a25,d16.10)')' dli2gen: converges badly at ',x
-        write(*,'(a)')'         with error ',error
-      endif
-      end
-
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     gamma function                                              c
-c                                                                 c
-c     written by Markus Roth                                      c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function gamma(x)
-      implicit none
-c local variable
-      integer max
-      parameter(max=10)
-      real*8 gamma,x,omx,a(max),prod,pi
-      integer i1
-      pi=4d0*datan(1d0)
-c a(1)=gammae
-      data a/0.5772156649015328606d0,0d0,
-     *       0.4006856343865314285d0,0d0,
-     *       0.2073855510286739853d0,0d0,
-     *       0.1440498967688461181d0,0d0,
-     *       0.1113342658695646905d0,0d0/ 
-c good convergence for small values of 1-x
-      omx=x-1d0
-      gamma=dexp(0.5d0*dlog(omx*pi/dsin(pi*omx)))
-      do i1=1,max,2
-        prod=dexp(-a(i1)*omx**i1)
-        gamma=gamma*prod
-        if(dabs(prod-1d0).lt.1d-10)return
-      enddo
-      write(*,'(a)')' gamma: converges badly'
-      stop
-      end
-
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     pseudo-random number generator                              c
-c                                                                 c
-c     written by Markus Roth                                      c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine rans(ran)
-      implicit none 
-c local variables
-      real*8 s1,s2,s3,ran
-      integer init
-      save init,s1,s2,s3
-      data init/0/,s1/0d0/,s2/0d0/,s3/0d0/
-      if (init.eq.0) then
-        init=1
-        s1=dsqrt(2d0)-1d0
-        s2=dsqrt(3d0)-1d0
-        s3=dsqrt(5d0)-2d0
-      endif
-      s1=dmod(s1+s2+s3,1d0)
-      s2=dmod(s1+s2+s3,1d0)
-      s3=dmod(s1+s2+s3,1d0)
-      ran=s1
-      end  
-
-
-
-
-
-
-
-
