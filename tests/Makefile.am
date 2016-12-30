@@ -7,6 +7,7 @@ check_LTLIBRARIES = libcatch.la
 noinst_HEADERS = catch.hpp test_structures.hpp
 
 check_PROGRAMS = \
+	test_fortran_helper \
 	test_initial_state \
 	test_observables_born_like \
 	test_observables_real

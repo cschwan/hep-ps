@@ -5,6 +5,7 @@ libhep_ps_la_SOURCES = \
 	cs_subtraction.cpp \
 	dipole.cpp \
 	find_hep_ps.cpp \
+	fortran_helper.cpp \
 	no_cutter.cpp \
 	no_recombiner.cpp \
 	p_type_jet_algorithm.cpp \
