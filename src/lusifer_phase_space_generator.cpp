@@ -35,6 +35,7 @@ class lusifer_phase_space_generator<T>::impl
 public:
 	std::size_t channels;
 	std::size_t particles;
+	std::size_t max_particles;
 };
 
 template <typename T>
@@ -56,8 +57,10 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	int maxgen;
 	lusifer_extra_generatormax(&maxex, &maxgen);
 
+	pimpl->max_particles = maxex;
+
 	// the number of particles must be supported by the generator
-	assert( maxex >= static_cast <int> (pimpl->particles) );
+	assert( pimpl->max_particles >= pimpl->particles );
 
 	// FORTRAN counting: use the first generator
 	int generator = 1;
@@ -162,10 +165,22 @@ void lusifer_phase_space_generator<T>::generate(
 	int generator = 1;
 	int switch_ = 1;
 
+	// the vector containing the random numbers must have the maximimum size
+	std::vector<T> random_numbers0;
+	random_numbers0.reserve(3 * (pimpl->max_particles - 4) + 2);
+	random_numbers0 = random_numbers;
+	random_numbers0.resize(3 * (pimpl->max_particles - 4) + 2);
+
+	// the same holds true for the momenta
+	std::vector<T> momenta0;
+	momenta0.reserve(4 * pimpl->max_particles);
+	momenta0 = momenta;
+	momenta0.resize(4 * pimpl->max_particles);
+
 	lusifer_phasespace(
-		random_numbers.data(),
+		random_numbers0.data(),
 		kbeam,
-		momenta.data(),
+		momenta0.data(),
 		&x1,
 		&x2,
 		&g,
@@ -174,7 +189,9 @@ void lusifer_phase_space_generator<T>::generate(
 		&switch_
 	);
 
-	fortran_ordering_to_cpp(momenta);
+	fortran_ordering_to_cpp(momenta0);
+	momenta0.resize(momenta.size());
+	momenta = momenta0;
 }
 
 template <typename T>
