@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libhep-ps.la
 libhep_ps_la_SOURCES = \
@@ -6,7 +6,13 @@ libhep_ps_la_SOURCES = \
 	dipole.cpp \
 	find_hep_ps.cpp \
 	fortran_helper.cpp \
+	generator.f \
+	lusifer_extra.f \
+	lusifer_interfaces.hpp \
+	lusifer_phase_space_generator.cpp \
 	no_cutter.cpp \
 	no_recombiner.cpp \
 	p_type_jet_algorithm.cpp \
 	pp_luminosities.cpp
+
+libhep_ps_la_LIBADD = $(FLIBS)

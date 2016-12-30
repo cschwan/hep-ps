@@ -22,6 +22,15 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 # check for C++11 conforming compiler (autoconf-archive macro)
 AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
 
+# we also need a Fortran 77 compiler
+AC_PROG_F77
+
+# needed for interoperability with C++
+AC_F77_LIBRARY_LDFLAGS
+
+# needed to find out FORTAN signatures
+AC_F77_WRAPPERS
+
 # initialize libtool
 LT_INIT
 

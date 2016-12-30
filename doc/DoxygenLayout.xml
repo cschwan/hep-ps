@@ -10,6 +10,7 @@
       <tab type="namespacemembers" visible="no" title="" intro=""/>
     </tab>
     <tab type="user" url="@ref hep" title="API Listing"/>
+    <tab type="user" url="@ref citelist" title="References"/>
     <tab type="classes" visible="no" title="">
       <tab type="classlist" visible="no" title="" intro=""/>
       <tab type="classindex" visible="no" title=""/>
