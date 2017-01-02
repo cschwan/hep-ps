@@ -1359,7 +1359,7 @@ c techparam
           q(i1)=q1(i1)+q2(i1) 
           k1(i1)=q1(i1)
         enddo
-        call boost(q,k1,1d0,switch)
+        call boost(s,q,k1,1d0,switch)
         if(k1(1).eq.0d0)then
           phi=dsign(pi*0.5d0,k1(2))
         else
@@ -1368,7 +1368,7 @@ c techparam
         if(k1(1).lt.0d0)phi=phi+pi
         cost=k1(3)/dsqrt(k1(1)*k1(1)+k1(2)*k1(2)+k1(3)*k1(3))
         call rotation(p1,-phi,cost,switch)
-        call boost(q,p1,-1d0,switch)        
+        call boost(s,q,p1,-1d0,switch)
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
           qt(i1)=q1(i1)-p1(i1)
@@ -1415,7 +1415,7 @@ c output
         p1(2)=0d0
         p1(3)=lambda*0.5d0/roots
         call rotation(p1,phi,cost,switch)
-        call boost(q,p1,-1d0,switch) 
+        call boost(s,q,p1,-1d0,switch)
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
         enddo
@@ -1552,7 +1552,7 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine boost(q,p,dir,switch)
+      subroutine boost(m2,q,p,dir,switch)
       implicit none
 c local variable
       real*8 p(0:3),q(0:3),dir,m,m2,bx,by,bz,gamma
@@ -1562,7 +1562,6 @@ c output
       integer nout,numout,maxout
       common/output/nout,numout,maxout
       if(switch.eq.0)return
-      m2=q(0)*q(0)-q(1)*q(1)-q(2)*q(2)-q(3)*q(3)
       if(m2.le.0d0)then
         if(numout.lt.maxout)then
           write(nout,'(a)')' boost: m2 <= 0'
