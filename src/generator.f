@@ -335,9 +335,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      *  includecuts,sout)
       implicit none
 c local variables
-      integer maxe,maxch,maxg,maxv,maxo
-      parameter(maxe=9,maxch=20000,maxg=1,maxv=40,maxo=20)
-      real*8 power(maxv),m2,m3,e2,e3,scutinv,pi,gamma
+      integer maxe,maxch,maxg,maxv
+      parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
+      real*8 power(maxv),m2,m3,e2,e3,scutinv
       integer idhep(maxe,maxe),binary(maxe,maxe),idhep2,idhep3
       integer i1,i2,i3,ns,nt,maxns,maxnt,binary1,binary2,binary3
       integer in1(maxe),in2(maxe),out1(maxe),out2(maxe),id,lightfermions
@@ -369,16 +369,10 @@ c cdensity
       integer maxprocess(maxg),nsdecay(maxch,maxg),chdecay(maxch,maxg)
       integer maxdecay(maxg),numinv(maxe,maxch,maxg)
       integer numprocess(maxe,maxch,maxg),numdecay(maxe,maxch,maxg)
-c cisr
-      real*8 gam,betae
 c output
       integer nout,numout,maxout
 c techparam
       real*8 a,techcut
-c adaptopt
-      real*8 alphaopt(maxch,maxo,maxg),betaopt(0:maxch,maxg)
-      real*8 wi(maxch,maxg)
-      integer nopt(0:maxo,maxg),opt(maxg)
 c cuts
       real*8 ecut(maxe),scut(maxe,maxe),ccut(maxe,maxe)
       common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
@@ -390,10 +384,8 @@ c cuts
      *  idhepprocess,nprocess
       common/cdensity/nsinv,chinv,maxinv,ntprocess,chprocess,
      *  maxprocess,nsdecay,chdecay,maxdecay,numinv,numprocess,numdecay
-      common/cisr/gam,betae
       common/output/nout,numout,maxout
       common/techparam/a,techcut
-      common/adaptopt/alphaopt,betaopt,wi,nopt,opt
       common/cuts/ecut,scut,ccut
 c technical parameter in h function and subroutine process
       a=1d-6
@@ -476,14 +468,6 @@ c initializing external masses
       do i1=1,nexternal(generator)
         s(allbinary(generator)-2**(i1-1))=s(2**(i1-1))
       enddo
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     initialize structure functions                              c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      pi=4d0*datan(1d0)
-      betae=2d0*alphaisr/pi*(2d0*dlog(scale/meisr)-1d0)
-      gam=gamma(1d0+0.5d0*betae)
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c                                                                 c
 c     initialize cuts                                             c
@@ -942,32 +926,6 @@ c decay
         write(nout,'(" calculation of 1->2 decays    =",i6)')
      *    maxdecay(generator)
       endif
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c                                                                 c
-c     initialize adaptive optimization                            c
-c                                                                 c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      do i1=0,maxo
-        nopt(i1,generator)=0
-      enddo
-      nopt(1,generator)=100
-      nopt(2,generator)=200
-      nopt(3,generator)=300
-      nopt(4,generator)=400
-      nopt(5,generator)=500
-      nopt(6,generator)=600
-      nopt(7,generator)=700
-      nopt(8,generator)=800
-      do i1=0,maxo
-        nopt(i1,generator)=nopt(i1,generator)*nchannel(generator)
-      enddo        
-      opt(generator)=1
-      betaopt(0,generator)=0d0
-      do i1=1,nchannel(generator)
-        wi(i1,generator)=0d0
-        alphaopt(i1,1,generator)=1d0/nchannel(generator)
-        betaopt(i1,generator)=dble(i1)/nchannel(generator)
-      enddo
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
