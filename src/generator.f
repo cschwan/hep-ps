@@ -14,7 +14,7 @@ c local variables
       real*8 random(3*maxe-10),k(maxe,0:3),kbeam(2,0:3),g
       real*8 mmin,mmax,smin,smax,x1,x2
       integer i1,i2,i3,i4,ns,nt,channel,generator,switch
-      integer ranstart,id,virtinv,inv1,inv2
+      integer ranstart,virtinv,inv1,inv2
 c general
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
@@ -186,14 +186,10 @@ c local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       real*8 random(3*maxe-10),ginv(maxch),gprocess(maxch)
-      real*8 gdecay(maxch),k(maxe,0:3),kbeam(2,0:3),x1,x2
-      real*8 g(maxch),help,mmin,mmax,smin,smax,lambda,s1,s2
-      real*8 t,t1,t2,d1,d2,d3,m(2**maxe)
-      real*8 ccut1,ccut2,lambdas,lambdat,tmin,tmax
-      real*8 mw,m2,p2,pi,omax,omin,jacobian,power
-      real*8 q0,qvec,qvec1,qvec2,cmax1,cmax2,cmax
-      integer i1,i2,i3,i4,i5,ns,nt,channel,generator,switch
-      integer id,virtinv,inv1,inv2
+      real*8 gdecay(maxch)
+      real*8 g(maxch),mmin,mmax,smin,smax
+      integer i1,i2,ns,nt,channel,generator,switch
+      integer virtinv,inv1,inv2
 c general
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
@@ -984,7 +980,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       function comparedecay(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
-      integer maxe,maxch,maxg,maxv,maxo
+      integer maxe,maxch,maxg
       parameter(maxe=9,maxch=20000,maxg=1)
       integer ns1,ns2,ch1,ch2,generator
       logical comparedecay
@@ -1011,7 +1007,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       function compareprocess(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
-      integer maxe,maxch,maxg,maxv,maxo
+      integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       integer ns1,ns2,ch1,ch2,generator,idhep1,idhep2
       logical compareprocess
@@ -1056,7 +1052,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       function compareinv(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
-      integer maxe,maxch,maxg,maxv,maxo
+      integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       integer i1,i2,ns1,ns2,ch1,ch2,generator,idhep1,idhep2
       logical compareinv,included
