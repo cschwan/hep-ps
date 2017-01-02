@@ -10,6 +10,7 @@ check_PROGRAMS = \
 	test_fortran_helper \
 	test_initial_state \
 	test_lusifer_phase_space_generator \
+	test_lusifer_phase_space_generator2 \
 	test_observables_born_like \
 	test_observables_real
 
