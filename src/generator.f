@@ -250,7 +250,7 @@ c inv
         smin=mmin**2
         smax=(dsqrt(s(3))-mmax)**2
         call inv(
-     *    random,                                        ! random number
+     *    random(1),                                     ! random number
      *    s(ininv(ns,channel,generator)),                ! invariant mass
      *    ginv(i1),                                      ! local density
      *    mass(idhepinv(ns,channel,generator)),          ! mass
