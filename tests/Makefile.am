@@ -8,6 +8,7 @@ noinst_HEADERS = catch.hpp test_structures.hpp
 
 check_PROGRAMS = \
 	test_fortran_helper \
+	test_hh_lusifer_phase_space_generator \
 	test_initial_state \
 	test_lusifer_phase_space_generator \
 	test_lusifer_phase_space_generator2 \

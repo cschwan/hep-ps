@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/hh_phase_space_generator.hpp"
 #include "hep/ps/luminosity_info.hpp"
 
 #include <cstddef>
@@ -120,6 +121,12 @@ private:
 	class impl;
 	std::unique_ptr<impl> pimpl;
 };
+
+/// The phase space generator \ref lusifer_phase_space_generator for
+/// hadron-hadron collisions.
+template <typename T>
+using hh_lusifer_phase_space_generator =
+	hh_phase_space_generator<lusifer_phase_space_generator<T>>;
 
 }
 
