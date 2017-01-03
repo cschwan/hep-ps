@@ -26,6 +26,14 @@ template <typename T>
 class luminosity_info
 {
 public:
+	luminosity_info(T energy_squared = T())
+		: x1_(T(1.0))
+		, x2_(T(1.0))
+		, energy_squared_(energy_squared)
+		, rapidity_shift_(T())
+	{
+	}
+
 	luminosity_info(T x1, T x2, T energy_squared, T rapidity_shift)
 		: x1_(x1)
 		, x2_(x2)

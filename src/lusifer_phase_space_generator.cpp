@@ -3,6 +3,7 @@
 #include "lusifer_interfaces.hpp"
 
 #include <cassert>
+#include <cmath>
 
 namespace hep
 {
@@ -36,6 +37,7 @@ public:
 	std::size_t channels;
 	std::size_t particles;
 	std::size_t max_particles;
+	T cmf_energy_;
 };
 
 template <typename T>
@@ -127,7 +129,7 @@ std::size_t lusifer_phase_space_generator<T>::channels() const
 }
 
 template <typename T>
-void lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
+T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 {
 	assert( densities.size() >= channels() );
 
@@ -135,6 +137,11 @@ void lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 	int switch_ = 2;
 
 	lusifer_density(densities.data(), &generator, &switch_);
+
+	using std::acos;
+	using std::pow;
+
+	return pow(T(0.5) / acos(T(-1.0)), T(3 * pimpl->particles - 10));
 }
 
 template <typename T>
@@ -192,6 +199,14 @@ void lusifer_phase_space_generator<T>::generate(
 	fortran_ordering_to_cpp(momenta0);
 	momenta0.resize(momenta.size());
 	momenta = momenta0;
+
+	pimpl->cmf_energy_ = cmf_energy;
+}
+
+template <typename T>
+luminosity_info<T> lusifer_phase_space_generator<T>::info() const
+{
+	return luminosity_info<T>(pimpl->cmf_energy_ * pimpl->cmf_energy_);
 }
 
 template <typename T>

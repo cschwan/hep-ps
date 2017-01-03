@@ -19,6 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/luminosity_info.hpp"
+
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -72,6 +74,9 @@ template <typename T>
 class lusifer_phase_space_generator
 {
 public:
+	/// The numeric type used to perform phase space generation.
+	using numeric_type = T;
+
 	/// Constructor.
 	lusifer_phase_space_generator(
 		std::string const& process,
@@ -86,8 +91,8 @@ public:
 
 	/// Evaluates all densities for the previously generated phase space point
 	/// and writes them into `densities`. This vector must have the size given
-	/// by \ref channels.
-	void densities(std::vector<T>& densities);
+	/// by \ref channels. The return value is an additional jacobian.
+	T densities(std::vector<T>& densities);
 
 	/// Returns how many random numbers are needed to construct a phase space
 	/// point.
@@ -102,6 +107,10 @@ public:
 		T cmf_energy,
 		std::size_t channel
 	);
+
+	/// Returns an object of class \ref luminosity that contains the energy of
+	/// the previously generated phase space point.
+	luminosity_info<T> info() const;
 
 	/// Returns the size of the vector `momenta` that has to be passed to
 	/// \ref generate.
