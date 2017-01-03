@@ -41,6 +41,10 @@ AC_CONFIG_SRCDIR([src/find_hep_ps.cpp])
 # that we dont need
 AC_CONFIG_HEADERS([config.hpp])
 
+# check for hep-mc (needed for some tests)
+AC_CHECK_HEADERS([hep/mc.hpp])
+AM_CONDITIONAL([HAVE_HEP_MC_HPP], [test -n "$ac_cv_header_hep_mc_hpp"])
+
 # find LHAPDF header and library
 AC_CHECK_HEADERS([LHAPDF/LHAPDF.h])
 AC_SEARCH_LIBS([_ZN6LHAPDF5mkPDFERKSsi], [LHAPDF], [],

@@ -1,5 +1,6 @@
 nobase_include_HEADERS = \
 	hep/ps.hpp \
+	hep/ps-mc.hpp \
 	hep/ps/constants.hpp \
 	hep/ps/cs_subtraction.hpp \
 	hep/ps/cut_result.hpp \
@@ -14,6 +15,7 @@ nobase_include_HEADERS = \
 	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
+	hep/ps/mc_phase_space_adapter.hpp \
 	hep/ps/no_cutter.hpp \
 	hep/ps/no_recombiner.hpp \
 	hep/ps/observables_born_like.hpp \

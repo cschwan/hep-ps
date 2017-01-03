@@ -16,6 +16,10 @@ check_PROGRAMS = \
 	test_observables_born_like \
 	test_observables_real
 
+if HAVE_HEP_MC_HPP
+check_PROGRAMS += test_mc_phase_space_adapter
+endif
+
 LDADD = $(check_LTLIBRARIES) $(top_builddir)/src/libhep-ps.la
 
 TESTS = $(check_PROGRAMS)
