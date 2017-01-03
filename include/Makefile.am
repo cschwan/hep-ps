@@ -21,6 +21,7 @@ nobase_include_HEADERS = \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/pp_luminosities.hpp \
 	hep/ps/particle_type.hpp \
+	hep/ps/requires_cut.hpp \
 	hep/ps/scales.hpp
 
 # create a timestamp file so we can depend on it instead of depending on every

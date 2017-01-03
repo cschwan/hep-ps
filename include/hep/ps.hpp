@@ -49,6 +49,7 @@ void find_hep_ps();
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/pp_luminosities.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
+#include "hep/ps/requires_cut.hpp"
 #include "hep/ps/scales.hpp"
 
 #endif

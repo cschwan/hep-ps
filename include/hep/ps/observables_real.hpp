@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
- * Copyright (C) 2016  Christopher Schwan
+ * Copyright (C) 2016-2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/particle_type.hpp"
+#include "hep/ps/requires_cut.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -57,13 +58,6 @@ inline std::vector<std::size_t> adjust_indices(
 	result.erase(std::prev(end));
 
 	return result;
-}
-
-// TODO: Make `constexpr` in C++14
-inline bool cut_required(hep::initial_state state, hep::cut_result cut)
-{
-	return (hep::state_has_neg_shift(state) && cut.neg_cutted()) ||
-		(hep::state_has_pos_shift(state) && cut.pos_cutted());
 }
 
 }
@@ -152,7 +146,7 @@ public:
 				{
 					for (auto const process : set)
 					{
-						if (cut_required(process, cut_result))
+						if (requires_cut(process, cut_result))
 						{
 							reals.set(process, T());
 						}
@@ -200,7 +194,7 @@ public:
 
 				auto const cut_result = cuts_.cut(phase_phase, shift, false);
 
-				if (cut_required(process, cut_result))
+				if (requires_cut(process, cut_result))
 				{
 					continue;
 				}
