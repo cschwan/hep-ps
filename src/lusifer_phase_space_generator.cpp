@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <utility>
 
 namespace hep
 {
@@ -117,6 +118,14 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	assert( channels > 0 );
 
 	pimpl->channels = channels;
+}
+
+template <typename T>
+lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
+	lusifer_phase_space_generator<T>&& psg
+)
+	: pimpl(std::move(psg.pimpl))
+{
 }
 
 template <typename T>
