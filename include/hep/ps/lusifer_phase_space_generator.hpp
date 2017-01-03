@@ -109,8 +109,8 @@ public:
 		std::size_t channel
 	);
 
-	/// Returns an object of class \ref luminosity that contains the energy of
-	/// the previously generated phase space point.
+	/// Returns an object of class \ref luminosity_info that contains the energy
+	/// of the previously generated phase space point.
 	luminosity_info<T> info() const;
 
 	/// Returns the size of the vector `momenta` that has to be passed to
