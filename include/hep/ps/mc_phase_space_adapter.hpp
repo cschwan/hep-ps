@@ -20,6 +20,7 @@
  */
 
 #include "hep/mc/multi_channel_map.hpp"
+#include "hep/ps/luminosity_info.hpp"
 
 #include <cstddef>
 #include <utility>
@@ -79,6 +80,11 @@ public:
 	std::size_t dimensions() const
 	{
 		return psg.dimensions();
+	}
+
+	luminosity_info<T> info() const
+	{
+		return psg.info();
 	}
 
 	/// Returns the value of `map_dimensions()` of `PhaseSpaceGenerator`.
