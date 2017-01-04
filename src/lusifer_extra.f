@@ -40,8 +40,8 @@
       width(6) = gt
       mass(23) = mz
       width(23) = gz
-      mass(24) = mh
-      width(24) = gh
-      mass(25) = mw
-      width(25) = gw
+      mass(24) = mw
+      width(24) = gw
+      mass(25) = mh
+      width(25) = gh
       end
