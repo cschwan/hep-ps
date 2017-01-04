@@ -93,7 +93,7 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 
 	// fill up the string with three spaces for particle not used
 	std::string process0 = process;
-	process0.append(' ', 3 * (maxex - pimpl->particles));
+	process0.append(3 * (maxex - pimpl->particles), ' ');
 
 	// TODO: what is the meaning of this parameter?
 	int lightfermions = 0;
