@@ -69,7 +69,7 @@ TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
 	std::vector<T> p(psg.map_dimensions());
 	std::vector<T> densities(psg.channels());
 
-	for (std::size_t i = 0; i != 1000; ++i)
+	for (std::size_t i = 0; i != 100; ++i)
 	{
 		std::generate(random_numbers.begin(), random_numbers.end(), [&](){
 			return std::generate_canonical<T,
