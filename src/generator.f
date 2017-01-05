@@ -5,8 +5,8 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine phasespace(random,kbeam,k,x1,x2,g,channel,generator,
-     *  switch)
+      subroutine lusifer_phasespace(random,kbeam,k,x1,x2,g,channel,
+     *  generator,switch)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
@@ -33,11 +33,11 @@ c cprocess
 c cdecay
       integer indecay(maxe,maxch,maxg),out1decay(maxe,maxch,maxg)
       integer out2decay(maxe,maxch,maxg),ndecay(maxch,maxg)
-      common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
-     *  nexternal,allbinary
-      common/cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
-      common/cdecay/indecay,out1decay,out2decay,ndecay
-      common/cprocess/powerprocess,ccutprocess, in1process,
+      common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width,
+     *  nchannel,nexternal,allbinary
+      common/lusifer_cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
+      common/lusifer_cdecay/indecay,out1decay,out2decay,ndecay
+      common/lusifer_cprocess/powerprocess,ccutprocess, in1process,
      *  in2process,out1process,out2process,inprocess,virtprocess,
      *  idhepprocess,nprocess
       if(switch.eq.0)return
@@ -88,7 +88,7 @@ c inv
         enddo        
         smin=mmin**2
         smax=(dsqrt(s(3))-mmax)**2
-        call inv(
+        call lusifer_inv(
      *    random(ns),                                    ! random number
      *    s(ininv(ns,channel,generator)),                ! invariant mass
      *    g,                                             ! local density
@@ -102,7 +102,7 @@ c inv
 c process
       ranstart=ninv(channel,generator)
       do nt=1,nprocess(channel,generator)
-        call process(
+        call lusifer_process(
      *    random(ranstart+2*nt-1),                       ! random numbers
      *    p(0,in1process(nt,channel,generator)),         ! incomming particle 1
      *    p(0,in2process(nt,channel,generator)),         ! incomming particle 2
@@ -127,7 +127,7 @@ c process
 c decay
       ranstart=ninv(channel,generator)+2*nprocess(channel,generator)
       do ns=1,ndecay(channel,generator)
-        call decay(
+        call lusifer_decay(
      *    random(ranstart+2*ns-1),                       ! random numbers
      *    p(0,indecay(ns,channel,generator)),            ! incomming particle 
      *    p(0,out1decay(ns,channel,generator)),          ! outgoing particle 1
@@ -180,7 +180,7 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine density(g,generator,switch)
+      subroutine lusifer_density(g,generator,switch)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
@@ -214,14 +214,14 @@ c cdensity
       integer maxprocess(maxg),nsdecay(maxch,maxg),chdecay(maxch,maxg)
       integer maxdecay(maxg),numinv(maxe,maxch,maxg)
       integer numprocess(maxe,maxch,maxg),numdecay(maxe,maxch,maxg)
-      common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
-     *  nexternal,allbinary
-      common/cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
-      common/cdecay/indecay,out1decay,out2decay,ndecay
-      common/cprocess/powerprocess,ccutprocess, in1process,
+      common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width,
+     *  nchannel,nexternal,allbinary
+      common/lusifer_cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
+      common/lusifer_cdecay/indecay,out1decay,out2decay,ndecay
+      common/lusifer_cprocess/powerprocess,ccutprocess, in1process,
      *  in2process,out1process,out2process,inprocess,virtprocess,
      *  idhepprocess,nprocess
-      common/cdensity/nsinv,chinv,maxinv,ntprocess,chprocess,
+      common/lusifer_cdensity/nsinv,chinv,maxinv,ntprocess,chprocess,
      *  maxprocess,nsdecay,chdecay,maxdecay,numinv,numprocess,numdecay
 c inv
       do i1=1,maxinv(generator)
@@ -249,7 +249,7 @@ c inv
         enddo        
         smin=mmin**2
         smax=(dsqrt(s(3))-mmax)**2
-        call inv(
+        call lusifer_inv(
      *    random(1),                                     ! random number
      *    s(ininv(ns,channel,generator)),                ! invariant mass
      *    ginv(i1),                                      ! local density
@@ -265,7 +265,7 @@ c process
         gprocess(i1)=1d0
         nt=ntprocess(i1,generator)
         channel=chprocess(i1,generator)
-        call process(
+        call lusifer_process(
      *    random,                                        ! random numbers
      *    p(0,in1process(nt,channel,generator)),         ! incomming particle 1
      *    p(0,in2process(nt,channel,generator)),         ! incomming particle 2
@@ -292,7 +292,7 @@ c decay
         gdecay(i1)=1d0
         ns=nsdecay(i1,generator)
         channel=chdecay(i1,generator)
-        call decay(
+        call lusifer_decay(
      *    random,                                        ! random numbers
      *    p(0,indecay(ns,channel,generator)),            ! incomming particle 
      *    p(0,out1decay(ns,channel,generator)),          ! outgoing particle 1
@@ -331,7 +331,7 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine initphasespace(name,generator,lightfermions,
+      subroutine lusifer_initphasespace(name,generator,lightfermions,
      *  includecuts,sout)
       implicit none
 c local variables
@@ -340,11 +340,13 @@ c local variables
       real*8 power(maxv),m2,m3,e2,e3,scutinv
       integer idhep(maxe,maxe),binary(maxe,maxe),idhep2,idhep3
       integer i1,i2,i3,ns,nt,maxns,maxnt,binary1,binary2,binary3
-      integer in1(maxe),in2(maxe),out1(maxe),out2(maxe),id,lightfermions
-      integer virt(maxe),channel,generator,includecuts,prop2,prop3,sout
+      integer in1(maxe),in2(maxe),out1(maxe),out2(maxe),lusifer_id
+      integer lightfermions,virt(maxe),channel,generator,includecuts
+      integer prop2,prop3,sout
       character*3 gname(-maxv:maxv),name(maxe)
-      logical vertex,included,exist,same,compareinv,comparedecay
-      logical compareprocess
+      logical lusifer_vertex,lusifer_included,exist,same,
+     *  lusifer_compareinv
+      logical lusifer_comparedecay,lusifer_compareprocess
 c general
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
@@ -375,18 +377,18 @@ c techparam
       real*8 a,techcut
 c cuts
       real*8 ecut(maxe),scut(maxe,maxe),ccut(maxe,maxe)
-      common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
-     *  nexternal,allbinary
-      common/cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
-      common/cdecay/indecay,out1decay,out2decay,ndecay
-      common/cprocess/powerprocess,ccutprocess,in1process,
+      common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width,
+     *  nchannel,nexternal,allbinary
+      common/lusifer_cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
+      common/lusifer_cdecay/indecay,out1decay,out2decay,ndecay
+      common/lusifer_cprocess/powerprocess,ccutprocess,in1process,
      *  in2process,out1process,out2process,inprocess,virtprocess,
      *  idhepprocess,nprocess
-      common/cdensity/nsinv,chinv,maxinv,ntprocess,chprocess,
+      common/lusifer_cdensity/nsinv,chinv,maxinv,ntprocess,chprocess,
      *  maxprocess,nsdecay,chdecay,maxdecay,numinv,numprocess,numdecay
-      common/output/nout,numout,maxout
-      common/techparam/a,techcut
-      common/cuts/ecut,scut,ccut
+      common/lusifer_output/nout,numout,maxout
+      common/lusifer_techparam/a,techcut
+      common/lusifer_cuts/ecut,scut,ccut
 c technical parameter in h function and subroutine process
       a=1d-6
       techcut=1d-7
@@ -491,7 +493,7 @@ c invariant-mass cut
       do i1=1,allbinary(generator)
         scutinv=0d0
         do i2=1,nexternal(generator)
-          if(included(i1,2**(i2-1),nexternal(generator)))then
+          if(lusifer_included(i1,2**(i2-1),nexternal(generator)))then
              scutinv=scutinv+mass(abs(idhep(i2,1)))
            endif
         enddo
@@ -499,8 +501,8 @@ c invariant-mass cut
         if(includecuts.eq.1)then
           do i2=1,nexternal(generator)
           do i3=i2+1,nexternal(generator)
-            if(included(i1,2**(i2-1),nexternal(generator)).and.
-     *        included(i1,2**(i3-1),nexternal(generator)))then
+            if(lusifer_included(i1,2**(i2-1),nexternal(generator)).and.
+     *        lusifer_included(i1,2**(i3-1),nexternal(generator)))then
               m2=mass(abs(idhep(i2,1)))
               m3=mass(abs(idhep(i3,1)))
               e2=max(ecut(i2),m2)
@@ -514,7 +516,7 @@ c invariant-mass cut
         endif
         mcutinv(i1,generator)=dsqrt(scutinv)
         do i2=2,i1-1
-          if(included(i1,i2,nexternal(generator)))then
+          if(lusifer_included(i1,i2,nexternal(generator)))then
             mcutinv(i1,generator)=max(mcutinv(i1,generator),
      *        mcutinv(i2,generator)+mcutinv(i1-i2,generator))
           endif
@@ -551,12 +553,12 @@ c virtual particle for ns'th decay
         if(virt(ns).lt.0.and.
      *    gname(virt(ns)).eq.gname(-virt(ns)))goto 400
 c checking whether 3-particle vertex exists
-        if(.not.vertex(gname(idhep(out1(ns),ns)),
+        if(.not.lusifer_vertex(gname(idhep(out1(ns),ns)),
      *    gname(idhep(out2(ns),ns)),gname(virt(ns)),
      *    lightfermions))goto 1500
 c checking last 3-particle vertex
         if(ns.eq.nexternal(generator)-3.and.
-     *    .not.vertex(gname(idhep(in1(ns),ns)),
+     *    .not.lusifer_vertex(gname(idhep(in1(ns),ns)),
      *      gname(idhep(in2(ns),ns)),gname(-virt(ns)),
      *      lightfermions))goto 1500
 c initializing next step
@@ -602,7 +604,7 @@ c virtual particle for nt's process
 c avoid doube counting of diagrams
         if(nt.ge.2.and.in1(nt-1).eq.in1(nt))goto 1300
 c checking whether 3-particle vertex exists
-        if(.not.vertex(gname(idhep(in1(nt),nt)),
+        if(.not.lusifer_vertex(gname(idhep(in1(nt),nt)),
      *    gname(idhep(out1(nt),nt)),gname(virt(nt)),
      *    lightfermions))goto 1300
 c initializing next step
@@ -627,7 +629,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         do i2=3,nexternal(generator)
           if(idhep(i2,i1).ne.0)i3=i2
         enddo
-        if(.not.vertex(gname(idhep(1,i1)),gname(idhep(2,i1)),
+        if(.not.lusifer_vertex(gname(idhep(1,i1)),gname(idhep(2,i1)),
      *    gname(idhep(i3,i1)),lightfermions))goto 1300
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c                                                                 c
@@ -657,11 +659,11 @@ c minimal invariant-mass cuts for subroutine inv
           binary1=ininv(i1,channel,generator)
           binary2=ininv(i2,channel,generator)
           lmin(i2,i1,channel,generator)=.false.
-          if(included(binary1,binary2,nexternal(generator)))then
+          if(lusifer_included(binary1,binary2,nexternal(generator)))then
             lmin(i2,i1,channel,generator)=.true.
             do i3=1,i1-1
               binary3=ininv(i3,channel,generator)
-              if(included(binary3,binary2,nexternal(generator))
+              if(lusifer_included(binary3,binary2,nexternal(generator))
      *          .and.i2.ne.i3)then
                 lmin(i2,i1,channel,generator)=.false.
               endif
@@ -675,11 +677,11 @@ c maximal invariant-mass cuts for subroutine inv
           binary1=allbinary(generator)-3-ininv(i1,channel,generator)
           binary2=ininv(i2,channel,generator)
           lmax(i2,i1,channel,generator)=.false.
-          if(included(binary1,binary2,nexternal(generator)))then
+          if(lusifer_included(binary1,binary2,nexternal(generator)))then
             lmax(i2,i1,channel,generator)=.true.
             do i3=1,i1-1
               binary3=ininv(i3,channel,generator)
-              if(included(binary3,binary2,nexternal(generator))
+              if(lusifer_included(binary3,binary2,nexternal(generator))
      *          .and.i2.ne.i3)then
                 lmax(i2,i1,channel,generator)=.false.
               endif
@@ -807,16 +809,18 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           write(nout,*)'channel=',channel
           do i2=1,maxns
             write(nout,*)'s channel: ',
-     *        id(binary(out1(i2),i2)),id(binary(out2(i2),i2)),' ->',
-     *        id(binary(out2(i2),i2+1)),'   ',
+     *        lusifer_id(binary(out1(i2),i2)),lusifer_id(
+     *        binary(out2(i2),i2)),' ->',
+     *        lusifer_id(binary(out2(i2),i2+1)),'   ',
      *        gname(-idhep(out1(i2),i2)),
      *        gname(-idhep(out2(i2),i2)),' -> ',
      *        gname(-idhep(out2(i2),i2+1))
           enddo
           do i2=maxns+1,maxnt
             write(nout,*)'t channel: ',
-     *        id(binary(in1(i2),i2)),id(binary(out1(i2),i2)),' ->',
-     *        id(binary(in1(i2),i2+1)),'   ',
+     *        lusifer_id(binary(in1(i2),i2)),lusifer_id(
+     *        binary(out1(i2),i2)),' ->',
+     *        lusifer_id(binary(in1(i2),i2+1)),'   ',
      *        gname(idhep(in1(i2),i2)),
      *        gname(-idhep(out1(i2),i2)),' -> ',
      *        gname(idhep(in1(i2),i2+1))
@@ -864,7 +868,7 @@ c initializing inv
         numinv(ns,channel,generator)=0
         do i1=1,channel-1
         do i2=1,ninv(i1,generator)
-          if(compareinv(ns,channel,i2,i1,generator))
+          if(lusifer_compareinv(ns,channel,i2,i1,generator))
      *      numinv(ns,channel,generator)=numinv(i2,i1,generator)
         enddo
         enddo
@@ -883,7 +887,7 @@ c process
         numprocess(nt,channel,generator)=0
         do i1=1,channel-1
         do i2=1,nprocess(i1,generator)
-          if(compareprocess(nt,channel,i2,i1,generator))
+          if(lusifer_compareprocess(nt,channel,i2,i1,generator))
      *      numprocess(nt,channel,generator)=numprocess(i2,i1,generator)
         enddo
         enddo
@@ -902,7 +906,7 @@ c decay
         numdecay(ns,channel,generator)=0
         do i1=1,channel-1
         do i2=1,ndecay(i1,generator)
-          if(comparedecay(ns,channel,i2,i1,generator))
+          if(lusifer_comparedecay(ns,channel,i2,i1,generator))
      *      numdecay(ns,channel,generator)=numdecay(i2,i1,generator)
         enddo
         enddo
@@ -935,24 +939,24 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function comparedecay(ns1,ch1,ns2,ch2,generator)
+      function lusifer_comparedecay(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg
       parameter(maxe=9,maxch=20000,maxg=1)
       integer ns1,ns2,ch1,ch2,generator
-      logical comparedecay
+      logical lusifer_comparedecay
 c cdecay
       integer indecay(maxe,maxch,maxg),out1decay(maxe,maxch,maxg)
       integer out2decay(maxe,maxch,maxg),ndecay(maxch,maxg)
-      common/cdecay/indecay,out1decay,out2decay,ndecay
-      comparedecay=.false.
+      common/lusifer_cdecay/indecay,out1decay,out2decay,ndecay
+      lusifer_comparedecay=.false.
       if(indecay(ns1,ch1,generator).ne.indecay(ns2,ch2,generator))
      *  return
       if(out1decay(ns1,ch1,generator).ne.out1decay(ns2,ch2,generator)
      *  .and.out1decay(ns1,ch1,generator).ne.
      *  out2decay(ns2,ch2,generator))return
-      comparedecay=.true.
+      lusifer_comparedecay=.true.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -962,13 +966,13 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function compareprocess(ns1,ch1,ns2,ch2,generator)
+      function lusifer_compareprocess(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       integer ns1,ns2,ch1,ch2,generator,idhep1,idhep2
-      logical compareprocess
+      logical lusifer_compareprocess
 c general
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
@@ -979,12 +983,12 @@ c cprocess
       integer out1process(maxe,maxch,maxg),out2process(maxe,maxch,maxg)
       integer inprocess(maxe,maxch,maxg),virtprocess(maxe,maxch,maxg)
       integer idhepprocess(maxe,maxch,maxg),nprocess(maxch,maxg)
-      common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
-     *  nexternal,allbinary
-      common/cprocess/powerprocess,ccutprocess,in1process,
+      common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width,
+     *  nchannel,nexternal,allbinary
+      common/lusifer_cprocess/powerprocess,ccutprocess,in1process,
      *  in2process,out1process,out2process,inprocess,virtprocess,
      *  idhepprocess,nprocess
-      compareprocess=.false.
+      lusifer_compareprocess=.false.
       if(inprocess(ns1,ch1,generator).ne.inprocess(ns2,ch2,generator))
      *  return
       if(virtprocess(ns1,ch1,generator).ne.
@@ -997,7 +1001,7 @@ c cprocess
       idhep2=idhepprocess(ns2,ch2,generator)
       if(mass(idhep1).ne.mass(idhep2).or.width(idhep1).ne.width(idhep2))
      *  return
-      compareprocess=.true.
+      lusifer_compareprocess=.true.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1007,13 +1011,13 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function compareinv(ns1,ch1,ns2,ch2,generator)
+      function lusifer_compareinv(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       integer i1,i2,ns1,ns2,ch1,ch2,generator,idhep1,idhep2
-      logical compareinv,included
+      logical lusifer_compareinv,lusifer_included
 c general
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
@@ -1023,10 +1027,10 @@ c cinv
       integer ininv(maxe,maxch,maxg),idhepinv(maxv,maxch,maxg)
       integer ninv(maxch,maxg)
       logical lmin(maxe,maxe,maxch,maxg),lmax(maxe,maxe,maxch,maxg)
-      common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
-     *  nexternal,allbinary
-      common/cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
-      compareinv=.false.
+      common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width,
+     *  nchannel,nexternal,allbinary
+      common/lusifer_cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
+      lusifer_compareinv=.false.
       if(ininv(ns1,ch1,generator).ne.ininv(ns2,ch2,generator))return
       if(powerinv(ns1,ch1,generator).ne.powerinv(ns2,ch2,generator))
      *  return
@@ -1036,45 +1040,45 @@ c cinv
      *  return
       do i1=1,ns1-1
         if(lmin(i1,ns1,ch1,generator))then
-          included=.false.
+          lusifer_included=.false.
           do i2=1,ns2-1
             if(lmin(i2,ns2,ch2,generator).and.
      *        ininv(i1,ch1,generator).eq.ininv(i2,ch2,generator))
-     *        included=.true.
+     *        lusifer_included=.true.
           enddo
-          if(.not.included)return
+          if(.not.lusifer_included)return
         endif
         if(lmax(i1,ns1,ch1,generator))then
-          included=.false.
+          lusifer_included=.false.
           do i2=1,ns2-1
             if(lmax(i2,ns2,ch2,generator).and.
      *        ininv(i1,ch1,generator).eq.ininv(i2,ch2,generator))
-     *        included=.true.
+     *        lusifer_included=.true.
           enddo
-          if(.not.included)return
+          if(.not.lusifer_included)return
         endif
       enddo    
       do i2=1,ns2-1
         if(lmin(i2,ns2,ch2,generator))then
-          included=.false.
+          lusifer_included=.false.
           do i1=1,ns1-1
             if(lmin(i1,ns1,ch1,generator).and.
      *        ininv(i1,ch1,generator).eq.ininv(i2,ch2,generator))
-     *        included=.true.
+     *        lusifer_included=.true.
           enddo
-          if(.not.included)return
+          if(.not.lusifer_included)return
         endif
         if(lmax(i2,ns2,ch2,generator))then
-          included=.false.
+          lusifer_included=.false.
           do i1=1,ns1-1
             if(lmax(i1,ns1,ch1,generator).and.
      *        ininv(i1,ch1,generator).eq.ininv(i2,ch2,generator))
-     *        included=.true.
+     *        lusifer_included=.true.
           enddo
-          if(.not.included)return
+          if(.not.lusifer_included)return
         endif
       enddo    
-      compareinv=.true.
+      lusifer_compareinv=.true.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1084,18 +1088,18 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function included(binary1,binary2,nexternal)
+      function lusifer_included(binary1,binary2,nexternal)
       implicit none
 c local variables
       integer binary1,binary2,i1,b1,b2,nexternal
-      logical included
-      included=.false.
+      logical lusifer_included
+      lusifer_included=.false.
       do i1=1,nexternal
         b1=binary1/2**(i1-1)
         b2=binary2/2**(i1-1)
         if(2*(b2/2).ne.b2.and.2*(b1/2).eq.b1)return
       enddo
-      included=.true.
+      lusifer_included=.true.
       end
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1105,21 +1109,22 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine inv(random,s,g,mass,width,power,smin,smax,switch)
+      subroutine lusifer_inv(random,s,g,mass,width,power,smin,smax,
+     *  switch)
       implicit none
 c local variable
       real*8 pi,random,s,g,mass,mass2,width,width2,power
-      real*8 smax,smin,omax,omin,h,jacobian,denum
+      real*8 smax,smin,omax,omin,lusifer_h,lusifer_jacobian,denum
       integer switch
 c output
       integer nout,numout,maxout
-      common/output/nout,numout,maxout
+      common/lusifer_output/nout,numout,maxout
       pi=4d0*datan(1d0)
       if(switch.eq.0)return
       mass2=mass*mass
       if(smax.le.smin)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' inv: smin >= smax'
+          write(nout,'(a)')' lusifer_inv: smin >= smax'
           write(nout,'(6x,"smin=",d16.10," smax=",d16.10)')smin,smax
           numout=numout+1
         endif
@@ -1128,7 +1133,7 @@ c output
       endif
       if(smin.lt.0d0)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' inv: smin < 0'
+          write(nout,'(a)')' lusifer_inv: smin < 0'
           numout=numout+1
         endif
         switch=0
@@ -1146,7 +1151,7 @@ c output
             g=g*mass*width/denum
           else 
             if(numout.lt.maxout)then
-              write(nout,'(a)')' inv: 1/density <= 0 (width>0)'
+              write(nout,'(a)')' lusifer_inv: 1/density <= 0 (width>0)'
               numout=numout+1
             endif
             switch=0
@@ -1155,14 +1160,14 @@ c output
         endif  
       else
         if(switch.eq.1)then
-          s=h(random,power,mass2,smin,smax,switch)
+          s=lusifer_h(random,power,mass2,smin,smax,switch)
         elseif(switch.eq.2)then
-          denum=jacobian(power,mass2,s,smin,smax,switch)
+          denum=lusifer_jacobian(power,mass2,s,smin,smax,switch)
           if(denum.gt.0d0)then
             g=g/denum
           else
             if(numout.lt.maxout)then
-              write(nout,'(a)')' inv: 1/density <= 0 (width=0)'
+              write(nout,'(a)')' lusifer_inv: 1/density <= 0 (width=0)'
             endif
             numout=numout+1
             switch=0
@@ -1179,22 +1184,22 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine process(random,q1,q2,p1,p2,qt,g,mass,width,nu,
+      subroutine lusifer_process(random,q1,q2,p1,p2,qt,g,mass,width,nu,
      *  s,s1,s2,t,t1,t2,ccut1,ccut2,switch)
       implicit none
 c local variable
       real*8 pi,random(2),q1(0:3),q2(0:3),p1(0:3),p2(0:3),qt(0:3)
       real*8 g,mass,width,nu,s1,s2,t1,t2,tmin,tmax,ccut1,ccut2
       real*8 lambdas,lambdat,mass2,width2,t,phi,cost,s,roots
-      real*8 qvec1,qvec2,q0,omega,omin,omax,k1(0:3),q(0:3),h
-      real*8 jacobian,denum,cmax,cmax1,cmax2
+      real*8 qvec1,qvec2,q0,omega,omin,omax,k1(0:3),q(0:3),lusifer_h
+      real*8 lusifer_jacobian,denum,cmax,cmax1,cmax2
       integer i1,switch
 c output
       integer nout,numout,maxout
 c techparam
       real*8 a,techcut
-      common/output/nout,numout,maxout
-      common/techparam/a,techcut
+      common/lusifer_output/nout,numout,maxout
+      common/lusifer_techparam/a,techcut
       pi=4d0*datan(1d0)
       if(switch.eq.0)return
       if((ccut1.ne.1d0.or.ccut2.ne.1d0).and.
@@ -1222,7 +1227,7 @@ c techparam
         lambdas=dsqrt(lambdas)
       else
         if(numout.lt.maxout)then
-          write(nout,'(a)')' process: lambdas <= 0'
+          write(nout,'(a)')' lusifer_process: lambdas <= 0'
           numout=numout+1
         endif
         switch=0
@@ -1233,7 +1238,7 @@ c techparam
         lambdat=dsqrt(lambdat)
       else
         if(numout.lt.maxout)then
-          write(nout,'(a)')' process: lambdat <= 0'
+          write(nout,'(a)')' lusifer_process: lambdat <= 0'
           numout=numout+1
         endif
         switch=0
@@ -1244,7 +1249,7 @@ c techparam
       if(dabs(tmax).lt.techcut)tmax=0d0
       if(tmax.le.tmin)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' process: tmin >= tmax'
+          write(nout,'(a)')' lusifer_process: tmin >= tmax'
           numout=numout+1
         endif
         switch=0
@@ -1252,7 +1257,7 @@ c techparam
       endif
       if(tmax.gt.0d0)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' process: tmax > 0'
+          write(nout,'(a)')' lusifer_process: tmax > 0'
           numout=numout+1
         endif
         switch=0
@@ -1273,7 +1278,8 @@ c techparam
             g=g*2d0*lambdat*mass*width/denum
           else
             if(numout.lt.maxout)then
-              write(nout,'(a)')' process: 1/density = 0 (width>0)'
+              write(nout,'(a)')' lusifer_process: 1/density = 0 (width&
+     &>0)'
               numout=numout+1
             endif
             switch=0
@@ -1285,15 +1291,16 @@ c techparam
           phi=2d0*pi*random(1)
           denum=lambdas*lambdat
           cost=((s+s1-s2)*(s+t1-t2)-2d0*s*(t1+s1)
-     *          -2d0*s*h(random(2),nu,-mass2,-tmax,-tmin,switch)
+     *          -2d0*s*lusifer_h(random(2),nu,-mass2,-tmax,-tmin,switch)
      *         )/lambdas/lambdat
         elseif(switch.eq.2)then
-          denum=pi*jacobian(nu,-mass2,-t,-tmax,-tmin,switch)
+          denum=pi*lusifer_jacobian(nu,-mass2,-t,-tmax,-tmin,switch)
           if(denum.ne.0d0)then
             g=g*2d0*lambdat/denum
           else
             if(numout.lt.maxout)then
-              write(nout,'(a)')' process: 1/density = 0 (width=0)'
+              write(nout,'(a)')' lusifer_process: 1/density = 0 (width&
+     &=0)'
             endif
             numout=numout+1
             switch=0
@@ -1308,12 +1315,12 @@ c techparam
         p1(2)=0d0
         p1(3)=lambdas*0.5d0/roots
         phi=dsign(phi,q1(3))
-        call rotation(p1,phi,cost,switch)
+        call lusifer_rotation(p1,phi,cost,switch)
         do i1=0,3
           q(i1)=q1(i1)+q2(i1) 
           k1(i1)=q1(i1)
         enddo
-        call boost(s,q,k1,1d0,switch)
+        call lusifer_boost(s,q,k1,1d0,switch)
         if(k1(1).eq.0d0)then
           phi=dsign(pi*0.5d0,k1(2))
         else
@@ -1321,8 +1328,8 @@ c techparam
         endif
         if(k1(1).lt.0d0)phi=phi+pi
         cost=k1(3)/dsqrt(k1(1)*k1(1)+k1(2)*k1(2)+k1(3)*k1(3))
-        call rotation(p1,-phi,cost,switch)
-        call boost(s,q,p1,-1d0,switch)
+        call lusifer_rotation(p1,-phi,cost,switch)
+        call lusifer_boost(s,q,p1,-1d0,switch)
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
           qt(i1)=q1(i1)-p1(i1)
@@ -1338,7 +1345,7 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine decay(random,q,p1,p2,g,s,s1,s2,switch)
+      subroutine lusifer_decay(random,q,p1,p2,g,s,s1,s2,switch)
       implicit none
 c local variable
       real*8 pi,random(2),q(0:3),p1(0:3),p2(0:3)
@@ -1346,7 +1353,7 @@ c local variable
       integer i1,switch
 c output
       integer nout,numout,maxout
-      common/output/nout,numout,maxout
+      common/lusifer_output/nout,numout,maxout
       pi=4d0*datan(1d0)
       if(switch.eq.0)return
       lambda=(s-s1-s2)*(s-s1-s2)-4d0*s1*s2
@@ -1354,7 +1361,7 @@ c output
         lambda=dsqrt(lambda)
       else
         if(numout.lt.maxout)then
-          write(nout,'(a)')' decay: lambda <= 0'
+          write(nout,'(a)')' lusifer_decay: lambda <= 0'
           numout=numout+1
         endif
         switch=0
@@ -1368,8 +1375,8 @@ c output
         p1(1)=0d0
         p1(2)=0d0
         p1(3)=lambda*0.5d0/roots
-        call rotation(p1,phi,cost,switch)
-        call boost(s,q,p1,-1d0,switch)
+        call lusifer_rotation(p1,phi,cost,switch)
+        call lusifer_boost(s,q,p1,-1d0,switch)
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
         enddo
@@ -1395,33 +1402,34 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function h(random,nu,mass2,xmin,xmax,switch)
+      function lusifer_h(random,nu,mass2,xmin,xmax,switch)
       implicit none
-      real*8 h,random,nu,xmin,xmax,mass2,m2
+      real*8 lusifer_h,random,nu,xmin,xmax,mass2,m2
       integer switch
 c techparam
       real*8 a,techcut
 c output
       integer nout,numout,maxout
-      common/techparam/a,techcut
-      common/output/nout,numout,maxout
-      h=0d0
+      common/lusifer_techparam/a,techcut
+      common/lusifer_output/nout,numout,maxout
+      lusifer_h=0d0
       if(switch.eq.0)return
       m2=mass2-a
       if(xmax-m2.lt.0d0.or.xmin-m2.lt.0d0)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' h: xmin-m2, xmax-m2 < 0'
+          write(nout,'(a)')' lusifer_h: xmin-m2, xmax-m2 < 0'
           numout=numout+1
         endif
         switch=0
         return
       endif
       if(nu.eq.0d0)then
-        h=random*xmax+(1d0-random)*xmin 
+        lusifer_h=random*xmax+(1d0-random)*xmin 
       elseif(nu.eq.1d0)then
-        h=dexp(random*dlog(xmax-m2)+(1d0-random)*dlog(xmin-m2))+m2
+        lusifer_h=dexp(random*dlog(xmax-m2)+(1d0-random)*dlog(xmin-m2))
+     *  +m2
       else
-        h=(random*(xmax-m2)**(1d0-nu)
+        lusifer_h=(random*(xmax-m2)**(1d0-nu)
      *    +(1d0-random)*(xmin-m2)**(1d0-nu))**(1d0/(1d0-nu))+m2
       endif
       end
@@ -1433,33 +1441,33 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function jacobian(nu,mass2,x,xmin,xmax,switch)
+      function lusifer_jacobian(nu,mass2,x,xmin,xmax,switch)
       implicit none
-      real*8 jacobian,nu,x,xmin,xmax,mass2,m2
+      real*8 lusifer_jacobian,nu,x,xmin,xmax,mass2,m2
       integer switch
 c techparam
       real*8 a,techcut
 c output
       integer nout,numout,maxout
-      common/techparam/a,techcut
-      common/output/nout,numout,maxout
-      jacobian=0d0
+      common/lusifer_techparam/a,techcut
+      common/lusifer_output/nout,numout,maxout
+      lusifer_jacobian=0d0
       if(switch.eq.0)return
       m2=mass2-a
       if(xmax-m2.lt.0d0.or.xmin-m2.lt.0d0)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' jacobian: xmin-m2, xmax-m2 < 0'
+          write(nout,'(a)')' lusifer_jacobian: xmin-m2, xmax-m2 < 0'
           numout=numout+1
         endif
         switch=0
         return
       endif
       if(nu.eq.0d0)then
-        jacobian=xmax-xmin
+        lusifer_jacobian=xmax-xmin
       elseif(nu.eq.1d0)then
-        jacobian=(dlog(xmax-m2)-dlog(xmin-m2))*(x-m2)
+        lusifer_jacobian=(dlog(xmax-m2)-dlog(xmin-m2))*(x-m2)
       else
-        jacobian=(((xmax-m2)**(1d0-nu)-(xmin-m2)**(1d0-nu))
+        lusifer_jacobian=(((xmax-m2)**(1d0-nu)-(xmin-m2)**(1d0-nu))
      *           /(1d0-nu))*(x-m2)**nu
       endif
       end
@@ -1471,20 +1479,20 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine rotation(p,phi,cost,switch)
+      subroutine lusifer_rotation(p,phi,cost,switch)
       implicit none
 c local variable
       real*8 p(0:3),phi,cost,sint,cosp,sinp,px,py,pz
       integer switch
 c output
       integer nout,numout,maxout
-      common/output/nout,numout,maxout
+      common/lusifer_output/nout,numout,maxout
       if(switch.eq.0)return
       cosp=dcos(phi)
       sinp=dsin(phi)
       if(dabs(cost).gt.1d0)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' rotation: |cost| > 1'
+          write(nout,'(a)')' lusifer_rotation: |cost| > 1'
           numout=numout+1
         endif
         switch=0
@@ -1506,7 +1514,7 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine boost(m2,q,p,dir,switch)
+      subroutine lusifer_boost(m2,q,p,dir,switch)
       implicit none
 c local variable
       real*8 p(0:3),q(0:3),dir,m,m2,bx,by,bz,gamma
@@ -1514,11 +1522,11 @@ c local variable
       integer switch
 c output
       integer nout,numout,maxout
-      common/output/nout,numout,maxout
+      common/lusifer_output/nout,numout,maxout
       if(switch.eq.0)return
       if(m2.le.0d0)then
         if(numout.lt.maxout)then
-          write(nout,'(a)')' boost: m2 <= 0'
+          write(nout,'(a)')' lusifer_boost: m2 <= 0'
           numout=numout+1
         endif
         switch=0
@@ -1548,20 +1556,20 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function vertex(p1,p2,p3,lightfermions)
+      function lusifer_vertex(p1,p2,p3,lightfermions)
       implicit none
 c local variables
       character*3 p1,p2,p3
       integer lightfermions
-      logical vertex,vertexg
-      vertex=.true.
-      if(vertexg(p1,p2,p3,lightfermions))return
-      if(vertexg(p1,p3,p2,lightfermions))return
-      if(vertexg(p2,p1,p3,lightfermions))return
-      if(vertexg(p2,p3,p1,lightfermions))return
-      if(vertexg(p3,p1,p2,lightfermions))return
-      if(vertexg(p3,p2,p1,lightfermions))return
-      vertex=.false.
+      logical lusifer_vertex,lusifer_vertexg
+      lusifer_vertex=.true.
+      if(lusifer_vertexg(p1,p2,p3,lightfermions))return
+      if(lusifer_vertexg(p1,p3,p2,lightfermions))return
+      if(lusifer_vertexg(p2,p1,p3,lightfermions))return
+      if(lusifer_vertexg(p2,p3,p1,lightfermions))return
+      if(lusifer_vertexg(p3,p1,p2,lightfermions))return
+      if(lusifer_vertexg(p3,p2,p1,lightfermions))return
+      lusifer_vertex=.false.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1571,13 +1579,13 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function vertexg(p1,p2,p3,lightfermions)
+      function lusifer_vertexg(p1,p2,p3,lightfermions)
       implicit none
 c local variables
       character*3 p1,p2,p3
       integer lightfermions
-      logical vertexg
-      vertexg=.true.
+      logical lusifer_vertexg
+      lusifer_vertexg=.true.
 c ew three-particle vertices
       if(p1.eq.'el '.and.p2.eq.'ne~'.and.p3.eq.'W+ ')return
       if(p1.eq.'el~'.and.p2.eq.'ne '.and.p3.eq.'W+~')return
@@ -1651,7 +1659,7 @@ c QCD vertices
 c QCD four-gluon vertex (auxiliary particle v3)
       if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'v3 ')return
       if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'v3~')return
-      vertexg=.false.
+      lusifer_vertexg=.false.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1661,17 +1669,17 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function id(binary)
+      function lusifer_id(binary)
       implicit none
 c local variables
-      integer id,binary,i1,i2,i3,nexternal
+      integer lusifer_id,binary,i1,i2,i3,nexternal
       i3=1
       nexternal=30
-      id=0
+      lusifer_id=0
       do i1=nexternal,1,-1
         i2=binary/2**(i1-1)
         if((i2/2)*2.ne.i2)then
-          id=id+i1*i3
+          lusifer_id=lusifer_id+i1*i3
           i3=10*i3
         endif
       enddo

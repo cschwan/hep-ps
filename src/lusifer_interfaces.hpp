@@ -2,9 +2,9 @@
 #include "config.hpp"
 #endif
 
-#define lusifer_initphasespace F77_FUNC(initphasespace, INITPHASESPACE)
-#define lusifer_phasespace F77_FUNC(phasespace, PHASESPACE)
-#define lusifer_density F77_FUNC(density, DENSITY)
+#define lusifer_initphasespace F77_FUNC(lusifer_initphasespace, INITPHASESPACE)
+#define lusifer_phasespace F77_FUNC(lusifer_phasespace, PHASESPACE)
+#define lusifer_density F77_FUNC(lusifer_density, DENSITY)
 
 #define lusifer_extra_generatormax F77_FUNC(generatormax, GENERATORMAX)
 #define lusifer_extra_generatordata F77_FUNC(generatordata, GENERATORDATA)

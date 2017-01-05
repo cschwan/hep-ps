@@ -15,8 +15,8 @@
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
       integer nchannel(maxg),nexternal(maxg),allbinary(maxg)
-      common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
-     *  nexternal,allbinary
+      common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width,
+     *  nchannel,nexternal,allbinary
       integer gen,nch
 
       nch = nchannel(gen)
@@ -29,8 +29,8 @@
       real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
       real*8 mass(0:maxv),width(0:maxv)
       integer nchannel(maxg),nexternal(maxg),allbinary(maxg)
-      common/general/alphaisr,scale,meisr,s,p,mass,width,nchannel,
-     *  nexternal,allbinary
+      common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width,
+     *  nchannel,nexternal,allbinary
       integer gen,nex
       real*8 mw,gw,mz,gz,mh,gh,mt,gt
 
