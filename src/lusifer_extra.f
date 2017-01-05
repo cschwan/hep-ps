@@ -1,4 +1,4 @@
-      subroutine generatormax(maxex,maxgen)
+      subroutine lusifer_extra_max(maxex,maxgen)
       implicit none
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
@@ -8,7 +8,7 @@
       maxgen = maxg
       end
 
-      subroutine generatordata(gen,nch)
+      subroutine lusifer_extra_data(gen,nch)
       implicit none
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
@@ -22,7 +22,7 @@
       nch = nchannel(gen)
       end
 
-      subroutine generatorset(gen,nex,mw,gw,mz,gz,mh,gh,mt,gt)
+      subroutine lusifer_extra_set(gen,nex,mw,gw,mz,gz,mh,gh,mt,gt)
       implicit none
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)

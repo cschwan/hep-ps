@@ -58,7 +58,7 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 
 	int maxex;
 	int maxgen;
-	lusifer_extra_generatormax(&maxex, &maxgen);
+	lusifer_extra_max(&maxex, &maxgen);
 
 	pimpl->max_particles = maxex;
 
@@ -78,18 +78,7 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	double gt = constants.width_t;
 
 	// set constants and the number of particles
-	lusifer_extra_generatorset(
-		&generator,
-		&nex,
-		&mw,
-		&gw,
-		&mz,
-		&gz,
-		&mh,
-		&gh,
-		&mt,
-		&gt
-	);
+	lusifer_extra_set(&generator, &nex, &mw, &gw, &mz, &gz, &mh, &gh, &mt, &gt);
 
 	// fill up the string with three spaces for particle not used
 	std::string process0 = process;
@@ -112,7 +101,7 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	);
 
 	int channels;
-	lusifer_extra_generatordata(&generator, &channels);
+	lusifer_extra_data(&generator, &channels);
 
 	// there must be at least one channel, otherwise something went wrong
 	assert( channels > 0 );

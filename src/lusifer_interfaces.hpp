@@ -6,9 +6,9 @@
 #define lusifer_phasespace F77_FUNC(lusifer_phasespace, PHASESPACE)
 #define lusifer_density F77_FUNC(lusifer_density, DENSITY)
 
-#define lusifer_extra_generatormax F77_FUNC(generatormax, GENERATORMAX)
-#define lusifer_extra_generatordata F77_FUNC(generatordata, GENERATORDATA)
-#define lusifer_extra_generatorset F77_FUNC(generatorset, GENERATORSET)
+#define lusifer_extra_max F77_FUNC(lusifer_extra_max, GENERATORMAX)
+#define lusifer_extra_data F77_FUNC(lusifer_extra_data, GENERATORDATA)
+#define lusifer_extra_set F77_FUNC(lusifer_extra_set, GENERATORSET)
 
 extern "C"
 {
@@ -40,17 +40,17 @@ void lusifer_density(
     int* switch_
 );
 
-void lusifer_extra_generatormax(
+void lusifer_extra_max(
 	int* maxex,
 	int* maxgen
 );
 
-void lusifer_extra_generatordata(
+void lusifer_extra_data(
 	int* gen,
 	int* nch
 );
 
-void lusifer_extra_generatorset(
+void lusifer_extra_set(
 	int* gen,
 	int* nex,
 	double* mw,
