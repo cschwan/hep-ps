@@ -51,6 +51,16 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg3.channels()       == 93 );
 	REQUIRE( psg3.dimensions()     == 14 );
 	REQUIRE( psg3.map_dimensions() == 32 );
+
+	// pp -> 3 jets + two pairs of leptons
+	hep::lusifer_phase_space_generator<T> psg4(
+		"sq~uq ne el~nm mu~dq cq~gl ",
+		constants
+	);
+
+	REQUIRE( psg4.channels()       == 452 );
+	REQUIRE( psg4.dimensions()     == 17 );
+	REQUIRE( psg4.map_dimensions() == 36 );
 }
 
 TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")

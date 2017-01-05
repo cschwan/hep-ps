@@ -412,7 +412,7 @@ c generic particle names, see also subroutine vertexg
       gname(23)='Z0 '
       gname(24)='W+ '
       gname(25)='H0 '
-c      gname(26)='gl '
+      gname(26)='gl '
       gname(30)='v1 ' ! auxiliary particle, 4-particle vertex
       gname(31)='v2 ' ! auxiliary particle, 4-particle vertex
       gname(32)='v3 ' ! auxiliary particle, 4-particle vertex
@@ -1655,7 +1655,7 @@ c QCD vertices
       if(p1.eq.'cq '.and.p2.eq.'cq~'.and.p3.eq.'gl ')return
       if(p1.eq.'bq '.and.p2.eq.'bq~'.and.p3.eq.'gl ')return
       if(p1.eq.'tq '.and.p2.eq.'tq~'.and.p3.eq.'gl ')return
-      if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'gl ')return
+c     if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'gl ')return
 c QCD four-gluon vertex (auxiliary particle v3)
       if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'v3 ')return
       if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'v3~')return
