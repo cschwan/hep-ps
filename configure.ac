@@ -45,6 +45,12 @@ AC_CONFIG_HEADERS([config.hpp])
 AC_CHECK_HEADERS([hep/mc.hpp])
 AM_CONDITIONAL([HAVE_HEP_MC_HPP], [test -n "$ac_cv_header_hep_mc_hpp"])
 
+# check for FastJet (needed for a test)
+AC_CHECK_HEADERS([fastjet/ClusterSequence.hh],
+	AC_SEARCH_LIBS([_ZN7fastjet15ClusterSequenceD1Ev], [fastjet]))
+AM_CONDITIONAL([HAVE_FASTJET_CLUSTER_SEQUENCE_HH],
+	[test -n "$ac_cv_header_fastjet_ClusterSequence_hh"])
+
 # find LHAPDF header and library
 AC_CHECK_HEADERS([LHAPDF/LHAPDF.h])
 AC_SEARCH_LIBS([_ZN6LHAPDF5mkPDFERKSsi], [LHAPDF], [],

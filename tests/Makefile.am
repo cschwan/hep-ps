@@ -20,6 +20,10 @@ if HAVE_HEP_MC_HPP
 check_PROGRAMS += test_mc_phase_space_adapter
 endif
 
+if HAVE_FASTJET_CLUSTER_SEQUENCE_HH
+check_PROGRAMS += test_p_type_jet_algorithm
+endif
+
 LDADD = $(check_LTLIBRARIES) $(top_builddir)/src/libhep-ps.la
 
 TESTS = $(check_PROGRAMS)
