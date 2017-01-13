@@ -33,6 +33,20 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg1.dimensions()     ==  2 );
 	REQUIRE( psg1.map_dimensions() == 16 );
 
+	for (std::size_t extra = 0; extra != 4; ++extra)
+	{
+		// e+e- -> muon pair + extra random numbers
+		hep::lusifer_phase_space_generator<T> psg(
+			"el~el mu mu~",
+			constants,
+			extra
+		);
+
+		REQUIRE( psg.channels()       ==  2 );
+		REQUIRE( psg.dimensions()     ==  2 + extra );
+		REQUIRE( psg.map_dimensions() == 16 );
+	}
+
 	hep::lusifer_phase_space_generator<T> psg2(
 		"sq~uq W+ W+ dq cq~",
 		constants

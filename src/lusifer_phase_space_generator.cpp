@@ -38,13 +38,15 @@ public:
 	std::size_t channels;
 	std::size_t particles;
 	std::size_t max_particles;
+	std::size_t extra_random_numbers;
 	T cmf_energy_;
 };
 
 template <typename T>
 lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	std::string const& process,
-	lusifer_constants<T> const& constants
+	lusifer_constants<T> const& constants,
+	std::size_t extra_random_numbers
 )
 	: pimpl(new impl())
 {
@@ -107,6 +109,7 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	assert( channels > 0 );
 
 	pimpl->channels = channels;
+	pimpl->extra_random_numbers = extra_random_numbers;
 }
 
 template <typename T>
@@ -145,7 +148,7 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 template <typename T>
 std::size_t lusifer_phase_space_generator<T>::dimensions() const
 {
-	return 3 * (pimpl->particles - 4) + 2;
+	return 3 * (pimpl->particles - 4) + 2 + pimpl->extra_random_numbers;
 }
 
 template <typename T>
