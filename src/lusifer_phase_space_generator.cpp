@@ -2,9 +2,225 @@
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "lusifer_interfaces.hpp"
 
+#include <bitset>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #include <utility>
+
+constexpr std::size_t maxg = 1;
+constexpr std::size_t maxe = 9;
+constexpr std::size_t maxch = 20000;
+constexpr std::size_t maxv = 40;
+
+extern "C"
+{
+
+struct
+{
+	double alphaisr;
+	double scale;
+	double meisr;
+	double s[1 << maxe];
+	double p[1 << maxe][4];
+	double mass[maxv + 1];
+	double width[maxv + 1];
+	int nchannel[maxg];
+	int nexternal[maxg];
+	int allbinary[maxg];
+} lusifer_general_;
+
+struct
+{
+	double powerinv[maxg][maxch][maxe];
+	double mcutinv[maxg][(1 << maxe) + 1];
+	int ininv[maxg][maxch][maxe];
+	int idhepinv[maxg][maxch][maxv];
+	int ninv[maxg][maxch];
+	int lmin[maxg][maxch][maxe][maxe];
+	int lmax[maxg][maxch][maxe][maxe];
+} lusifer_cinv_;
+
+struct
+{
+	int indecay[maxg][maxch][maxe];
+	int out1decay[maxg][maxch][maxe];
+	int out2decay[maxg][maxch][maxe];
+	int ndecay[maxg][maxch];
+} lusifer_cdecay_;
+
+struct
+{
+	double powerprocess[maxg][maxch][maxe];
+	double ccutprocess[maxg][1 << maxe];
+	int in1process[maxg][maxch][maxe];
+	int in2process[maxg][maxch][maxe];
+	int out1process[maxg][maxch][maxe];
+	int out2process[maxg][maxch][maxe];
+	int inprocess[maxg][maxch][maxe];
+	int virtprocess[maxg][maxch][maxe];
+	int idhepprocess[maxg][maxch][maxe];
+	int nprocess[maxg][maxch];
+} lusifer_cprocess_;
+
+struct
+{
+	int nsinv[maxg][maxch];
+	int chinv[maxg][maxch];
+	int maxinv[maxg];
+	int ntprocess[maxg][maxch];
+	int chprocess[maxg][maxch];
+	int maxprocess[maxg];
+	int nsdecay[maxg][maxch];
+	int chdecay[maxg][maxch];
+	int maxdecay[maxg];
+	int numinv[maxg][maxch][maxe];
+	int numprocess[maxg][maxch][maxe];
+	int numdecay[maxg][maxch][maxe];
+} lusifer_cdensity_;
+
+}
+
+namespace
+{
+
+struct invariant
+{
+	invariant(
+		std::size_t in,
+		std::size_t idhep,
+		std::bitset<std::numeric_limits<std::size_t>::digits> lmin,
+		std::bitset<std::numeric_limits<std::size_t>::digits> lmax,
+		std::size_t index
+	)
+		: in(in)
+		, idhep(idhep)
+		, lmin(lmin)
+		, lmax(lmax)
+		, index(index)
+	{
+	}
+
+	std::size_t in;
+	std::size_t idhep;
+	std::bitset<std::numeric_limits<std::size_t>::digits> lmin;
+	std::bitset<std::numeric_limits<std::size_t>::digits> lmax;
+	std::size_t index;
+};
+
+struct process
+{
+	process(
+		std::size_t in1,
+		std::size_t in2,
+		std::size_t out1,
+		std::size_t out2,
+		std::size_t in,
+		std::size_t virt,
+		std::size_t idhep,
+		std::size_t index
+	)
+		: in1(in1)
+		, in2(in2)
+		, out1(out1)
+		, out2(out2)
+		, in(in)
+		, virt(virt)
+		, idhep(idhep)
+		, index(index)
+	{
+	}
+
+	std::size_t in1;
+	std::size_t in2;
+	std::size_t out1;
+	std::size_t out2;
+	std::size_t in;
+	std::size_t virt;
+	std::size_t idhep;
+	std::size_t index;
+};
+
+struct decay
+{
+	decay(
+		std::size_t in,
+		std::size_t out1,
+		std::size_t out2,
+		std::size_t index
+	)
+		: in(in)
+		, out1(out1)
+		, out2(out2)
+		, index(index)
+	{
+	}
+
+	std::size_t in;
+	std::size_t out1;
+	std::size_t out2;
+	std::size_t index;
+};
+
+struct channel
+{
+	std::vector<invariant> invariants;
+	std::vector<process> processes;
+	std::vector<decay> decays;
+};
+
+struct invariant_info
+{
+	invariant_info(std::size_t index, std::size_t channel)
+		: index(index)
+		, channel(channel)
+	{
+	}
+
+	std::size_t index;
+	std::size_t channel;
+};
+
+struct process_info
+{
+	process_info(std::size_t index, std::size_t channel)
+		: index(index)
+		, channel(channel)
+	{
+	}
+
+	std::size_t index;
+	std::size_t channel;
+};
+
+struct decay_info
+{
+	decay_info(std::size_t index, std::size_t channel)
+		: index(index)
+		, channel(channel)
+	{
+	}
+
+	std::size_t index;
+	std::size_t channel;
+};
+
+template <typename T>
+struct particle_info
+{
+	particle_info(T power, T mass, T width)
+		: power(power)
+		, mass(mass)
+		, width(width)
+	{
+	}
+
+	T power;
+	T mass;
+	T width;
+};
+
+}
 
 namespace hep
 {
