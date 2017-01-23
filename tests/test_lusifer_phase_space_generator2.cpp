@@ -17,7 +17,7 @@ hep::lusifer_constants<T> constants(
 	T(91.1876), T(2.4952)
 );
 
-TEST_CASE("numerical values", "[lusifer_phase_space_generator]")
+TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 {
 	hep::lusifer_phase_space_generator<T> psg(
 		"sq~uq ne el~nm mu~dq cq~",
