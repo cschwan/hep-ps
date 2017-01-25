@@ -1,10 +1,12 @@
 #include "hep/ps/fortran_helper.hpp"
+#include "hep/ps/kaellen.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "lusifer_interfaces.hpp"
 
 #include <bitset>
 #include <cassert>
 #include <cmath>
+#include <iterator>
 #include <limits>
 #include <utility>
 
@@ -220,6 +222,108 @@ struct particle_info
 	T width;
 };
 
+template <typename T>
+T map(T power, T mass, T width, T x, T xmin, T xmax)
+{
+	using std::atan;
+	using std::copysign;
+	using std::exp;
+	using std::fabs;
+	using std::log;
+	using std::pow;
+	using std::tan;
+
+	T m2 = copysign(mass * mass, mass);
+	mass = fabs(mass);
+
+	if (width > T())
+	{
+		T const mg = mass * width;
+		T const min = atan((xmin - m2) / mg);
+		T const max = atan((xmax - m2) / mg);
+
+		return m2 + mg * tan(x * (max - min) + min);
+	}
+
+	if (power == T())
+	{
+		return x * xmax + (T(1.0) - x) * xmin;
+	}
+
+	// TODO: make this parameter accessible from outside
+	m2 -= T(1e-6);
+
+	if (power == T(1.0))
+	{
+		// TODO: WARNING this branch is untested!
+		return m2 + exp(x * log(xmax - m2) + (T(1.0) - x) * log(xmin - m2));
+	}
+
+	T const omp = T(1.0) - power;
+
+	return m2 + pow(x * pow(xmax - m2, omp) + (T(1.0) - x) *
+		pow(xmin - m2, omp), T(1.0) / omp);
+}
+
+template <typename T>
+void rotate(T (&p)[4], T phi, T cos_theta)
+{
+	using std::cos;
+	using std::sin;
+	using std::sqrt;
+
+	T const sin_phi = sin(phi);
+	T const cos_phi = cos(phi);
+	T const sin_theta = sqrt((T(1.0) - cos_theta) * (T(1.0) + cos_theta));
+
+	T const px = p[1];
+	T const py = p[2];
+	T const pz = p[3];
+
+	p[1] =  px * cos_theta * cos_phi + py * sin_phi + pz * sin_theta * cos_phi;
+	p[2] = -px * cos_theta * sin_phi + py * cos_phi - pz * sin_theta * sin_phi;
+	p[3] = -px * sin_theta                          + pz * cos_theta;
+}
+
+template <typename T>
+void boost(T m, T (&p)[4], T const (&q)[4], bool inverse)
+{
+	T const sign = inverse ? T(1.0) : T(-1.0);
+	T const bx = sign * q[1] / m;
+	T const by = sign * q[2] / m;
+	T const bz = sign * q[3] / m;
+	T const gamma = q[0] / m;
+	T const a = T(1.0) / (T(1.0) + gamma);
+	T const p0 = p[0];
+	T const px = p[1];
+	T const py = p[2];
+	T const pz = p[3];
+	T const bp = bx * px + by * py + bz * pz;
+
+	p[0] = gamma * p0 + bp;
+	p[1] = px + bx * p0 + a * bp * bx;
+	p[2] = py + by * p0 + a * bp * by;
+	p[3] = pz + bz * p0 + a * bp * bz;
+}
+
+template <typename T>
+void decay_momenta(
+	T m,
+	T const (&q)[4],
+	T phi,
+	T cos_theta,
+	T (&p1)[4],
+	T (&p2)[4]
+) {
+	rotate(p1, phi, cos_theta);
+	boost(m, p1, q, true);
+
+	p2[0] = q[0] - p1[0];
+	p2[1] = q[1] - p1[1];
+	p2[2] = q[2] - p1[2];
+	p2[3] = q[3] - p1[3];
+}
+
 }
 
 namespace hep
@@ -259,6 +363,11 @@ public:
 	);
 
 	std::vector<channel> channels;
+	std::vector<invariant_info> invariants;
+	std::vector<process_info> processes;
+	std::vector<decay_info> decays;
+	std::vector<particle_info<T>> particle_infos;
+	std::vector<T> mcut;
 	std::size_t particles;
 	std::size_t max_particles;
 	std::size_t extra_random_numbers;
@@ -277,6 +386,112 @@ lusifer_phase_space_generator<T>::impl::impl(
 	, extra_random_numbers(extra_random_numbers)
 {
 	this->channels.resize(channels);
+
+	for (std::size_t i = 0; i != channels; ++i)
+	{
+		auto& channel = this->channels.at(i);
+
+		channel.invariants.reserve(lusifer_cinv_.ninv[0][i]);
+		channel.processes.reserve(lusifer_cprocess_.nprocess[0][i]);
+		channel.decays.reserve(lusifer_cdecay_.ndecay[0][i]);
+
+		for (std::size_t j = 0; j != channel.invariants.capacity(); ++j)
+		{
+			decltype (invariant::lmin) lmin;
+			decltype (invariant::lmax) lmax;
+
+			for (std::size_t k = 0; k != maxe; ++k)
+			{
+				lmin.set(k, lusifer_cinv_.lmin[0][i][j][k]);
+				lmax.set(k, lusifer_cinv_.lmax[0][i][j][k]);
+			}
+
+			channel.invariants.emplace_back(
+				lusifer_cinv_.ininv[0][i][j] - 1,
+				lusifer_cinv_.idhepinv[0][i][j],
+				lmin,
+				lmax,
+				0
+			);
+		}
+
+		for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
+		{
+			channel.processes.emplace_back(
+				lusifer_cprocess_.in1process[0][i][j] - 1,
+				lusifer_cprocess_.in2process[0][i][j] - 1,
+				lusifer_cprocess_.out1process[0][i][j] - 1,
+				lusifer_cprocess_.out2process[0][i][j] - 1,
+				lusifer_cprocess_.inprocess[0][i][j] - 1,
+				lusifer_cprocess_.virtprocess[0][i][j] - 1,
+				lusifer_cprocess_.idhepprocess[0][i][j],
+				0
+			);
+		}
+
+		for (std::size_t j = 0; j != channel.decays.capacity(); ++j)
+		{
+			channel.decays.emplace_back(
+				lusifer_cdecay_.indecay[0][i][j] - 1,
+				lusifer_cdecay_.out1decay[0][i][j] - 1,
+				lusifer_cdecay_.out2decay[0][i][j] - 1,
+				0
+			);
+		}
+	}
+
+	invariants.reserve(lusifer_cdensity_.maxinv[0]);
+
+	for (std::size_t i = 0; i != invariants.capacity(); ++i)
+	{
+		invariants.emplace_back(
+			lusifer_cdensity_.nsinv[0][i],
+			lusifer_cdensity_.chinv[0][i]
+		);
+	}
+
+	processes.reserve(lusifer_cdensity_.maxprocess[0]);
+
+	for (std::size_t i = 0; i != processes.capacity(); ++i)
+	{
+		processes.emplace_back(
+			lusifer_cdensity_.ntprocess[0][i],
+			lusifer_cdensity_.chprocess[0][i]
+		);
+	}
+
+	decays.reserve(lusifer_cdensity_.maxdecay[0]);
+
+	for (std::size_t i = 0; i != decays.capacity(); ++i)
+	{
+		decays.emplace_back(
+			lusifer_cdensity_.nsdecay[0][i],
+			lusifer_cdensity_.chdecay[0][i]
+		);
+	}
+
+	particle_infos.reserve(maxv + 1);
+
+	for (std::size_t i = 0; i != particle_infos.capacity(); ++i)
+	{
+		// TODO: make this parameter available from outside
+		T power = T(0.9);
+		T mass  = lusifer_general_.mass[i];
+		T width = lusifer_general_.width[i];
+
+		if ((width > T()) || (i == 0) || ((i >= 30) && (i < 33)))
+		{
+			power = T();
+		}
+
+		particle_infos.emplace_back(power, mass, width);
+	}
+
+	// TODO: is the following needed?
+	mcut.assign(
+		std::begin(lusifer_cinv_.mcutinv[0]),
+		std::end(lusifer_cinv_.mcutinv[0])
+	);
 }
 
 template <typename T>
@@ -367,6 +582,65 @@ std::size_t lusifer_phase_space_generator<T>::channels() const
 template <typename T>
 T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 {
+	auto& p = lusifer_general_.p;
+	auto& s = lusifer_general_.s;
+
+	std::size_t const allbinary = lusifer_general_.allbinary[0];
+
+	// skip first three and last four elements; they are computed already
+	for (std::size_t i = 0; i != allbinary - 1u; ++i)
+	{
+		// check if this isn't already computed
+		if (p[i][0] != T())
+		{
+			continue;
+		}
+
+		// index of the sum that can be used with momentum conservation
+		std::size_t const index = allbinary - i - 2;
+
+		// if not already calculated, calculate all remaining sums and
+		// invariants that are needed during the calculation of the densities
+		// which have to be evaluated for all channels
+		if (p[index][0] == T())
+		{
+			std::bitset<32> bitset_i(i + 1);
+
+			std::size_t j = 0;
+			while (!bitset_i.test(j))
+			{
+				++j;
+			}
+			std::size_t leading_zero = 1 << j;
+
+			p[i][0] = p[i - leading_zero][0] + p[leading_zero - 1][0];
+			p[i][1] = p[i - leading_zero][1] + p[leading_zero - 1][1];
+			p[i][2] = p[i - leading_zero][2] + p[leading_zero - 1][2];
+			p[i][3] = p[i - leading_zero][3] + p[leading_zero - 1][3];
+
+			// calculate the corresponding invariant
+			s[i] = p[i][0] * p[i][0] - p[i][1] * p[i][1] -
+				p[i][2] * p[i][2] - p[i][3] * p[i][3];
+
+			p[index][0] = -p[i][0];
+			p[index][1] = -p[i][1];
+			p[index][2] = -p[i][2];
+			p[index][3] = -p[i][3];
+
+			s[index] = s[i];
+		}
+		else
+		{
+			// use momentum conservation
+			p[i][0] = -p[index][0];
+			p[i][1] = -p[index][1];
+			p[i][2] = -p[index][2];
+			p[i][3] = -p[index][3];
+
+			s[i] = s[index];
+		}
+	}
+
 	assert( densities.size() >= channels() );
 
 	int generator = 1;
@@ -393,48 +667,219 @@ void lusifer_phase_space_generator<T>::generate(
 	T cmf_energy,
 	std::size_t channel
 ) {
-	assert( random_numbers.size() >= dimensions() );
-	assert( momenta.size() == map_dimensions() );
+	using std::acos;
+	using std::atan2;
+	using std::copysign;
+	using std::fabs;
+	using std::sqrt;
 
-	double const value = 0.5 * cmf_energy;
-	// incoming beam momenta
-	double kbeam[] = { value, value, 0.0, 0.0, 0.0, 0.0, -value, value };
-	double x1 = 1.0;
-	double x2 = 1.0;
-	// dummy parameter
-	double g = 0.0;
-	// FORTRAN counting again
-	int channel_ = channel + 1;
-	int generator = 1;
-	int switch_ = 1;
+	auto& s = lusifer_general_.s;
+	auto& p = lusifer_general_.p;
 
-	// the vector containing the random numbers must have the maximimum size
-	std::vector<T> random_numbers0;
-	random_numbers0.reserve(3 * (pimpl->max_particles - 4) + 2);
-	random_numbers0 = random_numbers;
-	random_numbers0.resize(3 * (pimpl->max_particles - 4) + 2);
+	// clear all entries
+	for (auto& q : p)
+	{
+		std::fill(std::begin(q), std::end(q), T());
+	}
 
-	// the same holds true for the momenta
-	std::vector<T> momenta0;
-	momenta0.reserve(4 * pimpl->max_particles);
-	momenta0 = momenta;
-	momenta0.resize(4 * pimpl->max_particles);
+	std::size_t const allbinary = lusifer_general_.allbinary[0];
 
-	lusifer_phasespace(
-		random_numbers0.data(),
-		kbeam,
-		momenta0.data(),
-		&x1,
-		&x2,
-		&g,
-		&channel_,
-		&generator,
-		&switch_
-	);
+	// first momentum: negative of the first beam momentum
+	p[0][0] = T(-0.5) * cmf_energy;
+	p[0][3] = T( 0.5) * cmf_energy;
 
-	fortran_ordering_to_cpp(momenta0);
-	momenta0.resize(momenta.size());
-	momenta = momenta0;
+	// second momentum: negative of the second beam momentum
+	p[1][0] = T(-0.5) * cmf_energy;
+	p[1][3] = T(-0.5) * cmf_energy;
+
+	// sum of the first two momenta
+	p[2][0] = T(-1.0) * cmf_energy;
+
+	// sum of all momenta except the first two
+	p[allbinary - 4][0] = cmf_energy;
+
+	// sum of all momenta except the second
+	p[allbinary - 3][0] = T( 0.5) * cmf_energy;
+	p[allbinary - 3][3] = T( 0.5) * cmf_energy;
+
+	// sum of all momenta except the first
+	p[allbinary - 2][0] = T( 0.5) * cmf_energy;
+	p[allbinary - 2][3] = T(-0.5) * cmf_energy;
+
+	// square of the sum of the first two momenta
+	s[2] = cmf_energy * cmf_energy;
+
+	// square of the sum of all momenta except the first two
+	s[allbinary - 4] = s[2];
+
+	std::size_t ranstart = 0;
+
+	// iteratively construct the time-like invariants
+	for (auto const& invariant : pimpl->channels[channel].invariants)
+	{
+		// index corresponding to the ns'th invariant
+		std::size_t inv1 = invariant.in;
+		// `inv1 + inv2 = allbinary - 3`
+		std::size_t inv2 = (allbinary - 3 - inv1) - 2;
+
+		T mmin = pimpl->mcut[inv1];
+		T mmax = pimpl->mcut[inv2];
+
+		for (std::size_t i = 0;
+			&pimpl->channels[channel].invariants[i] != &invariant; ++i)
+		{
+			std::size_t const virt = pimpl->channels[channel].invariants[i].in;
+			bool const condition = s[virt] > pimpl->mcut[virt] * pimpl->mcut[virt];
+
+			// is there a minimum limit on this invariant?
+			if (invariant.lmin.test(i) && condition)
+			{
+				std::size_t const inv3 = inv1 - virt;
+				mmin += sqrt(s[virt]) - pimpl->mcut[inv1] + pimpl->mcut[inv3];
+				inv1 = inv3;
+			}
+
+			// is there a maximum limit on this invariant?
+			if (invariant.lmax.test(i) && condition)
+			{
+				std::size_t const inv3 = inv2 - virt;
+				mmax += sqrt(s[virt]) - pimpl->mcut[inv2] + pimpl->mcut[inv3];
+				inv2 = inv3;
+			}
+		}
+
+		T const smin = mmin * mmin;
+		T const smax = (cmf_energy - mmax) * (cmf_energy - mmax);
+
+		// TODO: replace particle_infos calls with model
+
+		s[invariant.in] = map(
+			pimpl->particle_infos.at(invariant.idhep).power,
+			pimpl->particle_infos.at(invariant.idhep).mass,
+			pimpl->particle_infos.at(invariant.idhep).width,
+			random_numbers.at(ranstart++),
+			smin,
+			smax
+		);
+	}
+
+	for (auto const& process : pimpl->channels[channel].processes)
+	{
+		T const s  = lusifer_general_.s[process.in];
+		T const s1 = lusifer_general_.s[process.out1];
+		T const s2 = lusifer_general_.s[process.out2];
+		T&      t  = lusifer_general_.s[process.virt];
+		T const t1 = lusifer_general_.s[process.in1];
+		T const t2 = lusifer_general_.s[process.in2];
+
+		T const lambdas = sqrt(kaellen(s, s1, s2));
+		T const lambdat = sqrt(kaellen(s, t1, t2));
+
+		T const tmp = (s + s1 - s2) * (s + t1 - t2);
+		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
+		T       tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
+
+		// TODO: make this parameter available from outside
+		if (fabs(tmax) < T(1e-7))
+		{
+			tmax = T();
+		}
+
+		T phi = T(2.0) * acos(T(-1.0)) * random_numbers.at(ranstart++);
+		T const h = map(
+			 pimpl->particle_infos.at(process.idhep).power,
+			-pimpl->particle_infos.at(process.idhep).mass,
+			 pimpl->particle_infos.at(process.idhep).width,
+			random_numbers.at(ranstart++),
+			-tmax,
+			-tmin
+		);
+		T cos_theta = (tmp - T(2.0) * s * (t1 + s1 + h)) / (lambdas * lambdat);
+
+		auto const& q1 = p[process.in1];
+		auto const& q2 = p[process.in2];
+		auto&       p1 = p[process.out1];
+		auto&       p2 = p[process.out2];
+		auto&       qt = p[process.virt];
+
+		T const sqrts = sqrt(s);
+
+		p1[0] = T(0.5) * (s + s1 - s2) / sqrts;
+		p1[3] = T(0.5) * lambdas / sqrts;
+
+		phi = copysign(phi, q1[3]);
+
+		rotate(p1, phi, cos_theta);
+
+		T const q[] = {
+			q1[0] + q2[0],
+			q1[1] + q2[1],
+			q1[2] + q2[2],
+			q1[3] + q2[3]
+		};
+
+		T k1[] = { q1[0], q1[1], q1[2], q1[3] };
+
+		boost(sqrts, k1, q, false);
+
+		// the following can not be abbreviated with a single call to atan2, is
+		// this choice of phi consistent?
+		if (k1[1] == T())
+		{
+			phi = copysign(T(0.5) * acos(T(-1.0)), k1[2]);
+		}
+		else
+		{
+			phi = atan2(k1[2], k1[1]);
+		}
+
+		cos_theta = k1[3] / sqrt(k1[1] * k1[1] + k1[2] * k1[2] + k1[3] * k1[3]);
+
+		decay_momenta(sqrts, q, -phi, cos_theta, p1, p2);
+
+		qt[0] = q1[0] - p1[0];
+		qt[1] = q1[1] - p1[1];
+		qt[2] = q1[2] - p1[2];
+		qt[3] = q1[3] - p1[3];
+
+		t = qt[0] * qt[0] - qt[1] * qt[1] - qt[2] * qt[2] - qt[3] * qt[3];
+	}
+
+	for (auto const& decay : pimpl->channels[channel].decays)
+	{
+		T const s  = lusifer_general_.s[decay.in];
+		T const s1 = lusifer_general_.s[decay.out1];
+		T const s2 = lusifer_general_.s[decay.out2];
+
+		auto& p1 = p[decay.out1];
+		T const sqrts = sqrt(s);
+
+		p1[0] = T(0.5) * (s + s1 - s2) / sqrts;
+		p1[3] = T(0.5) * sqrt(kaellen(s, s1, s2)) / sqrts;
+
+		T const phi = T(2.0) * acos(T(-1.0)) * random_numbers.at(ranstart++);
+		T const cos_theta = T(2.0) * random_numbers.at(ranstart++) - T(1.0);
+
+		decay_momenta(sqrts, p[decay.in], phi, cos_theta, p1, p[decay.out2]);
+	}
+
+	// assign beam momenta
+	momenta.at(0) = T( 0.5) * cmf_energy;
+	momenta.at(1) = T();
+	momenta.at(2) = T();
+	momenta.at(3) = T(-0.5) * cmf_energy;
+	momenta.at(4) = T( 0.5) * cmf_energy;
+	momenta.at(5) = T();
+	momenta.at(6) = T();
+	momenta.at(7) = T( 0.5) * cmf_energy;
+
+	for (std::size_t i = 2; i != pimpl->particles; ++i)
+	{
+		momenta.at(4 * i + 0) = p[(1 << i) - 1][0];
+		momenta.at(4 * i + 1) = p[(1 << i) - 1][1];
+		momenta.at(4 * i + 2) = p[(1 << i) - 1][2];
+		momenta.at(4 * i + 3) = p[(1 << i) - 1][3];
+	}
 
 	pimpl->cmf_energy_ = cmf_energy;
 }
