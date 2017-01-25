@@ -251,7 +251,14 @@ template <typename T>
 class lusifer_phase_space_generator<T>::impl
 {
 public:
-	std::size_t channels;
+	impl(
+		std::size_t particles,
+		std::size_t max_particles,
+		std::size_t channels,
+		std::size_t extra_random_numbers
+	);
+
+	std::vector<channel> channels;
 	std::size_t particles;
 	std::size_t max_particles;
 	std::size_t extra_random_numbers;
@@ -259,33 +266,41 @@ public:
 };
 
 template <typename T>
+lusifer_phase_space_generator<T>::impl::impl(
+	std::size_t particles,
+	std::size_t max_particles,
+	std::size_t channels,
+	std::size_t extra_random_numbers
+)
+	: particles(particles)
+	, max_particles(max_particles)
+	, extra_random_numbers(extra_random_numbers)
+{
+	this->channels.resize(channels);
+}
+
+template <typename T>
 lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	std::string const& process,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers
-)
-	: pimpl(new impl())
-{
+) {
 	// each particle must be specified with three characters
 	assert( process.size() % 3 == 0 );
-
-	pimpl->particles = process.size() / 3;
-
 	// there must be at least four particles
-	assert( pimpl->particles >= 4 );
+	assert( process.size() >= 4 * 3 );
 
 	int maxex;
 	int maxgen;
 	lusifer_extra_max(&maxex, &maxgen);
 
-	pimpl->max_particles = maxex;
+	int nex = process.size() / 3;
 
 	// the number of particles must be supported by the generator
-	assert( pimpl->max_particles >= pimpl->particles );
+	assert( nex <= maxex );
 
 	// FORTRAN counting: use the first generator
 	int generator = 1;
-	int nex = pimpl->particles;
 	double mw = constants.mass_w;
 	double gw = constants.width_w;
 	double mz = constants.mass_z;
@@ -300,7 +315,7 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 
 	// fill up the string with three spaces for particle not used
 	std::string process0 = process;
-	process0.append(3 * (maxex - pimpl->particles), ' ');
+	process0.append(3 * (maxex - nex), ' ');
 
 	// TODO: what is the meaning of this parameter?
 	int lightfermions = 0;
@@ -324,8 +339,12 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 	// there must be at least one channel, otherwise something went wrong
 	assert( channels > 0 );
 
-	pimpl->channels = channels;
-	pimpl->extra_random_numbers = extra_random_numbers;
+	pimpl = std::move(std::unique_ptr<impl>(new impl(
+		nex,
+		maxe,
+		channels,
+		extra_random_numbers
+	)));
 }
 
 template <typename T>
@@ -342,7 +361,7 @@ lusifer_phase_space_generator<T>::~lusifer_phase_space_generator() = default;
 template <typename T>
 std::size_t lusifer_phase_space_generator<T>::channels() const
 {
-	return pimpl->channels;
+	return pimpl->channels.size();
 }
 
 template <typename T>
