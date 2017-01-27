@@ -410,6 +410,9 @@ public:
 	std::vector<decay_info> decays;
 	std::vector<particle_info<T>> particle_infos;
 	std::vector<T> mcut;
+	std::vector<T> invariant_jacobians;
+	std::vector<T> process_jacobians;
+	std::vector<T> decay_jacobians;
 	std::size_t particles;
 	std::size_t max_particles;
 	std::size_t extra_random_numbers;
@@ -534,6 +537,10 @@ lusifer_phase_space_generator<T>::impl::impl(
 		std::begin(lusifer_cinv_.mcutinv[0]),
 		std::end(lusifer_cinv_.mcutinv[0])
 	);
+
+	invariant_jacobians.reserve(invariants.size());
+	process_jacobians.reserve(processes.size());
+	decay_jacobians.reserve(decays.size());
 }
 
 template <typename T>
@@ -688,13 +695,6 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 		}
 	}
 
-	std::vector<T> invariant_jacobians;
-	invariant_jacobians.reserve(pimpl->invariants.size());
-	std::vector<T> process_jacobians;
-	process_jacobians.reserve(pimpl->processes.size());
-	std::vector<T> decay_jacobians;
-	decay_jacobians.reserve(pimpl->decays.size());
-
 	for (auto const& info : pimpl->invariants)
 	{
 		auto const& invariant = pimpl->channels.at(info.channel).invariants.at(info.index);
@@ -734,7 +734,7 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 		T const smin = mmin * mmin;
 		T const smax = (pimpl->cmf_energy_ - mmax) * (pimpl->cmf_energy_ - mmax);
 
-		invariant_jacobians.push_back(jacobian(
+		pimpl->invariant_jacobians.push_back(jacobian(
 			pimpl->particle_infos.at(invariant.idhep).power,
 			pimpl->particle_infos.at(invariant.idhep).mass,
 			pimpl->particle_infos.at(invariant.idhep).width,
@@ -770,7 +770,7 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 
 		T const factor = T(2.0) * lambdat / acos(T(-1.0));
 
-		process_jacobians.push_back(factor * jacobian(
+		pimpl->process_jacobians.push_back(factor * jacobian(
 			 pimpl->particle_infos.at(process.idhep).power,
 			-pimpl->particle_infos.at(process.idhep).mass,
 			 pimpl->particle_infos.at(process.idhep).width,
@@ -791,10 +791,14 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 		T const jacobian = T(2.0) * s / (acos(T(-1.0)) *
 			sqrt(kaellen(s, s1, s2)));
 
-		decay_jacobians.push_back(jacobian);
+		pimpl->decay_jacobians.push_back(jacobian);
 	}
 
 	densities.clear();
+
+	pimpl->invariant_jacobians.clear();
+	pimpl->process_jacobians.clear();
+	pimpl->decay_jacobians.clear();
 
 	// compute the jacobians for each channel
 	for (auto const& channel : pimpl->channels)
@@ -803,17 +807,17 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 
 		for (auto const& invariant : channel.invariants)
 		{
-			jacobian *= invariant_jacobians[invariant.index];
+			jacobian *= pimpl->invariant_jacobians[invariant.index];
 		}
 
 		for (auto const& process : channel.processes)
 		{
-			jacobian *= process_jacobians[process.index];
+			jacobian *= pimpl->process_jacobians[process.index];
 		}
 
 		for (auto const& decay : channel.decays)
 		{
-			jacobian *= decay_jacobians[decay.index];
+			jacobian *= pimpl->decay_jacobians[decay.index];
 		}
 
 		densities.push_back(jacobian);
