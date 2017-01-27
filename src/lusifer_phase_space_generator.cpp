@@ -223,6 +223,48 @@ struct particle_info
 };
 
 template <typename T>
+T jacobian(T power, T mass, T width, T x, T xmin, T xmax)
+{
+	using std::atan;
+	using std::copysign;
+	using std::fabs;
+	using std::log;
+	using std::pow;
+
+	T m2 = copysign(mass * mass, mass);
+	mass = fabs(mass);
+
+	if (width > T())
+	{
+		T const mg = mass * width;
+		T const min = atan((xmin - m2) / mg);
+		T const max = atan((xmax - m2) / mg);
+		T const xprime = x - m2;
+
+		return mg / ((max - min) * (xprime * xprime + mg * mg));
+	}
+
+	if (power == T())
+	{
+		return T(1.0) / (xmax - xmin);
+	}
+
+	// TODO: make this parameter accessible from outside
+	m2 -= T(1e-6);
+
+	if (power == T(1.0))
+	{
+		// TODO: WARNING this branch is untested!
+		return T(1.0) / (log((xmax - m2) / (xmin - m2)) * (x - m2));
+	}
+
+	T const omp = T(1.0) - power;
+
+	return omp / ((pow(xmax - m2, omp) - pow(xmin - m2, omp)) *
+		pow(x - m2, power));
+}
+
+template <typename T>
 T map(T power, T mass, T width, T x, T xmin, T xmax)
 {
 	using std::atan;
@@ -411,7 +453,7 @@ lusifer_phase_space_generator<T>::impl::impl(
 				lusifer_cinv_.idhepinv[0][i][j],
 				lmin,
 				lmax,
-				0
+				lusifer_cdensity_.numinv[0][i][j] - 1
 			);
 		}
 
@@ -425,7 +467,7 @@ lusifer_phase_space_generator<T>::impl::impl(
 				lusifer_cprocess_.inprocess[0][i][j] - 1,
 				lusifer_cprocess_.virtprocess[0][i][j] - 1,
 				lusifer_cprocess_.idhepprocess[0][i][j],
-				0
+				lusifer_cdensity_.numprocess[0][i][j] - 1
 			);
 		}
 
@@ -435,7 +477,7 @@ lusifer_phase_space_generator<T>::impl::impl(
 				lusifer_cdecay_.indecay[0][i][j] - 1,
 				lusifer_cdecay_.out1decay[0][i][j] - 1,
 				lusifer_cdecay_.out2decay[0][i][j] - 1,
-				0
+				lusifer_cdensity_.numdecay[0][i][j] - 1
 			);
 		}
 	}
@@ -445,8 +487,8 @@ lusifer_phase_space_generator<T>::impl::impl(
 	for (std::size_t i = 0; i != invariants.capacity(); ++i)
 	{
 		invariants.emplace_back(
-			lusifer_cdensity_.nsinv[0][i],
-			lusifer_cdensity_.chinv[0][i]
+			lusifer_cdensity_.nsinv[0][i] - 1,
+			lusifer_cdensity_.chinv[0][i] - 1
 		);
 	}
 
@@ -455,8 +497,8 @@ lusifer_phase_space_generator<T>::impl::impl(
 	for (std::size_t i = 0; i != processes.capacity(); ++i)
 	{
 		processes.emplace_back(
-			lusifer_cdensity_.ntprocess[0][i],
-			lusifer_cdensity_.chprocess[0][i]
+			lusifer_cdensity_.ntprocess[0][i] - 1,
+			lusifer_cdensity_.chprocess[0][i] - 1
 		);
 	}
 
@@ -465,8 +507,8 @@ lusifer_phase_space_generator<T>::impl::impl(
 	for (std::size_t i = 0; i != decays.capacity(); ++i)
 	{
 		decays.emplace_back(
-			lusifer_cdensity_.nsdecay[0][i],
-			lusifer_cdensity_.chdecay[0][i]
+			lusifer_cdensity_.nsdecay[0][i] - 1,
+			lusifer_cdensity_.chdecay[0][i] - 1
 		);
 	}
 
@@ -582,6 +624,11 @@ std::size_t lusifer_phase_space_generator<T>::channels() const
 template <typename T>
 T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 {
+	using std::acos;
+	using std::fabs;
+	using std::pow;
+	using std::sqrt;
+
 	auto& p = lusifer_general_.p;
 	auto& s = lusifer_general_.s;
 
@@ -641,15 +688,136 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 		}
 	}
 
-	assert( densities.size() >= channels() );
+	std::vector<T> invariant_jacobians;
+	invariant_jacobians.reserve(pimpl->invariants.size());
+	std::vector<T> process_jacobians;
+	process_jacobians.reserve(pimpl->processes.size());
+	std::vector<T> decay_jacobians;
+	decay_jacobians.reserve(pimpl->decays.size());
 
-	int generator = 1;
-	int switch_ = 2;
+	for (auto const& info : pimpl->invariants)
+	{
+		auto const& invariant = pimpl->channels.at(info.channel).invariants.at(info.index);
 
-	lusifer_density(densities.data(), &generator, &switch_);
+		// index corresponding to the ns'th invariant
+		std::size_t inv1 = invariant.in;
+		// `inv1 + inv2 = allbinary - 3`
+		std::size_t inv2 = (allbinary - 3 - inv1) - 2;
 
-	using std::acos;
-	using std::pow;
+		T mmin = pimpl->mcut.at(inv1);
+		T mmax = pimpl->mcut.at(inv2);
+
+		for (std::size_t i = 0;
+			&pimpl->channels[info.channel].invariants[i] != &invariant; ++i)
+		{
+			std::size_t const virt = pimpl->channels[info.channel].invariants[i].in;
+			bool const condition = s[virt] > pimpl->mcut[virt] * pimpl->mcut[virt];
+
+			// is there a minimum limit on this invariant?
+			if (invariant.lmin.test(i) && condition)
+			{
+				// TODO: is `>` the right condition here?
+				std::size_t const inv3 = inv1 - virt;
+				mmin += sqrt(s[virt]) - pimpl->mcut.at(inv1) + pimpl->mcut.at(inv3);
+				inv1 = inv3;
+			}
+
+			// is there a maximum limit on this invariant?
+			if (invariant.lmax.test(i) && condition)
+			{
+				std::size_t const inv3 = inv2 - virt;
+				mmax += sqrt(s[virt]) - pimpl->mcut.at(inv2) + pimpl->mcut.at(inv3);
+				inv2 = inv3;
+			}
+		}
+
+		T const smin = mmin * mmin;
+		T const smax = (pimpl->cmf_energy_ - mmax) * (pimpl->cmf_energy_ - mmax);
+
+		invariant_jacobians.push_back(jacobian(
+			pimpl->particle_infos.at(invariant.idhep).power,
+			pimpl->particle_infos.at(invariant.idhep).mass,
+			pimpl->particle_infos.at(invariant.idhep).width,
+			s[invariant.in],
+			smin,
+			smax
+		));
+	}
+
+	for (auto const& info : pimpl->processes)
+	{
+		auto const& process = pimpl->channels[info.channel].processes[info.index];
+
+		T const s  = lusifer_general_.s[process.in];
+		T const s1 = lusifer_general_.s[process.out1];
+		T const s2 = lusifer_general_.s[process.out2];
+		T const t  = lusifer_general_.s[process.virt];
+		T const t1 = lusifer_general_.s[process.in1];
+		T const t2 = lusifer_general_.s[process.in2];
+
+		T const lambdas = sqrt(kaellen(s, s1, s2));
+		T const lambdat = sqrt(kaellen(s, t1, t2));
+
+		T const tmp = (s + s1 - s2) * (s + t1 - t2);
+		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
+		T       tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
+
+		// TODO: make this parameter available from outside
+		if (fabs(tmax) < T(1e-7))
+		{
+			tmax = T();
+		}
+
+		T const factor = T(2.0) * lambdat / acos(T(-1.0));
+
+		process_jacobians.push_back(factor * jacobian(
+			 pimpl->particle_infos.at(process.idhep).power,
+			-pimpl->particle_infos.at(process.idhep).mass,
+			 pimpl->particle_infos.at(process.idhep).width,
+			-t,
+			-tmax,
+			-tmin
+		));
+	}
+
+	for (auto const& info : pimpl->decays)
+	{
+		auto const& decay = pimpl->channels[info.channel].decays[info.index];
+
+		T const s  = lusifer_general_.s[decay.in];
+		T const s1 = lusifer_general_.s[decay.out1];
+		T const s2 = lusifer_general_.s[decay.out2];
+
+		T const jacobian = T(2.0) * s / (acos(T(-1.0)) *
+			sqrt(kaellen(s, s1, s2)));
+
+		decay_jacobians.push_back(jacobian);
+	}
+
+	densities.clear();
+
+	// compute the jacobians for each channel
+	for (auto const& channel : pimpl->channels)
+	{
+		T jacobian = T(1.0);
+
+		for (auto const& invariant : channel.invariants)
+		{
+			jacobian *= invariant_jacobians[invariant.index];
+		}
+
+		for (auto const& process : channel.processes)
+		{
+			jacobian *= process_jacobians[process.index];
+		}
+
+		for (auto const& decay : channel.decays)
+		{
+			jacobian *= decay_jacobians[decay.index];
+		}
+
+		densities.push_back(jacobian);
+	}
 
 	return pow(T(0.5) / acos(T(-1.0)), T(3 * pimpl->particles - 10));
 }
