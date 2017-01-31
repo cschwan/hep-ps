@@ -21,6 +21,7 @@ nobase_include_HEADERS = \
 	hep/ps/observables_born_like.hpp \
 	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
+	hep/ps/permutation.hpp \
 	hep/ps/pp_luminosities.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/requires_cut.hpp \

@@ -47,6 +47,7 @@ void find_hep_ps();
 #include "hep/ps/observables_born_like.hpp"
 #include "hep/ps/observables_real.hpp"
 #include "hep/ps/particle_type.hpp"
+#include "hep/ps/permutation.hpp"
 #include "hep/ps/pp_luminosities.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
 #include "hep/ps/requires_cut.hpp"
