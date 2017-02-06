@@ -119,11 +119,11 @@ public:
 		}
 
 		initial_state_array<T> reals;
-		std::vector<T> phase_phase(real_phase_space.size());
+		std::vector<T> phase_space(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
-			phase_phase,
+			phase_space,
 			matrix_elements_.real_recombination_candidates(),
 			1
 		);
@@ -135,7 +135,7 @@ public:
 
 		if (is_real || (inclusive_ && is_inclusive))
 		{
-			auto const cut_result = cuts_.cut(phase_phase, shift, is_inclusive);
+			auto const cut_result = cuts_.cut(phase_space, shift, is_inclusive);
 
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
@@ -155,7 +155,7 @@ public:
 			}
 		}
 
-		phase_phase.resize(real_phase_space.size() - 4);
+		phase_space.resize(real_phase_space.size() - 4);
 
 		// TODO: check for the same dipoles and calculate them only once
 
@@ -167,7 +167,7 @@ public:
 			{
 				// map the real phase space on the dipole phase space
 				auto const invariants = subtraction_.map_phase_space(
-					real_phase_space, phase_phase, dipole);
+					real_phase_space, phase_space, dipole);
 
 				if (invariants.adipole < alpha_min_)
 				{
@@ -180,8 +180,8 @@ public:
 						dipole.unresolved());
 
 				auto const dipole_recombined = recombiner_.recombine(
-					phase_phase,
-					phase_phase,
+					phase_space,
+					phase_space,
 					dipole_recombination_candidates,
 					0
 				);
@@ -192,7 +192,7 @@ public:
 					continue;
 				}
 
-				auto const cut_result = cuts_.cut(phase_phase, shift, false);
+				auto const cut_result = cuts_.cut(phase_space, shift, false);
 
 				if (requires_cut(process, cut_result))
 				{
@@ -223,12 +223,11 @@ public:
 					assert( false );
 				}
 
-				T const me = matrix_elements_.dipole(phase_phase, process,
+				T const me = matrix_elements_.dipole(phase_space, process,
 					dipole);
 				T const dipole_result = -factor * me;
 
 				reals.set(process, reals.get(process) + dipole_result);
-
 			}
 		}
 
