@@ -78,15 +78,22 @@ public:
 	/// The numeric type used to perform phase space generation.
 	using numeric_type = T;
 
-	/// Constructor. The parameter `process` specifies the partonic process that
-	/// is used to generate the channels the integrater uses to generate phase
-	/// space, with the masses and decay widths specified in `constants`. The
-	/// parameter `extra_random_numbers` specifies the number of extra random
-	/// numbers that should be generated. This number increases the value
+	/// Constructor. The parameter `processes` specify the partonic processes
+	/// that are used to generate the channels the integrater uses to generate
+	/// phase space, with the masses and decay widths specified in `constants`.
+	/// The parameter `extra_random_numbers` specifies the number of extra
+	/// random numbers that should be generated. This number increases the value
 	/// \ref dimensions returns and leaves \ref map_dimensions unchanged. The
 	/// random numbers that the generator uses to generate the phase space
 	/// points are the first \f$ 3 n - 4 \f$ numbers, where \f$ n \f$ are the
 	/// number of final state particles.
+	lusifer_phase_space_generator(
+		std::vector<std::string> const& processes,
+		lusifer_constants<T> const& constants,
+		std::size_t extra_random_numbers = 0
+	);
+
+	/// Constructor.
 	lusifer_phase_space_generator(
 		std::string const& process,
 		lusifer_constants<T> const& constants,

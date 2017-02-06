@@ -545,60 +545,73 @@ lusifer_phase_space_generator<T>::impl::impl(
 
 template <typename T>
 lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
-	std::string const& process,
+	std::vector<std::string> const& processes,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers
 ) {
-	// each particle must be specified with three characters
-	assert( process.size() % 3 == 0 );
-	// there must be at least four particles
-	assert( process.size() >= 4 * 3 );
-
 	int maxex;
 	int maxgen;
 	lusifer_extra_max(&maxex, &maxgen);
 
-	int nex = process.size() / 3;
-
-	// the number of particles must be supported by the generator
-	assert( nex <= maxex );
+	int nex = 0;
 
 	// FORTRAN counting: use the first generator
-	int generator = 1;
-	double mw = constants.mass_w;
-	double gw = constants.width_w;
-	double mz = constants.mass_z;
-	double gz = constants.width_z;
-	double mh = constants.mass_h;
-	double gh = constants.width_h;
-	double mt = constants.mass_t;
-	double gt = constants.width_t;
+	int g = 1;
 
-	// set constants and the number of particles
-	lusifer_extra_set(&generator, &nex, &mw, &gw, &mz, &gz, &mh, &gh, &mt, &gt);
+	for (auto const& process : processes)
+	{
+		// each particle must be specified with three characters
+		assert( process.size() % 3 == 0 );
 
-	// fill up the string with three spaces for particle not used
-	std::string process0 = process;
-	process0.append(3 * (maxex - nex), ' ');
+		if (nex == 0)
+		{
+			// there must be at least four particles
+			assert( process.size() >= 4 * 3 );
 
-	// TODO: what is the meaning of this parameter?
-	int lightfermions = 0;
-	// do not include cuts in the phase space generation
-	int includecuts = 0;
-	// do not print channel information
-	int sout = 0;
+			nex = process.size() / 3;
 
-	lusifer_initphasespace(
-		process0.c_str(),
-		&generator,
-		&lightfermions,
-		&includecuts,
-		&sout,
-		process0.size()
-	);
+			double mw = constants.mass_w;
+			double gw = constants.width_w;
+			double mz = constants.mass_z;
+			double gz = constants.width_z;
+			double mh = constants.mass_h;
+			double gh = constants.width_h;
+			double mt = constants.mass_t;
+			double gt = constants.width_t;
+
+			// set constants and the number of particles
+			lusifer_extra_set(&g, &nex, &mw, &gw, &mz, &gz, &mh, &gh, &mt, &gt);
+
+			// the number of particles must be supported by the generator
+			assert( nex <= maxex );
+		}
+
+		// all processes must have the same number of particles
+		assert( nex == static_cast <int> (process.size() / 3) );
+
+		// fill up the string with three spaces for particle not used
+		std::string process0 = process;
+		process0.append(3 * (maxex - nex), ' ');
+
+		// TODO: what is the meaning of this parameter?
+		int lightfermions = 0;
+		// do not include cuts in the phase space generation
+		int includecuts = 0;
+		// do not print channel information
+		int sout = 0;
+
+		lusifer_initphasespace(
+			process0.c_str(),
+			&g,
+			&lightfermions,
+			&includecuts,
+			&sout,
+			process0.size()
+		);
+	}
 
 	int channels;
-	lusifer_extra_data(&generator, &channels);
+	lusifer_extra_data(&g, &channels);
 
 	// there must be at least one channel, otherwise something went wrong
 	assert( channels > 0 );
@@ -609,6 +622,20 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 		channels,
 		extra_random_numbers
 	)));
+}
+
+template <typename T>
+lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
+	std::string const& process,
+	lusifer_constants<T> const& constants,
+	std::size_t extra_random_numbers
+)
+	: lusifer_phase_space_generator(
+		std::vector<std::string>{process},
+		constants,
+		extra_random_numbers
+	)
+{
 }
 
 template <typename T>

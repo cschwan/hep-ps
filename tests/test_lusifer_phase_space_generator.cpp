@@ -75,6 +75,59 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg4.channels()       == 452 );
 	REQUIRE( psg4.dimensions()     == 17 );
 	REQUIRE( psg4.map_dimensions() == 36 );
+
+	// pp -> 2jets
+
+	// NOTE: generator does not generate three-gluon vertices
+
+	// four-gluon vertex
+	hep::lusifer_phase_space_generator<T> psg5a(
+		"gl gl gl gl ",
+		constants
+	);
+
+	REQUIRE( psg5a.channels()       == 1 );
+	REQUIRE( psg5a.dimensions()     == 2 );
+	REQUIRE( psg5a.map_dimensions() == 16 );
+
+	// t- and u-channel
+	hep::lusifer_phase_space_generator<T> psg5b(
+		"uq~uq gl gl ",
+		constants
+	);
+
+	REQUIRE( psg5b.channels()       == 2 );
+	REQUIRE( psg5b.dimensions()     == 2 );
+	REQUIRE( psg5b.map_dimensions() == 16 );
+
+	// s-channels with gluon/photon and Z, and t-channel with W
+	hep::lusifer_phase_space_generator<T> psg5c(
+		"uq~uq dq dq~",
+		constants
+	);
+
+	REQUIRE( psg5c.channels()       == 3 );
+	REQUIRE( psg5c.dimensions()     == 2 );
+	REQUIRE( psg5c.map_dimensions() == 16 );
+
+	// s- and t-channels with gluon/photon and Z
+	hep::lusifer_phase_space_generator<T> psg5d(
+		"uq~uq uq uq~",
+		constants
+	);
+
+	REQUIRE( psg5d.channels()       == 4 );
+	REQUIRE( psg5d.dimensions()     == 2 );
+	REQUIRE( psg5d.map_dimensions() == 16 );
+
+	hep::lusifer_phase_space_generator<T> psg5(
+		{ "gl gl gl gl ", "uq~uq gl gl ", "uq~uq dq dq~", "uq~uq uq uq~" },
+		constants
+	);
+
+	REQUIRE( psg5.channels()       == 7 );
+	REQUIRE( psg5.dimensions()     == 2 );
+	REQUIRE( psg5.map_dimensions() == 16 );
 }
 
 TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
