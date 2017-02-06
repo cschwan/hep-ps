@@ -12,6 +12,7 @@ libhep_ps_la_SOURCES = \
 	lusifer_phase_space_generator.cpp \
 	p_type_jet_algorithm.cpp \
 	pp_luminosities.cpp \
+	silence_third_party_libs.cpp \
 	trivial_cutter.cpp \
 	trivial_recombiner.cpp
 

@@ -24,6 +24,7 @@ nobase_include_HEADERS = \
 	hep/ps/particle_type.hpp \
 	hep/ps/requires_cut.hpp \
 	hep/ps/scales.hpp \
+	hep/ps/silence_third_party_libs.hpp \
 	hep/ps/trivial_cutter.hpp \
 	hep/ps/trivial_recombiner.hpp
 
