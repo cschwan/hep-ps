@@ -21,7 +21,7 @@ void test_observables_real(
 	auto observables_real = hep::make_observables_real<T>(
 		test_matrix_elements<T>(set, count, emitter, unresolved, spectator),
 		test_subtraction<T>(emitter, unresolved, spectator),
-		test_cuts<T>(count),
+		test_cuts<T>(count, inclusive),
 		test_recombiner<T>(count),
 		test_luminosities<T>(set),
 		test_scale_setter<T>(),

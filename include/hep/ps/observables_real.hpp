@@ -84,7 +84,6 @@ public:
 		Luminosities&& luminosities,
 		ScaleSetter&& scale_setter,
 		T hbarc2,
-		bool inclusive,
 		T alpha_min
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
@@ -94,7 +93,6 @@ public:
 		, luminosities_(std::forward<Luminosities>(luminosities))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, hbarc2_(hbarc2)
-		, inclusive_(inclusive)
 		, alpha_min_(alpha_min)
 	{
 	}
@@ -133,7 +131,7 @@ public:
 
 		T const shift = info.rapidity_shift();
 
-		if (is_real || (inclusive_ && is_inclusive))
+		if (is_real || is_inclusive)
 		{
 			auto const cut_result = cuts_.cut(phase_space, shift, is_inclusive);
 
@@ -265,7 +263,6 @@ private:
 	L luminosities_;
 	U scale_setter_;
 	T hbarc2_;
-	bool inclusive_;
 	T alpha_min_;
 
 	T old_renormalization_scale_;
@@ -286,7 +283,6 @@ inline observables_real_type<T, M, S, C, R, L, U> make_observables_real(
 	L&& luminosities,
 	U&& scale_setter,
 	T hbarc2,
-	bool inclusive,
 	T alpha_min = T()
 ) {
 	return observables_real_type<T, M, S, C, R, L, U>(
@@ -297,7 +293,6 @@ inline observables_real_type<T, M, S, C, R, L, U> make_observables_real(
 		std::forward<L>(luminosities),
 		std::forward<U>(scale_setter),
 		hbarc2,
-		inclusive,
 		alpha_min
 	);
 }

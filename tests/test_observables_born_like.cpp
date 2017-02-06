@@ -14,7 +14,7 @@ void test_observables_born_like(hep::initial_state_set set, std::size_t count)
 {
 	auto observables_born_like = hep::make_observables_born_like<T>(
 		test_matrix_elements<T>(set, count, 0, 0, 0),
-		test_cuts<T>(count),
+		test_cuts<T>(count, false),
 		test_recombiner<T>(count),
 		test_luminosities<T>(set),
 		test_scale_setter<T>(),

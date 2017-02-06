@@ -216,13 +216,17 @@ template <typename T>
 struct test_cuts
 {
 public:
-	test_cuts(std::size_t final_states)
+	test_cuts(std::size_t final_states, std::size_t inclusive)
 		: final_states_(final_states)
+		, inclusive_(inclusive)
 	{
 	}
 
-	hep::cut_result cut(std::vector<T> const& phase_space, T, bool inclusive_event) const
-	{
+	hep::cut_result cut(
+		std::vector<T> const& phase_space,
+		T,
+		bool inclusive_event
+	) const {
 		if (inclusive_event)
 		{
 			REQUIRE( phase_space.size() == 4 * (final_states_ + 3) );
@@ -232,11 +236,17 @@ public:
 			REQUIRE( phase_space.size() == 4 * (final_states_ + 2) );
 		}
 
+		if (inclusive_event && !inclusive_)
+		{
+			return { true, true };
+		}
+
 		return { false, false };
 	}
 
 private:
 	std::size_t final_states_;
+	std::size_t inclusive_;
 };
 
 template <typename T>
