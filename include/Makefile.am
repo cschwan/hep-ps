@@ -16,8 +16,6 @@ nobase_include_HEADERS = \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
 	hep/ps/mc_phase_space_adapter.hpp \
-	hep/ps/no_cutter.hpp \
-	hep/ps/no_recombiner.hpp \
 	hep/ps/observables_born_like.hpp \
 	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
@@ -25,7 +23,9 @@ nobase_include_HEADERS = \
 	hep/ps/pp_luminosities.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/requires_cut.hpp \
-	hep/ps/scales.hpp
+	hep/ps/scales.hpp \
+	hep/ps/trivial_cutter.hpp \
+	hep/ps/trivial_recombiner.hpp
 
 # create a timestamp file so we can depend on it instead of depending on every
 # single header

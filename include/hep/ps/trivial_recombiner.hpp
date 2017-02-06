@@ -1,5 +1,5 @@
-#ifndef HEP_PS_NO_CUTTER_HPP
-#define HEP_PS_NO_CUTTER_HPP
+#ifndef HEP_PS_TRIVIAL_RECOMBINER_HPP
+#define HEP_PS_TRIVIAL_RECOMBINER_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,25 +19,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/cut_result.hpp"
-
+#include <cstddef>
 #include <vector>
 
 namespace hep
 {
 
-/// Helper class that never cuts any phase space point. This is useful for
+/// Helper class that never recombines any phase space point. This is useful for
 /// testing.
 template <typename T>
-class no_cutter
+class trivial_recombiner
 {
 public:
-	/// Always returns `false` for positive and negative rapidity shifts.
-	cut_result cut(
+	/// Always returns zero and performs the assignment of `phase_space` to
+	/// `recombined_phase_space`.
+	std::size_t recombine(
 		std::vector<T> const& phase_space,
-		T rapidity_shift,
-		bool inclusive_event
-	);
+		std::vector<T>& recombined_phase_space,
+		std::vector<std::size_t> const& recombination_candidates,
+		std::size_t max_recombinations
+	) const;
 };
 
 }

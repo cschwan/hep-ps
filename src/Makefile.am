@@ -10,9 +10,9 @@ libhep_ps_la_SOURCES = \
 	lusifer_extra.f \
 	lusifer_interfaces.hpp \
 	lusifer_phase_space_generator.cpp \
-	no_cutter.cpp \
-	no_recombiner.cpp \
 	p_type_jet_algorithm.cpp \
-	pp_luminosities.cpp
+	pp_luminosities.cpp \
+	trivial_cutter.cpp \
+	trivial_recombiner.cpp
 
 libhep_ps_la_LIBADD = $(FLIBS)

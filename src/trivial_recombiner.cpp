@@ -1,10 +1,10 @@
-#include "hep/ps/no_recombiner.hpp"
+#include "hep/ps/trivial_recombiner.hpp"
 
 namespace hep
 {
 
 template <typename T>
-std::size_t no_recombiner<T>::recombine(
+std::size_t trivial_recombiner<T>::recombine(
 	std::vector<T> const& phase_space,
 	std::vector<T>& recombined_phase_space,
 	std::vector<std::size_t> const&,
@@ -17,6 +17,6 @@ std::size_t no_recombiner<T>::recombine(
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
-template class no_recombiner<double>;
+template class trivial_recombiner<double>;
 
 }
