@@ -7,6 +7,7 @@ nobase_include_HEADERS = \
 	hep/ps/dipole.hpp \
 	hep/ps/dipole_invariants.hpp \
 	hep/ps/dipole_type.hpp \
+	hep/ps/fold.hpp \
 	hep/ps/fortran_helper.hpp \
 	hep/ps/hh_phase_space_generator.hpp \
 	hep/ps/initial_state.hpp \
