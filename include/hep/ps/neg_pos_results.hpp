@@ -1,5 +1,5 @@
-#ifndef HEP_PS_FOLD_HPP
-#define HEP_PS_FOLD_HPP
+#ifndef HEP_PS_NEG_POS_RESULTS_HPP
+#define HEP_PS_NEG_POS_RESULTS_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,54 +19,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/initial_state_array.hpp"
-#include "hep/ps/initial_state_set.hpp"
-#include "hep/ps/neg_pos_results.hpp"
-
 namespace hep
 {
 
 template <typename T>
-inline T fold(
-	initial_state_array<T> const& a,
-	initial_state_array<T> const& b,
-	initial_state_set set
-) {
-	T result{};
-
-	for (auto const state : set)
+struct neg_pos_results
+{
+	neg_pos_results(T neg_result, T pos_result)
+		: neg(neg_result)
+		, pos(pos_result)
 	{
-		result += a.get(state) * b.get(state);
 	}
 
-	return result;
-}
-
-template <typename T>
-inline neg_pos_results<T> fold(
-	initial_state_array<T> const& a,
-	initial_state_array<T> const& b,
-	initial_state_set set,
-	cut_result cut
-) {
-	T neg{};
-	T pos{};
-
-	for (auto const state : set)
-	{
-		if (state_has_neg_shift(state) && !cut.neg_cutted())
-		{
-			neg += a.get(state) * b.get(state);
-		}
-
-		if (state_has_pos_shift(state) && !cut.pos_cutted())
-		{
-			pos += a.get(state) * b.get(state);
-		}
-	}
-
-	return { neg, pos };
-}
+	T neg;
+	T pos;
+};
 
 }
 

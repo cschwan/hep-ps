@@ -26,6 +26,7 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/requires_cut.hpp"
+#include "hep/ps/trivial_distributions.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -65,10 +66,12 @@ public:
 	{
 	}
 
+	template <typename Distributions = trivial_distributions<T>>
 	T operator()(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
-		initial_state_set set
+		initial_state_set set,
+		Distributions&& distributions = trivial_distributions<T>()
 	) {
 		// TODO: generate distributions
 
@@ -103,27 +106,19 @@ public:
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
-		auto borns = matrix_elements_.borns(phase_space, set);
-
-		if (cut_result.neg_cutted() || cut_result.pos_cutted())
-		{
-			for (auto const process : set)
-			{
-				if (requires_cut(process, cut_result))
-				{
-					borns.set(process, T());
-				}
-			}
-		}
-
+		auto const borns = matrix_elements_.borns(phase_space, set);
 		auto const pdfs = luminosities_.pdfs(info.x1(), info.x2(),
 			scales.factorization());
 
-		T result = fold(pdfs, borns, set);
-		result *= T(0.5) / info.energy_squared();
-		result *= hbarc2_;
+		auto result = fold(pdfs, borns, set, cut_result);
+		T const factor = T(0.5) / info.energy_squared() * hbarc2_;
 
-		return result;
+		result.neg *= factor;
+		result.pos *= factor;
+
+		distributions(phase_space, result, rapidity_shift);
+
+		return result.neg + result.pos;
 	}
 
 	M const& matrix_elements() const

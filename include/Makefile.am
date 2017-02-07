@@ -17,6 +17,7 @@ nobase_include_HEADERS = \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
 	hep/ps/mc_phase_space_adapter.hpp \
+	hep/ps/neg_pos_results.hpp \
 	hep/ps/observables_born_like.hpp \
 	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
@@ -27,6 +28,7 @@ nobase_include_HEADERS = \
 	hep/ps/scales.hpp \
 	hep/ps/silence_third_party_libs.hpp \
 	hep/ps/trivial_cutter.hpp \
+	hep/ps/trivial_distributions.hpp \
 	hep/ps/trivial_recombiner.hpp
 
 # create a timestamp file so we can depend on it instead of depending on every
