@@ -47,6 +47,7 @@ inline neg_pos_results<T> fold(
 	initial_state_array<T> const& a,
 	initial_state_array<T> const& b,
 	initial_state_set set,
+	T factor,
 	cut_result cut
 ) {
 	T neg{};
@@ -65,7 +66,7 @@ inline neg_pos_results<T> fold(
 		}
 	}
 
-	return { neg, pos };
+	return { factor * neg, factor * pos };
 }
 
 }

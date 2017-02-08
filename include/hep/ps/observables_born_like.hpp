@@ -73,8 +73,6 @@ public:
 		initial_state_set set,
 		Distributions&& distributions = trivial_distributions<T>()
 	) {
-		// TODO: generate distributions
-
 		std::vector<T> aux_phase_space(phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -109,12 +107,8 @@ public:
 		auto const borns = matrix_elements_.borns(phase_space, set);
 		auto const pdfs = luminosities_.pdfs(info.x1(), info.x2(),
 			scales.factorization());
-
-		auto result = fold(pdfs, borns, set, cut_result);
-		T const factor = T(0.5) / info.energy_squared() * hbarc2_;
-
-		result.neg *= factor;
-		result.pos *= factor;
+		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
+		auto const result = fold(pdfs, borns, set, factor, cut_result);
 
 		distributions(phase_space, result, rapidity_shift);
 
