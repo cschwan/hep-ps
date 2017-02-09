@@ -25,10 +25,18 @@ namespace hep
 template <typename T>
 struct neg_pos_results
 {
-	neg_pos_results(T neg_result, T pos_result)
+	neg_pos_results(T neg_result = T(), T pos_result = T())
 		: neg(neg_result)
 		, pos(pos_result)
 	{
+	}
+
+	neg_pos_results<T>& operator+=(neg_pos_results<T> const& other)
+	{
+		neg += other.neg;
+		pos += other.pos;
+
+		return *this;
 	}
 
 	T neg;

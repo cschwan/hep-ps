@@ -25,8 +25,10 @@
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/requires_cut.hpp"
+#include "hep/ps/trivial_distributions.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -99,15 +101,25 @@ public:
 	{
 	}
 
+	template <typename Distributions = trivial_distributions<T>>
 	T operator()(
 		std::vector<T> const& real_phase_space,
 		luminosity_info<T> const& info,
-		initial_state_set set
+		initial_state_set set,
+		Distributions&& distributions = trivial_distributions<T>()
 	) {
-		// TODO: generate distributions
+		// TODO: using the same matrix element for both the original initial
+		// state and the initial state flipped does not work yet, maybe it
+		// doesn't work at all. Currently the program only calculates the
+		// positive ones and multiplies the result by a factor of two (in the
+		// variable `factor`)
 
 		// is `true` if neither real matrix elements nor dipoles are active
 		bool zero_event = true;
+
+		T const factor = T(2.0) * T(0.5) * hbarc2_ / info.energy_squared();
+
+		initial_state_array<T> lumis;
 
 		auto const scales = scale_setter_(real_phase_space);
 
@@ -145,26 +157,23 @@ public:
 		}
 
 		T const shift = info.rapidity_shift();
+		neg_pos_results<T> result;
 
 		if (event != event_type::other)
 		{
-			auto const cut_result = cuts_.cut(phase_space, shift, event);
+			hep::cut_result const cut_result(true, cuts_.cut(phase_space, shift,
+				event).pos_cutted());
 
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
 				zero_event = false;
-				reals = matrix_elements_.reals(real_phase_space, set);
+				lumis = luminosities_.pdfs(info.x1(), info.x2(),
+					scales.factorization());
 
-				if (cut_result.neg_cutted() || cut_result.pos_cutted())
-				{
-					for (auto const process : set)
-					{
-						if (requires_cut(process, cut_result))
-						{
-							reals.set(process, T());
-						}
-					}
-				}
+				reals = matrix_elements_.reals(real_phase_space, set);
+				result = fold(lumis, reals, set, factor, cut_result);
+
+				distributions(phase_space, result, shift, event);
 			}
 		}
 
@@ -189,8 +198,9 @@ public:
 				}
 
 				auto const dipole_recombination_candidates = adjust_indices(
-						matrix_elements_.real_recombination_candidates(),
-						dipole.unresolved());
+					matrix_elements_.real_recombination_candidates(),
+					dipole.unresolved()
+				);
 
 				auto const dipole_recombined = recombiner_.recombine(
 					phase_space,
@@ -205,26 +215,32 @@ public:
 					continue;
 				}
 
-				auto const cut_result = cuts_.cut(phase_space, shift,
-					event_type::born_like_n);
+				hep::cut_result const cut_result(true, cuts_.cut(phase_space,
+					shift, event_type::born_like_n).pos_cutted());
 
-				if (requires_cut(process, cut_result))
+				if (cut_result.pos_cutted())
 				{
 					continue;
 				}
 
-				zero_event = false;
+				if (zero_event)
+				{
+					zero_event = false;
+					lumis = luminosities_.pdfs(info.x1(), info.x2(),
+						scales.factorization());
+				}
 
 				bool const fermion_i = dipole.emitter_type() ==
 					particle_type::fermion;
 				bool const fermion_j = dipole.unresolved_type() ==
 					particle_type::fermion;
 
-				T factor;
+				T function;
 
 				if (fermion_i != fermion_j)
 				{
-					factor = subtraction_.fermion_function(dipole, invariants);
+					function = subtraction_.fermion_function(dipole,
+						invariants);
 				}
 				else if (fermion_i && fermion_j)
 				{
@@ -237,28 +253,21 @@ public:
 					assert( false );
 				}
 
-				T const me = matrix_elements_.dipole(phase_space, process,
-					dipole);
-				T const dipole_result = -factor * me;
+				T const matrix_element = matrix_elements_.dipole(phase_space,
+					process, dipole);
+				T const dipole_contribution = -function * matrix_element;
 
-				reals.set(process, reals.get(process) + dipole_result);
+				auto const dipole_result = fold(lumis, dipole_contribution,
+					process, factor, cut_result);
+
+				distributions(phase_space, dipole_result, shift,
+					event_type::born_like_n);
+
+				result += dipole_result;
 			}
 		}
 
-		// early exit to avoid the evaluation of luminosities
-		if (zero_event)
-		{
-			return T();
-		}
-
-		auto const lumis = luminosities_.pdfs(info.x1(), info.x2(),
-			scales.factorization());
-
-		T result = fold(lumis, reals, set);
-		result *= T(0.5) / info.energy_squared();
-		result *= hbarc2_;
-
-		return result;
+		return result.neg + result.pos;
 	}
 
 	M const& matrix_elements() const

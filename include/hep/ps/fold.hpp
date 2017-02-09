@@ -69,6 +69,30 @@ inline neg_pos_results<T> fold(
 	return { factor * neg, factor * pos };
 }
 
+template <typename T>
+inline neg_pos_results<T> fold(
+	initial_state_array<T> const& a,
+	T b,
+	initial_state state,
+	T factor,
+	cut_result cut
+) {
+	T neg{};
+	T pos{};
+
+	if (state_has_neg_shift(state) && !cut.neg_cutted())
+	{
+		neg += a.get(state) * b;
+	}
+
+	if (state_has_pos_shift(state) && !cut.pos_cutted())
+	{
+		pos += a.get(state) * b;
+	}
+
+	return { factor * neg, factor * pos };
+}
+
 }
 
 #endif

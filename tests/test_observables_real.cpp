@@ -32,7 +32,7 @@ void test_observables_real(
 	std::vector<T> real_phase_space_point(4 * (count + 3));
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
-	T const test_result = T(inclusive ? 2.5e-1 : -2.5e-1) / T(1024.0);
+	T const test_result = T(inclusive ? 5.0e-1 : -5.0e-1) / T(1024.0);
 	T const result = observables_real(real_phase_space_point, info, set);
 
 	REQUIRE( result == test_result );
@@ -40,7 +40,10 @@ void test_observables_real(
 
 TEST_CASE("observables_real", "[observables_real]")
 {
-	hep::initial_state_set set{hep::initial_state::q43_cu};
+	hep::initial_state_set set{
+		hep::initial_state::q43_cu,
+		hep::initial_state::q43_uc
+	};
 
 	test_observables_real(set, 4, 2, 3, 0, true);
 	test_observables_real(set, 4, 2, 3, 0, false);
