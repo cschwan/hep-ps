@@ -4,7 +4,7 @@ namespace hep
 {
 
 template <typename T>
-cut_result trivial_cutter<T>::cut(std::vector<T> const&, T, bool)
+cut_result trivial_cutter<T>::cut(std::vector<T> const&, T, event_type)
 {
 	// cut nothing
 	return cut_result(false, false);

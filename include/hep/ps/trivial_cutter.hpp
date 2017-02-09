@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/cut_result.hpp"
+#include "hep/ps/event_type.hpp"
 
 #include <vector>
 
@@ -32,11 +33,12 @@ template <typename T>
 class trivial_cutter
 {
 public:
-	/// Always returns `false` for positive and negative rapidity shifts.
+	/// Always returns `false` for positive and negative rapidity shifts,
+	/// independently of the \ref event_type given.
 	cut_result cut(
 		std::vector<T> const& phase_space,
 		T rapidity_shift,
-		bool inclusive_event
+		event_type event
 	);
 };
 
