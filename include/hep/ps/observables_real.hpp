@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/cut_result.hpp"
+#include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
@@ -127,14 +128,27 @@ public:
 			1
 		);
 
-		bool const is_real = recombined == 1;
-		bool const is_inclusive = recombined == 0;
+		event_type event;
+
+		switch (recombined)
+		{
+		case 0:
+			event = event_type::inclusive_n_plus_1;
+			break;
+
+		case 1:
+			event = event_type::born_like_n;
+			break;
+
+		default:
+			event = event_type::other;
+		}
 
 		T const shift = info.rapidity_shift();
 
-		if (is_real || is_inclusive)
+		if (event != event_type::other)
 		{
-			auto const cut_result = cuts_.cut(phase_space, shift, is_inclusive);
+			auto const cut_result = cuts_.cut(phase_space, shift, event);
 
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
@@ -191,7 +205,8 @@ public:
 					continue;
 				}
 
-				auto const cut_result = cuts_.cut(phase_space, shift, false);
+				auto const cut_result = cuts_.cut(phase_space, shift,
+					event_type::born_like_n);
 
 				if (requires_cut(process, cut_result))
 				{

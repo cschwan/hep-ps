@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/cut_result.hpp"
+#include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
@@ -88,7 +89,8 @@ public:
 		}
 
 		T const rapidity_shift = info.rapidity_shift();
-		auto const cut_result = cuts_.cut(phase_space, rapidity_shift, false);
+		auto const cut_result = cuts_.cut(phase_space, rapidity_shift,
+			event_type::born_like_n);
 
 		if (cut_result.neg_cutted() && cut_result.pos_cutted())
 		{
@@ -110,7 +112,8 @@ public:
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 		auto const result = fold(pdfs, borns, set, factor, cut_result);
 
-		distributions(phase_space, result, rapidity_shift);
+		distributions(phase_space, result, rapidity_shift,
+			event_type::born_like_n);
 
 		return result.neg + result.pos;
 	}

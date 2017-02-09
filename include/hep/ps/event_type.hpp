@@ -1,5 +1,5 @@
-#ifndef HEP_PS_TRIVIAL_DISTRIBUTIONS_HPP
-#define HEP_PS_TRIVIAL_DISTRIBUTIONS_HPP
+#ifndef HEP_PS_EVENT_TYPE_HPP
+#define HEP_PS_EVENT_TYPE_HPP
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
@@ -19,33 +19,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/event_type.hpp"
-#include "hep/ps/neg_pos_results.hpp"
-
-#include <vector>
-
 namespace hep
 {
 
-/// Trivial distribution generator, i.e. this functor does not generate any
-/// distributions at all.
-template <typename T>
-class trivial_distributions
+/// Enumeration whose instances specify the type of a single phase space point.
+enum class event_type
 {
-public:
-	/// Constructor.
-	trivial_distributions() = default;
-
-	/// Does nothing.
-	void operator()(
-		std::vector<T> const&,
-		neg_pos_results<T> const&,
-		T,
-		event_type
-	) {
-	}
+	born_like_n,
+	inclusive_n_plus_1,
+	other
 };
 
 }
 
 #endif
+

@@ -5,6 +5,7 @@
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
+#include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
@@ -225,18 +226,22 @@ public:
 	hep::cut_result cut(
 		std::vector<T> const& phase_space,
 		T,
-		bool inclusive_event
+		hep::event_type type
 	) const {
-		if (inclusive_event)
+		if (type == hep::event_type::inclusive_n_plus_1)
 		{
 			REQUIRE( phase_space.size() == 4 * (final_states_ + 3) );
 		}
-		else
+		else if (type == hep::event_type::born_like_n)
 		{
 			REQUIRE( phase_space.size() == 4 * (final_states_ + 2) );
 		}
+		else
+		{
+			FAIL( "type is neither born nor inclusive" );
+		}
 
-		if (inclusive_event && !inclusive_)
+		if (type == hep::event_type::inclusive_n_plus_1 && !inclusive_)
 		{
 			return { true, true };
 		}

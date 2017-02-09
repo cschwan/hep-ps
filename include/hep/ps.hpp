@@ -34,6 +34,7 @@ void find_hep_ps();
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
+#include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/hh_phase_space_generator.hpp"
