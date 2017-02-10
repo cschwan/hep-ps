@@ -26,10 +26,10 @@ namespace hep
 {
 
 // TODO: Make `constexpr` in C++14
-inline bool requires_cut(hep::initial_state state, hep::cut_result cut)
+inline bool requires_cut(initial_state state, cut_result cut)
 {
-	return (hep::state_has_neg_shift(state) && cut.neg_cutted()) ||
-		(hep::state_has_pos_shift(state) && cut.pos_cutted());
+	return (state_has_neg_shift(state) && cut.neg_cutted()) ||
+		(state_has_pos_shift(state) && cut.pos_cutted());
 }
 
 }
