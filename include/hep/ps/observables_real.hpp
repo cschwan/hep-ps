@@ -28,6 +28,7 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/requires_cut.hpp"
+#include "hep/ps/trivial_distributions.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -100,13 +101,13 @@ public:
 	{
 	}
 
+	template <typename Distributions = trivial_distributions<T>>
 	T operator()(
 		std::vector<T> const& real_phase_space,
 		luminosity_info<T> const& info,
-		initial_state_set set
+		initial_state_set set,
+		Distributions&& distributions = trivial_distributions<T>()
 	) {
-		// TODO: generate distributions
-
 		// is `true` if neither real matrix elements nor dipoles are active
 		bool zero_event = true;
 
@@ -269,19 +270,21 @@ public:
 				auto const dipole_result = fold(lumis, value, process, factor);
 
 				result += dipole_result;
+
+				distributions(phase_space, dipole_result, shift,
+					event_type::born_like_n);
 			}
 		}
 
-		// TODO: call distributions for `reals` here
-
-		// early exit to avoid the evaluation of luminosities
 		if (zero_event)
 		{
 			return T();
 		}
 
+		auto const real_result = fold(lumis, reals, set, factor, real_cuts);
+		result += real_result;
 
-		result += fold(lumis, reals, set, factor, real_cuts);
+		distributions(recombined_real_phase_space, real_result, shift, event);
 
 		return result.neg + result.pos;
 	}
