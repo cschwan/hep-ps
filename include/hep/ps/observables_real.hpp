@@ -120,6 +120,7 @@ public:
 		}
 
 		initial_state_array<T> reals;
+		initial_state_array<T> lumis;
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -146,27 +147,18 @@ public:
 		}
 
 		T const shift = info.rapidity_shift();
+		cut_result real_cuts(true, true);
 
 		if (event != event_type::other)
 		{
-			auto const cut_result = cuts_.cut(recombined_real_phase_space,
-				shift, event);
+			real_cuts = cuts_.cut(recombined_real_phase_space, shift, event);
 
-			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
+			if (!real_cuts.neg_cutted() || !real_cuts.pos_cutted())
 			{
 				zero_event = false;
 				reals = matrix_elements_.reals(real_phase_space, set);
-
-				if (cut_result.neg_cutted() || cut_result.pos_cutted())
-				{
-					for (auto const process : set)
-					{
-						if (requires_cut(process, cut_result))
-						{
-							reals.set(process, T());
-						}
-					}
-				}
+				lumis = luminosities_.pdfs(info.x1(), info.x2(),
+					scales.factorization());
 			}
 		}
 
@@ -174,6 +166,8 @@ public:
 
 		std::vector<std::vector<T>> dipole_phase_space;
 		std::vector<dipole_invariants<T>> phase_space_invariants;
+		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
+		neg_pos_results<T> result;
 
 		// go through all processes
 		for (auto const process : set)
@@ -240,18 +234,24 @@ public:
 					continue;
 				}
 
-				zero_event = false;
+				if (zero_event)
+				{
+					zero_event = false;
+					lumis = luminosities_.pdfs(info.x1(), info.x2(),
+						scales.factorization());
+				}
 
 				bool const fermion_i = dipole.emitter_type() ==
 					particle_type::fermion;
 				bool const fermion_j = dipole.unresolved_type() ==
 					particle_type::fermion;
 
-				T factor;
+				T function;
 
 				if (fermion_i != fermion_j)
 				{
-					factor = subtraction_.fermion_function(dipole, invariants);
+					function = subtraction_.fermion_function(dipole,
+						invariants);
 				}
 				else if (fermion_i && fermion_j)
 				{
@@ -264,11 +264,11 @@ public:
 					assert( false );
 				}
 
-				T const me = matrix_elements_.dipole(phase_space, process,
-					dipole);
-				T const dipole_result = -factor * me;
+				T const value = -function * matrix_elements_.dipole(phase_space,
+					process, dipole);
+				auto const dipole_result = fold(lumis, value, process, factor);
 
-				reals.set(process, reals.get(process) + dipole_result);
+				result += dipole_result;
 			}
 		}
 
@@ -280,14 +280,10 @@ public:
 			return T();
 		}
 
-		auto const lumis = luminosities_.pdfs(info.x1(), info.x2(),
-			scales.factorization());
 
-		T result = fold(lumis, reals, set);
-		result *= T(0.5) / info.energy_squared();
-		result *= hbarc2_;
+		result += fold(lumis, reals, set, factor, real_cuts);
 
-		return result;
+		return result.neg + result.pos;
 	}
 
 	M const& matrix_elements() const
