@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/cut_result.hpp"
+#include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_array.hpp"
@@ -119,11 +120,11 @@ public:
 		}
 
 		initial_state_array<T> reals;
-		std::vector<T> phase_space(real_phase_space.size());
+		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
-			phase_space,
+			recombined_real_phase_space,
 			matrix_elements_.real_recombination_candidates(),
 			1
 		);
@@ -148,7 +149,8 @@ public:
 
 		if (event != event_type::other)
 		{
-			auto const cut_result = cuts_.cut(phase_space, shift, event);
+			auto const cut_result = cuts_.cut(recombined_real_phase_space,
+				shift, event);
 
 			if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
 			{
@@ -168,29 +170,54 @@ public:
 			}
 		}
 
-		phase_space.resize(real_phase_space.size() - 4);
-
 		// TODO: check for the same dipoles and calculate them only once
+
+		std::vector<std::vector<T>> dipole_phase_space;
+		std::vector<dipole_invariants<T>> phase_space_invariants;
 
 		// go through all processes
 		for (auto const process : set)
 		{
+			dipole_phase_space.clear();
+			phase_space_invariants.clear();
+
+			bool tech_cut = false;
+
+			for (auto const dipole : matrix_elements_.dipole_ids(process))
+			{
+				dipole_phase_space.emplace_back();
+				dipole_phase_space.back().resize(real_phase_space.size() - 4);
+
+				// map the real phase space on the dipole phase space
+				phase_space_invariants.push_back(subtraction_.map_phase_space(
+					real_phase_space, dipole_phase_space.back(), dipole));
+
+				if (phase_space_invariants.back().adipole < alpha_min_)
+				{
+					tech_cut = true;
+					reals.set(process, T());
+
+					break;
+				}
+			}
+
+			if (tech_cut)
+			{
+				continue;
+			}
+
+			std::size_t i = 0;
+
 			// go through all dipoles for the current process
 			for (auto const dipole : matrix_elements_.dipole_ids(process))
 			{
-				// map the real phase space on the dipole phase space
-				auto const invariants = subtraction_.map_phase_space(
-					real_phase_space, phase_space, dipole);
-
-				if (invariants.adipole < alpha_min_)
-				{
-					reals.set(process, T());
-					break;
-				}
+				auto const& invariants = phase_space_invariants.at(i);
+				auto& phase_space = dipole_phase_space.at(i);
+				++i;
 
 				auto const dipole_recombination_candidates = adjust_indices(
-						matrix_elements_.real_recombination_candidates(),
-						dipole.unresolved());
+					matrix_elements_.real_recombination_candidates(),
+					dipole.unresolved());
 
 				auto const dipole_recombined = recombiner_.recombine(
 					phase_space,
@@ -244,6 +271,8 @@ public:
 				reals.set(process, reals.get(process) + dipole_result);
 			}
 		}
+
+		// TODO: call distributions for `reals` here
 
 		// early exit to avoid the evaluation of luminosities
 		if (zero_event)
