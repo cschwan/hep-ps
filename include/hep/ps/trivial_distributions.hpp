@@ -38,10 +38,10 @@ public:
 	trivial_distributions() = default;
 
 	/// Does nothing.
-	template <typename N, typename P>
+	template <typename I>
 	void operator()(
 		std::vector<T> const&,
-		cut_result_with_info<N, P> const&,
+		cut_result_with_info<I> const&,
 		neg_pos_results<T> const&,
 		T,
 		event_type

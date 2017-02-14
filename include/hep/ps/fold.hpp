@@ -43,13 +43,13 @@ inline T fold(
 	return result;
 }
 
-template <typename T, typename N, typename P>
+template <typename T, typename I>
 inline neg_pos_results<T> fold(
 	initial_state_array<T> const& a,
 	initial_state_array<T> const& b,
 	initial_state_set set,
 	T factor,
-	cut_result_with_info<N, P> const& cut
+	cut_result_with_info<I> const& cut
 ) {
 	T neg{};
 	T pos{};

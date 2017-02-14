@@ -28,7 +28,7 @@ namespace hep
 /// cutter back to the class generating the observables, in particular the
 /// distributions. The minimum information needed from the cuts needed is
 /// whether a given phase space point passes the cuts or not.
-template <typename N, typename P>
+template <typename I>
 class cut_result_with_info
 {
 public:
@@ -47,11 +47,10 @@ public:
 	{
 	}
 
-	/// Default constructor. Requires the types `N` and `P` to be default
-	/// constructible.
-	cut_result_with_info()
-		: neg_cutted_(true)
-		, pos_cutted_(true)
+	/// Constructor. Requires the types `N` and `P` to be default constructible.
+	cut_result_with_info(bool neg_cutted = true, bool pos_cutted = true)
+		: neg_cutted_(neg_cutted)
+		, pos_cutted_(pos_cutted)
 		, neg_info_()
 		, pos_info_()
 	{
@@ -72,13 +71,13 @@ public:
 	}
 
 	/// Returns information about the cuts applied with negative rapidity.
-	N const& neg_info() const
+	I const& neg_info() const
 	{
 		return neg_info_;
 	}
 
 	/// Returns information about the cuts applied with positive rapidity.
-	P const& pos_info() const
+	I const& pos_info() const
 	{
 		return pos_info_;
 	}
@@ -86,8 +85,8 @@ public:
 private:
 	bool neg_cutted_;
 	bool pos_cutted_;
-	N neg_info_;
-	P pos_info_;
+	I neg_info_;
+	I pos_info_;
 };
 
 class trivial_cut_info
@@ -96,7 +95,7 @@ class trivial_cut_info
 
 /// \cond DOXYGEN_IGNORE
 template <>
-class cut_result_with_info<trivial_cut_info, trivial_cut_info>
+class cut_result_with_info<trivial_cut_info>
 {
 public:
 	constexpr cut_result_with_info(
@@ -125,7 +124,7 @@ private:
 /// \endcond
 
 /// Backward compatible alias for cut results with no additional information.
-using cut_result = cut_result_with_info<trivial_cut_info, trivial_cut_info>;
+using cut_result = cut_result_with_info<trivial_cut_info>;
 
 }
 
