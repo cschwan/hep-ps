@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/cut_result.hpp"
 #include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/neg_pos_results.hpp"
@@ -42,13 +43,13 @@ inline T fold(
 	return result;
 }
 
-template <typename T>
+template <typename T, typename N, typename P>
 inline neg_pos_results<T> fold(
 	initial_state_array<T> const& a,
 	initial_state_array<T> const& b,
 	initial_state_set set,
 	T factor,
-	cut_result cut
+	cut_result_with_info<N, P> const& cut
 ) {
 	T neg{};
 	T pos{};

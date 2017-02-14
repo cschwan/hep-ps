@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/cut_result.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_array.hpp"

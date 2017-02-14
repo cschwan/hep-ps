@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
@@ -148,7 +147,11 @@ public:
 		}
 
 		T const shift = info.rapidity_shift();
-		cut_result real_cuts(true, true);
+
+		using cut_result_type = decltype (cuts_.cut(recombined_real_phase_space,
+			shift, event));
+
+		cut_result_type real_cuts;
 
 		if (event != event_type::other)
 		{
