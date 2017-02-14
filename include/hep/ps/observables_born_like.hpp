@@ -111,7 +111,7 @@ public:
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 		auto const result = fold(pdfs, borns, set, factor, cut_result);
 
-		distributions(phase_space, result, rapidity_shift,
+		distributions(phase_space, cut_result, result, rapidity_shift,
 			event_type::born_like_n);
 
 		return result.neg + result.pos;

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/cut_result.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 
@@ -37,8 +38,10 @@ public:
 	trivial_distributions() = default;
 
 	/// Does nothing.
+	template <typename N, typename P>
 	void operator()(
 		std::vector<T> const&,
+		cut_result_with_info<N, P> const&,
 		neg_pos_results<T> const&,
 		T,
 		event_type

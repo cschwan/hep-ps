@@ -151,13 +151,14 @@ public:
 		using cut_result_type = decltype (cuts_.cut(recombined_real_phase_space,
 			shift, event));
 
-		cut_result_type real_cuts;
+		cut_result_type real_cut_result;
 
 		if (event != event_type::other)
 		{
-			real_cuts = cuts_.cut(recombined_real_phase_space, shift, event);
+			real_cut_result = cuts_.cut(recombined_real_phase_space, shift,
+				event);
 
-			if (!real_cuts.neg_cutted() || !real_cuts.pos_cutted())
+			if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 			{
 				zero_event = false;
 				reals = matrix_elements_.reals(real_phase_space, set);
@@ -230,10 +231,10 @@ public:
 					continue;
 				}
 
-				auto const cut_result = cuts_.cut(phase_space, shift,
+				auto const dipole_cut_result = cuts_.cut(phase_space, shift,
 					event_type::born_like_n);
 
-				if (requires_cut(process, cut_result))
+				if (requires_cut(process, dipole_cut_result))
 				{
 					continue;
 				}
@@ -274,8 +275,8 @@ public:
 
 				result += dipole_result;
 
-				distributions(phase_space, dipole_result, shift,
-					event_type::born_like_n);
+				distributions(phase_space, dipole_cut_result, dipole_result,
+					shift, event_type::born_like_n);
 			}
 		}
 
@@ -284,10 +285,12 @@ public:
 			return T();
 		}
 
-		auto const real_result = fold(lumis, reals, set, factor, real_cuts);
+		auto const real_result = fold(lumis, reals, set, factor,
+			real_cut_result);
 		result += real_result;
 
-		distributions(recombined_real_phase_space, real_result, shift, event);
+		distributions(recombined_real_phase_space, real_cut_result, real_result,
+			shift, event);
 
 		return result.neg + result.pos;
 	}
