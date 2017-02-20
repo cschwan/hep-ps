@@ -45,6 +45,12 @@ AC_CONFIG_HEADERS([config.hpp])
 AC_CHECK_HEADERS([hep/mc.hpp])
 AM_CONDITIONAL([HAVE_HEP_MC_HPP], [test -n "$ac_cv_header_hep_mc_hpp"])
 
+# check for GSL's dilogarithm
+LIBS="-lgslcblas ${LIBS}"
+AC_CHECK_HEADERS([gsl/gsl_sf_dilog.h])
+AC_SEARCH_LIBS([gsl_sf_dilog], [gsl], [],
+	AC_MSG_ERROR([GSL is a required dependency]))
+
 # check for FastJet (needed for a test)
 AC_CHECK_HEADERS([fastjet/ClusterSequence.hh],
 	AC_SEARCH_LIBS([_ZN7fastjet15ClusterSequenceD1Ev], [fastjet]))

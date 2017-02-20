@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
- * Copyright (C) 2016  Christopher Schwan
+ * Copyright (C) 2016-2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/abc_terms.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
+#include "hep/ps/factorization_scheme.hpp"
 
+#include <cstddef>
 #include <vector>
 
 namespace hep
@@ -31,7 +34,7 @@ template <typename T>
 class cs_subtraction
 {
 public:
-	cs_subtraction(T n, T tf);
+	cs_subtraction(T n, T tf, T nf, factorization_scheme scheme);
 
 	dipole_invariants<T> map_phase_space(
 		std::vector<T> const& real_phase_space,
@@ -44,9 +47,31 @@ public:
 		dipole_invariants<T> const& invariants
 	);
 
+	///
+	abc_terms<T> fermion_abc_born(T x, T eta) const;
+
+	///
+	abc_terms<T> fermion_abc_final_initial(
+		T x,
+		T eta,
+		particle_type type_emitter
+	) const;
+
+	///
+	abc_terms<T> fermion_abc_initial_final(
+		T x,
+		T eta,
+		T mu2,
+		std::vector<T> const& phase_space,
+		std::size_t emitter,
+		std::size_t spectator
+	) const;
+
 private:
 	T n_;
 	T tf_;
+	T nf_;
+	factorization_scheme scheme_;
 };
 
 }

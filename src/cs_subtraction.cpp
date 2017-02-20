@@ -1,5 +1,7 @@
 #include "hep/ps/cs_subtraction.hpp"
 
+#include <gsl/gsl_sf_dilog.h>
+
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -24,9 +26,11 @@ namespace hep
 {
 
 template <typename T>
-cs_subtraction<T>::cs_subtraction(T n, T tf)
+cs_subtraction<T>::cs_subtraction(T n, T tf, T nf, factorization_scheme scheme)
 	: n_(n)
 	, tf_(tf)
+	, nf_(nf)
+	, scheme_(scheme)
 {
 }
 
@@ -297,6 +301,101 @@ T cs_subtraction<T>::fermion_function(
 	}
 
 	return factor * dipole * propagator;
+}
+
+template <typename T>
+abc_terms<T> cs_subtraction<T>::fermion_abc_born(T x, T eta) const
+{
+	using std::acos;
+	using std::log;
+
+	abc_terms<T> result;
+
+	auto const omx      = T(1.0) - x;
+	auto const logomxbx = log(omx / x);
+	auto const pi       = acos(T(-1.0));
+
+	result.a_boson = T(0.5)*tf_/pi*((x*x+omx*omx)*logomxbx+T(2.0)*x*omx);
+	result.b_boson = T();
+	result.c_boson = T();
+
+	auto const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+
+	result.a_fermion = T(0.5)*cf/pi*(((T(1.0)+x*x)/omx)*logomxbx+omx);
+	result.b_fermion = T(0.5)*cf/pi*(T(2.0)/omx)*logomxbx;
+
+	auto const dilogome = gsl_sf_dilog(T(1.0) - eta);
+	auto const logome   = log(T(1.0) - eta);
+
+	result.c_fermion = T(0.5)*cf/pi*(T(2.0)/T(3.0)*pi*pi-T(5.0)+T(2.0)*dilogome+
+		logome*logome);
+
+	return result;
+}
+
+template <typename T>
+abc_terms<T> cs_subtraction<T>::fermion_abc_final_initial(
+	T x,
+	T eta,
+	particle_type type_emitter
+) const {
+	using std::acos;
+	using std::log;
+
+	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+	T const ca = n_;
+
+	T const gamma = (type_emitter == particle_type::fermion)
+		? T(1.5) * cf
+		: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * nf_;
+
+	abc_terms<T> result;
+
+	result.a_boson = T();
+	result.b_boson = T();
+	result.c_boson = T();
+
+	T const factor = T(0.5) * gamma / acos(T(-1.0));
+
+	result.a_fermion = factor / (T(1.0) - x);
+	result.b_fermion = factor / (T(1.0) - x);
+	result.c_fermion = factor * (T(1.0) + log(T(1.0) - eta));
+
+	return result;
+}
+
+template <typename T>
+abc_terms<T> cs_subtraction<T>::fermion_abc_initial_final(
+	T x,
+	T eta,
+	T mu2,
+	std::vector<T> const& phase_space,
+	std::size_t emitter,
+	std::size_t spectator
+) const {
+	T const omx = T(1.0) - x;
+	T const sai = invariant(phase_space, emitter, spectator);
+
+	abc_terms<T> result;
+
+	T const logmu2bsaix = log(mu2 / (sai * x));
+	T const pi = acos(T(-1.0));
+
+	result.a_boson = T(0.5)*tf_/pi*(x*x+omx*omx)*logmu2bsaix;
+	result.b_boson = T();
+	result.c_boson = T();
+
+	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+
+	result.a_fermion = T(0.5)*cf/pi*(T(1.0)+x*x)/omx*logmu2bsaix;
+
+	T const logmu2bsai = log(mu2 / sai);
+
+	result.b_fermion = T(0.5)*cf/pi*(T(1.0)+x*x)/omx*logmu2bsai;
+	result.c_fermion = T(0.5)*cf/pi*(T(0.5)*eta*(T(2.0)+eta)+T(2.0)*
+		log(T(1.0)-eta))*logmu2bsai;
+
+	return result;
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

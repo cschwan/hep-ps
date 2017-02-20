@@ -1,6 +1,7 @@
 nobase_include_HEADERS = \
 	hep/ps.hpp \
 	hep/ps-mc.hpp \
+	hep/ps/abc_terms.hpp \
 	hep/ps/constants.hpp \
 	hep/ps/cs_subtraction.hpp \
 	hep/ps/cut_result.hpp \
@@ -8,6 +9,7 @@ nobase_include_HEADERS = \
 	hep/ps/dipole_invariants.hpp \
 	hep/ps/dipole_type.hpp \
 	hep/ps/event_type.hpp \
+	hep/ps/factorization_scheme.hpp \
 	hep/ps/fold.hpp \
 	hep/ps/fortran_helper.hpp \
 	hep/ps/hh_phase_space_generator.hpp \
