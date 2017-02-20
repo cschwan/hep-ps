@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
- * Copyright (C) 2016  Christopher Schwan
+ * Copyright (C) 2016-2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <array>
+#include "hep/ps/enum.hpp"
+
 #include <cassert>
 #include <cstddef>
-#include <initializer_list>
-
-// TODO: make the `enum` an `enum class`
-
-#define HEP_ENUM(name, ...)                                                    \
-	enum name : std::size_t                                                    \
-	{                                                                          \
-		__VA_ARGS__                                                            \
-	};                                                                         \
-	constexpr std::initializer_list<name> name ## _list()                      \
-	{                                                                          \
-		return { __VA_ARGS__ };                                                \
-	}                                                                          \
-	template <typename T>                                                      \
-	using name ## _array_ = std::array<T, name ## _list().size()>
 
 namespace hep
 {
