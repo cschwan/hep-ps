@@ -15,7 +15,6 @@ nobase_include_HEADERS = \
 	hep/ps/fortran_helper.hpp \
 	hep/ps/hh_phase_space_generator.hpp \
 	hep/ps/initial_state.hpp \
-	hep/ps/initial_state_array.hpp \
 	hep/ps/initial_state_set.hpp \
 	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \

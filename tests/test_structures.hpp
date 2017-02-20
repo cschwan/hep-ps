@@ -7,7 +7,6 @@
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/scales.hpp"
@@ -44,7 +43,7 @@ public:
 		{
 			if (set_.includes(process))
 			{
-				result.set(process, T(1.0));
+				result[process] = T(1.0);
 			}
 		}
 
@@ -110,7 +109,7 @@ public:
 		{
 			if (set.includes(process))
 			{
-				result.set(process, T(1.0));
+				result[process] = T(1.0);
 			}
 		}
 
@@ -130,7 +129,7 @@ public:
 		{
 			if (set.includes(process))
 			{
-				result.set(process, T(1.0));
+				result[process] = T(1.0);
 			}
 		}
 

@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
- * Copyright (C) 2016  Christopher Schwan
+ * Copyright (C) 2016-2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/initial_state_array.hpp"
+#include "hep/ps/initial_state.hpp"
 
 #include <cstddef>
 #include <memory>

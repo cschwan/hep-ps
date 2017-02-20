@@ -21,7 +21,6 @@
 
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
-#include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/particle_type.hpp"

@@ -40,7 +40,6 @@ void find_hep_ps();
 #include "hep/ps/fold.hpp"
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/hh_phase_space_generator.hpp"
-#include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/kaellen.hpp"

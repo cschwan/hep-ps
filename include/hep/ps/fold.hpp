@@ -20,7 +20,6 @@
  */
 
 #include "hep/ps/cut_result.hpp"
-#include "hep/ps/initial_state_array.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 
@@ -58,12 +57,12 @@ inline neg_pos_results<T> fold(
 	{
 		if (state_has_neg_shift(state) && !cut.neg_cutted())
 		{
-			neg += a.get(state) * b.get(state);
+			neg += a[state] * b[state];
 		}
 
 		if (state_has_pos_shift(state) && !cut.pos_cutted())
 		{
-			pos += a.get(state) * b.get(state);
+			pos += a[state] * b[state];
 		}
 	}
 
@@ -82,11 +81,11 @@ inline neg_pos_results<T> fold(
 
 	if (state_has_neg_shift(state))
 	{
-		neg += a.get(state) * b;
+		neg += a[state] * b;
 	}
 	else
 	{
-		pos += a.get(state) * b;
+		pos += a[state] * b;
 	}
 
 	return { factor * neg, factor * pos };

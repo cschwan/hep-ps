@@ -25,8 +25,12 @@
 
 // TODO: make the `enum` an `enum class`
 
-/// Defines an enumeration `name`. The arguments after `name` are the possible
-/// values of the enumeration.
+/// Defines an enumeration `name`, a `constexpr` function `name_list()`, and a
+/// template class `name_array<T>`. The arguments for this macro after `name`
+/// are the possible values of the enumeration. The function returns a
+/// `std::initializer_list` with the possible values of the enumeration. The
+/// class `name_array<T>` is a wrapper over `std::array<T, ...>` that supports
+/// access to its values by keys that are values of the enumeration.
 #define HEP_ENUM(name, ...)                                                    \
 	enum name : std::size_t                                                    \
 	{                                                                          \
@@ -37,6 +41,25 @@
 		return { __VA_ARGS__ };                                                \
 	}                                                                          \
 	template <typename T>                                                      \
-	using name ## _array_ = std::array<T, name ## _list().size()>
+	class name ## _array                                                       \
+	{                                                                          \
+	public:                                                                    \
+		name ## _array()                                                       \
+			: array_{{}}                                                       \
+		{                                                                      \
+		}                                                                      \
+	                                                                           \
+		T& operator[](name index)                                              \
+		{                                                                      \
+			return array_[static_cast <std::size_t> (index)];                  \
+		}                                                                      \
+	                                                                           \
+		T operator[](name index) const                                         \
+		{                                                                      \
+			return array_[static_cast <std::size_t> (index)];                  \
+		}                                                                      \
+	private:                                                                   \
+		std::array<T, name ## _list().size()> array_;                          \
+	}
 
 #endif
