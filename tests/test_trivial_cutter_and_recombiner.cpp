@@ -20,7 +20,7 @@ void test_trivial_cutter_and_recombiner(
 		test_matrix_elements<T>(set, count, 0, 0, 0),
 		hep::trivial_cutter<T>(),
 		hep::trivial_recombiner<T>(),
-		test_luminosities<T>(set),
+		test_pdf<T>(),
 		test_scale_setter<T>(),
 		T(1.0)
 	);

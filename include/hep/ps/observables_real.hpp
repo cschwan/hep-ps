@@ -67,7 +67,7 @@ inline std::vector<std::size_t> adjust_indices(
 namespace hep
 {
 
-template <class T, class M, class S, class C, class R, class L, class U>
+template <class T, class M, class S, class C, class R, class P, class U>
 class observables_real
 {
 public:
@@ -76,14 +76,14 @@ public:
 		typename Subtraction,
 		typename Cuts,
 		typename Recombiner,
-		typename Luminosities,
+		typename Pdf,
 		typename ScaleSetter>
 	observables_real(
 		MatrixElements&& matrix_elements,
 		Subtraction&& subtraction,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
-		Luminosities&& luminosities,
+		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
 		T hbarc2,
 		T alpha_min
@@ -92,7 +92,7 @@ public:
 		, subtraction_(std::forward<Subtraction>(subtraction))
 		, cuts_(std::forward<Cuts>(cuts))
 		, recombiner_(std::forward<Recombiner>(recombiner))
-		, luminosities_(std::forward<Luminosities>(luminosities))
+		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
@@ -114,12 +114,13 @@ public:
 		// only set renormalization scale if it changed
 		if (scales.renormalization() != old_renormalization_scale_)
 		{
-			matrix_elements_.scale(scales.renormalization(), luminosities_);
+			matrix_elements_.scale(scales.renormalization(), pdf_);
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
 		initial_state_array<T> reals;
-		initial_state_array<T> lumis;
+		parton_array<T> pdfx1;
+		parton_array<T> pdfx2;
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -161,8 +162,8 @@ public:
 			{
 				zero_event = false;
 				reals = matrix_elements_.reals(real_phase_space, set);
-				lumis = luminosities_.pdfs(info.x1(), info.x2(),
-					scales.factorization());
+				pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
+				pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
 			}
 		}
 
@@ -241,8 +242,8 @@ public:
 				if (zero_event)
 				{
 					zero_event = false;
-					lumis = luminosities_.pdfs(info.x1(), info.x2(),
-						scales.factorization());
+					pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
+					pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
 				}
 
 				bool const fermion_i = dipole.emitter_type() ==
@@ -270,7 +271,8 @@ public:
 
 				T const value = -function * matrix_elements_.dipole(phase_space,
 					process, dipole);
-				auto const dipole_result = fold(lumis, value, process, factor);
+				auto const dipole_result = fold(pdfx1, pdfx2, value, process,
+					factor);
 
 				result += dipole_result;
 
@@ -284,7 +286,7 @@ public:
 			return T();
 		}
 
-		auto const real_result = fold(lumis, reals, set, factor,
+		auto const real_result = fold(pdfx1, pdfx2, reals, set, factor,
 			real_cut_result);
 		result += real_result;
 
@@ -309,7 +311,7 @@ private:
 	S subtraction_;
 	C cuts_;
 	R recombiner_;
-	L luminosities_;
+	P pdf_;
 	U scale_setter_;
 	T hbarc2_;
 	T alpha_min_;
@@ -317,29 +319,29 @@ private:
 	T old_renormalization_scale_;
 };
 
-template <class T, class M, class S, class C, class R, class L, class U>
+template <class T, class M, class S, class C, class R, class P, class U>
 using observables_real_type = observables_real<T,
 	typename std::decay<M>::type, typename std::decay<S>::type,
 	typename std::decay<C>::type, typename std::decay<R>::type,
-	typename std::decay<L>::type, typename std::decay<U>::type>;
+	typename std::decay<P>::type, typename std::decay<U>::type>;
 
-template <class T, class M, class S, class C, class R, class L, class U>
-inline observables_real_type<T, M, S, C, R, L, U> make_observables_real(
+template <class T, class M, class S, class C, class R, class P, class U>
+inline observables_real_type<T, M, S, C, R, P, U> make_observables_real(
 	M&& matrix_elements,
 	S&& subtraction,
 	C&& cuts,
 	R&& recombiner,
-	L&& luminosities,
+	P&& pdf,
 	U&& scale_setter,
 	T hbarc2,
 	T alpha_min = T()
 ) {
-	return observables_real_type<T, M, S, C, R, L, U>(
+	return observables_real_type<T, M, S, C, R, P, U>(
 		std::forward<M>(matrix_elements),
 		std::forward<S>(subtraction),
 		std::forward<C>(cuts),
 		std::forward<R>(recombiner),
-		std::forward<L>(luminosities),
+		std::forward<P>(pdf),
 		std::forward<U>(scale_setter),
 		hbarc2,
 		alpha_min

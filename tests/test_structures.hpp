@@ -9,6 +9,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/particle_type.hpp"
+#include "hep/ps/parton.hpp"
 #include "hep/ps/scales.hpp"
 
 #include "catch.hpp"
@@ -22,36 +23,29 @@ namespace
 {
 
 template <typename T>
-class test_luminosities
+class test_pdf
 {
 public:
-	test_luminosities(hep::initial_state_set set)
-		: set_(set)
+	hep::parton_array<T> pdf(T x, T scale)
 	{
-	}
+		REQUIRE( x >= T() );
+		REQUIRE( x < T(1.0) );
+		REQUIRE( scale > T() );
 
-	hep::initial_state_array<T> pdfs(T x1, T x2, T)
-	{
-		REQUIRE( x1 >= T() );
-		REQUIRE( x1 < T(1.0) );
-		REQUIRE( x2 >= T() );
-		REQUIRE( x2 < T(1.0) );
+		hep::parton_array<T> result;
 
-		hep::initial_state_array<T> result;
-
-		for (auto const process : hep::initial_state_list())
-		{
-			if (set_.includes(process))
-			{
-				result[process] = T(1.0);
-			}
-		}
+		result[hep::parton::anti_up]      = T(1.0);
+		result[hep::parton::anti_down]    = T(1.0);
+		result[hep::parton::anti_charm]   = T(1.0);
+		result[hep::parton::anti_strange] = T(1.0);
+		result[hep::parton::gluon]        = T(1.0);
+		result[hep::parton::up]           = T(1.0);
+		result[hep::parton::down]         = T(1.0);
+		result[hep::parton::charm]        = T(1.0);
+		result[hep::parton::strange]      = T(1.0);
 
 		return result;
 	}
-
-private:
-	hep::initial_state_set set_;
 };
 
 template <typename T>
@@ -150,7 +144,7 @@ public:
 		return indices;
 	}
 
-	void scale(T, test_luminosities<T>&)
+	void scale(T, test_pdf<T>&)
 	{
 	}
 

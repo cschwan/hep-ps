@@ -23,7 +23,7 @@ void test_observables_real(
 		test_subtraction<T>(emitter, unresolved, spectator),
 		test_cuts<T>(count, inclusive),
 		test_recombiner<T>(count),
-		test_luminosities<T>(set),
+		test_pdf<T>(),
 		test_scale_setter<T>(),
 		T(1.0),
 		inclusive

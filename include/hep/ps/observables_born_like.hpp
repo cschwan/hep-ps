@@ -38,7 +38,7 @@
 namespace hep
 {
 
-template <class T, class M, class C, class R, class L, class S>
+template <class T, class M, class C, class R, class P, class S>
 class observables_born_like
 {
 public:
@@ -46,20 +46,20 @@ public:
 		typename MatrixElements,
 		typename Cuts,
 		typename Recombiner,
-		typename Luminosities,
+		typename Pdf,
 		typename ScaleSetter>
 	observables_born_like(
 		MatrixElements&& matrix_elements,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
-		Luminosities&& luminosities,
+		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
 		T hbarc2
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
 		, cuts_(std::forward<Cuts>(cuts))
 		, recombiner_(std::forward<Recombiner>(recombiner))
-		, luminosities_(std::forward<Luminosities>(luminosities))
+		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, hbarc2_(hbarc2)
 	{
@@ -100,15 +100,15 @@ public:
 		// only set renormalization scale if it changed
 		if (scales.renormalization() != old_renormalization_scale_)
 		{
-			matrix_elements_.scale(scales.renormalization(), luminosities_);
+			matrix_elements_.scale(scales.renormalization(), pdf_);
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
 		auto const borns = matrix_elements_.borns(phase_space, set);
-		auto const pdfs = luminosities_.pdfs(info.x1(), info.x2(),
-			scales.factorization());
+		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
+		auto const pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
-		auto const result = fold(pdfs, borns, set, factor, cut_result);
+		auto const result = fold(pdfx1, pdfx2, borns, set, factor, cut_result);
 
 		distributions(phase_space, cut_result, result, rapidity_shift,
 			event_type::born_like_n);
@@ -130,33 +130,33 @@ private:
 	M matrix_elements_;
 	C cuts_;
 	R recombiner_;
-	L luminosities_;
+	P pdf_;
 	S scale_setter_;
 	T hbarc2_;
 
 	T old_renormalization_scale_;
 };
 
-template <class T, class M, class C, class R, class L, class S>
+template <class T, class M, class C, class R, class P, class S>
 using observables_born_like_type = observables_born_like<T,
 	typename std::decay<M>::type, typename std::decay<C>::type,
-	typename std::decay<R>::type, typename std::decay<L>::type,
+	typename std::decay<R>::type, typename std::decay<P>::type,
 	typename std::decay<S>::type>;
 
-template <class T, class M, class C, class R, class L, class S>
-inline observables_born_like_type <T, M, C, R, L, S> make_observables_born_like(
+template <class T, class M, class C, class R, class P, class S>
+inline observables_born_like_type <T, M, C, R, P, S> make_observables_born_like(
 	M&& matrix_elements,
 	C&& cuts,
 	R&& recombiner,
-	L&& luminosities,
+	P&& pdf,
 	S&& scale_setter,
 	T hbarc2
 ) {
-	return observables_born_like_type<T, M, C, R, L, S>(
+	return observables_born_like_type<T, M, C, R, P, S>(
 		std::forward<M>(matrix_elements),
 		std::forward<C>(cuts),
 		std::forward<R>(recombiner),
-		std::forward<L>(luminosities),
+		std::forward<P>(pdf),
 		std::forward<S>(scale_setter),
 		hbarc2
 	);

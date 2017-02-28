@@ -20,32 +20,19 @@
  */
 
 #include "hep/ps/cut_result.hpp"
+#include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/neg_pos_results.hpp"
+#include "hep/ps/parton.hpp"
 
 namespace hep
 {
 
-template <typename T>
-inline T fold(
-	initial_state_array<T> const& a,
-	initial_state_array<T> const& b,
-	initial_state_set set
-) {
-	T result{};
-
-	for (auto const state : set)
-	{
-		result += a.get(state) * b.get(state);
-	}
-
-	return result;
-}
-
 template <typename T, typename I>
 inline neg_pos_results<T> fold(
-	initial_state_array<T> const& a,
-	initial_state_array<T> const& b,
+	parton_array<T> const& pdfx1,
+	parton_array<T> const& pdfx2,
+	initial_state_array<T> const& matrix_elements,
 	initial_state_set set,
 	T factor,
 	cut_result_with_info<I> const& cut
@@ -55,40 +42,48 @@ inline neg_pos_results<T> fold(
 
 	for (auto const state : set)
 	{
+		auto const one = state_parton_one(state);
+		auto const two = state_parton_two(state);
+
 		if (state_has_neg_shift(state) && !cut.neg_cutted())
 		{
-			neg += a[state] * b[state];
+			neg += pdfx1[one] * pdfx2[two] * matrix_elements[state];
 		}
 
 		if (state_has_pos_shift(state) && !cut.pos_cutted())
 		{
-			pos += a[state] * b[state];
+			pos += pdfx1[one] * pdfx2[two] * matrix_elements[state];
 		}
 	}
 
-	return { factor * neg, factor * pos };
+	return { factor * neg , factor * pos };
 }
 
 template <typename T>
 inline neg_pos_results<T> fold(
-	initial_state_array<T> const& a,
-	T b,
+	parton_array<T> const& pdfx1,
+	parton_array<T> const& pdfx2,
+	T matrix_element,
 	initial_state state,
 	T factor
 ) {
 	T neg{};
 	T pos{};
 
+	auto const one = state_parton_one(state);
+	auto const two = state_parton_two(state);
+
 	if (state_has_neg_shift(state))
 	{
-		neg += a[state] * b;
-	}
-	else
-	{
-		pos += a[state] * b;
+		neg += pdfx1[one] * pdfx2[two] * matrix_element;
 	}
 
-	return { factor * neg, factor * pos };
+	if (state_has_pos_shift(state))
+	{
+		pos += pdfx1[one] * pdfx2[two] * matrix_element;
+	}
+
+	return { factor * neg , factor * pos };
 }
 
 }
