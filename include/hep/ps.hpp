@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
- * Copyright (C) 2016  Christopher Schwan
+ * Copyright (C) 2016-2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ void find_hep_ps();
 #include "hep/ps/observables_real.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/permutation.hpp"
-#include "hep/ps/pp_luminosities.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
 #include "hep/ps/proton_pdf.hpp"

@@ -11,7 +11,6 @@ libhep_ps_la_SOURCES = \
 	lusifer_interfaces.hpp \
 	lusifer_phase_space_generator.cpp \
 	p_type_jet_algorithm.cpp \
-	pp_luminosities.cpp \
 	proton_pdf.cpp \
 	silence_third_party_libs.cpp \
 	trivial_cutter.cpp \

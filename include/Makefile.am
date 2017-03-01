@@ -26,7 +26,6 @@ nobase_include_HEADERS = \
 	hep/ps/parton.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/permutation.hpp \
-	hep/ps/pp_luminosities.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/proton_pdf.hpp \
 	hep/ps/requires_cut.hpp \
