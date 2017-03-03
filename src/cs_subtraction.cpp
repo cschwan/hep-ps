@@ -310,7 +310,7 @@ abc_terms<T> cs_subtraction<T>::finite_born(T x, T eta) const
 	using std::log;
 
 	// TODO: DIS scheme is NYI
-	assert( scheme_ != factorization_scheme::msbar );
+	assert( scheme_ == factorization_scheme::msbar );
 
 	abc_terms<T> result;
 
@@ -385,7 +385,7 @@ abc_terms<T> cs_subtraction<T>::finite_final_initial(
 	using std::log;
 
 	// TODO: DIS scheme is NYI
-	assert( scheme_ != factorization_scheme::msbar );
+	assert( scheme_ == factorization_scheme::msbar );
 
 	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
 	T const ca = n_;
@@ -451,7 +451,7 @@ abc_terms<T> cs_subtraction<T>::finite_initial_final(
 	using std::log;
 
 	// TODO: DIS scheme is NYI
-	assert( scheme_ != factorization_scheme::msbar );
+	assert( scheme_ == factorization_scheme::msbar );
 
 	T const omx = T(1.0) - x;
 	T const sai = invariant(phase_space, emitter, spectator);
