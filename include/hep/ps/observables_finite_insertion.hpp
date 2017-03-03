@@ -111,8 +111,8 @@ public:
 			info.x2()
 		};
 		T const xprime[] = {
-			T(1.0) - eta[0] * (T(1.0) - x),
-			T(1.0) - eta[1] * (T(1.0) - x)
+			eta[0] + (T(1.0) - eta[0]) * x,
+			eta[1] + (T(1.0) - eta[1]) * x
 		};
 		parton_array<T> const pdfa[] = {
 			pdf_.pdf(eta[0], scales.factorization()),
@@ -144,8 +144,8 @@ public:
 
 			for (auto const ap : parton_list())
 			{
-				d += pdfb[i][ap] * abc.a[ap][a] / xprime[i] / eta[i];
-				d -= pdfa[i][ap] * abc.b[ap][a] / xprime[i];
+				d += pdfb[i][ap] * abc.a[ap][a] * (T(1.0) - eta[i]) / xprime[i];
+				d -= pdfa[i][ap] * abc.b[ap][a] * (T(1.0) - eta[i]);
 				d += pdfa[i][ap] * abc.c[ap][a];
 			}
 
