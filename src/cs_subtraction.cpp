@@ -304,37 +304,76 @@ T cs_subtraction<T>::fermion_function(
 }
 
 template <typename T>
-abc_terms<T> cs_subtraction<T>::fermion_abc_born(T x, T eta) const
+abc_terms<T> cs_subtraction<T>::finite_born(T x, T eta) const
 {
 	using std::acos;
 	using std::log;
 
 	abc_terms<T> result;
 
+	T value;
+
 	auto const omx      = T(1.0) - x;
 	auto const logomxbx = log(omx / x);
 	auto const pi       = acos(T(-1.0));
 
-	result.a_boson = T(0.5)*tf_/pi*((x*x+omx*omx)*logomxbx+T(2.0)*x*omx);
-	result.b_boson = T();
-	result.c_boson = T();
+	value = T(0.5) * tf_ / pi * ((x*x + omx*omx) * logomxbx + T(2.0)*x*omx);
+
+	result.a[parton::gluon][parton::anti_up]      = value;
+	result.a[parton::gluon][parton::anti_down]    = value;
+	result.a[parton::gluon][parton::anti_charm]   = value;
+	result.a[parton::gluon][parton::anti_strange] = value;
+	result.a[parton::gluon][parton::up]           = value;
+	result.a[parton::gluon][parton::down]         = value;
+	result.a[parton::gluon][parton::charm]        = value;
+	result.a[parton::gluon][parton::strange]      = value;
 
 	auto const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
 
-	result.a_fermion = T(0.5)*cf/pi*(((T(1.0)+x*x)/omx)*logomxbx+omx);
-	result.b_fermion = T(0.5)*cf/pi*(T(2.0)/omx)*logomxbx;
+	value = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) * logomxbx + omx);
+
+	result.a[parton::anti_up     ][parton::anti_up     ] = value;
+	result.a[parton::anti_down   ][parton::anti_down   ] = value;
+	result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.a[parton::anti_strange][parton::anti_strange] = value;
+	result.a[parton::up          ][parton::up          ] = value;
+	result.a[parton::down        ][parton::down        ] = value;
+	result.a[parton::charm       ][parton::charm       ] = value;
+	result.a[parton::strange     ][parton::strange     ] = value;
+
+	value = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
+
+	result.b[parton::anti_up     ][parton::anti_up     ] = value;
+	result.b[parton::anti_down   ][parton::anti_down   ] = value;
+	result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.b[parton::anti_strange][parton::anti_strange] = value;
+	result.b[parton::up          ][parton::up          ] = value;
+	result.b[parton::down        ][parton::down        ] = value;
+	result.b[parton::charm       ][parton::charm       ] = value;
+	result.b[parton::strange     ][parton::strange     ] = value;
 
 	auto const dilogome = gsl_sf_dilog(T(1.0) - eta);
 	auto const logome   = log(T(1.0) - eta);
 
-	result.c_fermion = T(0.5)*cf/pi*(T(2.0)/T(3.0)*pi*pi-T(5.0)+T(2.0)*dilogome+
-		logome*logome);
+	value = T(0.5) * cf / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) + T(2.0) *
+		dilogome + logome * logome);
+
+	result.c[parton::anti_up     ][parton::anti_up     ] = value;
+	result.c[parton::anti_down   ][parton::anti_down   ] = value;
+	result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.c[parton::anti_strange][parton::anti_strange] = value;
+	result.c[parton::up          ][parton::up          ] = value;
+	result.c[parton::down        ][parton::down        ] = value;
+	result.c[parton::charm       ][parton::charm       ] = value;
+	result.c[parton::strange     ][parton::strange     ] = value;
+
+	// TODO: qg and gg are NYI
 
 	return result;
 }
 
 template <typename T>
-abc_terms<T> cs_subtraction<T>::fermion_abc_final_initial(
+abc_terms<T> cs_subtraction<T>::finite_final_initial(
 	T x,
 	T eta,
 	particle_type type_emitter
@@ -351,21 +390,50 @@ abc_terms<T> cs_subtraction<T>::fermion_abc_final_initial(
 
 	abc_terms<T> result;
 
-	result.a_boson = T();
-	result.b_boson = T();
-	result.c_boson = T();
-
 	T const factor = T(0.5) * gamma / acos(T(-1.0));
 
-	result.a_fermion = factor / (T(1.0) - x);
-	result.b_fermion = factor / (T(1.0) - x);
-	result.c_fermion = factor * (T(1.0) + log(T(1.0) - eta));
+	T value;
+
+	value = factor / (T(1.0) - x);
+
+	result.a[parton::anti_up     ][parton::anti_up     ] = value;
+	result.a[parton::anti_down   ][parton::anti_down   ] = value;
+	result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.a[parton::anti_strange][parton::anti_strange] = value;
+	result.a[parton::up          ][parton::up          ] = value;
+	result.a[parton::down        ][parton::down        ] = value;
+	result.a[parton::charm       ][parton::charm       ] = value;
+	result.a[parton::strange     ][parton::strange     ] = value;
+
+	value = factor / (T(1.0) - x);
+
+	result.b[parton::anti_up     ][parton::anti_up     ] = value;
+	result.b[parton::anti_down   ][parton::anti_down   ] = value;
+	result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.b[parton::anti_strange][parton::anti_strange] = value;
+	result.b[parton::up          ][parton::up          ] = value;
+	result.b[parton::down        ][parton::down        ] = value;
+	result.b[parton::charm       ][parton::charm       ] = value;
+	result.b[parton::strange     ][parton::strange     ] = value;
+
+	value = factor * (T(1.0) + log(T(1.0) - eta));
+
+	result.c[parton::anti_up     ][parton::anti_up     ] = value;
+	result.c[parton::anti_down   ][parton::anti_down   ] = value;
+	result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.c[parton::anti_strange][parton::anti_strange] = value;
+	result.c[parton::up          ][parton::up          ] = value;
+	result.c[parton::down        ][parton::down        ] = value;
+	result.c[parton::charm       ][parton::charm       ] = value;
+	result.c[parton::strange     ][parton::strange     ] = value;
+
+	// TODO: qg and gg are NYI
 
 	return result;
 }
 
 template <typename T>
-abc_terms<T> cs_subtraction<T>::fermion_abc_initial_final(
+abc_terms<T> cs_subtraction<T>::finite_initial_final(
 	T x,
 	T eta,
 	T mu2,
@@ -381,19 +449,75 @@ abc_terms<T> cs_subtraction<T>::fermion_abc_initial_final(
 	T const logmu2bsaix = log(mu2 / (sai * x));
 	T const pi = acos(T(-1.0));
 
-	result.a_boson = T(0.5)*tf_/pi*(x*x+omx*omx)*logmu2bsaix;
-	result.b_boson = T();
-	result.c_boson = T();
+	T value;
+
+	value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsaix;
+
+	result.a[parton::gluon][parton::anti_up]      = value;
+	result.a[parton::gluon][parton::anti_down]    = value;
+	result.a[parton::gluon][parton::anti_charm]   = value;
+	result.a[parton::gluon][parton::anti_strange] = value;
+	result.a[parton::gluon][parton::up]           = value;
+	result.a[parton::gluon][parton::down]         = value;
+	result.a[parton::gluon][parton::charm]        = value;
+	result.a[parton::gluon][parton::strange]      = value;
 
 	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
 
-	result.a_fermion = T(0.5)*cf/pi*(T(1.0)+x*x)/omx*logmu2bsaix;
+	value = T(0.5)*cf/pi*(T(1.0)+x*x)/omx*logmu2bsaix;
+
+	result.a[parton::anti_up     ][parton::anti_up     ] = value;
+	result.a[parton::anti_down   ][parton::anti_down   ] = value;
+	result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.a[parton::anti_strange][parton::anti_strange] = value;
+	result.a[parton::up          ][parton::up          ] = value;
+	result.a[parton::down        ][parton::down        ] = value;
+	result.a[parton::charm       ][parton::charm       ] = value;
+	result.a[parton::strange     ][parton::strange     ] = value;
 
 	T const logmu2bsai = log(mu2 / sai);
 
-	result.b_fermion = T(0.5)*cf/pi*(T(1.0)+x*x)/omx*logmu2bsai;
-	result.c_fermion = T(0.5)*cf/pi*(T(0.5)*eta*(T(2.0)+eta)+T(2.0)*
-		log(T(1.0)-eta))*logmu2bsai;
+	value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * logmu2bsai;
+
+	result.b[parton::anti_up     ][parton::anti_up     ] = value;
+	result.b[parton::anti_down   ][parton::anti_down   ] = value;
+	result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.b[parton::anti_strange][parton::anti_strange] = value;
+	result.b[parton::up          ][parton::up          ] = value;
+	result.b[parton::down        ][parton::down        ] = value;
+	result.b[parton::charm       ][parton::charm       ] = value;
+	result.b[parton::strange     ][parton::strange     ] = value;
+
+	value = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) + T(2.0) *
+		log(T(1.0) - eta)) * logmu2bsai;
+
+	result.c[parton::anti_up     ][parton::anti_up     ] = value;
+	result.c[parton::anti_down   ][parton::anti_down   ] = value;
+	result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
+	result.c[parton::anti_strange][parton::anti_strange] = value;
+	result.c[parton::up          ][parton::up          ] = value;
+	result.c[parton::down        ][parton::down        ] = value;
+	result.c[parton::charm       ][parton::charm       ] = value;
+	result.c[parton::strange     ][parton::strange     ] = value;
+
+	// TODO: qg and gg are NYI
+
+	return result;
+}
+
+template <typename T>
+abc_terms<T> cs_subtraction<T>::finite_initial_initial(
+	T /*x*/,
+	T /*eta*/,
+	T /*mu2*/,
+	std::vector<T> const& /*phase_space*/,
+	std::size_t /*emitter*/,
+	std::size_t /*spectator*/
+) const {
+	abc_terms<T> result;
+
+	// TODO: NYI
+	assert( false );
 
 	return result;
 }

@@ -1,6 +1,6 @@
 nobase_include_HEADERS = \
-	hep/ps.hpp \
 	hep/ps-mc.hpp \
+	hep/ps.hpp \
 	hep/ps/abc_terms.hpp \
 	hep/ps/constants.hpp \
 	hep/ps/cs_subtraction.hpp \
@@ -23,10 +23,10 @@ nobase_include_HEADERS = \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/observables_born_like.hpp \
 	hep/ps/observables_real.hpp \
-	hep/ps/parton.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
-	hep/ps/permutation.hpp \
 	hep/ps/particle_type.hpp \
+	hep/ps/parton.hpp \
+	hep/ps/permutation.hpp \
 	hep/ps/proton_pdf.hpp \
 	hep/ps/requires_cut.hpp \
 	hep/ps/scales.hpp \

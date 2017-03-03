@@ -48,17 +48,27 @@ public:
 	);
 
 	///
-	abc_terms<T> fermion_abc_born(T x, T eta) const;
+	abc_terms<T> finite_born(T x, T eta) const;
 
 	///
-	abc_terms<T> fermion_abc_final_initial(
+	abc_terms<T> finite_final_initial(
 		T x,
 		T eta,
 		particle_type type_emitter
 	) const;
 
 	///
-	abc_terms<T> fermion_abc_initial_final(
+	abc_terms<T> finite_initial_final(
+		T x,
+		T eta,
+		T mu2,
+		std::vector<T> const& phase_space,
+		std::size_t emitter,
+		std::size_t spectator
+	) const;
+
+	///
+	abc_terms<T> finite_initial_initial(
 		T x,
 		T eta,
 		T mu2,

@@ -19,19 +19,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/parton.hpp"
+
 namespace hep
 {
 
 template <typename T>
 struct abc_terms
 {
-	T a_boson;
-	T b_boson;
-	T c_boson;
-
-	T a_fermion;
-	T b_fermion;
-	T c_fermion;
+	parton_array<parton_array<T>> a;
+	parton_array<parton_array<T>> b;
+	parton_array<parton_array<T>> c;
 };
 
 }
