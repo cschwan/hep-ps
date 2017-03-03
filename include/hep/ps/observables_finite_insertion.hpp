@@ -187,7 +187,8 @@ public:
 
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
 		auto const mu2 = scales.factorization() * scales.factorization();
-		auto const& correlated_me = matrix_elements_.correlated_me(phase_space);
+		auto const& correlated_me = matrix_elements_.correlated_me(phase_space,
+			set);
 
 		// loop over the two particle in the initial state
 		for (auto const i : { 0, 1 })

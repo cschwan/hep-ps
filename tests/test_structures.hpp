@@ -172,7 +172,8 @@ public:
 	}
 
 	std::array<hep::initial_state_array<T>, 2> correlated_me(
-		std::vector<T> const&
+		std::vector<T> const&,
+		hep::initial_state_set
 	) {
 		return {
 			hep::initial_state_array<T>(),
