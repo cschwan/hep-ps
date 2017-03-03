@@ -29,12 +29,12 @@ namespace hep
 {
 
 /// Enumeration listing all possible partonic initial states. The order matters,
-/// e.g. there is both \ref q43_uc and \ref q43_cu. If both initial states are
-/// the same, e.g. for \ref q43_uu, then there is another value where `x`
-/// replaces the `q` in the identifier, e.g. \ref x43_uu. Note that the
-/// relative ordering of similar initial states (same partons, but transposed)
-/// is important because it determines whether a process belongs to a positive
-/// or negative rapidity shift.
+/// e.g. there is both `q43_uc` and `q43_cu`. If both initial states are the
+/// same, e.g. for `q43_uu`, then there is another value where `x` replaces the
+/// `q` in the identifier, e.g. `x43_uu`. Note that the relative ordering of
+/// similar initial states (same partons, but transposed) is important because
+/// it determines whether a process belongs to a positive or negative rapidity
+/// shift.
 HEP_ENUM(initial_state,
 	q43_uu,
 	x43_uu,
