@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	test_lusifer_phase_space_generator2 \
 	test_lusifer_phase_space_generator3 \
 	test_observables_born_like \
+	test_observables_finite_insertion \
 	test_observables_real \
 	test_permutation \
 	test_trivial_cutter_and_recombiner

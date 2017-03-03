@@ -16,12 +16,15 @@ nobase_include_HEADERS = \
 	hep/ps/hh_phase_space_generator.hpp \
 	hep/ps/initial_state.hpp \
 	hep/ps/initial_state_set.hpp \
+	hep/ps/insertion_term.hpp \
+	hep/ps/insertion_term_type.hpp \
 	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
 	hep/ps/mc_phase_space_adapter.hpp \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/observables_born_like.hpp \
+	hep/ps/observables_finite_insertion.hpp \
 	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/particle_type.hpp \

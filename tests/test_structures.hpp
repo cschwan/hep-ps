@@ -1,6 +1,7 @@
 #ifndef TEST_STRUCTURES_HPP
 #define TEST_STRUCTURES_HPP
 
+#include "hep/ps/abc_terms.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
@@ -8,6 +9,8 @@
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/insertion_term.hpp"
+#include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/scales.hpp"
@@ -144,6 +147,40 @@ public:
 		return indices;
 	}
 
+	std::array<hep::insertion_term, 2> insertion_terms() const
+	{
+		return {
+			hep::insertion_term(
+				emitter_,
+				spectator_,
+				hep::particle_type::fermion,
+				hep::insertion_term_type::final_initial
+			),
+			hep::insertion_term(
+				emitter_,
+				spectator_,
+				hep::particle_type::fermion,
+				hep::insertion_term_type::initial_final
+			)//,
+//			hep::insertion_term(
+//				emitter_,
+//				spectator_,
+//				hep::particle_type::fermion,
+//				hep::insertion_term_type::initial_initial
+//			)
+		};
+	}
+
+	std::array<hep::initial_state_array<T>, 2> correlated_me(
+		std::vector<T> const&
+	) {
+		return {
+			hep::initial_state_array<T>(),
+			hep::initial_state_array<T>()//,
+//			hep::initial_state_array<T>()
+		};
+	}
+
 	void scale(T, test_pdf<T>&)
 	{
 	}
@@ -198,6 +235,38 @@ public:
 		REQUIRE( invariants.adipole == T(8.0) );
 
 		return T(1.0);
+	}
+
+	hep::abc_terms<T> finite_born(T, T)
+	{
+		return hep::abc_terms<T>();
+	}
+
+	hep::abc_terms<T> finite_final_initial(T, T, hep::particle_type)
+	{
+		return hep::abc_terms<T>();
+	}
+
+	hep::abc_terms<T> finite_initial_final(
+		T,
+		T,
+		T,
+		std::vector<T> const&,
+		std::size_t,
+		std::size_t
+	) {
+		return hep::abc_terms<T>();
+	}
+
+	hep::abc_terms<T> finite_initial_initial(
+		T,
+		T,
+		T,
+		std::vector<T> const&,
+		std::size_t,
+		std::size_t
+	) {
+		return hep::abc_terms<T>();
 	}
 
 private:
