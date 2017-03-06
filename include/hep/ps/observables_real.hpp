@@ -189,14 +189,13 @@ public:
 
 			for (auto const dipole : matrix_elements_.dipole_ids(process))
 			{
-				dipole_phase_space.emplace_back();
-				dipole_phase_space.back().resize(real_phase_space.size() - 4);
+				std::vector<T> phase_space(real_phase_space.size() - 4);
 
 				// map the real phase space on the dipole phase space
-				phase_space_invariants.push_back(subtraction_.map_phase_space(
-					real_phase_space, dipole_phase_space.back(), dipole));
+				auto const invariants = subtraction_.map_phase_space(
+					real_phase_space, phase_space, dipole);
 
-				if (phase_space_invariants.back().adipole < alpha_min_)
+				if (invariants.adipole < alpha_min_)
 				{
 					tech_cut = true;
 					reals[process] = T();
@@ -209,8 +208,8 @@ public:
 					dipole.unresolved());
 
 				auto const dipole_recombined = recombiner_.recombine(
-					dipole_phase_space.back(),
-					dipole_phase_space.back(),
+					phase_space,
+					phase_space,
 					dipole_recombination_candidates,
 					0
 				);
@@ -221,6 +220,8 @@ public:
 					continue;
 				}
 
+				dipole_phase_space.push_back(std::move(phase_space));
+				phase_space_invariants.push_back(invariants);
 				dipoles.push_back(dipole);
 			}
 
@@ -229,14 +230,12 @@ public:
 				continue;
 			}
 
-			std::size_t i = 0;
-
 			// go through all dipoles for the current process
-			for (auto const dipole : dipoles)
+			for (std::size_t i = 0; i != dipoles.size(); ++i)
 			{
+				auto const& dipole = dipoles.at(i);
+				auto const& phase_space = dipole_phase_space.at(i);
 				auto const& invariants = phase_space_invariants.at(i);
-				auto& phase_space = dipole_phase_space.at(i);
-				++i;
 
 				auto const dipole_cut_result = cuts_.cut(phase_space, shift,
 					event_type::born_like_n);
