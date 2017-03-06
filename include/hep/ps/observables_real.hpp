@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
@@ -167,10 +168,13 @@ public:
 			}
 		}
 
-		// TODO: check for the same dipoles and calculate them only once
+		// TODO: change the interface and tell the matrix elements which dipoles
+		// to calculate?
 
 		std::vector<std::vector<T>> dipole_phase_space;
 		std::vector<dipole_invariants<T>> phase_space_invariants;
+		std::vector<dipole> dipoles;
+
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 		neg_pos_results<T> result;
 
@@ -179,6 +183,7 @@ public:
 		{
 			dipole_phase_space.clear();
 			phase_space_invariants.clear();
+			dipoles.clear();
 
 			bool tech_cut = false;
 
@@ -198,6 +203,25 @@ public:
 
 					break;
 				}
+
+				auto const dipole_recombination_candidates = adjust_indices(
+					matrix_elements_.real_recombination_candidates(),
+					dipole.unresolved());
+
+				auto const dipole_recombined = recombiner_.recombine(
+					dipole_phase_space.back(),
+					dipole_phase_space.back(),
+					dipole_recombination_candidates,
+					0
+				);
+
+				// check if it passed the recombination
+				if (dipole_recombined > 0)
+				{
+					continue;
+				}
+
+				dipoles.push_back(dipole);
 			}
 
 			if (tech_cut)
@@ -208,28 +232,11 @@ public:
 			std::size_t i = 0;
 
 			// go through all dipoles for the current process
-			for (auto const dipole : matrix_elements_.dipole_ids(process))
+			for (auto const dipole : dipoles)
 			{
 				auto const& invariants = phase_space_invariants.at(i);
 				auto& phase_space = dipole_phase_space.at(i);
 				++i;
-
-				auto const dipole_recombination_candidates = adjust_indices(
-					matrix_elements_.real_recombination_candidates(),
-					dipole.unresolved());
-
-				auto const dipole_recombined = recombiner_.recombine(
-					phase_space,
-					phase_space,
-					dipole_recombination_candidates,
-					0
-				);
-
-				// check if it passed the recombination
-				if (dipole_recombined > 0)
-				{
-					continue;
-				}
 
 				auto const dipole_cut_result = cuts_.cut(phase_space, shift,
 					event_type::born_like_n);
