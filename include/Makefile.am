@@ -23,6 +23,7 @@ nobase_include_HEADERS = \
 	hep/ps/lusifer_phase_space_generator.hpp \
 	hep/ps/mc_phase_space_adapter.hpp \
 	hep/ps/neg_pos_results.hpp \
+	hep/ps/non_zero_dipole.hpp \
 	hep/ps/observables_born_like.hpp \
 	hep/ps/observables_finite_insertion.hpp \
 	hep/ps/observables_real.hpp \

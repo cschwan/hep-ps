@@ -19,12 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/requires_cut.hpp"
 #include "hep/ps/trivial_distributions.hpp"
@@ -171,13 +170,10 @@ public:
 		// TODO: change the interface and tell the matrix elements which dipoles
 		// to calculate?
 
-		using cut_result_t = decltype (cuts_.cut(real_phase_space, shift,
-			event_type::born_like_n));
+		using info_t = typename decltype (cuts_.cut(real_phase_space, shift,
+			event_type::born_like_n))::info_t;
 
-		std::vector<std::vector<T>> dipole_phase_space;
-		std::vector<dipole_invariants<T>> phase_space_invariants;
-		std::vector<dipole> dipoles;
-		std::vector<cut_result_t> dipole_cut_results;
+		std::vector<non_zero_dipole<T, info_t>> non_zero_dipoles;
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 		neg_pos_results<T> result;
@@ -185,10 +181,7 @@ public:
 		// go through all processes
 		for (auto const process : set)
 		{
-			dipole_phase_space.clear();
-			phase_space_invariants.clear();
-			dipoles.clear();
-			dipole_cut_results.clear();
+			non_zero_dipoles.clear();
 
 			bool tech_cut = false;
 
@@ -228,15 +221,18 @@ public:
 				auto const dipole_cut_result = cuts_.cut(phase_space, shift,
 					event_type::born_like_n);
 
-				if (dipole_cut_result.neg_cutted() && dipole_cut_result.pos_cutted())
+				if (dipole_cut_result.neg_cutted() &&
+					dipole_cut_result.pos_cutted())
 				{
 					continue;
 				}
 
-				dipole_phase_space.push_back(std::move(phase_space));
-				phase_space_invariants.push_back(invariants);
-				dipole_cut_results.push_back(dipole_cut_result);
-				dipoles.push_back(dipole);
+				non_zero_dipoles.emplace_back(
+					std::move(phase_space),
+					invariants,
+					dipole,
+					dipole_cut_result
+				);
 			}
 
 			if (tech_cut)
@@ -245,12 +241,12 @@ public:
 			}
 
 			// go through all dipoles for the current process
-			for (std::size_t i = 0; i != dipoles.size(); ++i)
+			for (auto const non_zero_dipole : non_zero_dipoles)
 			{
-				auto const& dipole = dipoles.at(i);
-				auto const& dipole_cut_result = dipole_cut_results.at(i);
-				auto const& phase_space = dipole_phase_space.at(i);
-				auto const& invariants = phase_space_invariants.at(i);
+				auto const& dipole = non_zero_dipole.dipole();
+				auto const& dipole_cut_result = non_zero_dipole.cut_result();
+				auto const& phase_space = non_zero_dipole.phase_space();
+				auto const& invariants = non_zero_dipole.invariants();
 
 				if (requires_cut(process, dipole_cut_result))
 				{

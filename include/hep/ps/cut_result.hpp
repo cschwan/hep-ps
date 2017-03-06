@@ -56,6 +56,9 @@ public:
 	{
 	}
 
+	/// Type definition for the template parameter `I`.
+	using info_t = I;
+
 	/// Returns `true` if a given phase space point has been cutted for negative
 	/// rapidity.
 	bool neg_cutted() const
@@ -106,6 +109,8 @@ public:
 		, pos_cutted_(pos_cutted)
 	{
 	}
+
+	using info_t = trivial_cut_info;
 
 	constexpr bool neg_cutted() const
 	{
