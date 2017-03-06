@@ -171,9 +171,13 @@ public:
 		// TODO: change the interface and tell the matrix elements which dipoles
 		// to calculate?
 
+		using cut_result_t = decltype (cuts_.cut(real_phase_space, shift,
+			event_type::born_like_n));
+
 		std::vector<std::vector<T>> dipole_phase_space;
 		std::vector<dipole_invariants<T>> phase_space_invariants;
 		std::vector<dipole> dipoles;
+		std::vector<cut_result_t> dipole_cut_results;
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 		neg_pos_results<T> result;
@@ -184,6 +188,7 @@ public:
 			dipole_phase_space.clear();
 			phase_space_invariants.clear();
 			dipoles.clear();
+			dipole_cut_results.clear();
 
 			bool tech_cut = false;
 
@@ -220,8 +225,17 @@ public:
 					continue;
 				}
 
+				auto const dipole_cut_result = cuts_.cut(phase_space, shift,
+					event_type::born_like_n);
+
+				if (dipole_cut_result.neg_cutted() && dipole_cut_result.pos_cutted())
+				{
+					continue;
+				}
+
 				dipole_phase_space.push_back(std::move(phase_space));
 				phase_space_invariants.push_back(invariants);
+				dipole_cut_results.push_back(dipole_cut_result);
 				dipoles.push_back(dipole);
 			}
 
@@ -234,11 +248,9 @@ public:
 			for (std::size_t i = 0; i != dipoles.size(); ++i)
 			{
 				auto const& dipole = dipoles.at(i);
+				auto const& dipole_cut_result = dipole_cut_results.at(i);
 				auto const& phase_space = dipole_phase_space.at(i);
 				auto const& invariants = phase_space_invariants.at(i);
-
-				auto const dipole_cut_result = cuts_.cut(phase_space, shift,
-					event_type::born_like_n);
 
 				if (requires_cut(process, dipole_cut_result))
 				{
