@@ -286,7 +286,7 @@ public:
 				T const value = -function * matrix_elements_.dipole(phase_space,
 					process, dipole);
 				auto const dipole_result = fold(pdfx1, pdfx2, value, process,
-					factor);
+					factor, dipole_cut_result);
 
 				result += dipole_result;
 
