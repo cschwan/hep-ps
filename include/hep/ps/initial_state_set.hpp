@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
- * Copyright (C) 2016  Christopher Schwan
+ * Copyright (C) 2016-2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -142,7 +142,10 @@ public:
 	{
 	}
 
-	// TODO: add initializer list constructor
+	void subtract(initial_state_set other_set)
+	{
+		set_ ^= (set_ & other_set.set_);
+	}
 
 	void add(initial_state state)
 	{
