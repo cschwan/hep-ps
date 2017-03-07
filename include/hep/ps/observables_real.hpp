@@ -153,7 +153,8 @@ public:
 
 		cut_result_type real_cut_result;
 
-		if (event != event_type::other)
+		if (event == event_type::inclusive_n_plus_1 ||
+			event == event_type::born_like_n)
 		{
 			real_cut_result = cuts_.cut(recombined_real_phase_space, shift,
 				event);
@@ -283,15 +284,15 @@ public:
 					assert( false );
 				}
 
-				T const value = -function * matrix_elements_.dipole(phase_space,
-					process, dipole);
+				auto const value = matrix_elements_.dipole(phase_space, process,
+					dipole);
 				auto const dipole_result = fold(pdfx1, pdfx2, value, process,
-					factor, dipole_cut_result);
-
-				result += dipole_result;
+					-function * factor, dipole_cut_result);
 
 				distributions(phase_space, dipole_cut_result, dipole_result,
 					shift, event_type::born_like_n);
+
+				result += dipole_result;
 			}
 		}
 
