@@ -31,8 +31,8 @@ inline bool requires_cut(
 	initial_state state,
 	cut_result_with_info<I> const& cut
 ) {
-	return (state_has_neg_shift(state) && cut.neg_cutted()) ||
-		(state_has_pos_shift(state) && cut.pos_cutted());
+	return (!state_has_neg_shift(state) || cut.neg_cutted()) &&
+		(!state_has_pos_shift(state) || cut.pos_cutted());
 }
 
 }
