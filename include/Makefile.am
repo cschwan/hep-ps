@@ -8,6 +8,7 @@ nobase_include_HEADERS = \
 	hep/ps/dipole.hpp \
 	hep/ps/dipole_invariants.hpp \
 	hep/ps/dipole_type.hpp \
+	hep/ps/dipole_with_set.hpp \
 	hep/ps/enum.hpp \
 	hep/ps/event_type.hpp \
 	hep/ps/factorization_scheme.hpp \
