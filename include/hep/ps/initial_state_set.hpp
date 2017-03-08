@@ -142,6 +142,11 @@ public:
 	{
 	}
 
+	bool empty() const
+	{
+		return set_ == 0;
+	}
+
 	void subtract(initial_state_set other_set)
 	{
 		set_ ^= (set_ & other_set.set_);
