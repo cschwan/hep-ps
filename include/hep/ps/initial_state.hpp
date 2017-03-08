@@ -50,14 +50,14 @@ HEP_ENUM(initial_state,
 	q23_ds,
 	q23_sd,
 	q23_ss,
-	q23_ug,
 	q23_gu,
-	q23_cg,
+	q23_ug,
 	q23_gc,
-	q13_dg,
+	q23_cg,
 	q13_gd,
-	q13_sg,
-	q13_gs
+	q13_dg,
+	q13_gs,
+	q13_sg
 );
 
 // TODO: make function `constexpr` in C++14
