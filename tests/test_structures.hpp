@@ -4,6 +4,7 @@
 #include "hep/ps/abc_terms.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole.hpp"
+#include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/event_type.hpp"
@@ -70,27 +71,33 @@ public:
 	{
 	}
 
-	T dipole(
+	hep::initial_state_array<T> dipole_me(
+		hep::dipole const& dipole_info,
 		std::vector<T> const& dipole_phase_space,
-		hep::initial_state process,
-		hep::dipole const& dipole_info
+		hep::initial_state_set set
 	) const {
 		REQUIRE( dipole_phase_space.size() == 4 * (final_states_ + 2) );
-		REQUIRE( set_.includes(process) );
+		REQUIRE( set_ == set );
 		REQUIRE( dipole_info.emitter() == emitter_ );
 		REQUIRE( dipole_info.unresolved() == unresolved_ );
 		REQUIRE( dipole_info.spectator() == spectator_ );
 
-		return T(0.5);
+		hep::initial_state_array<T> result;
+
+		for (auto const state : set_)
+		{
+			result[state] = T(0.5);
+		}
+
+		return result;
 	}
 
-	std::vector<hep::dipole> dipole_ids(hep::initial_state state) const
+	std::array<hep::dipole_with_set, 1> dipoles() const
 	{
-		REQUIRE( set_.includes(state) );
-
-		return { hep::dipole(emitter_, unresolved_, spectator_,
+		return { hep::dipole_with_set(emitter_, unresolved_, spectator_,
 			hep::particle_type::fermion, hep::particle_type::boson,
-			hep::particle_type::fermion, hep::dipole_type::final_initial) };
+			hep::particle_type::fermion, hep::dipole_type::final_initial, set_)
+		};
 	}
 
 	hep::initial_state_array<T> borns(

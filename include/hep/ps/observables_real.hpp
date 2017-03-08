@@ -106,9 +106,6 @@ public:
 		initial_state_set set,
 		Distributions&& distributions = trivial_distributions<T>()
 	) {
-		// is `true` if neither real matrix elements nor dipoles are active
-		bool zero_event = true;
-
 		auto const scales = scale_setter_(real_phase_space);
 
 		// only set renormalization scale if it changed
@@ -118,9 +115,6 @@ public:
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
-		initial_state_array<T> reals;
-		parton_array<T> pdfx1;
-		parton_array<T> pdfx2;
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -152,6 +146,7 @@ public:
 			shift, event));
 
 		cut_result_type real_cut_result;
+		initial_state_array<T> reals;
 
 		if (event == event_type::inclusive_n_plus_1 ||
 			event == event_type::born_like_n)
@@ -161,10 +156,7 @@ public:
 
 			if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 			{
-				zero_event = false;
 				reals = matrix_elements_.reals(real_phase_space, set);
-				pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
-				pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
 			}
 		}
 
@@ -176,129 +168,109 @@ public:
 
 		std::vector<non_zero_dipole<T, info_t>> non_zero_dipoles;
 
-		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
-		neg_pos_results<T> result;
-
-		// go through all processes
-		for (auto const process : set)
+		for (auto const dipole_with_set : matrix_elements_.dipoles())
 		{
-			non_zero_dipoles.clear();
+			auto const& dipole = dipole_with_set.dipole();
 
-			bool tech_cut = false;
+			std::vector<T> phase_space(real_phase_space.size() - 4);
 
-			for (auto const dipole : matrix_elements_.dipole_ids(process))
+			// map the real phase space on the dipole phase space
+			auto const invariants = subtraction_.map_phase_space(
+				real_phase_space, phase_space, dipole);
+
+			if (invariants.adipole < alpha_min_)
 			{
-				std::vector<T> phase_space(real_phase_space.size() - 4);
-
-				// map the real phase space on the dipole phase space
-				auto const invariants = subtraction_.map_phase_space(
-					real_phase_space, phase_space, dipole);
-
-				if (invariants.adipole < alpha_min_)
-				{
-					tech_cut = true;
-					reals[process] = T();
-
-					break;
-				}
-
-				auto const dipole_recombination_candidates = adjust_indices(
-					matrix_elements_.real_recombination_candidates(),
-					dipole.unresolved());
-
-				auto const dipole_recombined = recombiner_.recombine(
-					phase_space,
-					phase_space,
-					dipole_recombination_candidates,
-					0
-				);
-
-				// check if it passed the recombination
-				if (dipole_recombined > 0)
-				{
-					continue;
-				}
-
-				auto const dipole_cut_result = cuts_.cut(phase_space, shift,
-					event_type::born_like_n);
-
-				if (dipole_cut_result.neg_cutted() &&
-					dipole_cut_result.pos_cutted())
-				{
-					continue;
-				}
-
-				non_zero_dipoles.emplace_back(
-					std::move(phase_space),
-					invariants,
-					dipole,
-					dipole_cut_result
-				);
+				// remove all initial states from the set that share this dipole
+				set.subtract(dipole_with_set.set());
+				continue;
 			}
 
-			if (tech_cut)
+			auto const dipole_recombination_candidates = adjust_indices(
+				matrix_elements_.real_recombination_candidates(),
+				dipole.unresolved());
+
+			auto const dipole_recombined = recombiner_.recombine(
+				phase_space,
+				phase_space,
+				dipole_recombination_candidates,
+				0
+			);
+
+			// check if it passed the recombination
+			if (dipole_recombined > 0)
 			{
 				continue;
 			}
 
-			// go through all dipoles for the current process
-			for (auto const non_zero_dipole : non_zero_dipoles)
+			auto const dipole_cut_result = cuts_.cut(phase_space, shift,
+				event_type::born_like_n);
+
+			if (dipole_cut_result.neg_cutted() &&
+				dipole_cut_result.pos_cutted())
 			{
-				auto const& dipole = non_zero_dipole.dipole();
-				auto const& dipole_cut_result = non_zero_dipole.cut_result();
-				auto const& phase_space = non_zero_dipole.phase_space();
-				auto const& invariants = non_zero_dipole.invariants();
-
-				if (requires_cut(process, dipole_cut_result))
-				{
-					continue;
-				}
-
-				if (zero_event)
-				{
-					zero_event = false;
-					pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
-					pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
-				}
-
-				bool const fermion_i = dipole.emitter_type() ==
-					particle_type::fermion;
-				bool const fermion_j = dipole.unresolved_type() ==
-					particle_type::fermion;
-
-				T function;
-
-				if (fermion_i != fermion_j)
-				{
-					function = subtraction_.fermion_function(dipole,
-						invariants);
-				}
-				else if (fermion_i && fermion_j)
-				{
-					// TODO: NYI
-					assert( false );
-				}
-				else
-				{
-					// TODO: NYI
-					assert( false );
-				}
-
-				auto const value = matrix_elements_.dipole(phase_space, process,
-					dipole);
-				auto const dipole_result = fold(pdfx1, pdfx2, value, process,
-					-function * factor, dipole_cut_result);
-
-				distributions(phase_space, dipole_cut_result, dipole_result,
-					shift, event_type::born_like_n);
-
-				result += dipole_result;
+				continue;
 			}
+
+			non_zero_dipoles.emplace_back(
+				std::move(phase_space),
+				invariants,
+				dipole,
+				dipole_cut_result
+			);
 		}
 
-		if (zero_event)
+		if (set.empty() || (non_zero_dipoles.empty() &&
+			real_cut_result.neg_cutted() && real_cut_result.pos_cutted()))
 		{
 			return T();
+		}
+
+		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
+		auto const pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
+
+		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
+
+		neg_pos_results<T> result;
+
+		for (auto const non_zero_dipole : non_zero_dipoles)
+		{
+			auto const& dipole = non_zero_dipole.dipole();
+			auto const& dipole_cut_result = non_zero_dipole.cut_result();
+			auto const& phase_space = non_zero_dipole.phase_space();
+			auto const& invariants = non_zero_dipole.invariants();
+
+			bool const fermion_i = dipole.emitter_type() ==
+				particle_type::fermion;
+			bool const fermion_j = dipole.unresolved_type() ==
+				particle_type::fermion;
+
+			T function;
+
+			if (fermion_i != fermion_j)
+			{
+				function = subtraction_.fermion_function(dipole,
+					invariants);
+			}
+			else if (fermion_i && fermion_j)
+			{
+				// TODO: NYI
+				assert( false );
+			}
+			else
+			{
+				// TODO: NYI
+				assert( false );
+			}
+
+			auto const dipole_me = matrix_elements_.dipole_me(dipole,
+				phase_space, set);
+			auto const dipole_result = fold(pdfx1, pdfx2, dipole_me, set,
+				-function * factor, dipole_cut_result);
+
+			distributions(phase_space, dipole_cut_result, dipole_result,
+				shift, event_type::born_like_n);
+
+			result += dipole_result;
 		}
 
 		auto const real_result = fold(pdfx1, pdfx2, reals, set, factor,
