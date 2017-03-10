@@ -879,7 +879,7 @@ void lusifer_phase_space_generator<T>::generate(
 	auto& s = pimpl->s;
 	auto& p = pimpl->p;
 
-	std::fill(p.begin(), p.end(), std::array<T, 4>{ T(), T(), T(), T() });
+	std::fill(p.begin(), p.end(), std::array<T, 4>{});
 
 	std::size_t const allbinary = (1 << pimpl->particles) - 1;
 
