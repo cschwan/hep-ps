@@ -308,7 +308,7 @@ T map(T power, T mass, T width, T x, T xmin, T xmax)
 }
 
 template <typename T>
-void rotate(T (&p)[4], T phi, T cos_theta)
+void rotate(std::array<T, 4>& p, T phi, T cos_theta)
 {
 	using std::cos;
 	using std::sin;
@@ -328,7 +328,7 @@ void rotate(T (&p)[4], T phi, T cos_theta)
 }
 
 template <typename T>
-void boost(T m, T (&p)[4], T const (&q)[4], bool inverse)
+void boost(T m, std::array<T, 4>& p, std::array<T, 4> const& q, bool inverse)
 {
 	T const sign = inverse ? T(1.0) : T(-1.0);
 	T const bx = sign * q[1] / m;
@@ -351,11 +351,11 @@ void boost(T m, T (&p)[4], T const (&q)[4], bool inverse)
 template <typename T>
 void decay_momenta(
 	T m,
-	T const (&q)[4],
+	std::array<T, 4> const& q,
 	T phi,
 	T cos_theta,
-	T (&p1)[4],
-	T (&p2)[4]
+	std::array<T, 4>& p1,
+	std::array<T, 4>& p2
 ) {
 	rotate(p1, phi, cos_theta);
 	boost(m, p1, q, true);
@@ -413,6 +413,8 @@ public:
 	std::vector<T> invariant_jacobians;
 	std::vector<T> process_jacobians;
 	std::vector<T> decay_jacobians;
+	std::vector<T> s;
+	std::vector<std::array<T, 4>> p;
 	std::size_t particles;
 	std::size_t max_particles;
 	std::size_t extra_random_numbers;
@@ -426,7 +428,9 @@ lusifer_phase_space_generator<T>::impl::impl(
 	std::size_t channels,
 	std::size_t extra_random_numbers
 )
-	: particles(particles)
+	: s(1 << particles)
+	, p(1 << particles)
+	, particles(particles)
 	, max_particles(max_particles)
 	, extra_random_numbers(extra_random_numbers)
 {
@@ -663,10 +667,10 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 	using std::pow;
 	using std::sqrt;
 
-	auto& p = lusifer_general_.p;
-	auto& s = lusifer_general_.s;
+	auto& p = pimpl->p;
+	auto& s = pimpl->s;
 
-	std::size_t const allbinary = lusifer_general_.allbinary[0];
+	std::size_t const allbinary = (1 << pimpl->particles) - 1;
 
 	// skip first three and last four elements; they are computed already
 	for (std::size_t i = 0; i != allbinary - 1u; ++i)
@@ -775,12 +779,12 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 	{
 		auto const& process = pimpl->channels[info.channel].processes[info.index];
 
-		T const s  = lusifer_general_.s[process.in];
-		T const s1 = lusifer_general_.s[process.out1];
-		T const s2 = lusifer_general_.s[process.out2];
-		T const t  = lusifer_general_.s[process.virt];
-		T const t1 = lusifer_general_.s[process.in1];
-		T const t2 = lusifer_general_.s[process.in2];
+		T const s  = pimpl->s[process.in];
+		T const s1 = pimpl->s[process.out1];
+		T const s2 = pimpl->s[process.out2];
+		T const t  = pimpl->s[process.virt];
+		T const t1 = pimpl->s[process.in1];
+		T const t2 = pimpl->s[process.in2];
 
 		T const lambdas = sqrt(kaellen(s, s1, s2));
 		T const lambdat = sqrt(kaellen(s, t1, t2));
@@ -811,9 +815,9 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 	{
 		auto const& decay = pimpl->channels[info.channel].decays[info.index];
 
-		T const s  = lusifer_general_.s[decay.in];
-		T const s1 = lusifer_general_.s[decay.out1];
-		T const s2 = lusifer_general_.s[decay.out2];
+		T const s  = pimpl->s[decay.in];
+		T const s1 = pimpl->s[decay.out1];
+		T const s2 = pimpl->s[decay.out2];
 
 		T const jacobian = T(2.0) * s / (acos(T(-1.0)) *
 			sqrt(kaellen(s, s1, s2)));
@@ -872,16 +876,12 @@ void lusifer_phase_space_generator<T>::generate(
 	using std::fabs;
 	using std::sqrt;
 
-	auto& s = lusifer_general_.s;
-	auto& p = lusifer_general_.p;
+	auto& s = pimpl->s;
+	auto& p = pimpl->p;
 
-	// clear all entries
-	for (auto& q : p)
-	{
-		std::fill(std::begin(q), std::end(q), T());
-	}
+	std::fill(p.begin(), p.end(), std::array<T, 4>{ T(), T(), T(), T() });
 
-	std::size_t const allbinary = lusifer_general_.allbinary[0];
+	std::size_t const allbinary = (1 << pimpl->particles) - 1;
 
 	// first momentum: negative of the first beam momentum
 	p[0][0] = T(-0.5) * cmf_energy;
@@ -964,12 +964,12 @@ void lusifer_phase_space_generator<T>::generate(
 
 	for (auto const& process : pimpl->channels[channel].processes)
 	{
-		T const s  = lusifer_general_.s[process.in];
-		T const s1 = lusifer_general_.s[process.out1];
-		T const s2 = lusifer_general_.s[process.out2];
-		T&      t  = lusifer_general_.s[process.virt];
-		T const t1 = lusifer_general_.s[process.in1];
-		T const t2 = lusifer_general_.s[process.in2];
+		T const s  = pimpl->s[process.in];
+		T const s1 = pimpl->s[process.out1];
+		T const s2 = pimpl->s[process.out2];
+		T&      t  = pimpl->s[process.virt];
+		T const t1 = pimpl->s[process.in1];
+		T const t2 = pimpl->s[process.in2];
 
 		T const lambdas = sqrt(kaellen(s, s1, s2));
 		T const lambdat = sqrt(kaellen(s, t1, t2));
@@ -1010,14 +1010,14 @@ void lusifer_phase_space_generator<T>::generate(
 
 		rotate(p1, phi, cos_theta);
 
-		T const q[] = {
+		std::array<T, 4> const q = {
 			q1[0] + q2[0],
 			q1[1] + q2[1],
 			q1[2] + q2[2],
 			q1[3] + q2[3]
 		};
 
-		T k1[] = { q1[0], q1[1], q1[2], q1[3] };
+		std::array<T, 4> k1 = { q1[0], q1[1], q1[2], q1[3] };
 
 		boost(sqrts, k1, q, false);
 
@@ -1046,9 +1046,9 @@ void lusifer_phase_space_generator<T>::generate(
 
 	for (auto const& decay : pimpl->channels[channel].decays)
 	{
-		T const s  = lusifer_general_.s[decay.in];
-		T const s1 = lusifer_general_.s[decay.out1];
-		T const s2 = lusifer_general_.s[decay.out2];
+		T const s  = pimpl->s[decay.in];
+		T const s1 = pimpl->s[decay.out1];
+		T const s2 = pimpl->s[decay.out2];
 
 		auto& p1 = p[decay.out1];
 		T const sqrts = sqrt(s);
