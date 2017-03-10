@@ -23,86 +23,93 @@
 #include "hep/ps/parton.hpp"
 
 #include <cassert>
-#include <cstddef>
 
 namespace hep
 {
 
-/// Enumeration listing all possible partonic initial states. The order matters,
-/// e.g. there is both `q43_uc` and `q43_cu`. Note that the relative ordering of
-/// similar initial states (same partons, but transposed) is important because
-/// it determines whether a process belongs to a positive or negative rapidity
-/// shift.
+/// Enumeration listing all possible partonic initial states. The order matters
+/// for the correspoding matrix elements, because of the PDFs. Initial states
+/// with transposed partons are automatically calculated.
 HEP_ENUM(initial_state,
 	q43_uu,
-//	q43_uc,
 	q43_cu,
 	q43_cc,
-//	q33_ud,
 	q33_du,
-//	q33_cd,
 	q33_dc,
-//	q33_us,
 	q33_su,
-//	q33_cs,
 	q33_sc,
 	q23_dd,
-//	q23_ds,
 	q23_sd,
 	q23_ss,
-//	q23_gu,
 	q23_ug,
-//	q23_gc,
 	q23_cg,
-//	q13_gd,
 	q13_dg,
-//	q13_gs,
 	q13_sg
 );
 
 // TODO: make function `constexpr` in C++14
+
+/// Returns the second parton of the given initial_state `state`.
 inline parton state_parton_one(initial_state state)
 {
 	switch (state)
 	{
-	case initial_state::q43_uu: return parton::up;
-	case initial_state::q43_cc: return parton::charm;
-	case initial_state::q23_dd: return parton::anti_down;
-	case initial_state::q23_ss: return parton::anti_strange;
-	case initial_state::q43_cu: return parton::charm;
-	case initial_state::q33_du: return parton::anti_down;
-	case initial_state::q33_dc: return parton::anti_down;
-	case initial_state::q33_su: return parton::anti_strange;
-	case initial_state::q33_sc: return parton::anti_strange;
-	case initial_state::q23_sd: return parton::anti_strange;
-	case initial_state::q23_ug: return parton::up;
-	case initial_state::q23_cg: return parton::charm;
-	case initial_state::q13_dg: return parton::anti_down;
-	case initial_state::q13_sg: return parton::anti_strange;
+	case initial_state::q43_uu:
+	case initial_state::q23_ug:
+		return parton::up;
+
+	case initial_state::q23_dd:
+	case initial_state::q33_du:
+	case initial_state::q33_dc:
+	case initial_state::q13_dg:
+		return parton::anti_down;
+
+	case initial_state::q43_cc:
+	case initial_state::q43_cu:
+	case initial_state::q23_cg:
+		return parton::charm;
+
+	case initial_state::q33_su:
+	case initial_state::q23_sd:
+	case initial_state::q33_sc:
+	case initial_state::q23_ss:
+	case initial_state::q13_sg:
+		return parton::anti_strange;
 	}
 
 	assert( false );
 }
 
 // TODO: make function `constexpr` in C++14
+
+/// Returns the second parton of the given initial_state `state`.
 inline parton state_parton_two(initial_state state)
 {
 	switch (state)
 	{
-	case initial_state::q43_uu: return parton::up;
-	case initial_state::q43_cc: return parton::charm;
-	case initial_state::q23_dd: return parton::anti_down;
-	case initial_state::q23_ss: return parton::anti_strange;
-	case initial_state::q43_cu: return parton::up;
-	case initial_state::q33_du: return parton::up;
-	case initial_state::q33_dc: return parton::charm;
-	case initial_state::q33_su: return parton::up;
-	case initial_state::q33_sc: return parton::charm;
-	case initial_state::q23_sd: return parton::anti_down;
-	case initial_state::q23_ug: return parton::gluon;
-	case initial_state::q23_cg: return parton::gluon;
-	case initial_state::q13_dg: return parton::gluon;
-	case initial_state::q13_sg: return parton::gluon;
+	case initial_state::q43_uu:
+	case initial_state::q33_du:
+	case initial_state::q43_cu:
+	case initial_state::q33_su:
+		return parton::up;
+
+	case initial_state::q33_dc:
+	case initial_state::q43_cc:
+	case initial_state::q33_sc:
+		return parton::charm;
+
+	case initial_state::q23_dd:
+	case initial_state::q23_sd:
+		return parton::anti_down;
+
+	case initial_state::q23_ss:
+		return parton::anti_strange;
+
+	case initial_state::q23_ug:
+	case initial_state::q13_dg:
+	case initial_state::q23_cg:
+	case initial_state::q13_sg:
+		return parton::gluon;
 	}
 
 	assert( false );
