@@ -25,7 +25,6 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/particle_type.hpp"
-#include "hep/ps/requires_cut.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
 #include <algorithm>

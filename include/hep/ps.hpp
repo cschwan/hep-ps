@@ -58,7 +58,6 @@ void find_hep_ps();
 #include "hep/ps/parton.hpp"
 #include "hep/ps/permutation.hpp"
 #include "hep/ps/proton_pdf.hpp"
-#include "hep/ps/requires_cut.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/silence_third_party_libs.hpp"
 #include "hep/ps/trivial_cutter.hpp"

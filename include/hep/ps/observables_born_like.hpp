@@ -24,7 +24,6 @@
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/particle_type.hpp"
-#include "hep/ps/requires_cut.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
 #include <algorithm>

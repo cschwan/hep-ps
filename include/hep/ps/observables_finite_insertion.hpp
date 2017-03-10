@@ -156,14 +156,14 @@ public:
 
 			neg_pos_results<T> result;
 
-			if (!cut.neg_cutted() && state_has_neg_shift(state))
-			{
-				result.neg = factor * d * pdfa[j][b] * me[state];
-			}
-
-			if (!cut.pos_cutted() && state_has_pos_shift(state))
+			if (!cut.pos_cutted())
 			{
 				result.pos = factor * d * pdfa[j][b] * me[state];
+			}
+
+			if (!cut.neg_cutted())
+			{
+				result.neg = factor * d * pdfa[j][b] * me[state];
 			}
 
 			return result;

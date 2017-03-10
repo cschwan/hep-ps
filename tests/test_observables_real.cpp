@@ -32,7 +32,7 @@ void test_observables_real(
 	std::vector<T> real_phase_space_point(4 * (count + 3));
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
-	T const test_result = T(inclusive ? 2.5e-1 : -2.5e-1) / T(1024.0);
+	T const test_result = T(inclusive ? 0.5 : -0.5) / T(1024.0);
 	T const result = observables_real(real_phase_space_point, info, set);
 
 	REQUIRE( result == test_result );

@@ -46,14 +46,14 @@ inline neg_pos_results<T> fold(
 		auto const two = state_parton_two(state);
 		auto const sym = (one == two) ? T(0.5) : T(1.0);
 
-		if (state_has_neg_shift(state) && !cut.neg_cutted())
-		{
-			neg += sym * pdfx1[one] * pdfx2[two] * matrix_elements[state];
-		}
-
-		if (state_has_pos_shift(state) && !cut.pos_cutted())
+		if (!cut.pos_cutted())
 		{
 			pos += sym * pdfx1[one] * pdfx2[two] * matrix_elements[state];
+		}
+
+		if (!cut.neg_cutted())
+		{
+			neg += sym * pdfx1[two] * pdfx2[one] * matrix_elements[state];
 		}
 	}
 
@@ -76,14 +76,14 @@ inline neg_pos_results<T> fold(
 	auto const two = state_parton_two(state);
 	auto const sym = (one == two) ? T(0.5) : T(1.0);
 
-	if (state_has_neg_shift(state) && !cut.neg_cutted())
-	{
-		neg += sym * pdfx1[one] * pdfx2[two] * matrix_element;
-	}
-
-	if (state_has_pos_shift(state) && !cut.pos_cutted())
+	if (!cut.pos_cutted())
 	{
 		pos += sym * pdfx1[one] * pdfx2[two] * matrix_element;
+	}
+
+	if (!cut.neg_cutted())
+	{
+		neg += sym * pdfx1[two] * pdfx2[one] * matrix_element;
 	}
 
 	return { factor * neg , factor * pos };

@@ -10,7 +10,6 @@ check_PROGRAMS = \
 	test_fortran_helper \
 	test_headers \
 	test_hh_lusifer_phase_space_generator \
-	test_initial_state \
 	test_lusifer_phase_space_generator \
 	test_lusifer_phase_space_generator2 \
 	test_lusifer_phase_space_generator3 \

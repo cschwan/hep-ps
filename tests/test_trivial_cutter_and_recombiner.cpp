@@ -28,7 +28,7 @@ void test_trivial_cutter_and_recombiner(
 	std::vector<T> phase_space_point(4 * (count + 2));
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
-	T const test_result = T(0.5) / T(1024.0);
+	T const test_result = T(1.0) / T(1024.0);
 	T const result = observables_born_like(phase_space_point, info, set);
 
 	REQUIRE( result == test_result );
