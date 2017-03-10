@@ -23,7 +23,6 @@
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
-#include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
@@ -177,7 +176,8 @@ public:
 		// loop over the both initial particles
 		for (auto const i : { 0, 1 })
 		{
-			auto const abc = subtraction_.finite_born(xprime[i], eta[i]);
+			auto const& abc = subtraction_.finite_insertion_term_born(xprime[i],
+				eta[i]);
 
 			// loop over all initial states
 			for (auto const state : set)
@@ -187,7 +187,6 @@ public:
 		}
 
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
-		auto const mu2 = scales.factorization() * scales.factorization();
 		auto const& correlated_me = matrix_elements_.correlated_me(phase_space,
 			set);
 
@@ -197,41 +196,13 @@ public:
 			// loop over all FI, IF, and II
 			for (std::size_t index = 0; index != insertion_terms.size(); ++index)
 			{
-				auto const& term = insertion_terms.at(index);
-				abc_terms<T> abc;
-
-				switch (term.type())
-				{
-				case insertion_term_type::final_initial:
-					abc = subtraction_.finite_final_initial(
-						xprime[i],
-						eta[i],
-						term.emitter_type()
-					);
-					break;
-
-				case insertion_term_type::initial_final:
-					abc = subtraction_.finite_initial_final(
-						xprime[i],
-						eta[i],
-						mu2,
-						phase_space,
-						term.emitter(),
-						term.spectator()
-					);
-					break;
-
-				case insertion_term_type::initial_initial:
-					abc = subtraction_.finite_initial_initial(
-						xprime[i],
-						eta[i],
-						mu2,
-						phase_space,
-						term.emitter(),
-						term.spectator()
-					);
-					break;
-				}
+				auto const& abc = subtraction_.finite_insertion_term(
+					insertion_terms.at(index),
+					phase_space,
+					xprime[i],
+					eta[i],
+					scales.factorization()
+				);
 
 				auto const me = correlated_me.at(index);
 

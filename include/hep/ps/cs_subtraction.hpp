@@ -23,6 +23,7 @@
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/factorization_scheme.hpp"
+#include "hep/ps/insertion_term.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -48,33 +49,15 @@ public:
 	);
 
 	///
-	abc_terms<T> finite_born(T x, T eta) const;
+	abc_terms<T> finite_insertion_term_born(T x, T eta) const;
 
 	///
-	abc_terms<T> finite_final_initial(
-		T x,
-		T eta,
-		particle_type type_emitter
-	) const;
-
-	///
-	abc_terms<T> finite_initial_final(
-		T x,
-		T eta,
-		T mu2,
+	abc_terms<T> finite_insertion_term(
+		insertion_term const& term,
 		std::vector<T> const& phase_space,
-		std::size_t emitter,
-		std::size_t spectator
-	) const;
-
-	///
-	abc_terms<T> finite_initial_initial(
 		T x,
 		T eta,
-		T mu2,
-		std::vector<T> const& phase_space,
-		std::size_t emitter,
-		std::size_t spectator
+		T factorization_scale
 	) const;
 
 private:

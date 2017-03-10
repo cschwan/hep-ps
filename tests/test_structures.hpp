@@ -245,34 +245,17 @@ public:
 		return T(1.0);
 	}
 
-	hep::abc_terms<T> finite_born(T, T)
+	hep::abc_terms<T> finite_insertion_term_born(T, T)
 	{
 		return hep::abc_terms<T>();
 	}
 
-	hep::abc_terms<T> finite_final_initial(T, T, hep::particle_type)
-	{
-		return hep::abc_terms<T>();
-	}
-
-	hep::abc_terms<T> finite_initial_final(
-		T,
-		T,
-		T,
+	hep::abc_terms<T> finite_insertion_term(
+		hep::insertion_term const&,
 		std::vector<T> const&,
-		std::size_t,
-		std::size_t
-	) {
-		return hep::abc_terms<T>();
-	}
-
-	hep::abc_terms<T> finite_initial_initial(
 		T,
 		T,
-		T,
-		std::vector<T> const&,
-		std::size_t,
-		std::size_t
+		T
 	) {
 		return hep::abc_terms<T>();
 	}
