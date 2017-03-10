@@ -879,31 +879,26 @@ void lusifer_phase_space_generator<T>::generate(
 	auto& s = pimpl->s;
 	auto& p = pimpl->p;
 
-	std::fill(p.begin(), p.end(), std::array<T, 4>{});
+	for (auto& momentum : p)
+	{
+		momentum[0] = T();
+	}
 
 	std::size_t const allbinary = (1 << pimpl->particles) - 1;
 
 	// first momentum: negative of the first beam momentum
-	p[0][0] = T(-0.5) * cmf_energy;
-	p[0][3] = T( 0.5) * cmf_energy;
-
+	p[0] = { T(-0.5) * cmf_energy, T(), T(), T(0.5) * cmf_energy };
 	// second momentum: negative of the second beam momentum
-	p[1][0] = T(-0.5) * cmf_energy;
-	p[1][3] = T(-0.5) * cmf_energy;
-
+	p[1] = { T(-0.5) * cmf_energy, T(), T(), T(-0.5) * cmf_energy };
 	// sum of the first two momenta
-	p[2][0] = T(-1.0) * cmf_energy;
+	p[2] = { T(-1.0) * cmf_energy, T(), T(), T() };
 
 	// sum of all momenta except the first two
-	p[allbinary - 4][0] = cmf_energy;
-
+	p[allbinary - 4] = { cmf_energy, T(), T(), T() };
 	// sum of all momenta except the second
-	p[allbinary - 3][0] = T( 0.5) * cmf_energy;
-	p[allbinary - 3][3] = T( 0.5) * cmf_energy;
-
+	p[allbinary - 3] = { T( 0.5) * cmf_energy, T(), T(), T(0.5) * cmf_energy };
 	// sum of all momenta except the first
-	p[allbinary - 2][0] = T( 0.5) * cmf_energy;
-	p[allbinary - 2][3] = T(-0.5) * cmf_energy;
+	p[allbinary - 2] = { T( 0.5) * cmf_energy, T(), T(), T(-0.5) * cmf_energy };
 
 	// square of the sum of the first two momenta
 	s[2] = cmf_energy * cmf_energy;
@@ -1003,8 +998,8 @@ void lusifer_phase_space_generator<T>::generate(
 
 		T const sqrts = sqrt(s);
 
-		p1[0] = T(0.5) * (s + s1 - s2) / sqrts;
-		p1[3] = T(0.5) * lambdas / sqrts;
+		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
+			T(0.5) * lambdas / sqrts };
 
 		phi = copysign(phi, q1[3]);
 
@@ -1036,11 +1031,7 @@ void lusifer_phase_space_generator<T>::generate(
 
 		decay_momenta(sqrts, q, -phi, cos_theta, p1, p2);
 
-		qt[0] = q1[0] - p1[0];
-		qt[1] = q1[1] - p1[1];
-		qt[2] = q1[2] - p1[2];
-		qt[3] = q1[3] - p1[3];
-
+		qt = { q1[0] - p1[0], q1[1] - p1[1], q1[2] - p1[2], q1[3] - p1[3] };
 		t = qt[0] * qt[0] - qt[1] * qt[1] - qt[2] * qt[2] - qt[3] * qt[3];
 	}
 
@@ -1054,6 +1045,8 @@ void lusifer_phase_space_generator<T>::generate(
 		T const sqrts = sqrt(s);
 
 		p1[0] = T(0.5) * (s + s1 - s2) / sqrts;
+		p1[1] = T();
+		p1[2] = T();
 		p1[3] = T(0.5) * sqrt(kaellen(s, s1, s2)) / sqrts;
 
 		T const phi = T(2.0) * acos(T(-1.0)) * random_numbers.at(ranstart++);
