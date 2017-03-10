@@ -21,6 +21,7 @@
 
 #include "hep/ps/abc_terms.hpp"
 #include "hep/ps/event_type.hpp"
+#include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
@@ -122,95 +123,84 @@ public:
 			pdf_.pdf(eta[1] / xprime[1], scales.factorization())
 		};
 
-		auto function = [&](
-			std::size_t i,
-			initial_state state,
-			decltype (cut_result) cut,
+		auto d_pdf = [&](
+			parton_array<T> const& pdfa,
+			parton_array<T> const& pdfb,
 			abc_terms<T> const& abc,
-			initial_state_array<T> const& me
+			T xprime,
+			T eta
 		) {
-			auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
-			auto const a = (i == 0)
-				? state_parton_one(state)
-				: state_parton_two(state);
+			parton_array<T> d;
 
-			T d{};
-
-			if (a == parton::gluon)
+			for (auto const a : parton_list())
 			{
-				// TODO: NYI
-				assert( false );
+				for (auto const ap : parton_list())
+				{
+					d[a] += pdfb[ap] * abc.a[ap][a] * (T(1.0) - eta) / xprime;
+					d[a] -= pdfa[ap] * abc.b[ap][a] * (T(1.0) - eta);
+					d[a] += pdfa[ap] * abc.c[ap][a];
+				}
 			}
 
-			for (auto const ap : parton_list())
-			{
-				d += pdfb[i][ap] * abc.a[ap][a] * (T(1.0) - eta[i]) / xprime[i];
-				d -= pdfa[i][ap] * abc.b[ap][a] * (T(1.0) - eta[i]);
-				d += pdfa[i][ap] * abc.c[ap][a];
-			}
-
-			auto const b = (i == 0)
-				? state_parton_two(state)
-				: state_parton_one(state);
-			auto const j = 1 - i;
-
-			auto const sym = (a == b) ? T(0.5) : T(1.0);
-
-			neg_pos_results<T> result;
-
-			if (!cut.pos_cutted())
-			{
-				result.pos = factor * sym * d * pdfa[j][b] * me[state];
-			}
-
-			if (!cut.neg_cutted())
-			{
-				result.neg = factor * sym * d * pdfa[j][b] * me[state];
-			}
-
-			return result;
+			return d;
 		};
 
 		auto const borns = matrix_elements_.borns(phase_space, set);
+		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		neg_pos_results<T> result;
 
-		// loop over the both initial particles
 		for (auto const i : { 0, 1 })
 		{
-			auto const& abc = subtraction_.finite_insertion_term_born(xprime[i],
-				eta[i]);
+			auto const& d = d_pdf(
+				pdfa[i],
+				pdfb[i],
+				subtraction_.finite_insertion_term_born(xprime[i], eta[i]),
+				xprime[i],
+				eta[i]
+			);
 
-			// loop over all initial states
-			for (auto const state : set)
+			if (i == 0)
 			{
-				result += function(i, state, cut_result, abc, borns);
+				result += fold(d, pdfa[1], borns, set, factor, cut_result);
+			}
+			else
+			{
+				result += fold(pdfa[0], d, borns, set, factor, cut_result);
 			}
 		}
 
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
-		auto const& correlated_me = matrix_elements_.correlated_me(phase_space,
-			set);
+		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set);
 
-		// loop over the two particle in the initial state
-		for (auto const i : { 0, 1 })
+		// loop over all FI, IF, and II
+		for (std::size_t index = 0; index != insertion_terms.size(); ++index)
 		{
-			// loop over all FI, IF, and II
-			for (std::size_t index = 0; index != insertion_terms.size(); ++index)
+			auto const me = corr_me.at(index);
+
+			for (auto const i : { 0, 1 })
 			{
-				auto const& abc = subtraction_.finite_insertion_term(
-					insertion_terms.at(index),
-					phase_space,
+				auto const& d = d_pdf(
+					pdfa[i],
+					pdfb[i],
+					subtraction_.finite_insertion_term(
+						insertion_terms.at(index),
+						phase_space,
+						xprime[i],
+						eta[i],
+						scales.factorization()
+					),
 					xprime[i],
-					eta[i],
-					scales.factorization()
+					eta[i]
 				);
 
-				auto const me = correlated_me.at(index);
-
-				for (auto const state : set)
+				if (i == 0)
 				{
-					result += function(i, state, cut_result, abc, me);
+					result += fold(d, pdfa[1], me, set, factor, cut_result);
+				}
+				else
+				{
+					result += fold(pdfa[0], d, me, set, factor, cut_result);
 				}
 			}
 		}
