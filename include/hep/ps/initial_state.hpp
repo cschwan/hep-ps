@@ -71,9 +71,8 @@ inline parton state_parton_one(initial_state state)
 	case initial_state::q23_ss: return parton::anti_strange;
 	case initial_state::q43_cu: return parton::charm;
 	case initial_state::q33_du: return parton::anti_down;
-	case initial_state::q33_cd: return parton::charm;
+	case initial_state::q33_dc: return parton::anti_down;
 	case initial_state::q33_su: return parton::anti_strange;
-	case initial_state::q33_us: return parton::up;
 	case initial_state::q33_sc: return parton::anti_strange;
 	case initial_state::q23_sd: return parton::anti_strange;
 	case initial_state::q23_ug: return parton::up;
@@ -96,9 +95,8 @@ inline parton state_parton_two(initial_state state)
 	case initial_state::q23_ss: return parton::anti_strange;
 	case initial_state::q43_cu: return parton::up;
 	case initial_state::q33_du: return parton::up;
-	case initial_state::q33_cd: return parton::anti_down;
+	case initial_state::q33_dc: return parton::charm;
 	case initial_state::q33_su: return parton::up;
-	case initial_state::q33_us: return parton::anti_strange;
 	case initial_state::q33_sc: return parton::charm;
 	case initial_state::q23_sd: return parton::anti_down;
 	case initial_state::q23_ug: return parton::gluon;
