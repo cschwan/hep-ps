@@ -130,6 +130,7 @@ public:
 			abc_terms<T> const& abc,
 			initial_state_array<T> const& me
 		) {
+			auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 			auto const a = (i == 0)
 				? state_parton_one(state)
 				: state_parton_two(state);
@@ -158,12 +159,12 @@ public:
 
 			if (!cut.neg_cutted() && state_has_neg_shift(state))
 			{
-				result.neg = d * pdfa[j][b] * me[state];
+				result.neg = factor * d * pdfa[j][b] * me[state];
 			}
 
 			if (!cut.pos_cutted() && state_has_pos_shift(state))
 			{
-				result.pos = d * pdfa[j][b] * me[state];
+				result.pos = factor * d * pdfa[j][b] * me[state];
 			}
 
 			return result;
