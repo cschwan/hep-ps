@@ -122,7 +122,7 @@ public:
 			pdf_.pdf(eta[1] / xprime[1], scales.factorization())
 		};
 
-		auto d_function = [&](
+		auto function = [&](
 			std::size_t i,
 			initial_state state,
 			decltype (cut_result) cut,
@@ -154,16 +154,18 @@ public:
 				: state_parton_one(state);
 			auto const j = 1 - i;
 
+			auto const sym = (a == b) ? T(0.5) : T(1.0);
+
 			neg_pos_results<T> result;
 
 			if (!cut.pos_cutted())
 			{
-				result.pos = factor * d * pdfa[j][b] * me[state];
+				result.pos = factor * sym * d * pdfa[j][b] * me[state];
 			}
 
 			if (!cut.neg_cutted())
 			{
-				result.neg = factor * d * pdfa[j][b] * me[state];
+				result.neg = factor * sym * d * pdfa[j][b] * me[state];
 			}
 
 			return result;
@@ -182,7 +184,7 @@ public:
 			// loop over all initial states
 			for (auto const state : set)
 			{
-				result += d_function(i, state, cut_result, abc, borns);
+				result += function(i, state, cut_result, abc, borns);
 			}
 		}
 
@@ -208,7 +210,7 @@ public:
 
 				for (auto const state : set)
 				{
-					result += d_function(i, state, cut_result, abc, me);
+					result += function(i, state, cut_result, abc, me);
 				}
 			}
 		}
