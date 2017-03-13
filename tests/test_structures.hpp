@@ -154,20 +154,23 @@ public:
 		return indices;
 	}
 
-	std::array<hep::insertion_term, 2> insertion_terms() const
+	std::array<hep::insertion_term, 3> insertion_terms() const
 	{
 		return {
 			hep::insertion_term(
-				emitter_,
-				spectator_,
-				hep::particle_type::fermion,
-				hep::insertion_term_type::final_initial
+				hep::insertion_term_type::born
 			),
 			hep::insertion_term(
+				hep::insertion_term_type::final_initial,
 				emitter_,
-				spectator_,
 				hep::particle_type::fermion,
-				hep::insertion_term_type::initial_final
+				spectator_
+			),
+			hep::insertion_term(
+				hep::insertion_term_type::initial_final,
+				emitter_,
+				hep::particle_type::fermion,
+				spectator_
 			)
 		};
 	}

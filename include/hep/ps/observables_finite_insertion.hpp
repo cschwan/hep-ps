@@ -123,76 +123,40 @@ public:
 			pdf_.pdf(eta[1] / xprime[1], scales.factorization())
 		};
 
-		auto d_pdf = [&](
-			parton_array<T> const& pdfa,
-			parton_array<T> const& pdfb,
-			abc_terms<T> const& abc,
-			T xprime,
-			T eta
-		) {
-			parton_array<T> d;
-
-			for (auto const a : parton_list())
-			{
-				for (auto const ap : parton_list())
-				{
-					d[a] += pdfb[ap] * abc.a[ap][a] * (T(1.0) - eta) / xprime;
-					d[a] -= pdfa[ap] * abc.b[ap][a] * (T(1.0) - eta);
-					d[a] += pdfa[ap] * abc.c[ap][a];
-				}
-			}
-
-			return d;
-		};
-
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set);
-		auto const& borns = corr_me.front();
+		auto const& insertion_terms = matrix_elements_.insertion_terms();
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		neg_pos_results<T> result;
 
-		for (auto const i : { 0, 1 })
-		{
-			auto const& d = d_pdf(
-				pdfa[i],
-				pdfb[i],
-				subtraction_.finite_insertion_term_born(xprime[i], eta[i]),
-				xprime[i],
-				eta[i]
-			);
-
-			if (i == 0)
-			{
-				result += fold(d, pdfa[1], borns, set, factor, cut_result);
-			}
-			else
-			{
-				result += fold(pdfa[0], d, borns, set, factor, cut_result);
-			}
-		}
-
-		auto const& insertion_terms = matrix_elements_.insertion_terms();
-
-		// loop over all FI, IF, and II
+		// loop over all Born, FI, IF, and II
 		for (std::size_t index = 0; index != insertion_terms.size(); ++index)
 		{
-			auto const me = corr_me.at(index + 1);
+			auto const me = corr_me.at(index);
 
+			// loop over both initial state partons
 			for (auto const i : { 0, 1 })
 			{
-				auto const& d = d_pdf(
-					pdfa[i],
-					pdfb[i],
-					subtraction_.finite_insertion_term(
-						insertion_terms.at(index),
-						phase_space,
-						xprime[i],
-						eta[i],
-						scales.factorization()
-					),
+				auto const& abc = subtraction_.finite_insertion_term(
+					insertion_terms.at(index),
+					phase_space,
 					xprime[i],
-					eta[i]
+					eta[i],
+					scales.factorization()
 				);
+
+				parton_array<T> d;
+
+				for (auto const a : parton_list())
+				{
+					for (auto const ap : parton_list())
+					{
+						d[a] += pdfb[i][ap] * abc.a[ap][a] * (T(1.0) - eta[i]);
+						d[a] /= xprime[i];
+						d[a] -= pdfa[i][ap] * abc.b[ap][a] * (T(1.0) - eta[i]);
+						d[a] += pdfa[i][ap] * abc.c[ap][a];
+					}
+				}
 
 				if (i == 0)
 				{

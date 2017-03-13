@@ -305,78 +305,6 @@ T cs_subtraction<T>::fermion_function(
 }
 
 template <typename T>
-abc_terms<T> cs_subtraction<T>::finite_insertion_term_born(T x, T eta) const
-{
-	using std::acos;
-	using std::log;
-
-	// TODO: DIS scheme is NYI
-	assert( scheme_ == factorization_scheme::msbar );
-
-	abc_terms<T> result;
-
-	T value;
-
-	auto const omx      = T(1.0) - x;
-	auto const logomxbx = log(omx / x);
-	auto const pi       = acos(T(-1.0));
-
-	value = T(0.5) * tf_ / pi * ((x*x + omx*omx) * logomxbx + T(2.0)*x*omx);
-
-	result.a[parton::gluon][parton::anti_up]      = value;
-	result.a[parton::gluon][parton::anti_down]    = value;
-	result.a[parton::gluon][parton::anti_charm]   = value;
-	result.a[parton::gluon][parton::anti_strange] = value;
-	result.a[parton::gluon][parton::up]           = value;
-	result.a[parton::gluon][parton::down]         = value;
-	result.a[parton::gluon][parton::charm]        = value;
-	result.a[parton::gluon][parton::strange]      = value;
-
-	auto const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
-
-	value = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) * logomxbx + omx);
-
-	result.a[parton::anti_up     ][parton::anti_up     ] = value;
-	result.a[parton::anti_down   ][parton::anti_down   ] = value;
-	result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
-	result.a[parton::anti_strange][parton::anti_strange] = value;
-	result.a[parton::up          ][parton::up          ] = value;
-	result.a[parton::down        ][parton::down        ] = value;
-	result.a[parton::charm       ][parton::charm       ] = value;
-	result.a[parton::strange     ][parton::strange     ] = value;
-
-	value = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
-
-	result.b[parton::anti_up     ][parton::anti_up     ] = value;
-	result.b[parton::anti_down   ][parton::anti_down   ] = value;
-	result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
-	result.b[parton::anti_strange][parton::anti_strange] = value;
-	result.b[parton::up          ][parton::up          ] = value;
-	result.b[parton::down        ][parton::down        ] = value;
-	result.b[parton::charm       ][parton::charm       ] = value;
-	result.b[parton::strange     ][parton::strange     ] = value;
-
-	auto const dilogome = gsl_sf_dilog(T(1.0) - eta);
-	auto const logome   = log(T(1.0) - eta);
-
-	value = T(0.5) * cf / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) + T(2.0) *
-		dilogome + logome * logome);
-
-	result.c[parton::anti_up     ][parton::anti_up     ] = value;
-	result.c[parton::anti_down   ][parton::anti_down   ] = value;
-	result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
-	result.c[parton::anti_strange][parton::anti_strange] = value;
-	result.c[parton::up          ][parton::up          ] = value;
-	result.c[parton::down        ][parton::down        ] = value;
-	result.c[parton::charm       ][parton::charm       ] = value;
-	result.c[parton::strange     ][parton::strange     ] = value;
-
-	// TODO: qg and gg are NYI
-
-	return result;
-}
-
-template <typename T>
 abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 	insertion_term const& term,
 	std::vector<T> const& phase_space,
@@ -392,20 +320,29 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 
 	abc_terms<T> result;
 
-	T value;
+	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+	T const pi = acos(T(-1.0));
 
 	switch (term.type())
 	{
-	case insertion_term_type::final_initial:
+	case insertion_term_type::born:
 	{
-		T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
-		T const ca = n_;
+		T const omx = T(1.0) - x;
+		T const logomxbx = log(omx / x);
 
-		T const gamma = (term.emitter_type() == particle_type::fermion)
-			? T(1.5) * cf
-			: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * nf_;
+		T value = T(0.5) * tf_ / pi * ((x * x + omx * omx) * logomxbx +
+			T(2.0) * x * omx);
 
-		value = T(0.5) * gamma / acos(T(-1.0)) / (T(1.0) - x);
+		result.a[parton::gluon][parton::anti_up]      = value;
+		result.a[parton::gluon][parton::anti_down]    = value;
+		result.a[parton::gluon][parton::anti_charm]   = value;
+		result.a[parton::gluon][parton::anti_strange] = value;
+		result.a[parton::gluon][parton::up]           = value;
+		result.a[parton::gluon][parton::down]         = value;
+		result.a[parton::gluon][parton::charm]        = value;
+		result.a[parton::gluon][parton::strange]      = value;
+
+		value = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) * logomxbx + omx);
 
 		result.a[parton::anti_up     ][parton::anti_up     ] = value;
 		result.a[parton::anti_down   ][parton::anti_down   ] = value;
@@ -416,7 +353,7 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		result.a[parton::charm       ][parton::charm       ] = value;
 		result.a[parton::strange     ][parton::strange     ] = value;
 
-		value = T(0.5) * gamma / acos(T(-1.0)) / (T(1.0) - x);
+		value = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
 
 		result.b[parton::anti_up     ][parton::anti_up     ] = value;
 		result.b[parton::anti_down   ][parton::anti_down   ] = value;
@@ -427,7 +364,11 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		result.b[parton::charm       ][parton::charm       ] = value;
 		result.b[parton::strange     ][parton::strange     ] = value;
 
-		value = T(0.5) * gamma / acos(T(-1.0)) * (T(1.0) + log(T(1.0) - eta));
+		T const dilogome = gsl_sf_dilog(T(1.0) - eta);
+		T const logome   = log(T(1.0) - eta);
+
+		value = T(0.5) * cf / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
+			T(2.0) * dilogome + logome * logome);
 
 		result.c[parton::anti_up     ][parton::anti_up     ] = value;
 		result.c[parton::anti_down   ][parton::anti_down   ] = value;
@@ -441,6 +382,50 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		// TODO: qg and gg are NYI
 	}
 
+		break;
+
+	case insertion_term_type::final_initial:
+	{
+		T const ca = n_;
+		T const gamma = (term.emitter_type() == particle_type::fermion)
+			? T(1.5) * cf
+			: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * nf_;
+
+		T value = T(0.5) * gamma / pi / (T(1.0) - x);
+
+		result.a[parton::anti_up     ][parton::anti_up     ] = value;
+		result.a[parton::anti_down   ][parton::anti_down   ] = value;
+		result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
+		result.a[parton::anti_strange][parton::anti_strange] = value;
+		result.a[parton::up          ][parton::up          ] = value;
+		result.a[parton::down        ][parton::down        ] = value;
+		result.a[parton::charm       ][parton::charm       ] = value;
+		result.a[parton::strange     ][parton::strange     ] = value;
+
+		value = T(0.5) * gamma / pi / (T(1.0) - x);
+
+		result.b[parton::anti_up     ][parton::anti_up     ] = value;
+		result.b[parton::anti_down   ][parton::anti_down   ] = value;
+		result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
+		result.b[parton::anti_strange][parton::anti_strange] = value;
+		result.b[parton::up          ][parton::up          ] = value;
+		result.b[parton::down        ][parton::down        ] = value;
+		result.b[parton::charm       ][parton::charm       ] = value;
+		result.b[parton::strange     ][parton::strange     ] = value;
+
+		value = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
+
+		result.c[parton::anti_up     ][parton::anti_up     ] = value;
+		result.c[parton::anti_down   ][parton::anti_down   ] = value;
+		result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
+		result.c[parton::anti_strange][parton::anti_strange] = value;
+		result.c[parton::up          ][parton::up          ] = value;
+		result.c[parton::down        ][parton::down        ] = value;
+		result.c[parton::charm       ][parton::charm       ] = value;
+		result.c[parton::strange     ][parton::strange     ] = value;
+
+		// TODO: qg and gg are NYI
+	}
 
 		break;
 
@@ -450,9 +435,8 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		T const sai = invariant(phase_space, term.emitter(), term.spectator());
 		T const mu2 = factorization_scale * factorization_scale;
 		T const logmu2bsaix = log(mu2 / (sai * x));
-		T const pi = acos(T(-1.0));
 
-		value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsaix;
+		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsaix;
 
 		result.a[parton::gluon][parton::anti_up]      = value;
 		result.a[parton::gluon][parton::anti_down]    = value;
@@ -462,8 +446,6 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		result.a[parton::gluon][parton::down]         = value;
 		result.a[parton::gluon][parton::charm]        = value;
 		result.a[parton::gluon][parton::strange]      = value;
-
-		T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
 
 		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * logmu2bsaix;
 

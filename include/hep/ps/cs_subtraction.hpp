@@ -48,10 +48,6 @@ public:
 		dipole_invariants<T> const& invariants
 	);
 
-	///
-	abc_terms<T> finite_insertion_term_born(T x, T eta) const;
-
-	///
 	abc_terms<T> finite_insertion_term(
 		insertion_term const& term,
 		std::vector<T> const& phase_space,

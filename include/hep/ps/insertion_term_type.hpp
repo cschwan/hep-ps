@@ -25,6 +25,10 @@ namespace hep
 /// Enumeration for the finite insertion term types.
 enum class insertion_term_type
 {
+	/// Marks an finite insertion term that is proportional to the Born matrix
+	/// element.
+	born,
+
 	/// Marks an initial-initial (II) finite insertion term, i.e. a term with an
 	/// initial state emitter and an initial state spectator.
 	initial_initial,

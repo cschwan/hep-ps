@@ -22,6 +22,7 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/particle_type.hpp"
 
+#include <cassert>
 #include <cstddef>
 
 namespace hep
@@ -32,35 +33,52 @@ namespace hep
 class insertion_term
 {
 public:
-	/// Constructor.
+	/// Constructor for insertion terms not of the type `born`.
 	insertion_term(
+		insertion_term_type type,
 		std::size_t emitter,
-		std::size_t spectator,
 		particle_type emitter_type,
-		insertion_term_type type
+		std::size_t spectator
 	)
-		: emitter_(emitter)
-		, spectator_(spectator)
+		: type_(type)
+		, emitter_(emitter)
 		, emitter_type_(emitter_type)
-		, type_(type)
+		, spectator_(spectator)
 	{
+		assert( type != insertion_term_type::born );
+	}
+
+	/// Constructor for `born` insertion terms.
+	insertion_term(insertion_term_type type)
+		: type_(type)
+		, emitter_(0)
+		, emitter_type_(particle_type::boson)
+		, spectator_(0)
+	{
+		assert( type == insertion_term_type::born );
 	}
 
 	/// Returns the index of the emitter particle.
 	std::size_t emitter() const
 	{
+		assert( type_ != insertion_term_type::born );
+
 		return emitter_;
 	}
 
 	/// Returns the index of the spectator particle.
 	std::size_t spectator() const
 	{
+		assert( type_ != insertion_term_type::born );
+
 		return spectator_;
 	}
 
 	/// Returns the type of the emitter particle.
 	particle_type emitter_type() const
 	{
+		assert( type_ != insertion_term_type::born );
+
 		return emitter_type_;
 	}
 
@@ -71,10 +89,10 @@ public:
 	}
 
 private:
-	std::size_t emitter_;
-	std::size_t spectator_;
-	particle_type emitter_type_;
 	insertion_term_type type_;
+	std::size_t emitter_;
+	particle_type emitter_type_;
+	std::size_t spectator_;
 };
 
 }
