@@ -145,7 +145,8 @@ public:
 			return d;
 		};
 
-		auto const borns = matrix_elements_.borns(phase_space, set);
+		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set);
+		auto const& borns = corr_me.first();
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		neg_pos_results<T> result;
@@ -171,12 +172,11 @@ public:
 		}
 
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
-		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set);
 
 		// loop over all FI, IF, and II
 		for (std::size_t index = 0; index != insertion_terms.size(); ++index)
 		{
-			auto const me = corr_me.at(index);
+			auto const me = corr_me.at(index + 1);
 
 			for (auto const i : { 0, 1 })
 			{
