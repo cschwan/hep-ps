@@ -168,24 +168,18 @@ public:
 				spectator_,
 				hep::particle_type::fermion,
 				hep::insertion_term_type::initial_final
-			)//,
-//			hep::insertion_term(
-//				emitter_,
-//				spectator_,
-//				hep::particle_type::fermion,
-//				hep::insertion_term_type::initial_initial
-//			)
+			)
 		};
 	}
 
-	std::array<hep::initial_state_array<T>, 2> correlated_me(
+	std::array<hep::initial_state_array<T>, 3> correlated_me(
 		std::vector<T> const&,
 		hep::initial_state_set
 	) {
 		return {
 			hep::initial_state_array<T>(),
-			hep::initial_state_array<T>()//,
-//			hep::initial_state_array<T>()
+			hep::initial_state_array<T>(),
+			hep::initial_state_array<T>()
 		};
 	}
 

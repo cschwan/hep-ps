@@ -146,7 +146,7 @@ public:
 		};
 
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set);
-		auto const& borns = corr_me.first();
+		auto const& borns = corr_me.front();
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		neg_pos_results<T> result;
