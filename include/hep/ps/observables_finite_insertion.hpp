@@ -151,8 +151,8 @@ public:
 				{
 					for (auto const ap : parton_list())
 					{
-						d[a] += pdfb[i][ap] * abc.a[ap][a] * (T(1.0) - eta[i]);
-						d[a] /= xprime[i];
+						d[a] += pdfb[i][ap] * abc.a[ap][a] * (T(1.0) - eta[i]) /
+							xprime[i];
 						d[a] -= pdfa[i][ap] * abc.b[ap][a] * (T(1.0) - eta[i]);
 						d[a] += pdfa[i][ap] * abc.c[ap][a];
 					}
