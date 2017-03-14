@@ -105,15 +105,6 @@ public:
 		initial_state_set set,
 		Distributions&& distributions = trivial_distributions<T>()
 	) {
-		auto const scales = scale_setter_(real_phase_space);
-
-		// only set renormalization scale if it changed
-		if (scales.renormalization() != old_renormalization_scale_)
-		{
-			matrix_elements_.scale(scales.renormalization(), pdf_);
-			old_renormalization_scale_ = scales.renormalization();
-		}
-
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -127,14 +118,8 @@ public:
 
 		switch (recombined)
 		{
-		case 0:
-			event = event_type::inclusive_n_plus_1;
-			break;
-
-		case 1:
-			event = event_type::born_like_n;
-			break;
-
+		case 0: event = event_type::inclusive_n_plus_1; break;
+		case 1: event = event_type::born_like_n; break;
 		default:
 			event = event_type::other;
 		}
@@ -145,27 +130,17 @@ public:
 			shift, event));
 
 		cut_result_type real_cut_result;
-		initial_state_array<T> reals;
 
 		if (event == event_type::inclusive_n_plus_1 ||
 			event == event_type::born_like_n)
 		{
 			real_cut_result = cuts_.cut(recombined_real_phase_space, shift,
 				event);
-
-			if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
-			{
-				reals = matrix_elements_.reals(real_phase_space, set);
-			}
 		}
 
-		// TODO: change the interface and tell the matrix elements which dipoles
-		// to calculate?
+		using info_type = typename cut_result_type::info_t;
 
-		using info_t = typename decltype (cuts_.cut(real_phase_space, shift,
-			event_type::born_like_n))::info_t;
-
-		std::vector<non_zero_dipole<T, info_t>> non_zero_dipoles;
+		std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles;
 
 		for (auto const dipole_with_set : matrix_elements_.dipoles())
 		{
@@ -218,10 +193,27 @@ public:
 			);
 		}
 
+		// if there are neither dipoles nor real matrix elements stop here
 		if (set.empty() || (non_zero_dipoles.empty() &&
 			real_cut_result.neg_cutted() && real_cut_result.pos_cutted()))
 		{
 			return T();
+		}
+
+		auto const scales = scale_setter_(recombined_real_phase_space);
+
+		// only set renormalization scale if it changed
+		if (scales.renormalization() != old_renormalization_scale_)
+		{
+			matrix_elements_.scale(scales.renormalization(), pdf_);
+			old_renormalization_scale_ = scales.renormalization();
+		}
+
+		initial_state_array<T> reals;
+
+		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
+		{
+			reals = matrix_elements_.reals(real_phase_space, set);
 		}
 
 		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
