@@ -434,9 +434,9 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		T const omx = T(1.0) - x;
 		T const sai = invariant(phase_space, term.emitter(), term.spectator());
 		T const mu2 = factorization_scale * factorization_scale;
-		T const logmu2bsaix = log(mu2 / (sai * x));
+		T const logmu2bsai = log(mu2 / sai);
 
-		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsaix;
+		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsai;
 
 		result.a[parton::gluon][parton::anti_up]      = value;
 		result.a[parton::gluon][parton::anti_down]    = value;
@@ -447,7 +447,7 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		result.a[parton::gluon][parton::charm]        = value;
 		result.a[parton::gluon][parton::strange]      = value;
 
-		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * logmu2bsaix;
+		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * logmu2bsai;
 
 		result.a[parton::anti_up     ][parton::anti_up     ] = value;
 		result.a[parton::anti_down   ][parton::anti_down   ] = value;
@@ -457,10 +457,6 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 		result.a[parton::down        ][parton::down        ] = value;
 		result.a[parton::charm       ][parton::charm       ] = value;
 		result.a[parton::strange     ][parton::strange     ] = value;
-
-		T const logmu2bsai = log(mu2 / sai);
-
-		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * logmu2bsai;
 
 		result.b[parton::anti_up     ][parton::anti_up     ] = value;
 		result.b[parton::anti_down   ][parton::anti_down   ] = value;
