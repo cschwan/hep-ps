@@ -24,6 +24,7 @@
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
@@ -137,12 +138,13 @@ public:
 			// loop over both initial state partons
 			for (auto const i : { 0, 1 })
 			{
-				auto const& abc = subtraction_.finite_insertion_term(
+				auto const& abc = subtraction_.insertion_terms(
 					insertion_terms.at(index),
+					scales,
 					phase_space,
 					xprime[i],
 					eta[i],
-					scales.factorization()
+					i
 				);
 
 				parton_array<T> d;

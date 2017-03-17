@@ -242,18 +242,14 @@ public:
 		return T(1.0);
 	}
 
-	hep::abc_terms<T> finite_insertion_term_born(T, T)
-	{
-		return hep::abc_terms<T>();
-	}
-
-	hep::abc_terms<T> finite_insertion_term(
+	hep::abc_terms<T> insertion_terms(
 		hep::insertion_term const&,
+		hep::scales<T> const&,
 		std::vector<T> const&,
 		T,
 		T,
-		T
-	) {
+		std::size_t
+	) const {
 		return hep::abc_terms<T>();
 	}
 

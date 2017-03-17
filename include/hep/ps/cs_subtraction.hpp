@@ -24,6 +24,7 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/insertion_term.hpp"
+#include "hep/ps/scales.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -48,12 +49,13 @@ public:
 		dipole_invariants<T> const& invariants
 	);
 
-	abc_terms<T> finite_insertion_term(
+	abc_terms<T> insertion_terms(
 		insertion_term const& term,
+		scales<T> const& mu,
 		std::vector<T> const& phase_space,
 		T x,
 		T eta,
-		T factorization_scale
+		std::size_t initial_state
 	) const;
 
 private:

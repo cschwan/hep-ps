@@ -305,12 +305,13 @@ T cs_subtraction<T>::fermion_function(
 }
 
 template <typename T>
-abc_terms<T> cs_subtraction<T>::finite_insertion_term(
+abc_terms<T> cs_subtraction<T>::insertion_terms(
 	insertion_term const& term,
+	scales<T> const& mu,
 	std::vector<T> const& phase_space,
 	T x,
 	T eta,
-	T factorization_scale
+	std::size_t initial_state
 ) const {
 	using std::acos;
 	using std::log;
@@ -386,6 +387,12 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 
 	case insertion_term_type::final_initial:
 	{
+		// initial states must agree
+		if (term.spectator() != initial_state)
+		{
+			return result;
+		}
+
 		T const ca = n_;
 		T const gamma = (term.emitter_type() == particle_type::fermion)
 			? T(1.5) * cf
@@ -431,9 +438,15 @@ abc_terms<T> cs_subtraction<T>::finite_insertion_term(
 
 	case insertion_term_type::initial_final:
 	{
+		// initial states must agree
+		if (term.emitter() != initial_state)
+		{
+			return result;
+		}
+
 		T const omx = T(1.0) - x;
 		T const sai = invariant(phase_space, term.emitter(), term.spectator());
-		T const mu2 = factorization_scale * factorization_scale;
+		T const mu2 = mu.factorization() * mu.factorization();
 		T const logmu2bsai = log(mu2 / sai);
 
 		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsai;
