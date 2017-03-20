@@ -2,7 +2,7 @@
 #define HEP_PS_INSERTION_TERM_HPP
 
 /*
- * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
+ * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
  * Copyright (C) 2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify

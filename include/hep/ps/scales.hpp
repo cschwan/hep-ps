@@ -2,8 +2,8 @@
 #define HEP_PS_SCALES_HPP
 
 /*
- * hep-ps - A C++ Library for Perturbative Calculations in High Energy Physics
- * Copyright (C) 2016  Christopher Schwan
+ * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
+ * Copyright (C) 2016-2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
