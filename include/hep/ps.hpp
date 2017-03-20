@@ -19,15 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern "C"
-{
-
-/// C-function that lets build systems find the `hep-ps` library. This function
-/// does nothing.
-void find_hep_ps();
-
-}
-
 #include "hep/ps/abc_terms.hpp"
 #include "hep/ps/constants.hpp"
 #include "hep/ps/cs_subtraction.hpp"

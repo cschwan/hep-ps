@@ -1,3 +1,5 @@
+#include "hep/ps/find_hep_ps.hpp"
+
 extern "C"
 {
 
