@@ -59,7 +59,7 @@ AM_CONDITIONAL([HAVE_FASTJET_CLUSTER_SEQUENCE_HH],
 
 # find LHAPDF header and library
 AC_CHECK_HEADERS([LHAPDF/LHAPDF.h])
-AC_SEARCH_LIBS([_ZN6LHAPDF5mkPDFERKSsi], [LHAPDF], [],
+AC_SEARCH_LIBS([_ZN6LHAPDF5mkPDFEi], [LHAPDF], [],
 	AC_MSG_ERROR([LHAPDF is a required dependency]))
 
 # if the documentation is enabled find doxygen binary
