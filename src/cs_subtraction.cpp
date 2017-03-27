@@ -533,7 +533,7 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		result.a[parton::charm       ][parton::charm       ] = value;
 		result.a[parton::strange     ][parton::strange     ] = value;
 
-		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * (logmu2bsai -
+		value = T(0.5) * cf / pi * ((T(1.0) + x * x) / omx * logmu2bsai -
 			T(2.0) * logomx / omx);
 
 		result.b[parton::anti_up     ][parton::anti_up     ] = value;
@@ -548,7 +548,7 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		T const logome = log(T(1.0) - eta);
 
 		value = T(0.5) * cf / pi * (pi * pi / T(3.0) + (eta + T(0.5) * eta *
-			eta + T(2.0) * logome) * logmu2bsai + logome * logome);
+			eta + T(2.0) * logome) * logmu2bsai - logome * logome);
 
 		result.c[parton::anti_up     ][parton::anti_up     ] = value;
 		result.c[parton::anti_down   ][parton::anti_down   ] = value;
