@@ -145,6 +145,7 @@ TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
 
 	std::vector<T> p(psg.map_dimensions());
 	std::vector<T> densities(psg.channels());
+	std::size_t const particles = psg.map_dimensions() / 4;
 
 	for (std::size_t i = 0; i != 100; ++i)
 	{
@@ -159,7 +160,7 @@ TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
 
 			std::array<T, 4> sums = { T(), T(), T(), T() };
 
-			for (std::size_t particle = 0; particle != 8; ++particle)
+			for (std::size_t particle = 0; particle != particles; ++particle)
 			{
 				// count incoming particles as negative
 				T const sign = (particle < 2) ? T(-1.0) : T(1.0);
@@ -179,7 +180,7 @@ TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
 			CHECK( sums.at(2) == Approx(T()) );
 			CHECK( sums.at(3) == Approx(T()) );
 
-			for (std::size_t particle = 0; particle != 8; ++particle)
+			for (std::size_t particle = 0; particle != particles; ++particle)
 			{
 				T const invariant =
 					p.at(4 * particle + 0) * p.at(4 * particle + 0) -
