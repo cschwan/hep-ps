@@ -2,13 +2,13 @@
 #include "config.hpp"
 #endif
 
-#define lusifer_initphasespace F77_FUNC(lusifer_initphasespace, INITPHASESPACE)
-#define lusifer_phasespace F77_FUNC(lusifer_phasespace, PHASESPACE)
-#define lusifer_density F77_FUNC(lusifer_density, DENSITY)
+#define lusifer_initphasespace F77_FUNC(lusifer_initphasespace, LUSIFER_INITPHASESPACE)
+#define lusifer_phasespace F77_FUNC(lusifer_phasespace, LUSIFER_PHASESPACE)
+#define lusifer_density F77_FUNC(lusifer_density, LUSIFER_DENSITY)
 
-#define lusifer_extra_max F77_FUNC(lusifer_extra_max, GENERATORMAX)
-#define lusifer_extra_data F77_FUNC(lusifer_extra_data, GENERATORDATA)
-#define lusifer_extra_set F77_FUNC(lusifer_extra_set, GENERATORSET)
+#define lusifer_extra_max F77_FUNC(lusifer_extra_max, LUSIFER_EXTRA_MAX)
+#define lusifer_extra_data F77_FUNC(lusifer_extra_data, LUSIFER_EXTRA_DATA)
+#define lusifer_extra_set F77_FUNC(lusifer_extra_set, LUSIFER_EXTRA_SET)
 
 extern "C"
 {
