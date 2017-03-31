@@ -7,6 +7,7 @@ check_LTLIBRARIES = libcatch.la
 noinst_HEADERS = catch.hpp test_structures.hpp
 
 check_PROGRAMS = \
+	test_cofferaa_phase_space_generator \
 	test_fortran_helper \
 	test_headers \
 	test_hh_lusifer_phase_space_generator \

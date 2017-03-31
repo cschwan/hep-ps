@@ -2,6 +2,7 @@ nobase_include_HEADERS = \
 	hep/ps-mc.hpp \
 	hep/ps.hpp \
 	hep/ps/abc_terms.hpp \
+	hep/ps/cofferaa_phase_space_generator.hpp \
 	hep/ps/constants.hpp \
 	hep/ps/cs_subtraction.hpp \
 	hep/ps/cut_result.hpp \

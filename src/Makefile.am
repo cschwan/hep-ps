@@ -2,6 +2,10 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libhep-ps.la
 libhep_ps_la_SOURCES = \
+	cofferaa_generator.f \
+	cofferaa_extra.f \
+	cofferaa_interfaces.hpp \
+	cofferaa_phase_space_generator.cpp \
 	cs_subtraction.cpp \
 	dipole.cpp \
 	find_hep_ps.cpp \
