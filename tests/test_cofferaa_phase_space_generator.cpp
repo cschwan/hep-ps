@@ -56,7 +56,7 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	CHECK( psg3.dimensions()     == 14 );
 	CHECK( psg3.map_dimensions() == 32 );
 
-	// pp -> 2 jets + two pairs of leptons + photon
+	// pp -> 2 jets + two pairs of leptons + gluon
 	hep::cofferaa_phase_space_generator<T> psg4(
 		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4, 26},
 		constants,
