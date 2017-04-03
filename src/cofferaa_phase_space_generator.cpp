@@ -17,6 +17,8 @@ public:
 	std::size_t channels;
 	std::size_t max_particles;
 	std::size_t particles;
+
+	std::vector<T> current_point;
 };
 
 template <typename T>
@@ -40,6 +42,8 @@ cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 	pimpl->max_particles = maxex;
 
 	assert( pimpl->max_particles >= pimpl->particles );
+
+	pimpl->current_point.resize(4 * maxex);
 
 	// FORTRAN counting: use the first generator
 	int generator = 1;
@@ -121,10 +125,8 @@ T cofferaa_phase_space_generator<T>::densities(std::vector<T>& densities)
 	int generator = 1;
 	int switch_ = 2;
 
-	std::array<T, 4 * 9> k = {{ }};
-
 	cofferaa_density(
-		k.data(),
+		pimpl->current_point.data(),
 		densities.data(),
 		&generator,
 		&switch_
@@ -161,24 +163,19 @@ void cofferaa_phase_space_generator<T>::generate(
 	int generator = 1;
 	int switch_ = 1;
 
-	std::vector<double> phase_space(4 * pimpl->max_particles);
-
 	cofferaa_generation(
 		random_numbers.data(),
 		&kbeam[0],
-		phase_space.data(),
+		pimpl->current_point.data(),
 		&g,
 		&channel_,
 		&generator,
 		&switch_
 	);
 
-	fortran_ordering_to_cpp(phase_space);
-
-	momenta.assign(
-		phase_space.begin(),
-		phase_space.begin() + map_dimensions()
-	);
+	momenta = pimpl->current_point;
+	fortran_ordering_to_cpp(momenta);
+	momenta.resize(map_dimensions());
 }
 
 template <typename T>
