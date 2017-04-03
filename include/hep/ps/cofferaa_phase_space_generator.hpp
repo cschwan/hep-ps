@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace hep
@@ -44,7 +45,8 @@ public:
 	cofferaa_phase_space_generator(
 		std::vector<int> const& process,
 		lusifer_constants<T> const& constants,
-		bool generate_subtraction_channels = true,
+		std::vector<std::tuple<int, int, int>> const& dipoles
+			= std::vector<std::tuple<int, int, int>>{},
 		std::size_t extra_random_numbers = 0
 	);
 

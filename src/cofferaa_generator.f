@@ -543,7 +543,8 @@ c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine cofferaa_initgenerator(energy,smin,hepnum,generator,
-     *  next,smodel,sincludecuts,ssub)
+     *  next,smodel,sincludecuts,ssub,dipole_count,dipole_emitter,
+     *  dipole_unresolved,dipole_spectator)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv,maxo
@@ -561,6 +562,10 @@ c local variables
       logical cofferaa_comparedecay,cofferaa_compareprocess,schannel
       character*9 particle(maxv)
       character*80 vertices
+      integer dipole_count,dipole_loop
+      integer dipole_emitter(dipole_count)
+      integer dipole_unresolved(dipole_count)
+      integer dipole_spectator(dipole_count)
 c mcparticle
       integer family(-maxv:maxv,6),light(-maxv:maxv)
       character*3 pname(-maxv:maxv),gname(-maxv:maxv)
@@ -953,9 +958,19 @@ c                                                                 c
 c     loop over emitter and spectator                             c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      do em=0,nexternal(generator)
-      do sp=0,nexternal(generator)
-      do ga=0,nexternal(generator)
+      do dipole_loop=0,dipole_count
+      if(dipole_loop.eq.0)then
+        em=0
+        ga=0
+        sp=0
+      else
+        em=dipole_emitter(dipole_loop)
+        ga=dipole_unresolved(dipole_loop)
+        sp=dipole_spectator(dipole_loop)
+      endif
+c      do em=0,nexternal(generator)
+c      do sp=0,nexternal(generator)
+c      do ga=0,nexternal(generator)
       n=0
       lmap(em,sp,ga)=.false.
       if(em.eq.0.and.sp.eq.0.and.ga.eq.0)then
@@ -1312,8 +1327,8 @@ c decay
       enddo
       endif
       enddo
-      enddo
-      enddo
+c      enddo
+c      enddo
       if(nout.ne.0.and.noutgen.ge.1)then
 c output
         write(nout,'(a)')' '

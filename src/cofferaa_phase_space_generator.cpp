@@ -25,7 +25,7 @@ template <typename T>
 cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 	std::vector<int> const& process,
 	lusifer_constants<T> const& constants,
-	bool generate_subtraction_channels,
+	std::vector<std::tuple<int, int, int>> const& dipoles,
 	std::size_t extra_random_numbers
 )
 	: pimpl(new impl())
@@ -79,7 +79,20 @@ cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 	int smodel = 12;
 	int sincludecuts = 0;
 	// generate phase space according to the dipole mappings
-	int ssub = generate_subtraction_channels ? 1 : 0;
+	int ssub = (dipoles.size() != 0) ? 1 : 0;
+
+	std::vector<int> dipole_emitter;
+	std::vector<int> dipole_unresolved;
+	std::vector<int> dipole_spectator;
+
+	for (auto const& dipole : dipoles)
+	{
+		dipole_emitter.push_back(std::get<0>(dipole));
+		dipole_unresolved.push_back(std::get<1>(dipole));
+		dipole_spectator.push_back(std::get<2>(dipole));
+	}
+
+	int dipole_count = dipoles.size();
 
 	cofferaa_initgenerator(
 		&energy,
@@ -89,7 +102,11 @@ cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 		&next,
 		&smodel,
 		&sincludecuts,
-		&ssub
+		&ssub,
+		&dipole_count,
+		dipole_emitter.data(),
+		dipole_unresolved.data(),
+		dipole_spectator.data()
 	);
 
 	int channels;

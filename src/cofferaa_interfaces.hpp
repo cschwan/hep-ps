@@ -38,7 +38,11 @@ void cofferaa_initgenerator(
 	int* next,
 	int* smodel,
 	int* sincludecuts,
-	int* ssub
+	int* ssub,
+	int*,
+	int*,
+	int*,
+	int*
 );
 
 void cofferaa_extra_max(

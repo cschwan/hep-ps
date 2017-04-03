@@ -47,8 +47,7 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	// pp -> 2 jets + two pairs of leptons
 	hep::cofferaa_phase_space_generator<T> psg3(
 		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4},
-		constants,
-		false
+		constants
 	);
 
 	// TODO: why are there one channel less than what LUSIFER's PSG returns?
@@ -56,14 +55,21 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	CHECK( psg3.dimensions()     == 14 );
 	CHECK( psg3.map_dimensions() == 32 );
 
+	std::vector<std::tuple<int, int, int>> dipoles = {
+		std::make_tuple(1, 9, 8),
+		std::make_tuple(2, 9, 7),
+		std::make_tuple(7, 9, 2),
+		std::make_tuple(8, 9, 1)
+	};
+
 	// pp -> 2 jets + two pairs of leptons + gluon
 	hep::cofferaa_phase_space_generator<T> psg4(
 		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4, 26},
 		constants,
-		true
+		dipoles
 	);
 
-	CHECK( psg4.channels()       == 1560 );
+	CHECK( psg4.channels()       == (456+4*92) );
 	CHECK( psg4.dimensions()     == 17 );
 	CHECK( psg4.map_dimensions() == 36 );
 }
