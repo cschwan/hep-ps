@@ -97,6 +97,14 @@ cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 }
 
 template <typename T>
+cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
+	cofferaa_phase_space_generator&& psg
+)
+	: pimpl(std::move(psg.pimpl))
+{
+}
+
+template <typename T>
 cofferaa_phase_space_generator<T>::~cofferaa_phase_space_generator() = default;
 
 template <typename T>

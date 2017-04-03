@@ -48,6 +48,9 @@ public:
 		std::size_t extra_random_numbers = 0
 	);
 
+	/// Move constructor.
+	cofferaa_phase_space_generator(cofferaa_phase_space_generator&& psg);
+
 	/// Destructor.
 	~cofferaa_phase_space_generator();
 
