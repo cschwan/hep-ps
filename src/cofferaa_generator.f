@@ -10,7 +10,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables 
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       real*8 random(3*maxe-7),p(0:3,2**maxe),s(2**maxe)
       real*8 k(maxe,0:3),kt(maxe,0:3),kbeam(2,0:3),h
       real*8 mmin,mmax,smin,smax,x,g,tcut1,tcut2
@@ -261,7 +261,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxg
-      parameter(maxe=7,maxg=4)
+      parameter(maxe=9,maxg=4)
       real*8 k(maxe,0:3),mom,acc
       integer i1,i2,next,switch
 c mckinemetics
@@ -302,7 +302,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       real*8 random(3*maxe-7),p(0:3,2**maxe,0:maxe,0:maxe,0:maxe)
       real*8 s(2**maxe,0:maxe,0:maxe,0:maxe),k(maxe,0:3),kt(maxe,0:3)
       real*8 gmap(0:maxe,0:maxe,0:maxe),ginv(maxch),gprocess(maxch)
@@ -547,7 +547,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv,maxo
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200,maxo=20)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200,maxo=20)
       real*8 m2,m3,e2,e3,scutinv,energy,smin
       integer idhep(maxe,maxe),binary(maxe,maxe),idhep2,idhep3
       integer i1,i2,i3,i4,i5,i6,ns,nt,maxns,maxnt,binary1,binary2
@@ -1360,7 +1360,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer i1,i2,ch1,ch2,generator,prop1,prop2,smap,idhep1,idhep2
       integer binary1,binary2,ga
       logical comparechannel,same,exist
@@ -1498,7 +1498,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer i1,i2,ch1,ch2,generator
 c mckinemetics
       real*8 massext2(maxe,maxg)
@@ -1573,7 +1573,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg
-      parameter(maxe=7,maxch=10000,maxg=4)
+      parameter(maxe=9,maxch=20000,maxg=4)
       integer ns1,ns2,ch1,ch2,generator
       logical comparedecay
 c mcdecay
@@ -1608,7 +1608,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer ns1,ns2,ch1,ch2,generator,idhep1,idhep2,ga
       logical compareprocess
 c mcgenerator
@@ -1664,7 +1664,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer i1,i2,ns1,ns2,ch1,ch2,generator,idhep1,idhep2
       logical compareinv,included
 c mcgenerator
@@ -2272,7 +2272,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxe,maxg,maxch
-      parameter(maxe=7,maxg=4,maxch=10000)
+      parameter(maxe=9,maxg=4,maxch=20000)
       real*8 k(maxe,0:3),kt(maxe,0:3),g,h,denum,jacobian
       real*8 x,z,y,v,kk(7,7),pi,ck(0:3),ckt(0:3),st
       integer i1,i2,j,em,sp,ga,next,switch
@@ -2387,7 +2387,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxch,maxg,maxe
-      parameter(maxch=10000,maxg=4,maxe=7)
+      parameter(maxch=20000,maxg=4,maxe=9)
       real*8 random(3),k(maxe,0:3),kt(maxe,0:3),g,m2,m,pi
       real*8 kem(0:3),ksp(0:3),ktr(0:3),ck(0:3),ckt(0:3)
       real*8 ksum(0:3),kj(maxe,0:3),y,h,z,f,v,c,x,kk(maxe,maxe)
@@ -2876,7 +2876,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
 c local variables
       integer maxch,maxo,maxg
-      parameter(maxch=10000,maxo=20,maxg=4)
+      parameter(maxch=20000,maxo=20,maxg=4)
       real*8 weight,g(maxch),gsum
       integer n,nchannel,generator,i1
 c mcadaptopt

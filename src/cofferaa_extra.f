@@ -1,7 +1,7 @@
       subroutine cofferaa_extra_max(maxex,maxgen)
       implicit none
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer maxex,maxgen
 
       maxex = maxe
@@ -11,7 +11,7 @@
       subroutine cofferaa_extra_data(gen,nch)
       implicit none
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       real*8 mass(0:maxv),width(0:maxv),power(0:maxv)
       integer nchannel(maxg)
       common/mcgenerator/mass,width,power,nchannel
@@ -23,7 +23,7 @@
       subroutine cofferaa_extra_set(gen,mw,gw,mz,gz,mh,gh,mt,gt)
       implicit none
       integer maxe,maxch,maxg,maxv
-      parameter(maxe=7,maxch=10000,maxg=4,maxv=200)
+      parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       real*8 mass(0:maxv),width(0:maxv),power(0:maxv)
       integer nchannel(maxg)
       common/mcgenerator/mass,width,power,nchannel
