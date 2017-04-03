@@ -960,7 +960,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         n=nexternal(generator)
       elseif(ssub.ne.0.and.em.ne.sp.and.em.ne.ga.and.sp.ne.ga.and.
      *  em.gt.0.and.sp.gt.0.and.ga.gt.0)then
-        if(pname(hepnum(ga)).eq.'ph '.and.ga.ge.3.and.
+        if(pname(hepnum(ga)).eq.'gl '.and.ga.ge.3.and.
      *    vertex(hepnum(em),-hepnum(em),hepnum(ga),schannel).and.
      *    vertex(hepnum(sp),-hepnum(sp),hepnum(ga),schannel))then
           n=nexternal(generator)-1

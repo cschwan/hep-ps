@@ -23,6 +23,7 @@ template <typename T>
 cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 	std::vector<int> const& process,
 	lusifer_constants<T> const& constants,
+	bool generate_subtraction_channels,
 	std::size_t extra_random_numbers
 )
 	: pimpl(new impl())
@@ -74,7 +75,7 @@ cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 	int smodel = 12;
 	int sincludecuts = 0;
 	// generate phase space according to the dipole mappings
-	int ssub = 1;
+	int ssub = generate_subtraction_channels ? 1 : 0;
 
 	cofferaa_initgenerator(
 		&energy,

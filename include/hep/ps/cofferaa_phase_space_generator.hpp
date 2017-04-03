@@ -43,6 +43,7 @@ public:
 	cofferaa_phase_space_generator(
 		std::vector<int> const& process,
 		lusifer_constants<T> const& constants,
+		bool generate_subtraction_channels = true,
 		std::size_t extra_random_numbers = 0
 	);
 

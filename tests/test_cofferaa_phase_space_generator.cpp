@@ -29,31 +29,43 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	);
 
 	// two s-channels with a photon or Z boson
-	REQUIRE( psg1.channels()       ==  2 );
-	REQUIRE( psg1.dimensions()     ==  2 );
-	REQUIRE( psg1.map_dimensions() == 16 );
-
-	// e+e- -> muon pair + photon
-	hep::cofferaa_phase_space_generator<T> psg2(
-		std::vector<int>{11, -11, 13, -13, 22},
-		constants
-	);
-
-	// eight diagrams times four dipoles
-	REQUIRE( psg2.channels()       == 32 );
-	REQUIRE( psg2.dimensions()     ==  5 );
-	REQUIRE( psg2.map_dimensions() == 20 );
+	CHECK( psg1.channels()       ==  2 );
+	CHECK( psg1.dimensions()     ==  2 );
+	CHECK( psg1.map_dimensions() == 16 );
 
 	// e+e- -> up-quark pair
-	hep::cofferaa_phase_space_generator<T> psg3(
+	hep::cofferaa_phase_space_generator<T> psg2(
 		std::vector<int>{11, -11, 2, -2},
 		constants
 	);
 
 	// two s-channels with a photon or Z boson
-	REQUIRE( psg3.channels()       ==  2 );
-	REQUIRE( psg3.dimensions()     ==  2 );
-	REQUIRE( psg3.map_dimensions() == 16 );
+	CHECK( psg2.channels()       ==  2 );
+	CHECK( psg2.dimensions()     ==  2 );
+	CHECK( psg2.map_dimensions() == 16 );
+
+	// pp -> 2 jets + two pairs of leptons
+	hep::cofferaa_phase_space_generator<T> psg3(
+		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4},
+		constants,
+		false
+	);
+
+	// TODO: why are there one channel less than what LUSIFER's PSG returns?
+	CHECK( psg3.channels()       == 93-1 );
+	CHECK( psg3.dimensions()     == 14 );
+	CHECK( psg3.map_dimensions() == 32 );
+
+	// pp -> 2 jets + two pairs of leptons + photon
+	hep::cofferaa_phase_space_generator<T> psg4(
+		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4, 26},
+		constants,
+		true
+	);
+
+	CHECK( psg4.channels()       == 1560 );
+	CHECK( psg4.dimensions()     == 17 );
+	CHECK( psg4.map_dimensions() == 36 );
 }
 
 TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
