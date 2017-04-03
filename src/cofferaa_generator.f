@@ -5,17 +5,17 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine generation(random,kbeam,k,g,channel,generator,
-     *  switch)
+      subroutine cofferaa_generation(random,kbeam,k,g,channel,
+     *  generator,switch)
       implicit none
 c local variables 
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       real*8 random(3*maxe-7),p(0:3,2**maxe),s(2**maxe)
-      real*8 k(maxe,0:3),kt(maxe,0:3),kbeam(2,0:3),h
+      real*8 k(maxe,0:3),kt(maxe,0:3),kbeam(2,0:3),cofferaa_h
       real*8 mmin,mmax,smin,smax,x,g,tcut1,tcut2
       integer i1,i2,i3,i4,ns,nt,channel,generator,switch,step
-      integer ranstart,virtinv,inv1,inv2,em,sp,ga,pid
+      integer ranstart,virtinv,inv1,inv2,em,sp,ga,cofferaa_pid
 c mcgenerator
       real*8 mass(0:maxv),width(0:maxv),power(0:maxv)
       integer nchannel(maxg)
@@ -63,13 +63,13 @@ c incoming momenta and definition of x
         ranstart=1+ninv(channel,generator)
      *    +2*nprocess(channel,generator)+2*ndecay(channel,generator)
         if(em.eq.1.or.(sp.eq.1.and.em.ge.3))then
-          x=1d0-h(random(ranstart),powermap,0d0,0d0,1d0,switch)
+          x=1d0-cofferaa_h(random(ranstart),powermap,0d0,0d0,1d0,switch)
           do i1=0,3
             p(i1,1)=-x*kbeam(1,i1)
             p(i1,2)=-kbeam(2,i1)
           enddo
         elseif(em.eq.2.or.(sp.eq.2.and.em.ge.3))then
-          x=1d0-h(random(ranstart),powermap,0d0,0d0,1d0,switch)
+          x=1d0-cofferaa_h(random(ranstart),powermap,0d0,0d0,1d0,switch)
           do i1=0,3
             p(i1,1)=-kbeam(1,i1)
             p(i1,2)=-x*kbeam(2,i1)
@@ -109,7 +109,7 @@ c defining momenta
           kt(i1,i2)=k(i1,i2)
         enddo
         enddo
-        call mapin(kt,g,em,sp,ga,nexternal(generator),switch)
+        call cofferaa_mapin(kt,g,em,sp,ga,nexternal(generator),switch)
         do i1=1,allbinary(ga,generator)
           p(0,i1)=0d0
         enddo
@@ -171,7 +171,7 @@ c inv
         enddo        
         smin=mmin**2
         smax=(dsqrt(s(3))-mmax)**2
-        call inv(
+        call cofferaa_inv(
      *    random(ns),                                    ! random number
      *    s(ininv(ns,channel,generator)),                ! invariant mass
      *    g,                                             ! local density
@@ -193,7 +193,7 @@ c process
           tcut2=tcutprocess(virtprocess(nt,channel,generator),
      *      generator)
         endif
-        call process(
+        call cofferaa_process(
      *    random(ranstart+2*nt-1),                       ! random numbers
      *    p(0,in1process(nt,channel,generator)),         ! incomming particle 1
      *    p(0,in2process(nt,channel,generator)),         ! incomming particle 2
@@ -216,7 +216,7 @@ c process
 c decay
       ranstart=ninv(channel,generator)+2*nprocess(channel,generator)
       do ns=1,ndecay(channel,generator)
-        call decay(
+        call cofferaa_decay(
      *    random(ranstart+2*ns-1),                       ! random numbers
      *    p(0,indecay(ns,channel,generator)),            ! incomming particle 
      *    p(0,out1decay(ns,channel,generator)),          ! outgoing particle 1
@@ -239,7 +239,7 @@ c map
       if(step.eq.1)then
         ranstart=1+ninv(channel,generator)
      *    +2*nprocess(channel,generator)+2*ndecay(channel,generator)
-        call mapout(random(ranstart),k,x,g,em,sp,ga,
+        call cofferaa_mapout(random(ranstart),k,x,g,em,sp,ga,
      *    nexternal(generator),switch)
       endif
 c restoring external masses
@@ -247,7 +247,7 @@ c restoring external masses
         k(i1,0)=dsqrt(massext2(i1,generator)
      *    +k(i1,1)**2+k(i1,2)**2+k(i1,3)**2)
       enddo
-c      call checkmom(k,nexternal(generator),switch)
+c      call cofferaa_checkmom(k,nexternal(generator),switch)
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -257,7 +257,7 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine checkmom(k,next,switch)
+      subroutine cofferaa_checkmom(k,next,switch)
       implicit none
 c local variables
       integer maxe,maxg
@@ -298,7 +298,7 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine density(k,g,generator,switch)
+      subroutine cofferaa_density(k,g,generator,switch)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
@@ -361,11 +361,11 @@ c mcmap
             kt(i1,i2)=k(i1,i2)
           enddo
           enddo
-c          call checkmom(k,nexternal(generator),switch)
+c          call cofferaa_checkmom(k,nexternal(generator),switch)
 c generating phasespace configurations
-          call mapin(kt,gmap(em,sp,ga),em,sp,ga,nexternal(generator),
-     *      switch)     
-c          if(ga.gt.0)call checkmom(kt,nexternal(generator)-1,switch)
+          call cofferaa_mapin(kt,gmap(em,sp,ga),em,sp,ga,
+     *      nexternal(generator),switch)     
+c          if(ga.gt.0)call cofferaa_checkmom(kt,nexternal(generator)-1,switch)
 c calculating invariants
           do i1=1,allbinary(ga,generator)
             p(0,i1,em,sp,ga)=0d0
@@ -445,7 +445,7 @@ c inv
         enddo        
         smin=mmin**2
         smax=(dsqrt(s(3,em,sp,ga))-mmax)**2
-        call inv(
+        call cofferaa_inv(
      *    random,                                           ! random number
      *    s(ininv(ns,channel,generator),em,sp,ga),          ! invariant mass
      *    ginv(i1),                                         ! local density
@@ -472,7 +472,7 @@ c process
           tcut2=tcutprocess(virtprocess(nt,channel,generator),
      *      generator)
         endif
-        call process(
+        call cofferaa_process(
      *    random,                                           ! random numbers
      *    p(0,in1process(nt,channel,generator),em,sp,ga),   ! incomming p. 1
      *    p(0,in2process(nt,channel,generator),em,sp,ga),   ! incomming p. 2
@@ -500,7 +500,7 @@ c decay
         sp=spmap(channel,generator)
         ga=gamap(channel,generator)
         ns=nsdecay(i1,generator)
-        call decay(
+        call cofferaa_decay(
      *    random,                                           ! random numbers
      *    p(0,indecay(ns,channel,generator),em,sp,ga),      ! incomming p. 
      *    p(0,out1decay(ns,channel,generator),em,sp,ga),    ! outgoing p. 1
@@ -542,8 +542,8 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine initgenerator(energy,smin,hepnum,generator,next,
-     *  smodel,sincludecuts,ssub)
+      subroutine cofferaa_initgenerator(energy,smin,hepnum,generator,
+     *  next,smodel,sincludecuts,ssub)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv,maxo
@@ -551,12 +551,14 @@ c local variables
       real*8 m2,m3,e2,e3,scutinv,energy,smin
       integer idhep(maxe,maxe),binary(maxe,maxe),idhep2,idhep3
       integer i1,i2,i3,i4,i5,i6,ns,nt,maxns,maxnt,binary1,binary2
-      integer binary3,in1(maxe),in2(maxe),out1(maxe),out2(maxe),pid
+      integer binary3,in1(maxe),in2(maxe),out1(maxe),out2(maxe),
+     * cofferaa_pid
       integer virt(maxe),channel,generator,sincludecuts,prop2,prop3
       integer smodel,smap,noutgen,hepnum(maxe),naux,nmap,next,ssub
       integer em,sp,ga,n
-      logical vertex,included,exist,comparechannel,compareinv
-      logical comparedecay,compareprocess,schannel
+      logical cofferaa_vertex,cofferaa_included,exist,
+     * cofferaa_comparechannel,cofferaa_compareinv
+      logical cofferaa_comparedecay,cofferaa_compareprocess,schannel
       character*9 particle(maxv)
       character*80 vertices
 c mcparticle
@@ -800,7 +802,7 @@ c output of couplings
         do i1=-naux+1,naux-1
         do i2=i1+1,naux
         do i3=i2+1,naux
-        if(vertex(i1,i2,i3,schannel).and.
+        if(cofferaa_vertex(i1,i2,i3,schannel).and.
      *    (gname(i1)(3:3).ne.' '.or.i1.gt.0).and.
      *    (gname(i2)(3:3).ne.' '.or.i2.gt.0).and.
      *    (gname(i3)(3:3).ne.' '.or.i3.gt.0))then
@@ -823,12 +825,12 @@ c output of couplings
         do i2=-naux+1,naux-1
         do i3=i2+1,naux-1
         schannel=.true.
-        if(vertex(i1,i2,i3,schannel).and.
+        if(cofferaa_vertex(i1,i2,i3,schannel).and.
      *    (gname(i2)(3:3).ne.' '.or.i2.gt.0).and.
      *    (gname(i3)(3:3).ne.' '.or.i3.gt.0))then
           do i4=-naux+1,naux-1
           do i5=i4+1,naux-1
-          if(vertex(-i1,i4,i5,schannel).and.
+          if(cofferaa_vertex(-i1,i4,i5,schannel).and.
      *      (gname(i4)(3:3).ne.' '.or.i4.gt.0).and.
      *      (gname(i5)(3:3).ne.' '.or.i5.gt.0))then
             vertices=vertices(1:i6)//' ('//pname(i2)//','//
@@ -909,7 +911,7 @@ c invariant-mass cut
       do i1=1,allbinary(0,generator)
         scutinv=0d0
         do i2=1,nexternal(generator)
-          if(included(i1,2**(i2-1),nexternal(generator)))then
+          if(cofferaa_included(i1,2**(i2-1),nexternal(generator)))then
              scutinv=scutinv+mass(abs(idhep(i2,1)))
            endif
         enddo
@@ -917,8 +919,8 @@ c invariant-mass cut
         if(sincludecuts.eq.1)then
           do i2=1,nexternal(generator)
           do i3=i2+1,nexternal(generator)
-            if(included(i1,2**(i2-1),nexternal(generator)).and.
-     *        included(i1,2**(i3-1),nexternal(generator)))then
+            if(cofferaa_included(i1,2**(i2-1),nexternal(generator)).and.
+     *        cofferaa_included(i1,2**(i3-1),nexternal(generator)))then
               m2=mass(abs(idhep(i2,1)))
               m3=mass(abs(idhep(i3,1)))
               e2=max(ecut(i2,generator),m2)
@@ -933,7 +935,7 @@ c invariant-mass cut
         endif
         mcutinv(i1,generator)=dsqrt(scutinv)
         do i2=2,i1-1
-          if(included(i1,i2,nexternal(generator)))then
+          if(cofferaa_included(i1,i2,nexternal(generator)))then
             mcutinv(i1,generator)=max(mcutinv(i1,generator),
      *        mcutinv(i2,generator)+mcutinv(i1-i2,generator))
           endif
@@ -961,8 +963,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       elseif(ssub.ne.0.and.em.ne.sp.and.em.ne.ga.and.sp.ne.ga.and.
      *  em.gt.0.and.sp.gt.0.and.ga.gt.0)then
         if(pname(hepnum(ga)).eq.'gl '.and.ga.ge.3.and.
-     *    vertex(hepnum(em),-hepnum(em),hepnum(ga),schannel).and.
-     *    vertex(hepnum(sp),-hepnum(sp),hepnum(ga),schannel))then
+     *    cofferaa_vertex(hepnum(em),-hepnum(em),hepnum(ga),
+     *    schannel).and.cofferaa_vertex(hepnum(sp),-hepnum(sp),
+     *    hepnum(ga),schannel))then
           n=nexternal(generator)-1
           idhep(ga,1)=0
         endif
@@ -994,10 +997,10 @@ c virtual particle for ns'th decay
      *    gname(virt(ns)).eq.gname(-virt(ns)))goto 400
 c checking whether 3-particle vertex exists
         schannel=.true.
-        if(.not.vertex(idhep(out1(ns),ns),idhep(out2(ns),ns),
+        if(.not.cofferaa_vertex(idhep(out1(ns),ns),idhep(out2(ns),ns),
      *    virt(ns),schannel))goto 1500
 c checking last 3-particle vertex
-        if(ns.eq.n-3.and..not.vertex(idhep(in1(ns),ns),
+        if(ns.eq.n-3.and..not.cofferaa_vertex(idhep(in1(ns),ns),
      *    idhep(in2(ns),ns),-virt(ns),schannel))goto 1500
 c initializing next step
         do i2=1,n
@@ -1044,7 +1047,7 @@ c avoid doube counting of diagrams
         if(nt.gt.maxns+1.and.in1(nt-1).eq.in1(nt))goto 1300
 c checking whether 3-particle vertex exists
         schannel=.false.
-        if(.not.vertex(idhep(in1(nt),nt),idhep(out1(nt),nt),
+        if(.not.cofferaa_vertex(idhep(in1(nt),nt),idhep(out1(nt),nt),
      *    virt(nt),schannel))goto 1300
 c initializing n step
         do i2=1,n
@@ -1070,8 +1073,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         enddo
         schannel=.true.
         if(gname(idhep(i3,i1)).eq.'   '.or..not.
-     *    vertex(idhep(1,i1),idhep(2,i1),idhep(i3,i1),schannel))
-     *    goto 1300
+     *    cofferaa_vertex(idhep(1,i1),idhep(2,i1),idhep(i3,i1),
+     *    schannel)) goto 1300
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c                                                                 c
 c     initializing channels                                       c
@@ -1103,11 +1106,11 @@ c minimal invariant-mass cuts for subroutine inv
           binary1=ininv(i1,channel,generator)
           binary2=ininv(i2,channel,generator)
           lmin(i2,i1,channel,generator)=.false.
-          if(included(binary1,binary2,n))then
+          if(cofferaa_included(binary1,binary2,n))then
             lmin(i2,i1,channel,generator)=.true.
             do i3=1,i1-1
               binary3=ininv(i3,channel,generator)
-              if(included(binary3,binary2,n)
+              if(cofferaa_included(binary3,binary2,n)
      *          .and.i2.ne.i3)then
                 lmin(i2,i1,channel,generator)=.false.
               endif
@@ -1121,11 +1124,11 @@ c maximal invariant-mass cuts for subroutine inv
           binary1=allbinary(ga,generator)-3-ininv(i1,channel,generator)
           binary2=ininv(i2,channel,generator)
           lmax(i2,i1,channel,generator)=.false.
-          if(included(binary1,binary2,n))then
+          if(cofferaa_included(binary1,binary2,n))then
             lmax(i2,i1,channel,generator)=.true.
             do i3=1,i1-1
               binary3=ininv(i3,channel,generator)
-              if(included(binary3,binary2,n)
+              if(cofferaa_included(binary3,binary2,n)
      *          .and.i2.ne.i3)then
                 lmax(i2,i1,channel,generator)=.false.
               endif
@@ -1165,12 +1168,12 @@ c initializing map
          gamap(channel,generator)=ga
 c checking whether generator already exists
         do i1=1,channel-1
-        if(comparechannel(i1,channel,smap,generator))then
+        if(cofferaa_comparechannel(i1,channel,smap,generator))then
           if(tcutprocess(allbinary(ga,generator)
      *      -virtprocess(1,channel,generator),generator).ne.0d0.or.
      *      tcutprocess(virtprocess(1,channel,generator),generator)
      *      .ne.0d0)then
-            call copychannel(channel,i1,generator)
+            call cofferaa_copychannel(channel,i1,generator)
           endif
           goto 1300
         endif
@@ -1192,16 +1195,18 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      *        '   s channel: ('//pname(-idhep(out1(i1),i1))//','//
      *        pname(-idhep(out2(i1),i1))//','//
      *        pname(-idhep(out2(i1),i1+1))//'), ',
-     *        pid(binary(out1(i1),i1)),pid(binary(out2(i1),i1)),
-     *        pid(binary(out2(i1),i1+1))
+     *        cofferaa_pid(binary(out1(i1),i1)),
+     *        cofferaa_pid(binary(out2(i1),i1)),
+     *        cofferaa_pid(binary(out2(i1),i1+1))
           enddo
           do i1=maxns+1,maxnt
             write(nout,'(a30,i6," +",i6," ->",i6)')
      *        '   t channel: ('//pname(idhep(in1(i1),i1))//','//
      *        pname(-idhep(out1(i1),i1))//','//
      *        pname(idhep(in1(i1),i1+1))//'), ',
-     *        pid(binary(in1(i1),i1)),pid(binary(out1(i1),i1)),
-     *        pid(binary(in1(i1),i1+1))
+     *        cofferaa_pid(binary(in1(i1),i1)),
+     *        cofferaa_pid(binary(out1(i1),i1)),
+     *        cofferaa_pid(binary(in1(i1),i1+1))
           enddo
         endif
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1255,7 +1260,7 @@ c initializing inv
         numinv(ns,channel,generator)=0
         do i1=1,channel-1
         do i2=1,ninv(i1,generator)
-          if(compareinv(ns,channel,i2,i1,generator))
+          if(cofferaa_compareinv(ns,channel,i2,i1,generator))
      *      numinv(ns,channel,generator)=numinv(i2,i1,generator)
         enddo
         enddo
@@ -1274,7 +1279,7 @@ c process
         numprocess(nt,channel,generator)=0
         do i1=1,channel-1
         do i2=1,nprocess(i1,generator)
-          if(compareprocess(nt,channel,i2,i1,generator))
+          if(cofferaa_compareprocess(nt,channel,i2,i1,generator))
      *      numprocess(nt,channel,generator)=numprocess(i2,i1,generator)
         enddo
         enddo
@@ -1293,7 +1298,7 @@ c decay
         numdecay(ns,channel,generator)=0
         do i1=1,channel-1
         do i2=1,ndecay(i1,generator)
-          if(comparedecay(ns,channel,i2,i1,generator))
+          if(cofferaa_comparedecay(ns,channel,i2,i1,generator))
      *      numdecay(ns,channel,generator)=numdecay(i2,i1,generator)
         enddo
         enddo
@@ -1356,14 +1361,14 @@ c                                                                 c
 c     check whether generator already exists                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function comparechannel(ch1,ch2,smap,generator)
+      function cofferaa_comparechannel(ch1,ch2,smap,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer i1,i2,ch1,ch2,generator,prop1,prop2,smap,idhep1,idhep2
       integer binary1,binary2,ga
-      logical comparechannel,same,exist
+      logical cofferaa_comparechannel,same,exist
 c mcgenerator
       real*8 mass(0:maxv),width(0:maxv),power(0:maxv)
       integer nchannel(maxg)
@@ -1397,7 +1402,7 @@ c mcmap
       common/mcinv/powerinv,mcutinv,ininv,idhepinv,idhepfirst,ninv,
      *  lmin,lmax
       common/mcmap/powermap,emmap,spmap,gamap,lmap
-      comparechannel=.false.
+      cofferaa_comparechannel=.false.
 c checking emitter, spectator, and photon
       if(emmap(ch1,generator).ne.emmap(ch2,generator))return
       if(spmap(ch1,generator).ne.spmap(ch2,generator))return
@@ -1486,7 +1491,7 @@ c checking first s-channel propagator
      *    width(idhep1).ne.width(idhep2).or.
      *    power(idhep1).ne.power(idhep2))return
       endif
-      comparechannel=.true.
+      cofferaa_comparechannel=.true.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1494,7 +1499,7 @@ c                                                                 c
 c     copy channel ch1 to channel ch2                             c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine copychannel(ch1,ch2,generator)
+      subroutine cofferaa_copychannel(ch1,ch2,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
@@ -1569,13 +1574,13 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function comparedecay(ns1,ch1,ns2,ch2,generator)
+      function cofferaa_comparedecay(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg
       parameter(maxe=9,maxch=20000,maxg=4)
       integer ns1,ns2,ch1,ch2,generator
-      logical comparedecay
+      logical cofferaa_comparedecay
 c mcdecay
       integer indecay(maxe,maxch,maxg),out1decay(maxe,maxch,maxg)
       integer out2decay(maxe,maxch,maxg),ndecay(maxch,maxg)
@@ -1585,7 +1590,7 @@ c mcmap
       logical lmap(0:maxe,0:maxe,0:maxe)
       common/mcdecay/indecay,out1decay,out2decay,ndecay
       common/mcmap/powermap,emmap,spmap,gamap,lmap
-      comparedecay=.false.
+      cofferaa_comparedecay=.false.
       if(emmap(ch1,generator).ne.emmap(ch2,generator))return
       if(spmap(ch1,generator).ne.spmap(ch2,generator))return
       if(gamap(ch1,generator).ne.gamap(ch2,generator))return
@@ -1594,7 +1599,7 @@ c mcmap
       if(out1decay(ns1,ch1,generator).ne.out1decay(ns2,ch2,generator)
      *  .and.out1decay(ns1,ch1,generator).ne.
      *  out2decay(ns2,ch2,generator))return
-      comparedecay=.true.
+      cofferaa_comparedecay=.true.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1604,13 +1609,13 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function compareprocess(ns1,ch1,ns2,ch2,generator)
+      function cofferaa_compareprocess(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer ns1,ns2,ch1,ch2,generator,idhep1,idhep2,ga
-      logical compareprocess
+      logical cofferaa_compareprocess
 c mcgenerator
       real*8 mass(0:maxv),width(0:maxv),power(0:maxv)
       integer nchannel(maxg)
@@ -1633,7 +1638,7 @@ c mcmap
      *  in2process,out1process,out2process,inprocess,virtprocess,
      *  idhepprocess,nprocess
       common/mcmap/powermap,emmap,spmap,gamap,lmap
-      compareprocess=.false.
+      cofferaa_compareprocess=.false.
       if(emmap(ch1,generator).ne.emmap(ch2,generator))return
       if(spmap(ch1,generator).ne.spmap(ch2,generator))return
       if(gamap(ch1,generator).ne.gamap(ch2,generator))return
@@ -1650,7 +1655,7 @@ c mcmap
       idhep2=idhepprocess(ns2,ch2,generator)
       if(mass(idhep1).ne.mass(idhep2).or.width(idhep1).ne.width(idhep2))
      *  return
-      compareprocess=.true.
+      cofferaa_compareprocess=.true.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1660,13 +1665,13 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function compareinv(ns1,ch1,ns2,ch2,generator)
+      function cofferaa_compareinv(ns1,ch1,ns2,ch2,generator)
       implicit none
 c local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
       integer i1,i2,ns1,ns2,ch1,ch2,generator,idhep1,idhep2
-      logical compareinv,included
+      logical cofferaa_compareinv,included
 c mcgenerator
       real*8 mass(0:maxv),width(0:maxv),power(0:maxv)
       integer nchannel(maxg)
@@ -1683,7 +1688,7 @@ c mcmap
       common/mcinv/powerinv,mcutinv,ininv,idhepinv,idhepfirst,ninv,
      *  lmin,lmax
       common/mcmap/powermap,emmap,spmap,gamap,lmap
-      compareinv=.false.
+      cofferaa_compareinv=.false.
       if(emmap(ch1,generator).ne.emmap(ch2,generator))return
       if(spmap(ch1,generator).ne.spmap(ch2,generator))return
       if(gamap(ch1,generator).ne.gamap(ch2,generator))return
@@ -1734,7 +1739,7 @@ c mcmap
           if(.not.included)return
         endif
       enddo    
-      compareinv=.true.
+      cofferaa_compareinv=.true.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1744,18 +1749,18 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function included(binary1,binary2,nexternal)
+      function cofferaa_included(binary1,binary2,nexternal)
       implicit none
 c local variables
       integer binary1,binary2,i1,b1,b2,nexternal
-      logical included
-      included=.false.
+      logical cofferaa_included
+      cofferaa_included=.false.
       do i1=1,nexternal
         b1=binary1/2**(i1-1)
         b2=binary2/2**(i1-1)
         if(2*(b2/2).ne.b2.and.2*(b1/2).eq.b1)return
       enddo
-      included=.true.
+      cofferaa_included=.true.
       end
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1765,11 +1770,12 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine inv(random,s,g,mass,width,power,smin,smax,step,switch)
+      subroutine cofferaa_inv(random,s,g,mass,width,power,smin,smax,
+     * step,switch)
       implicit none
 c local variable
       real*8 pi,random,s,g,mass,mass2,width,width2,power
-      real*8 smax,smin,omax,omin,h,jacobian,denum
+      real*8 smax,smin,omax,omin,cofferaa_h,cofferaa_jacobian,denum
       integer step,switch
 c mcoutput
       integer nout,numout,maxout
@@ -1815,9 +1821,9 @@ c mcoutput
         endif  
       else
         if(step.eq.1)then
-          s=h(random,power,mass2,smin,smax,switch)
+          s=cofferaa_h(random,power,mass2,smin,smax,switch)
         elseif(step.eq.2)then
-          denum=jacobian(power,mass2,s,smin,smax,switch)
+          denum=cofferaa_jacobian(power,mass2,s,smin,smax,switch)
           if(denum.gt.0d0)then
             g=g/denum
           else
@@ -1839,15 +1845,16 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine process(random,q1,q2,p1,p2,qt,g,mass,width,nu,
-     *  s,s1,s2,t,t1,t2,tcut1,tcut2,step,switch)
+      subroutine cofferaa_process(random,q1,q2,p1,p2,qt,g,mass,width,
+     *  nu,s,s1,s2,t,t1,t2,tcut1,tcut2,step,switch)
       implicit none
 c local variable
       real*8 pi,random(2),q1(0:3),q2(0:3),p1(0:3),p2(0:3),qt(0:3)
       real*8 g,mass,width,nu,s1,s2,t1,t2,tmin,tmax,tcut1,tcut2
       real*8 lambdas,lambdat,mass2,width2,t,phi,cost,s,roots
       real*8 gamma2,beta,gs,d,lambda,be,omega,omin,omax
-      real*8 k1(0:3),q(0:3),h,jacobian,denum,cmax,cmax1,cmax2
+      real*8 k1(0:3),q(0:3),cofferaa_h,cofferaa_jacobian,denum,cmax,
+     * cmax1,cmax2
       integer i1,step,switch
 c mcoutput
       integer nout,numout,maxout
@@ -1988,10 +1995,10 @@ c mctechparam
           phi=2d0*pi*random(1)
           denum=lambdas*lambdat
           cost=((s+s1-s2)*(s+t1-t2)-2d0*s*(t1+s1)
-     *          -2d0*s*h(random(2),nu,-mass2,-tmax,-tmin,switch)
-     *         )/lambdas/lambdat
+     *          -2d0*s*cofferaa_h(random(2),nu,-mass2,-tmax,-tmin,
+     *          switch))/lambdas/lambdat
         elseif(step.eq.2)then
-          denum=pi*jacobian(nu,-mass2,-t,-tmax,-tmin,switch)
+          denum=pi*cofferaa_jacobian(nu,-mass2,-t,-tmax,-tmin,switch)
           if(denum.ne.0d0)then
             g=g*2d0*lambdat/denum
           else
@@ -2020,12 +2027,12 @@ c mctechparam
         p1(2)=0d0
         p1(3)=lambdas*0.5d0/roots
         phi=dsign(phi,q1(3))
-        call rotation(p1,phi,cost,switch)
+        call cofferaa_rotation(p1,phi,cost,switch)
         do i1=0,3
           q(i1)=q1(i1)+q2(i1) 
           k1(i1)=q1(i1)
         enddo
-        call boost(q,k1,1d0,switch)
+        call cofferaa_boost(q,k1,1d0,switch)
         if(k1(1).eq.0d0)then
           phi=dsign(pi*0.5d0,k1(2))
         else
@@ -2033,8 +2040,8 @@ c mctechparam
         endif
         if(k1(1).lt.0d0)phi=phi+pi
         cost=k1(3)/dsqrt(k1(1)**2+k1(2)**2+k1(3)**2)
-        call rotation(p1,-phi,cost,switch)
-        call boost(q,p1,-1d0,switch) 
+        call cofferaa_rotation(p1,-phi,cost,switch)
+        call cofferaa_boost(q,p1,-1d0,switch) 
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
           qt(i1)=q1(i1)-p1(i1)
@@ -2050,7 +2057,7 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine decay(random,q,p1,p2,g,s,s1,s2,step,switch)
+      subroutine cofferaa_decay(random,q,p1,p2,g,s,s1,s2,step,switch)
       implicit none
 c local variable
       real*8 pi,random(2),q(0:3),p1(0:3),p2(0:3)
@@ -2089,8 +2096,8 @@ c mcoutput
         p1(1)=0d0
         p1(2)=0d0
         p1(3)=lambda*0.5d0/roots
-        call rotation(p1,phi,cost,switch)
-        call boost(q,p1,-1d0,switch) 
+        call cofferaa_rotation(p1,phi,cost,switch)
+        call cofferaa_boost(q,p1,-1d0,switch) 
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
         enddo
@@ -2116,9 +2123,9 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function h(random,nu,mass2,xmin,xmax,switch)
+      function cofferaa_h(random,nu,mass2,xmin,xmax,switch)
       implicit none
-      real*8 h,random,nu,xmin,xmax,mass2,m2
+      real*8 cofferaa_h,random,nu,xmin,xmax,mass2,m2
       integer switch
 c mctechparam
       real*8 techparam(3)
@@ -2126,7 +2133,7 @@ c mcoutput
       integer nout,numout,maxout
       common/mctechparam/techparam
       common/mcoutput/nout,numout,maxout
-      h=0d0
+      cofferaa_h=0d0
       if(switch.eq.0)return
       m2=mass2-techparam(1)
       if(xmax-m2.lt.0d0.or.xmin-m2.lt.0d0)then
@@ -2138,11 +2145,12 @@ c mcoutput
         return
       endif
       if(nu.eq.0d0)then
-        h=random*xmax+(1d0-random)*xmin 
+        cofferaa_h=random*xmax+(1d0-random)*xmin 
       elseif(nu.eq.1d0)then
-        h=dexp(random*dlog(xmax-m2)+(1d0-random)*dlog(xmin-m2))+m2
+        cofferaa_h=dexp(random*dlog(xmax-m2)+(1d0-random)*
+     *             dlog(xmin-m2))+m2
       else
-        h=(random*(xmax-m2)**(1d0-nu)
+        cofferaa_h=(random*(xmax-m2)**(1d0-nu)
      *    +(1d0-random)*(xmin-m2)**(1d0-nu))**(1d0/(1d0-nu))+m2
       endif
       end
@@ -2154,9 +2162,9 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function jacobian(nu,mass2,x,xmin,xmax,switch)
+      function cofferaa_jacobian(nu,mass2,x,xmin,xmax,switch)
       implicit none
-      real*8 jacobian,nu,x,xmin,xmax,mass2,m2
+      real*8 cofferaa_jacobian,nu,x,xmin,xmax,mass2,m2
       integer switch
 c mctechparam
       real*8 techparam(3)
@@ -2164,7 +2172,7 @@ c mcoutput
       integer nout,numout,maxout
       common/mctechparam/techparam
       common/mcoutput/nout,numout,maxout
-      jacobian=0d0
+      cofferaa_jacobian=0d0
       if(switch.eq.0)return
       m2=mass2-techparam(1)
       if(xmax-m2.lt.0d0.or.xmin-m2.lt.0d0)then
@@ -2176,11 +2184,11 @@ c mcoutput
         return
       endif
       if(nu.eq.0)then
-        jacobian=xmax-xmin
+        cofferaa_jacobian=xmax-xmin
       elseif(nu.eq.1d0)then
-        jacobian=(dlog(xmax-m2)-dlog(xmin-m2))*(x-m2)
+        cofferaa_jacobian=(dlog(xmax-m2)-dlog(xmin-m2))*(x-m2)
       else
-        jacobian=(((xmax-m2)**(1d0-nu)-(xmin-m2)**(1d0-nu))
+        cofferaa_jacobian=(((xmax-m2)**(1d0-nu)-(xmin-m2)**(1d0-nu))
      *    /(1d0-nu))*(x-m2)**nu
       endif
       end
@@ -2192,7 +2200,7 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine rotation(p,phi,cost,switch)
+      subroutine cofferaa_rotation(p,phi,cost,switch)
       implicit none
 c local variable
       real*8 p(0:3),phi,cost,sint,cosp,sinp,px,py,pz
@@ -2227,7 +2235,7 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine boost(q,p,dir,switch)
+      subroutine cofferaa_boost(q,p,dir,switch)
       implicit none
 c local variable
       real*8 p(0:3),q(0:3),dir,m,m2,bx,by,bz,gamma
@@ -2268,12 +2276,12 @@ c                                                                 c
 c     mapping from (n+1)- into n-particle phasespace              c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mapin(kt,g,em,sp,ga,next,switch)
+      subroutine cofferaa_mapin(kt,g,em,sp,ga,next,switch)
       implicit none
 c local variables
       integer maxe,maxg,maxch
       parameter(maxe=9,maxg=4,maxch=20000)
-      real*8 k(maxe,0:3),kt(maxe,0:3),g,h,denum,jacobian
+      real*8 k(maxe,0:3),kt(maxe,0:3),g,h,denum,cofferaa_jacobian
       real*8 x,z,y,v,kk(7,7),pi,ck(0:3),ckt(0:3),st
       integer i1,i2,j,em,sp,ga,next,switch
 c mcoutput
@@ -2311,8 +2319,8 @@ c final-state emitter with final-state spectator
           kt(sp,i1)=1d0/(1d0-y)*k(sp,i1)
           kt(ga,i1)=0d0
         enddo
-        denum=pi*(1d0-y)*jacobian(powermap,0d0,1d0-y,0d0,1d0,switch)
-     *    *jacobian(powermap,0d0,1d0-z,0d0,1d0,switch)
+        denum=pi*(1d0-y)*cofferaa_jacobian(powermap,0d0,1d0-y,0d0,1d0,
+     *    switch)*cofferaa_jacobian(powermap,0d0,1d0-z,0d0,1d0,switch)
 c final-state emitter with initial-state spectator
       elseif(em.ge.3.and.sp.le.2)then      
         x=(kk(em,sp)+kk(sp,ga)-kk(em,ga))/(kk(em,sp)+kk(sp,ga))
@@ -2322,8 +2330,8 @@ c final-state emitter with initial-state spectator
           kt(sp,i1)=x*k(sp,i1)
           kt(ga,i1)=0d0
         enddo
-        denum=pi*jacobian(powermap,0d0,1d0-x,0d0,1d0,switch)
-     *    *jacobian(powermap,0d0,1d0-z,0d0,1d0,switch)            
+        denum=pi*cofferaa_jacobian(powermap,0d0,1d0-x,0d0,1d0,switch)
+     *    *cofferaa_jacobian(powermap,0d0,1d0-z,0d0,1d0,switch)
 c initial-state emitter with final-state spectator
       elseif(em.le.2.and.sp.ge.3)then      
         x=(kk(em,sp)+kk(em,ga)-kk(sp,ga))/(kk(em,sp)+kk(em,ga))
@@ -2333,8 +2341,8 @@ c initial-state emitter with final-state spectator
           kt(em,i1)=x*k(em,i1)
           kt(ga,i1)=0d0
         enddo
-        denum=pi*jacobian(powermap,0d0,1d0-x,0d0,1d0,switch)
-     *    *jacobian(powermap,0d0,1d0-z,0d0,1d0,switch)            
+        denum=pi*cofferaa_jacobian(powermap,0d0,1d0-x,0d0,1d0,switch)
+     *    *cofferaa_jacobian(powermap,0d0,1d0-z,0d0,1d0,switch)
 c initial-state emitter with initial-state spectator
       elseif(em.le.2.and.sp.le.2)then      
         x=(kk(em,sp)-kk(em,ga)-kk(sp,ga))/kk(em,sp)
@@ -2362,7 +2370,8 @@ c initial-state emitter with initial-state spectator
           kt(sp,i1)=k(sp,i1)
           kt(ga,i1)=0d0
         enddo 
-        denum=pi*(1d0-x)*jacobian(powermap,0d0,1d0-x,0d0,1d0,switch)
+        denum=pi*(1d0-x)*cofferaa_jacobian(powermap,0d0,1d0-x,0d0,1d0,
+     *    switch)
       endif
       st=kt(em,0)*kt(sp,0)-kt(em,1)*kt(sp,1)-kt(em,2)*kt(sp,2)
      *  -kt(em,3)*kt(sp,3)
@@ -2383,14 +2392,15 @@ c                                                                 c
 c     mapping from n- into (n+1)-particle phase space             c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mapout(random,k,x,g,em,sp,ga,next,switch)
+      subroutine cofferaa_mapout(random,k,x,g,em,sp,ga,next,switch)
       implicit none
 c local variables
       integer maxch,maxg,maxe
       parameter(maxch=20000,maxg=4,maxe=9)
       real*8 random(3),k(maxe,0:3),kt(maxe,0:3),g,m2,m,pi
       real*8 kem(0:3),ksp(0:3),ktr(0:3),ck(0:3),ckt(0:3)
-      real*8 ksum(0:3),kj(maxe,0:3),y,h,z,f,v,c,x,kk(maxe,maxe)
+      real*8 ksum(0:3),kj(maxe,0:3),y,cofferaa_h,z,f,v,c,x,
+     * kk(maxe,maxe)
       integer i1,i2,j,em,sp,ga,next,switch
 c mcoutput
       integer nout,numout,maxout
@@ -2422,14 +2432,14 @@ c mapping from n- into (n+1)-particle phasespace
       endif
       if(em.ge.3.and.sp.ge.3)then
 c final-state emitter with final-state spectator
-        y=1d0-h(random(1),powermap,0d0,0d0,1d0,switch)
-        z=1d0-h(random(2),powermap,0d0,0d0,1d0,switch)
+        y=1d0-cofferaa_h(random(1),powermap,0d0,0d0,1d0,switch)
+        z=1d0-cofferaa_h(random(2),powermap,0d0,0d0,1d0,switch)
         f=dsqrt(y*z/(1d0-z))
         ktr(0)=-f*f*m
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=-f*f*m
-        call transverse(ksum,ksp,ktr,switch)
+        call cofferaa_transverse(ksum,ksp,ktr,switch)
         do i1=0,3
           k(em,i1)=y*(1d0+z)*ksp(i1)+z*kem(i1)+(1d0-z)*ktr(i1)
           k(ga,i1)=(1d0-z)*kem(i1)-y*z*ksp(i1)-(1d0-z)*ktr(i1)
@@ -2437,13 +2447,13 @@ c final-state emitter with final-state spectator
         enddo
 c final-state emitter with initial-state spectator
       elseif(em.ge.3.and.sp.le.2)then      
-        z=1d0-h(random(2),powermap,0d0,0d0,1d0,switch)
+        z=1d0-cofferaa_h(random(2),powermap,0d0,0d0,1d0,switch)
         f=dsqrt(z*(1d0-x)/(1d0-z)/x)
         ktr(0)=-f*f*m
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=-f*f*m
-        call transverse(ksum,ksp,ktr,switch)
+        call cofferaa_transverse(ksum,ksp,ktr,switch)
         do i1=0,3
           k(ga,i1)=(1-z)*kem(i1)-(1d0-x)/x*z*ksp(i1)-(1d0-z)*ktr(i1)
           k(em,i1)=(1d0-x)/x*(1d0+z)*ksp(i1)+z*kem(i1)
@@ -2452,13 +2462,13 @@ c final-state emitter with initial-state spectator
         enddo
 c initial-state emitter with final-state spectator
       elseif(em.le.2.and.sp.ge.3)then
-        z=1d0-h(random(2),powermap,0d0,0d0,1d0,switch)
+        z=1d0-cofferaa_h(random(2),powermap,0d0,0d0,1d0,switch)
         f=dsqrt((1d0-z)*(1d0-x)/z/x)
         ktr(0)=-f*f*m
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=-f*f*m
-        call transverse(ksum,kem,ktr,switch)
+        call cofferaa_transverse(ksum,kem,ktr,switch)
         do i1=0,3
           k(ga,i1)=(1d0-x)/x*(2d0-z)*kem(i1)+(1d0-z)*ksp(i1)
      *      +z*ktr(i1)
@@ -2478,7 +2488,7 @@ c initial-state emitter with initial-state spectator
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=0d0
-        call transverse(ksum,kem,ktr,switch)
+        call cofferaa_transverse(ksum,kem,ktr,switch)
         do i1=0,3
           ck(i1)=(x+v)/x*kem(i1)+(1d0-v)*ksp(i1)-ktr(i1)
           ckt(i1)=kem(i1)+ksp(i1)
@@ -2515,7 +2525,7 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine transverse(ksum,k,ktr,switch)
+      subroutine cofferaa_transverse(ksum,k,ktr,switch)
       implicit none
 c local variables
       real*8 k(0:3),ktr(0:3),ksum(0:3),p(0:3),pvec,pi,phi,cost
@@ -2528,7 +2538,7 @@ c output
       do i1=0,3
         p(i1)=k(i1)
       enddo
-      call boost(ksum,p,1d0,switch)
+      call cofferaa_boost(ksum,p,1d0,switch)
       if(p(1).eq.0d0)then
         phi=dsign(pi*0.5d0,p(2))
       else
@@ -2546,8 +2556,8 @@ c output
         return
       endif
       cost=p(3)/pvec 
-      call rotation(ktr,-phi,cost,switch)
-      call boost(ksum,ktr,-1d0,switch)
+      call cofferaa_rotation(ktr,-phi,cost,switch)
+      call cofferaa_boost(ksum,ktr,-1d0,switch)
       end       
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2557,18 +2567,18 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function vertex(i1,i2,i3,schannel)
+      function cofferaa_vertex(i1,i2,i3,schannel)
       implicit none
 c local variables
       integer maxv
       parameter(maxv=200)
       integer i1,i2,i3
-      logical vertex,vertexg,schannel
+      logical cofferaa_vertex,cofferaa_vertexg,schannel
 c mcparticle
       integer family(-maxv:maxv,6),light(-maxv:maxv)
       character*3 pname(-maxv:maxv),gname(-maxv:maxv)
       common/mcparticle/family,light,pname,gname
-      vertex=.false.
+      cofferaa_vertex=.false.
       if(gname(i1).eq.'   ')return
       if(gname(i2).eq.'   ')return
       if(gname(i3).eq.'   ')return
@@ -2579,15 +2589,15 @@ c family conservation
       if(family(i1,4)+family(i2,4)+family(i3,4).ne.0)return
       if(family(i1,5)+family(i2,5)+family(i3,5).ne.0)return
       if(family(i1,6)+family(i2,6)+family(i3,6).ne.0)return
-      vertex=.true.
+      cofferaa_vertex=.true.
 c testing vertex
-      if(vertexg(i1,i2,i3,schannel))return
-      if(vertexg(i1,i3,i2,schannel))return
-      if(vertexg(i2,i1,i3,schannel))return
-      if(vertexg(i2,i3,i1,schannel))return
-      if(vertexg(i3,i1,i2,schannel))return
-      if(vertexg(i3,i2,i1,schannel))return
-      vertex=.false.
+      if(cofferaa_vertexg(i1,i2,i3,schannel))return
+      if(cofferaa_vertexg(i1,i3,i2,schannel))return
+      if(cofferaa_vertexg(i2,i1,i3,schannel))return
+      if(cofferaa_vertexg(i2,i3,i1,schannel))return
+      if(cofferaa_vertexg(i3,i1,i2,schannel))return
+      if(cofferaa_vertexg(i3,i2,i1,schannel))return
+      cofferaa_vertex=.false.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2597,19 +2607,19 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function vertexg(i1,i2,i3,schannel)
+      function cofferaa_vertexg(i1,i2,i3,schannel)
       implicit none
 c local variables
       integer maxv
       parameter(maxv=200)
       integer i1,i2,i3
       character*3 p1,p2,p3,g1,g2,g3
-      logical vertexg,nonstandardcoup,schannel
+      logical cofferaa_vertexg,nonstandardcoup,schannel
 c mcparticle
       integer family(-maxv:maxv,6),light(-maxv:maxv)
       character*3 pname(-maxv:maxv),gname(-maxv:maxv)
       common/mcparticle/family,light,pname,gname
-      vertexg=.true.
+      cofferaa_vertexg=.true.
       p1=pname(i1)
       p2=pname(i2)
       p3=pname(i3) 
@@ -2839,7 +2849,7 @@ c 4 particle vertices
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'15~')return
 c add non-standard couplings (with family conservation!)
 c      if(nonstandardcoup(p1,p2,p3,g1,g2,g3,schannel))return
-      vertexg=.false.
+      cofferaa_vertexg=.false.
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2849,17 +2859,17 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function pid(binary)
+      function cofferaa_pid(binary)
       implicit none
 c local variables
-      integer pid,binary,i1,i2,i3,nexternal
+      integer cofferaa_pid,binary,i1,i2,i3,nexternal
       i3=1
       nexternal=30
-      pid=0
+      cofferaa_pid=0
       do i1=nexternal,1,-1
         i2=binary/2**(i1-1)
         if((i2/2)*2.ne.i2)then
-          pid=pid+i1*i3
+          cofferaa_pid=cofferaa_pid+i1*i3
           i3=10*i3
         endif
       enddo
@@ -2872,7 +2882,8 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine optimization(weight,g,gsum,n,generator,nchannel)
+      subroutine cofferaa_optimization(weight,g,gsum,n,generator,
+     * nchannel)
       implicit none
 c local variables
       integer maxch,maxo,maxg
@@ -2937,7 +2948,7 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine rans(random)
+      subroutine cofferaa_rans(random)
       implicit none 
 c local variables
       real*8 s1,s2,s3,random

@@ -2,9 +2,9 @@
 #include "config.hpp"
 #endif
 
-#define cofferaa_initgenerator F77_FUNC(initgenerator, INITGENERATOR)
-#define cofferaa_generation F77_FUNC(generation, GENERATION)
-#define cofferaa_density F77_FUNC(density, DENSITY)
+#define cofferaa_initgenerator F77_FUNC(cofferaa_initgenerator, COFFERAA_INITGENERATOR)
+#define cofferaa_generation F77_FUNC(cofferaa_generation, COFFERAA_GENERATION)
+#define cofferaa_density F77_FUNC(cofferaa_density, COFFERAA_DENSITY)
 
 #define cofferaa_extra_max F77_FUNC(cofferaa_extra_max, COFFERAA_EXTRA_MAX)
 #define cofferaa_extra_data F77_FUNC(cofferaa_extra_data, COFFERAA_EXTRA_DATA)
