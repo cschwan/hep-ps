@@ -158,7 +158,8 @@ T cofferaa_phase_space_generator<T>::densities(std::vector<T>& densities)
 template <typename T>
 std::size_t cofferaa_phase_space_generator<T>::dimensions() const
 {
-	return 3 * (pimpl->particles - 4) + 2;
+	// this PS generator needs three additional random numbers
+	return 3 * pimpl->particles - 7;
 }
 
 template <typename T>
