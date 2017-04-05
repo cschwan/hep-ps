@@ -41,21 +41,23 @@ AC_CONFIG_SRCDIR([src/find_hep_ps.cpp])
 # that we dont need
 AC_CONFIG_HEADERS([config.hpp])
 
-# check for hep-mc (needed for some tests)
-AC_CHECK_HEADERS([hep/mc.hpp])
-AM_CONDITIONAL([HAVE_HEP_MC_HPP], [test -n "$ac_cv_header_hep_mc_hpp"])
+# offer to enable additional tests that need more headers and libraries
+AC_ARG_ENABLE([additional-tests], AS_HELP_STRING([--enable-additional-tests],
+	[disable addititional tests that need third party libraries]))
+AS_IF([test "x$enable_additional_tests" == "xyes"], [
+	AC_CHECK_HEADERS([hep/mc.hpp], [], AC_MSG_ERROR([hep-mc main header not found]))
+	AC_CHECK_HEADERS([fastjet/ClusterSequence.hh],
+		AC_SEARCH_LIBS([_ZN7fastjet15ClusterSequenceD1Ev], [fastjet], [],
+			AC_MSG_ERROR([FastJet library not found])),
+		AC_MSG_ERROR([FastJet headers not found]))
+])
+AM_CONDITIONAL([ADDITIONAL_TESTS], [test "x$enable_additional_tests" == "xyes"])
 
 # check for GSL's dilogarithm
 LIBS="-lgslcblas ${LIBS}"
 AC_CHECK_HEADERS([gsl/gsl_sf_dilog.h])
 AC_SEARCH_LIBS([gsl_sf_dilog], [gsl], [],
 	AC_MSG_ERROR([GSL is a required dependency]))
-
-# check for FastJet (needed for a test)
-AC_CHECK_HEADERS([fastjet/ClusterSequence.hh],
-	AC_SEARCH_LIBS([_ZN7fastjet15ClusterSequenceD1Ev], [fastjet]))
-AM_CONDITIONAL([HAVE_FASTJET_CLUSTER_SEQUENCE_HH],
-	[test -n "$ac_cv_header_fastjet_ClusterSequence_hh"])
 
 # find LHAPDF header and library
 AC_CHECK_HEADERS([LHAPDF/LHAPDF.h])

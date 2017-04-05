@@ -20,12 +20,10 @@ check_PROGRAMS = \
 	test_permutation \
 	test_trivial_cutter_and_recombiner
 
-if HAVE_HEP_MC_HPP
-check_PROGRAMS += test_mc_phase_space_adapter
-endif
-
-if HAVE_FASTJET_CLUSTER_SEQUENCE_HH
-check_PROGRAMS += test_p_type_jet_algorithm
+if ADDITIONAL_TESTS
+check_PROGRAMS += \
+	test_mc_phase_space_adapter \
+	test_p_type_jet_algorithm
 endif
 
 LDADD = $(check_LTLIBRARIES) $(top_builddir)/src/libhep-ps.la
