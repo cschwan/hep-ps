@@ -30,7 +30,7 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 
 	// two s-channels with a photon or Z boson
 	CHECK( psg1.channels()       ==  2 );
-	CHECK( psg1.dimensions()     ==  5 );
+	CHECK( psg1.dimensions()     ==  2 );
 	CHECK( psg1.map_dimensions() == 16 );
 
 	// e+e- -> up-quark pair
@@ -41,7 +41,7 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 
 	// two s-channels with a photon or Z boson
 	CHECK( psg2.channels()       ==  2 );
-	CHECK( psg2.dimensions()     ==  5 );
+	CHECK( psg2.dimensions()     ==  2 );
 	CHECK( psg2.map_dimensions() == 16 );
 
 	// pp -> 2 jets + two pairs of leptons
@@ -52,7 +52,7 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 
 	// TODO: why are there one channel less than what LUSIFER's PSG returns?
 	CHECK( psg3.channels()       == 93-1 );
-	CHECK( psg3.dimensions()     == 17 );
+	CHECK( psg3.dimensions()     == 14 );
 	CHECK( psg3.map_dimensions() == 32 );
 
 	std::vector<std::tuple<int, int, int>> dipoles = {
@@ -70,7 +70,7 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	);
 
 	CHECK( psg4.channels()       == (456+4*92) );
-	CHECK( psg4.dimensions()     == 20 );
+	CHECK( psg4.dimensions()     == 17 );
 	CHECK( psg4.map_dimensions() == 36 );
 }
 

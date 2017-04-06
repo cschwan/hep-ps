@@ -11,7 +11,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c local variables 
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=4,maxv=200)
-      real*8 random(3*maxe-7),p(0:3,2**maxe),s(2**maxe)
+      real*8 random(3*maxe-10),p(0:3,2**maxe),s(2**maxe)
       real*8 k(maxe,0:3),kt(maxe,0:3),kbeam(2,0:3),cofferaa_h
       real*8 mmin,mmax,smin,smax,x,g,tcut1,tcut2
       integer i1,i2,i3,i4,ns,nt,channel,generator,switch,step
