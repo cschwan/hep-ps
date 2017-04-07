@@ -2047,7 +2047,7 @@ c mctechparam
           q(i1)=q1(i1)+q2(i1) 
           k1(i1)=q1(i1)
         enddo
-        call cofferaa_boost(q,k1,1d0,switch)
+        call cofferaa_boost(s,q,k1,1d0,switch)
         if(k1(1).eq.0d0)then
           phi=dsign(pi*0.5d0,k1(2))
         else
@@ -2056,7 +2056,7 @@ c mctechparam
         if(k1(1).lt.0d0)phi=phi+pi
         cost=k1(3)/dsqrt(k1(1)**2+k1(2)**2+k1(3)**2)
         call cofferaa_rotation(p1,-phi,cost,switch)
-        call cofferaa_boost(q,p1,-1d0,switch) 
+        call cofferaa_boost(s,q,p1,-1d0,switch)
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
           qt(i1)=q1(i1)-p1(i1)
@@ -2112,7 +2112,7 @@ c mcoutput
         p1(2)=0d0
         p1(3)=lambda*0.5d0/roots
         call cofferaa_rotation(p1,phi,cost,switch)
-        call cofferaa_boost(q,p1,-1d0,switch) 
+        call cofferaa_boost(s,q,p1,-1d0,switch)
         do i1=0,3
           p2(i1)=q(i1)-p1(i1)
         enddo
@@ -2250,7 +2250,7 @@ c                                                                c
 c     written by Markus Roth                                     c
 c                                                                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine cofferaa_boost(q,p,dir,switch)
+      subroutine cofferaa_boost(m2,q,p,dir,switch)
       implicit none
 c local variable
       real*8 p(0:3),q(0:3),dir,m,m2,bx,by,bz,gamma
@@ -2260,7 +2260,6 @@ c mcoutput
       integer nout,numout,maxout
       common/mcoutput/nout,numout,maxout
       if(switch.eq.0)return
-      m2=q(0)**2-q(1)**2-q(2)**2-q(3)**2
       if(m2.le.0d0)then
         if(numout.lt.maxout)then
           write(nout,'(a)')' boost: m2 <= 0'
@@ -2454,7 +2453,7 @@ c final-state emitter with final-state spectator
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=-f*f*m
-        call cofferaa_transverse(ksum,ksp,ktr,switch)
+        call cofferaa_transverse(m2,ksum,ksp,ktr,switch)
         do i1=0,3
           k(em,i1)=y*(1d0+z)*ksp(i1)+z*kem(i1)+(1d0-z)*ktr(i1)
           k(ga,i1)=(1d0-z)*kem(i1)-y*z*ksp(i1)-(1d0-z)*ktr(i1)
@@ -2468,7 +2467,7 @@ c final-state emitter with initial-state spectator
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=-f*f*m
-        call cofferaa_transverse(ksum,ksp,ktr,switch)
+        call cofferaa_transverse(m2,ksum,ksp,ktr,switch)
         do i1=0,3
           k(ga,i1)=(1-z)*kem(i1)-(1d0-x)/x*z*ksp(i1)-(1d0-z)*ktr(i1)
           k(em,i1)=(1d0-x)/x*(1d0+z)*ksp(i1)+z*kem(i1)
@@ -2483,7 +2482,7 @@ c initial-state emitter with final-state spectator
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=-f*f*m
-        call cofferaa_transverse(ksum,kem,ktr,switch)
+        call cofferaa_transverse(m2,ksum,kem,ktr,switch)
         do i1=0,3
           k(ga,i1)=(1d0-x)/x*(2d0-z)*kem(i1)+(1d0-z)*ksp(i1)
      *      +z*ktr(i1)
@@ -2503,7 +2502,7 @@ c initial-state emitter with initial-state spectator
         ktr(1)=f*m*dcos(2d0*pi*random(3))
         ktr(2)=f*m*dsin(2d0*pi*random(3))
         ktr(3)=0d0
-        call cofferaa_transverse(ksum,kem,ktr,switch)
+        call cofferaa_transverse(m2,ksum,kem,ktr,switch)
         do i1=0,3
           ck(i1)=(x+v)/x*kem(i1)+(1d0-v)*ksp(i1)-ktr(i1)
           ckt(i1)=kem(i1)+ksp(i1)
@@ -2540,10 +2539,10 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine cofferaa_transverse(ksum,k,ktr,switch)
+      subroutine cofferaa_transverse(m2,ksum,k,ktr,switch)
       implicit none
 c local variables
-      real*8 k(0:3),ktr(0:3),ksum(0:3),p(0:3),pvec,pi,phi,cost
+      real*8 k(0:3),ktr(0:3),ksum(0:3),p(0:3),pvec,pi,phi,cost,m2
       integer i1,switch
 c output
       integer nout,numout,maxout
@@ -2553,7 +2552,7 @@ c output
       do i1=0,3
         p(i1)=k(i1)
       enddo
-      call cofferaa_boost(ksum,p,1d0,switch)
+      call cofferaa_boost(m2,ksum,p,1d0,switch)
       if(p(1).eq.0d0)then
         phi=dsign(pi*0.5d0,p(2))
       else
@@ -2572,7 +2571,7 @@ c output
       endif
       cost=p(3)/pvec 
       call cofferaa_rotation(ktr,-phi,cost,switch)
-      call cofferaa_boost(ksum,ktr,-1d0,switch)
+      call cofferaa_boost(m2,ksum,ktr,-1d0,switch)
       end       
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
