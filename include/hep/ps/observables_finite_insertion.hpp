@@ -55,7 +55,8 @@ public:
 		Recombiner&& recombiner,
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
-		T hbarc2
+		T hbarc2,
+		bool insertion2 = false
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
 		, subtraction_(std::forward<Subtraction>(subtraction))
@@ -64,6 +65,7 @@ public:
 		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, hbarc2_(hbarc2)
+		, insertion2_(insertion2)
 	{
 	}
 
@@ -169,6 +171,17 @@ public:
 					result += fold(pdfa[0], d, me, set, factor, cut_result);
 				}
 			}
+
+			if (insertion2_)
+			{
+				T const ins = factor * subtraction_.insertion_terms2(
+					insertion_terms.at(index),
+					scales,
+					phase_space
+				);
+
+				result += fold(pdfa[0], pdfa[1], me, set, ins, cut_result);
+			}
 		}
 
 		distributions(phase_space, cut_result, result, rapidity_shift,
@@ -197,6 +210,7 @@ private:
 	T hbarc2_;
 
 	T old_renormalization_scale_;
+	bool insertion2_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U>

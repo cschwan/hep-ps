@@ -24,6 +24,7 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/insertion_term.hpp"
+#include "hep/ps/renormalization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 
 #include <cstddef>
@@ -36,7 +37,13 @@ template <typename T>
 class cs_subtraction
 {
 public:
-	cs_subtraction(T n, T tf, T nf, factorization_scheme scheme);
+	cs_subtraction(
+		T n,
+		T tf,
+		T nf,
+		factorization_scheme fscheme,
+		renormalization_scheme rscheme
+	);
 
 	dipole_invariants<T> map_phase_space(
 		std::vector<T> const& real_phase_space,
@@ -58,11 +65,18 @@ public:
 		std::size_t initial_state
 	) const;
 
+	T insertion_terms2(
+		insertion_term const& term,
+		scales<T> const& mu,
+		std::vector<T> const& phase_space
+	) const;
+
 private:
 	T n_;
 	T tf_;
 	T nf_;
-	factorization_scheme scheme_;
+	factorization_scheme fscheme_;
+	renormalization_scheme rscheme_;
 };
 
 }

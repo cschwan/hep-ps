@@ -27,11 +27,18 @@ namespace hep
 {
 
 template <typename T>
-cs_subtraction<T>::cs_subtraction(T n, T tf, T nf, factorization_scheme scheme)
+cs_subtraction<T>::cs_subtraction(
+	T n,
+	T tf,
+	T nf,
+	factorization_scheme fscheme,
+	renormalization_scheme rscheme
+)
 	: n_(n)
 	, tf_(tf)
 	, nf_(nf)
-	, scheme_(scheme)
+	, fscheme_(fscheme)
+	, rscheme_(rscheme)
 {
 }
 
@@ -317,7 +324,7 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 	using std::log;
 
 	// TODO: DIS scheme is NYI
-	assert( scheme_ == factorization_scheme::msbar );
+	assert( fscheme_ == factorization_scheme::msbar );
 
 	abc_terms<T> result;
 
@@ -563,6 +570,51 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 	}
 
 	return result;
+}
+
+template <typename T>
+T cs_subtraction<T>::insertion_terms2(
+	insertion_term const& term,
+	scales<T> const& mu,
+	std::vector<T> const& phase_space
+) const {
+	using std::acos;
+
+	// TODO: other schemes are NYI
+	assert( rscheme_ == renormalization_scheme::msbar );
+
+	switch (term.emitter_type())
+	{
+	case particle_type::fermion:
+	{
+		T result{};
+
+		result += T(5.0);
+
+		T const pi = acos(T(-1.0));
+
+		result -= T(7.0) * pi * pi / T(12.0);
+
+		T const sij = invariant(phase_space, term.emitter(), term.spectator());
+		T const mu2 = mu.renormalization() * mu.renormalization();
+		T const logmubsij = log(mu2 / sij);
+
+		result += T(3.0) / T(2.0) * logmubsij;
+		result += T(0.5) * logmubsij * logmubsij;
+
+		T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+
+		result *= T(-0.5) * cf / pi;
+
+		return result;
+	}
+
+		break;
+
+	default:
+		// NYI
+		assert( false );
+	}
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

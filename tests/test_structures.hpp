@@ -253,6 +253,14 @@ public:
 		return hep::abc_terms<T>();
 	}
 
+	T insertion_terms2(
+		hep::insertion_term const&,
+		hep::scales<T> const&,
+		std::vector<T> const&
+	) const {
+		return T();
+	}
+
 private:
 	std::size_t emitter_;
 	std::size_t unresolved_;
