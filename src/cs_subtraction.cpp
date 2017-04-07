@@ -580,6 +580,11 @@ T cs_subtraction<T>::insertion_terms2(
 ) const {
 	using std::acos;
 
+	if (term.type() == insertion_term_type::born)
+	{
+		return T();
+	}
+
 	// TODO: other schemes are NYI
 	assert( rscheme_ == renormalization_scheme::msbar );
 
