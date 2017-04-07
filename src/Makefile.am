@@ -7,7 +7,6 @@ libhep_ps_la_SOURCES = \
 	cofferaa_interfaces.hpp \
 	cofferaa_phase_space_generator.cpp \
 	cs_subtraction.cpp \
-	dipole.cpp \
 	find_hep_ps.cpp \
 	fortran_helper.cpp \
 	generator.f \
