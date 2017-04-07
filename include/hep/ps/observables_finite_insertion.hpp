@@ -56,7 +56,7 @@ public:
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
 		T hbarc2,
-		bool insertion2 = false
+		bool insertion2
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
 		, subtraction_(std::forward<Subtraction>(subtraction))
@@ -228,7 +228,8 @@ make_observables_finite_insertion(
 	R&& recombiner,
 	P&& pdf,
 	U&& scale_setter,
-	T hbarc2
+	T hbarc2,
+	bool insertion2 = false
 ) {
 	return observables_finite_insertion_type<T, M, S, C, R, P, U>(
 		std::forward<M>(matrix_elements),
@@ -237,7 +238,8 @@ make_observables_finite_insertion(
 		std::forward<R>(recombiner),
 		std::forward<P>(pdf),
 		std::forward<U>(scale_setter),
-		hbarc2
+		hbarc2,
+		insertion2
 	);
 }
 
