@@ -962,7 +962,6 @@ void lusifer_phase_space_generator<T>::generate(
 		T const s  = pimpl->s[process.in];
 		T const s1 = pimpl->s[process.out1];
 		T const s2 = pimpl->s[process.out2];
-		T&      t  = pimpl->s[process.virt];
 		T const t1 = pimpl->s[process.in1];
 		T const t2 = pimpl->s[process.in2];
 
@@ -990,20 +989,19 @@ void lusifer_phase_space_generator<T>::generate(
 		);
 		T cos_theta = (tmp - T(2.0) * s * (t1 + s1 + h)) / (lambdas * lambdat);
 
-		auto const& q1 = p[process.in1];
-		auto const& q2 = p[process.in2];
-		auto&       p1 = p[process.out1];
-		auto&       p2 = p[process.out2];
-		auto&       qt = p[process.virt];
+		auto& p1 = p[process.out1];
 
 		T const sqrts = sqrt(s);
 
 		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
 			T(0.5) * lambdas / sqrts };
 
+		auto const& q1 = p[process.in1];
 		phi = copysign(phi, q1[3]);
 
 		rotate(p1, phi, cos_theta);
+
+		auto const& q2 = p[process.in2];
 
 		std::array<T, 4> const q = {
 			q1[0] + q2[0],
@@ -1029,9 +1027,13 @@ void lusifer_phase_space_generator<T>::generate(
 
 		cos_theta = k1[3] / sqrt(k1[1] * k1[1] + k1[2] * k1[2] + k1[3] * k1[3]);
 
+		auto& p2 = p[process.out2];
 		decay_momenta(sqrts, q, -phi, cos_theta, p1, p2);
 
+		auto& qt = p[process.virt];
 		qt = { q1[0] - p1[0], q1[1] - p1[1], q1[2] - p1[2], q1[3] - p1[3] };
+
+		T& t = pimpl->s[process.virt];
 		t = qt[0] * qt[0] - qt[1] * qt[1] - qt[2] * qt[2] - qt[3] * qt[3];
 	}
 
@@ -1044,10 +1046,8 @@ void lusifer_phase_space_generator<T>::generate(
 		auto& p1 = p[decay.out1];
 		T const sqrts = sqrt(s);
 
-		p1[0] = T(0.5) * (s + s1 - s2) / sqrts;
-		p1[1] = T();
-		p1[2] = T();
-		p1[3] = T(0.5) * sqrt(kaellen(s, s1, s2)) / sqrts;
+		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
+			T(0.5) * sqrt(kaellen(s, s1, s2)) / sqrts };
 
 		T const phi = T(2.0) * acos(T(-1.0)) * random_numbers.at(ranstart++);
 		T const cos_theta = T(2.0) * random_numbers.at(ranstart++) - T(1.0);
