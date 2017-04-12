@@ -25,7 +25,6 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/particle_type.hpp"
-#include "hep/ps/trivial_distributions.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -66,7 +65,8 @@ inline std::vector<std::size_t> adjust_indices(
 namespace hep
 {
 
-template <class T, class M, class S, class C, class R, class P, class U>
+template <class T, class M, class S, class C, class R, class P, class U,
+	class D>
 class observables_real
 {
 public:
@@ -76,7 +76,8 @@ public:
 		typename Cuts,
 		typename Recombiner,
 		typename Pdf,
-		typename ScaleSetter>
+		typename ScaleSetter,
+		typename Distributions>
 	observables_real(
 		MatrixElements&& matrix_elements,
 		Subtraction&& subtraction,
@@ -84,6 +85,7 @@ public:
 		Recombiner&& recombiner,
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
+		Distributions&& distributions,
 		T hbarc2,
 		T alpha_min
 	)
@@ -93,17 +95,16 @@ public:
 		, recombiner_(std::forward<Recombiner>(recombiner))
 		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
+		, distributions_(std::forward<Distributions>(distributions))
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
 	{
 	}
 
-	template <typename Distributions = trivial_distributions<T>>
 	T operator()(
 		std::vector<T> const& real_phase_space,
 		luminosity_info<T> const& info,
-		initial_state_set set,
-		Distributions&& distributions = trivial_distributions<T>()
+		initial_state_set set
 	) {
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
@@ -258,7 +259,7 @@ public:
 			auto const dipole_result = fold(pdfx1, pdfx2, dipole_me, set,
 				-function * factor, dipole_cut_result);
 
-			distributions(phase_space, dipole_cut_result, dipole_result,
+			distributions_(phase_space, dipole_cut_result, dipole_result,
 				shift, event_type::born_like_n);
 
 			result += dipole_result;
@@ -268,7 +269,7 @@ public:
 			real_cut_result);
 		result += real_result;
 
-		distributions(recombined_real_phase_space, real_cut_result, real_result,
+		distributions_(recombined_real_phase_space, real_cut_result, real_result,
 			shift, event);
 
 		return result.neg + result.pos;
@@ -291,36 +292,42 @@ private:
 	R recombiner_;
 	P pdf_;
 	U scale_setter_;
+	D distributions_;
 	T hbarc2_;
 	T alpha_min_;
 
 	T old_renormalization_scale_;
 };
 
-template <class T, class M, class S, class C, class R, class P, class U>
+template <class T, class M, class S, class C, class R, class P, class U,
+	class D>
 using observables_real_type = observables_real<T,
 	typename std::decay<M>::type, typename std::decay<S>::type,
 	typename std::decay<C>::type, typename std::decay<R>::type,
-	typename std::decay<P>::type, typename std::decay<U>::type>;
+	typename std::decay<P>::type, typename std::decay<U>::type,
+	typename std::decay<D>::type>;
 
-template <class T, class M, class S, class C, class R, class P, class U>
-inline observables_real_type<T, M, S, C, R, P, U> make_observables_real(
+template <class T, class M, class S, class C, class R, class P, class U,
+	class D>
+inline observables_real_type<T, M, S, C, R, P, U, D> make_observables_real(
 	M&& matrix_elements,
 	S&& subtraction,
 	C&& cuts,
 	R&& recombiner,
 	P&& pdf,
 	U&& scale_setter,
+	D&& distributions,
 	T hbarc2,
 	T alpha_min = T()
 ) {
-	return observables_real_type<T, M, S, C, R, P, U>(
+	return observables_real_type<T, M, S, C, R, P, U, D>(
 		std::forward<M>(matrix_elements),
 		std::forward<S>(subtraction),
 		std::forward<C>(cuts),
 		std::forward<R>(recombiner),
 		std::forward<P>(pdf),
 		std::forward<U>(scale_setter),
+		std::forward<D>(distributions),
 		hbarc2,
 		alpha_min
 	);

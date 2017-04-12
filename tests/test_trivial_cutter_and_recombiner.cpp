@@ -2,6 +2,7 @@
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_born_like.hpp"
 #include "hep/ps/trivial_cutter.hpp"
+#include "hep/ps/trivial_distributions.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
 
 #include "test_structures.hpp"
@@ -22,6 +23,7 @@ void test_trivial_cutter_and_recombiner(
 		hep::trivial_recombiner<T>(),
 		test_pdf<T>(),
 		test_scale_setter<T>(),
+		hep::trivial_distributions<T>(),
 		T(1.0)
 	);
 

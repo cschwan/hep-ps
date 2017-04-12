@@ -1,6 +1,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_born_like.hpp"
+#include "hep/ps/trivial_distributions.hpp"
 
 #include "test_structures.hpp"
 
@@ -18,6 +19,7 @@ void test_observables_born_like(hep::initial_state_set set, std::size_t count)
 		test_recombiner<T>(count),
 		test_pdf<T>(),
 		test_scale_setter<T>(),
+		hep::trivial_distributions<T>(),
 		T(1.0)
 	);
 

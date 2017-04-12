@@ -1,6 +1,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_finite_insertion.hpp"
+#include "hep/ps/trivial_distributions.hpp"
 
 #include "test_structures.hpp"
 
@@ -22,6 +23,7 @@ void test_observables_finite_insertion(
 		test_recombiner<T>(count),
 		test_pdf<T>(),
 		test_scale_setter<T>(),
+		hep::trivial_distributions<T>(),
 		T(1.0)
 	);
 

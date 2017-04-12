@@ -26,7 +26,6 @@
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/trivial_distributions.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -37,7 +36,8 @@
 namespace hep
 {
 
-template <class T, class M, class S, class C, class R, class P, class U>
+template <class T, class M, class S, class C, class R, class P, class U,
+	class D>
 class observables_finite_insertion
 {
 public:
@@ -47,7 +47,8 @@ public:
 		typename Cuts,
 		typename Recombiner,
 		typename Pdf,
-		typename ScaleSetter>
+		typename ScaleSetter,
+		typename Distributions>
 	observables_finite_insertion(
 		MatrixElements&& matrix_elements,
 		Subtraction&& subtraction,
@@ -55,6 +56,7 @@ public:
 		Recombiner&& recombiner,
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
+		Distributions&& distributions,
 		T hbarc2,
 		bool insertion2
 	)
@@ -64,18 +66,17 @@ public:
 		, recombiner_(std::forward<Recombiner>(recombiner))
 		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
+		, distributions_(std::forward<Distributions>(distributions))
 		, hbarc2_(hbarc2)
 		, insertion2_(insertion2)
 	{
 	}
 
-	template <typename Distributions = trivial_distributions<T>>
 	T operator()(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
 		T x,
-		initial_state_set set,
-		Distributions&& distributions = trivial_distributions<T>()
+		initial_state_set set
 	) {
 		std::vector<T> aux_phase_space(phase_space.size());
 
@@ -184,7 +185,7 @@ public:
 			}
 		}
 
-		distributions(phase_space, cut_result, result, rapidity_shift,
+		distributions_(phase_space, cut_result, result, rapidity_shift,
 			event_type::born_like_n);
 
 		return result.neg + result.pos;
@@ -207,20 +208,24 @@ private:
 	R recombiner_;
 	P pdf_;
 	U scale_setter_;
+	D distributions_;
 	T hbarc2_;
 
 	T old_renormalization_scale_;
 	bool insertion2_;
 };
 
-template <class T, class M, class S, class C, class R, class P, class U>
+template <class T, class M, class S, class C, class R, class P, class U,
+	class D>
 using observables_finite_insertion_type = observables_finite_insertion<T,
 	typename std::decay<M>::type, typename std::decay<S>::type,
 	typename std::decay<C>::type, typename std::decay<R>::type,
-	typename std::decay<P>::type, typename std::decay<U>::type>;
+	typename std::decay<P>::type, typename std::decay<U>::type,
+	typename std::decay<D>::type>;
 
-template <class T, class M, class S, class C, class R, class P, class U>
-inline observables_finite_insertion_type<T, M, S, C, R, P, U>
+template <class T, class M, class S, class C, class R, class P, class U,
+	class D>
+inline observables_finite_insertion_type<T, M, S, C, R, P, U, D>
 make_observables_finite_insertion(
 	M&& matrix_elements,
 	S&& subtraction,
@@ -228,16 +233,18 @@ make_observables_finite_insertion(
 	R&& recombiner,
 	P&& pdf,
 	U&& scale_setter,
+	D&& distributions,
 	T hbarc2,
 	bool insertion2 = false
 ) {
-	return observables_finite_insertion_type<T, M, S, C, R, P, U>(
+	return observables_finite_insertion_type<T, M, S, C, R, P, U, D>(
 		std::forward<M>(matrix_elements),
 		std::forward<S>(subtraction),
 		std::forward<C>(cuts),
 		std::forward<R>(recombiner),
 		std::forward<P>(pdf),
 		std::forward<U>(scale_setter),
+		std::forward<D>(distributions),
 		hbarc2,
 		insertion2
 	);

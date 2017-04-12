@@ -24,7 +24,6 @@
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/particle_type.hpp"
-#include "hep/ps/trivial_distributions.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -37,7 +36,7 @@
 namespace hep
 {
 
-template <class T, class M, class C, class R, class P, class S>
+template <class T, class M, class C, class R, class P, class S, class D>
 class observables_born_like
 {
 public:
@@ -46,13 +45,15 @@ public:
 		typename Cuts,
 		typename Recombiner,
 		typename Pdf,
-		typename ScaleSetter>
+		typename ScaleSetter,
+		typename Distributions>
 	observables_born_like(
 		MatrixElements&& matrix_elements,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
+		Distributions&& distributions,
 		T hbarc2
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
@@ -60,16 +61,15 @@ public:
 		, recombiner_(std::forward<Recombiner>(recombiner))
 		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
+		, distributions_(std::forward<Distributions>(distributions))
 		, hbarc2_(hbarc2)
 	{
 	}
 
-	template <typename Distributions = trivial_distributions<T>>
 	T operator()(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
-		initial_state_set set,
-		Distributions&& distributions = trivial_distributions<T>()
+		initial_state_set set
 	) {
 		std::vector<T> aux_phase_space(phase_space.size());
 
@@ -109,7 +109,7 @@ public:
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 		auto const result = fold(pdfx1, pdfx2, borns, set, factor, cut_result);
 
-		distributions(phase_space, cut_result, result, rapidity_shift,
+		distributions_(phase_space, cut_result, result, rapidity_shift,
 			event_type::born_like_n);
 
 		return result.neg + result.pos;
@@ -131,32 +131,36 @@ private:
 	R recombiner_;
 	P pdf_;
 	S scale_setter_;
+	D distributions_;
 	T hbarc2_;
 
 	T old_renormalization_scale_;
 };
 
-template <class T, class M, class C, class R, class P, class S>
+template <class T, class M, class C, class R, class P, class S, class D>
 using observables_born_like_type = observables_born_like<T,
 	typename std::decay<M>::type, typename std::decay<C>::type,
 	typename std::decay<R>::type, typename std::decay<P>::type,
-	typename std::decay<S>::type>;
+	typename std::decay<S>::type, typename std::decay<D>::type>;
 
-template <class T, class M, class C, class R, class P, class S>
-inline observables_born_like_type <T, M, C, R, P, S> make_observables_born_like(
+template <class T, class M, class C, class R, class P, class S, class D>
+inline observables_born_like_type<T, M, C, R, P, S, D>
+make_observables_born_like(
 	M&& matrix_elements,
 	C&& cuts,
 	R&& recombiner,
 	P&& pdf,
 	S&& scale_setter,
+	D&& distributions,
 	T hbarc2
 ) {
-	return observables_born_like_type<T, M, C, R, P, S>(
+	return observables_born_like_type<T, M, C, R, P, S, D>(
 		std::forward<M>(matrix_elements),
 		std::forward<C>(cuts),
 		std::forward<R>(recombiner),
 		std::forward<P>(pdf),
 		std::forward<S>(scale_setter),
+		std::forward<D>(distributions),
 		hbarc2
 	);
 }
