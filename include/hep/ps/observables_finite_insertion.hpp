@@ -191,6 +191,16 @@ public:
 		return result.neg + result.pos;
 	}
 
+	D const& distributions() const
+	{
+		return distributions_;
+	}
+
+	D& distributions()
+	{
+		return distributions_;
+	}
+
 	M const& matrix_elements() const
 	{
 		return matrix_elements_;
