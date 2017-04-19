@@ -865,7 +865,7 @@ std::size_t lusifer_phase_space_generator<T>::dimensions() const
 
 template <typename T>
 void lusifer_phase_space_generator<T>::generate(
-	std::vector<T> const& random_numbers,
+	random_numbers<T>& numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
 	std::size_t channel
@@ -905,8 +905,6 @@ void lusifer_phase_space_generator<T>::generate(
 
 	// square of the sum of all momenta except the first two
 	s[allbinary - 4] = s[2];
-
-	std::size_t ranstart = 0;
 
 	// iteratively construct the time-like invariants
 	for (auto const& invariant : pimpl->channels[channel].invariants)
@@ -951,7 +949,7 @@ void lusifer_phase_space_generator<T>::generate(
 			pimpl->particle_infos.at(invariant.idhep).power,
 			pimpl->particle_infos.at(invariant.idhep).mass,
 			pimpl->particle_infos.at(invariant.idhep).width,
-			random_numbers.at(ranstart++),
+			numbers.front(),
 			smin,
 			smax
 		);
@@ -978,12 +976,12 @@ void lusifer_phase_space_generator<T>::generate(
 			tmax = T();
 		}
 
-		T phi = T(2.0) * acos(T(-1.0)) * random_numbers.at(ranstart++);
+		T phi = T(2.0) * acos(T(-1.0)) * numbers.front();
 		T const h = map(
 			 pimpl->particle_infos.at(process.idhep).power,
 			-pimpl->particle_infos.at(process.idhep).mass,
 			 pimpl->particle_infos.at(process.idhep).width,
-			random_numbers.at(ranstart++),
+			numbers.front(),
 			-tmax,
 			-tmin
 		);
@@ -1049,8 +1047,8 @@ void lusifer_phase_space_generator<T>::generate(
 		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
 			T(0.5) * sqrt(kaellen(s, s1, s2)) / sqrts };
 
-		T const phi = T(2.0) * acos(T(-1.0)) * random_numbers.at(ranstart++);
-		T const cos_theta = T(2.0) * random_numbers.at(ranstart++) - T(1.0);
+		T const phi = T(2.0) * acos(T(-1.0)) * numbers.front();
+		T const cos_theta = T(2.0) * numbers.front() - T(1.0);
 
 		decay_momenta(sqrts, p[decay.in], phi, cos_theta, p1, p[decay.out2]);
 	}

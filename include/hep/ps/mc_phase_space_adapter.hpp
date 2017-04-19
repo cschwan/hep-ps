@@ -21,6 +21,7 @@
 
 #include "hep/mc/multi_channel_map.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/random_numbers.hpp"
 
 #include <cstddef>
 #include <utility>
@@ -54,7 +55,7 @@ public:
 	template <typename T>
 	T operator()(
 		std::size_t channel,
-		std::vector<T> const& random_numbers,
+		std::vector<T> const& numbers,
 		std::vector<T>& momenta,
 		std::vector<T>& densities,
 		hep::multi_channel_map action
@@ -64,7 +65,8 @@ public:
 			return psg.densities(densities);
 		}
 
-		psg.generate(random_numbers, momenta, cmf_energy_, channel);
+		random_numbers<T> rans(numbers);
+		psg.generate(rans, momenta, cmf_energy_, channel);
 
 		// value gets ignored
 		return T(1.0);

@@ -31,8 +31,11 @@ void test_observables_finite_insertion(
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
 	T const test_result = T();
+
 	T const x = T(0.5);
-	T const result = observables_insertion(phase_space_point, info, x, set);
+	std::vector<T> numbers = { x };
+	hep::random_numbers<T> rans(numbers);
+	T const result = observables_insertion(phase_space_point, info, rans, set);
 
 	REQUIRE( result == test_result );
 }

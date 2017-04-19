@@ -25,9 +25,9 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	);
 
 	std::mt19937 rng;
-	std::vector<T> random_numbers(psg.dimensions());
+	std::vector<T> numbers(psg.dimensions());
 
-	std::generate(random_numbers.begin(), random_numbers.end(), [&](){
+	std::generate(numbers.begin(), numbers.end(), [&](){
 		return std::generate_canonical<T, std::numeric_limits<T>::digits>(rng);
 	});
 
@@ -42,9 +42,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 //
 //	for (std::size_t channel = 0; channel != psg.channels(); ++channel)
 //	{
+//		hep::random_numbers<T> random_numbers(numbers);
 //		psg.generate(random_numbers, p, energy, channel);
 //
 //		std::cout << "\t// channel " << channel << "\n";
+//		std::cout << "\t{\n\n";
+//		std::cout << "\thep::random_numbers<T> random_numbers(numbers);\n";
 //		std::cout << "\tpsg.generate(random_numbers, p, energy, " << channel
 //			<< ");\n\n";
 //
@@ -54,10 +57,13 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 //				<< std::setw(std::cout.precision() + 7) << p.at(i) << " );\n";
 //		}
 //
-//		std::cout << "\n";
+//		std::cout << "\n\t}\n\n";
 //	}
 
 	// channel 0
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 0);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -93,7 +99,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 1
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 1);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -129,7 +140,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 2
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 2);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -165,7 +181,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 3
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 3);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -201,7 +222,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 4
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 4);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -237,7 +263,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 5
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 5);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -273,7 +304,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 6
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 6);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -309,7 +345,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 7
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 7);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -345,7 +386,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 8
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 8);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -381,7 +427,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 9
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 9);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -417,7 +468,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.13741722779179710e-01 );
 	CHECK( p.at(31) == -2.05791617113019243e-01 );
 
+	}
+
 	// channel 10
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 10);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -453,7 +509,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.08165961899708236e+01 );
 	CHECK( p.at(31) ==  6.56743610512525180e+01 );
 
+	}
+
 	// channel 11
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 11);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -489,7 +550,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.42228945905790045e+01 );
 	CHECK( p.at(31) ==  5.92593677704371942e+01 );
 
+	}
+
 	// channel 12
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 12);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -525,7 +591,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.42228945905790045e+01 );
 	CHECK( p.at(31) ==  5.92593677704371942e+01 );
 
+	}
+
 	// channel 13
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 13);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -561,7 +632,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.53547653188032207e-01 );
 	CHECK( p.at(31) == -2.40217190671193598e-01 );
 
+	}
+
 	// channel 14
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 14);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -597,7 +673,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.53547653188032207e-01 );
 	CHECK( p.at(31) == -2.40217190671193598e-01 );
 
+	}
+
 	// channel 15
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 15);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -633,7 +714,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.53547653188032207e-01 );
 	CHECK( p.at(31) == -2.40217190671193598e-01 );
 
+	}
+
 	// channel 16
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 16);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -669,7 +755,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.55730331714165948e-01 );
 	CHECK( p.at(31) == -2.42168803193105214e-01 );
 
+	}
+
 	// channel 17
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 17);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -705,7 +796,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.55730331714165948e-01 );
 	CHECK( p.at(31) == -2.42168803193105214e-01 );
 
+	}
+
 	// channel 18
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 18);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -741,7 +837,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.55730331714165948e-01 );
 	CHECK( p.at(31) == -2.42168803193105214e-01 );
 
+	}
+
 	// channel 19
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 19);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -777,7 +878,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 20
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 20);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -813,7 +919,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 21
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 21);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -849,7 +960,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 22
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 22);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -885,7 +1001,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 23
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 23);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -921,7 +1042,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 24
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 24);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -957,7 +1083,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.08165961899708236e+01 );
 	CHECK( p.at(31) ==  6.56743610512525180e+01 );
 
+	}
+
 	// channel 25
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 25);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -993,7 +1124,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.42228945905790045e+01 );
 	CHECK( p.at(31) ==  5.92593677704371942e+01 );
 
+	}
+
 	// channel 26
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 26);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1029,7 +1165,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.42228945905790045e+01 );
 	CHECK( p.at(31) ==  5.92593677704371942e+01 );
 
+	}
+
 	// channel 27
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 27);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1065,7 +1206,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.53547653188032207e-01 );
 	CHECK( p.at(31) == -2.40217190671193598e-01 );
 
+	}
+
 	// channel 28
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 28);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1101,7 +1247,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.53547653188032207e-01 );
 	CHECK( p.at(31) == -2.40217190671193598e-01 );
 
+	}
+
 	// channel 29
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 29);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1137,7 +1288,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.53547653188032207e-01 );
 	CHECK( p.at(31) == -2.40217190671193598e-01 );
 
+	}
+
 	// channel 30
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 30);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1173,7 +1329,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 31
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 31);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1209,7 +1370,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 32
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 32);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1245,7 +1411,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 33
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 33);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1281,7 +1452,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 34
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 34);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1317,7 +1493,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.03225080365823318e-01 );
 	CHECK( p.at(31) == -2.86258096223176717e-01 );
 
+	}
+
 	// channel 35
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 35);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1353,7 +1534,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.55730331714165948e-01 );
 	CHECK( p.at(31) == -2.42168803193105214e-01 );
 
+	}
+
 	// channel 36
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 36);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1389,7 +1575,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.55730331714165948e-01 );
 	CHECK( p.at(31) == -2.42168803193105214e-01 );
 
+	}
+
 	// channel 37
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 37);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1425,7 +1616,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.55730331714165948e-01 );
 	CHECK( p.at(31) == -2.42168803193105214e-01 );
 
+	}
+
 	// channel 38
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 38);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1461,7 +1657,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.21283428010241567e+00 );
 	CHECK( p.at(31) == -9.40522413004405977e-01 );
 
+	}
+
 	// channel 39
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 39);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1497,7 +1698,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.21283428010241567e+00 );
 	CHECK( p.at(31) == -9.40522413004405977e-01 );
 
+	}
+
 	// channel 40
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 40);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1533,7 +1739,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.21283428010241567e+00 );
 	CHECK( p.at(31) == -9.40522413004405977e-01 );
 
+	}
+
 	// channel 41
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 41);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1569,7 +1780,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -8.78798267598016594e+01 );
 	CHECK( p.at(31) == -3.37819701740164589e+02 );
 
+	}
+
 	// channel 42
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 42);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1605,7 +1821,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -8.78864378006868634e+01 );
 	CHECK( p.at(31) == -3.39597112065549538e+02 );
 
+	}
+
 	// channel 43
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 43);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1641,7 +1862,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -8.78864378006868634e+01 );
 	CHECK( p.at(31) == -3.39597112065549538e+02 );
 
+	}
+
 	// channel 44
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 44);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1677,7 +1903,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.11144494089541013e+01 );
 	CHECK( p.at(31) ==  3.21186123944640030e+02 );
 
+	}
+
 	// channel 45
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 45);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1713,7 +1944,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  9.10834025777755727e+01 );
 	CHECK( p.at(31) == -1.07613824622668275e+02 );
 
+	}
+
 	// channel 46
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 46);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1749,7 +1985,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.00209892794110104e+02 );
 	CHECK( p.at(31) ==  3.08003774139599614e+02 );
 
+	}
+
 	// channel 47
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 47);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1785,7 +2026,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.12740151750118386e+02 );
 	CHECK( p.at(31) == -2.48052756442327251e+02 );
 
+	}
+
 	// channel 48
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 48);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1821,7 +2067,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  6.24066974129238474e+01 );
 	CHECK( p.at(31) ==  3.20682262017581138e+02 );
 
+	}
+
 	// channel 49
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 49);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1857,7 +2108,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  9.28958922129621527e+01 );
 	CHECK( p.at(31) == -1.07732873238568047e+02 );
 
+	}
+
 	// channel 50
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 50);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1893,7 +2149,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  9.99421803903464649e+01 );
 	CHECK( p.at(31) ==  3.06453547729852062e+02 );
 
+	}
+
 	// channel 51
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 51);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1929,7 +2190,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.12334439483169618e+02 );
 	CHECK( p.at(31) == -2.47132186982801358e+02 );
 
+	}
+
 	// channel 52
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 52);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -1965,7 +2231,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.25392797266107214e+00 );
 	CHECK( p.at(31) == -6.34129278188035617e+00 );
 
+	}
+
 	// channel 53
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 53);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2001,7 +2272,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.25392797266107214e+00 );
 	CHECK( p.at(31) == -6.34129278188035617e+00 );
 
+	}
+
 	// channel 54
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 54);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2037,7 +2313,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.24471192387661844e+00 );
 	CHECK( p.at(31) == -6.30774565266478060e+00 );
 
+	}
+
 	// channel 55
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 55);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2073,7 +2354,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.24471192387661844e+00 );
 	CHECK( p.at(31) == -6.30774565266478060e+00 );
 
+	}
+
 	// channel 56
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 56);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2109,7 +2395,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.41578049398425954e+00 );
 	CHECK( p.at(31) == -6.94358708640053202e+00 );
 
+	}
+
 	// channel 57
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 57);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2145,7 +2436,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.41578049398425954e+00 );
 	CHECK( p.at(31) == -6.94358708640053202e+00 );
 
+	}
+
 	// channel 58
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 58);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2181,7 +2477,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.41578049398425954e+00 );
 	CHECK( p.at(31) == -6.94358708640053202e+00 );
 
+	}
+
 	// channel 59
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 59);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2217,7 +2518,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.41578049398425954e+00 );
 	CHECK( p.at(31) == -6.94358708640053202e+00 );
 
+	}
+
 	// channel 60
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 60);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2253,7 +2559,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.41578049398425954e+00 );
 	CHECK( p.at(31) == -6.94358708640053202e+00 );
 
+	}
+
 	// channel 61
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 61);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2289,7 +2600,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.41578049398425954e+00 );
 	CHECK( p.at(31) == -6.94358708640053202e+00 );
 
+	}
+
 	// channel 62
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 62);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2325,7 +2641,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  3.41578049398425954e+00 );
 	CHECK( p.at(31) == -6.94358708640053202e+00 );
 
+	}
+
 	// channel 63
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 63);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2361,7 +2682,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.21283428010241567e+00 );
 	CHECK( p.at(31) == -9.40522413004405977e-01 );
 
+	}
+
 	// channel 64
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 64);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2397,7 +2723,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.21283428010241567e+00 );
 	CHECK( p.at(31) == -9.40522413004405977e-01 );
 
+	}
+
 	// channel 65
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 65);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2433,7 +2764,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.21283428010241567e+00 );
 	CHECK( p.at(31) == -9.40522413004405977e-01 );
 
+	}
+
 	// channel 66
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 66);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2469,7 +2805,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -8.78798267598016594e+01 );
 	CHECK( p.at(31) == -3.37819701740164589e+02 );
 
+	}
+
 	// channel 67
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 67);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2505,7 +2846,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -8.78864378006868634e+01 );
 	CHECK( p.at(31) == -3.39597112065549538e+02 );
 
+	}
+
 	// channel 68
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 68);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2541,7 +2887,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -8.78864378006868634e+01 );
 	CHECK( p.at(31) == -3.39597112065549538e+02 );
 
+	}
+
 	// channel 69
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 69);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2577,7 +2928,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -9.15528974455805411e+00 );
 	CHECK( p.at(31) ==  5.29147679457416515e+01 );
 
+	}
+
 	// channel 70
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 70);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2613,7 +2969,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -1.08988890791824389e+01 );
 	CHECK( p.at(31) ==  5.27024131641193136e+01 );
 
+	}
+
 	// channel 71
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 71);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2649,7 +3010,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.60434634715537072e+01 );
 	CHECK( p.at(31) == -1.31868153737486153e+02 );
 
+	}
+
 	// channel 72
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 72);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2685,7 +3051,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.60434634715537072e+01 );
 	CHECK( p.at(31) == -1.31868153737486153e+02 );
 
+	}
+
 	// channel 73
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 73);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2721,7 +3092,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.60434634715537072e+01 );
 	CHECK( p.at(31) == -1.31868153737486153e+02 );
 
+	}
+
 	// channel 74
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 74);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2757,7 +3133,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -1.29841095718147244e+02 );
 	CHECK( p.at(31) == -2.71510097166489345e+02 );
 
+	}
+
 	// channel 75
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 75);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2793,7 +3174,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -6.07395909280910757e+01 );
 	CHECK( p.at(31) == -3.87106393341976229e+02 );
 
+	}
+
 	// channel 76
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 76);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2829,7 +3215,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -6.07395909280910757e+01 );
 	CHECK( p.at(31) == -3.87106393341976229e+02 );
 
+	}
+
 	// channel 77
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 77);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2865,7 +3256,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -7.16061359625434193e+01 );
 	CHECK( p.at(31) == -4.30051662003272440e+02 );
 
+	}
+
 	// channel 78
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 78);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2901,7 +3297,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -7.16061359625434193e+01 );
 	CHECK( p.at(31) == -4.30051662003272440e+02 );
 
+	}
+
 	// channel 79
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 79);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2937,7 +3338,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -2.15398920551612250e+00 );
 	CHECK( p.at(31) ==  1.23106400238668314e+01 );
 
+	}
+
 	// channel 80
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 80);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -2973,7 +3379,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -2.29088089569408737e+00 );
 	CHECK( p.at(31) ==  1.22901167646226419e+01 );
 
+	}
+
 	// channel 81
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 81);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3009,7 +3420,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.96780498398645154e+00 );
 	CHECK( p.at(31) == -3.40651756703493191e+01 );
 
+	}
+
 	// channel 82
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 82);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3045,7 +3461,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.96780498398645154e+00 );
 	CHECK( p.at(31) == -3.40651756703493191e+01 );
 
+	}
+
 	// channel 83
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 83);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3081,7 +3502,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  7.96780498398645154e+00 );
 	CHECK( p.at(31) == -3.40651756703493191e+01 );
 
+	}
+
 	// channel 84
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 84);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3117,7 +3543,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -1.86924408925724101e+01 );
 	CHECK( p.at(31) == -3.83058021710582238e+02 );
 
+	}
+
 	// channel 85
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 85);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3153,7 +3584,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.17965217415422785e+01 );
 	CHECK( p.at(31) == -4.16126547202734344e+02 );
 
+	}
+
 	// channel 86
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 86);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3189,7 +3625,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.17965217415422785e+01 );
 	CHECK( p.at(31) == -4.16126547202734344e+02 );
 
+	}
+
 	// channel 87
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 87);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3225,7 +3666,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  9.10157434187317804e+00 );
 	CHECK( p.at(31) == -4.31024427586699233e+02 );
 
+	}
+
 	// channel 88
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 88);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3261,7 +3707,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  9.10157434187317804e+00 );
 	CHECK( p.at(31) == -4.31024427586699233e+02 );
 
+	}
+
 	// channel 89
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 89);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3297,7 +3748,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  2.38759880096541224e+01 );
 	CHECK( p.at(31) == -6.26794730843139263e+01 );
 
+	}
+
 	// channel 90
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 90);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3333,7 +3789,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) ==  1.65117181757305929e+01 );
 	CHECK( p.at(31) == -9.18143068440846832e+01 );
 
+	}
+
 	// channel 91
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 91);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3369,7 +3830,12 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(30) == -5.95140769025368002e+01 );
 	CHECK( p.at(31) == -4.03829586402078348e+02 );
 
+	}
+
 	// channel 92
+	{
+
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 92);
 
 	CHECK( p.at( 0) ==  5.00000000000000000e+02 );
@@ -3404,4 +3870,6 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 	CHECK( p.at(29) == -3.96186197132219533e+01 );
 	CHECK( p.at(30) == -7.38554268076508151e+01 );
 	CHECK( p.at(31) == -4.48002421276341806e+02 );
+
+	}
 }

@@ -50,6 +50,7 @@
 #include "hep/ps/parton.hpp"
 #include "hep/ps/permutation.hpp"
 #include "hep/ps/proton_pdf.hpp"
+#include "hep/ps/random_numbers.hpp"
 #include "hep/ps/renormalization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/silence_third_party_libs.hpp"

@@ -3,6 +3,8 @@
 
 #include "cofferaa_interfaces.hpp"
 
+#include <algorithm>
+#include <array>
 #include <cassert>
 
 namespace hep
@@ -163,12 +165,11 @@ std::size_t cofferaa_phase_space_generator<T>::dimensions() const
 
 template <typename T>
 void cofferaa_phase_space_generator<T>::generate(
-	std::vector<T> const& random_numbers,
+	random_numbers<T>& numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
 	std::size_t channel
 ) {
-	assert( random_numbers.size() >= dimensions() );
 	assert( momenta.size() == map_dimensions() );
 
 	double const value = 0.5 * static_cast <double> (cmf_energy);
@@ -180,8 +181,16 @@ void cofferaa_phase_space_generator<T>::generate(
 	int generator = 1;
 	int switch_ = 1;
 
+	constexpr std::size_t max_particles = 9;
+	assert( max_particles <= pimpl->max_particles );
+	std::array<T, max_particles * 4> data;
+
+	std::generate_n(data.begin(), dimensions(), [&]() {
+		return numbers.front();
+	});
+
 	cofferaa_generation(
-		random_numbers.data(),
+		data.data(),
 		&kbeam[0],
 		pimpl->current_point.data(),
 		&g,

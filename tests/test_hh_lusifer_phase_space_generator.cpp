@@ -1,5 +1,6 @@
 #include "hep/ps/hh_phase_space_generator.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
+#include "hep/ps/random_numbers.hpp"
 
 #include "catch.hpp"
 
@@ -63,7 +64,7 @@ TEST_CASE("phase space generation", "[hh_lusifer_phase_space_generator]")
 	);
 
 	std::mt19937 rng;
-	std::vector<T> random_numbers(psg.dimensions());
+	std::vector<T> numbers(psg.dimensions());
 
 	// energy should not be much smaller than the masses we specified
 	T const energy = T(1000.0);
@@ -71,13 +72,14 @@ TEST_CASE("phase space generation", "[hh_lusifer_phase_space_generator]")
 	std::vector<T> p(psg.map_dimensions());
 	std::vector<T> densities(psg.channels());
 
-	std::generate(random_numbers.begin(), random_numbers.end(), [&](){
+	std::generate(numbers.begin(), numbers.end(), [&](){
 		return std::generate_canonical<T, std::numeric_limits<T>::digits>(rng);
 	});
 
 	// random channel
 	std::size_t const channel = 53;
 
+	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, channel);
 
 	// check if the momentum fractions are between zero and one

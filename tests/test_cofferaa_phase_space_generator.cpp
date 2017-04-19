@@ -1,4 +1,5 @@
 #include "hep/ps/cofferaa_phase_space_generator.hpp"
+#include "hep/ps/random_numbers.hpp"
 
 #include "catch.hpp"
 
@@ -82,7 +83,7 @@ TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
 	);
 
 	std::mt19937 rng;
-	std::vector<T> random_numbers(psg.dimensions());
+	std::vector<T> numbers(psg.dimensions());
 
 	// energy should not be much smaller than the masses we specified
 	T const energy = T(1000.0);
@@ -93,13 +94,14 @@ TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
 
 	for (std::size_t i = 0; i != 100; ++i)
 	{
-		std::generate(random_numbers.begin(), random_numbers.end(), [&](){
+		std::generate(numbers.begin(), numbers.end(), [&](){
 			return std::generate_canonical<T,
 				std::numeric_limits<T>::digits>(rng);
 		});
 
 		for (std::size_t channel = 0; channel != psg.channels(); ++channel)
 		{
+			hep::random_numbers<T> random_numbers(numbers);
 			psg.generate(random_numbers, p, energy, channel);
 
 			std::array<T, 4> sums = { T(), T(), T(), T() };

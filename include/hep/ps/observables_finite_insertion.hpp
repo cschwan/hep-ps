@@ -26,6 +26,7 @@
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/random_numbers.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -75,7 +76,7 @@ public:
 	T operator()(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
-		T x,
+		random_numbers<T>& random_numbers,
 		initial_state_set set
 	) {
 		std::vector<T> aux_phase_space(phase_space.size());
@@ -110,6 +111,7 @@ public:
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
+		T const x = random_numbers.front();
 		T const eta[] = {
 			info.x1(),
 			info.x2()
