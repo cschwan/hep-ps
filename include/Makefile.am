@@ -28,8 +28,8 @@ nobase_include_HEADERS = \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/non_zero_dipole.hpp \
 	hep/ps/observables.hpp \
-	hep/ps/observables_born_like.hpp \
-	hep/ps/observables_finite_insertion.hpp \
+	hep/ps/observables_born.hpp \
+	hep/ps/observables_fini.hpp \
 	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/particle_type.hpp \
