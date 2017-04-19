@@ -1,6 +1,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_born_like.hpp"
+#include "hep/ps/random_numbers.hpp"
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
@@ -10,6 +11,7 @@
 #include "catch.hpp"
 
 #include <cstddef>
+#include <vector>
 
 using T = HEP_TYPE_T;
 
@@ -17,7 +19,7 @@ void test_trivial_cutter_and_recombiner(
 	hep::initial_state_set set,
 	std::size_t count
 ) {
-	auto observables_born_like = hep::make_observables_born_like<T>(
+	auto observables = hep::make_observables_born<T>(
 		test_matrix_elements<T>(set, count, 0, 0, 0),
 		hep::trivial_cutter<T>(),
 		hep::trivial_recombiner<T>(),
@@ -31,7 +33,9 @@ void test_trivial_cutter_and_recombiner(
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
 	T const test_result = T(1.0) / T(1024.0);
-	T const result = observables_born_like(phase_space_point, info, set);
+	std::vector<T> numbers;
+	hep::random_numbers<T> rans(numbers);
+	T const result = observables->eval(phase_space_point, info, rans, set);
 
 	REQUIRE( result == test_result );
 }

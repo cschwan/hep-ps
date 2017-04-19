@@ -24,14 +24,17 @@
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
+#include "hep/ps/observables.hpp"
 #include "hep/ps/particle_type.hpp"
+#include "hep/ps/random_numbers.hpp"
 
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <iterator>
-#include <utility>
+#include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace
@@ -67,7 +70,7 @@ namespace hep
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-class observables_real
+class observables_real : public observables<T>
 {
 public:
 	template <
@@ -101,11 +104,12 @@ public:
 	{
 	}
 
-	T operator()(
+	T eval(
 		std::vector<T> const& real_phase_space,
 		luminosity_info<T> const& info,
+		random_numbers<T>&,
 		initial_state_set set
-	) {
+	) override {
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -319,7 +323,7 @@ using observables_real_type = observables_real<T,
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-inline observables_real_type<T, M, S, C, R, P, U, D> make_observables_real(
+inline std::unique_ptr<observables<T>> make_observables_real(
 	M&& matrix_elements,
 	S&& subtraction,
 	C&& cuts,
@@ -330,17 +334,18 @@ inline observables_real_type<T, M, S, C, R, P, U, D> make_observables_real(
 	T hbarc2,
 	T alpha_min = T()
 ) {
-	return observables_real_type<T, M, S, C, R, P, U, D>(
-		std::forward<M>(matrix_elements),
-		std::forward<S>(subtraction),
-		std::forward<C>(cuts),
-		std::forward<R>(recombiner),
-		std::forward<P>(pdf),
-		std::forward<U>(scale_setter),
-		std::forward<D>(distributions),
-		hbarc2,
-		alpha_min
-	);
+	return std::unique_ptr<observables_real_type<T, M, S, C, R, P, U, D>>(
+		new observables_real_type<T, M, S, C, R, P, U, D>(
+			std::forward<M>(matrix_elements),
+			std::forward<S>(subtraction),
+			std::forward<C>(cuts),
+			std::forward<R>(recombiner),
+			std::forward<P>(pdf),
+			std::forward<U>(scale_setter),
+			std::forward<D>(distributions),
+			hbarc2,
+			alpha_min
+	));
 }
 
 }

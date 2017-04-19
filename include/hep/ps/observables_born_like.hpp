@@ -1,5 +1,5 @@
-#ifndef HEP_PS_OBSERVABLES_BORN_LIKE_HPP
-#define HEP_PS_OBSERVABLES_BORN_LIKE_HPP
+#ifndef HEP_PS_OBSERVABLES_BORN_HPP
+#define HEP_PS_OBSERVABLES_BORN_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -23,21 +23,24 @@
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/observables.hpp"
 #include "hep/ps/particle_type.hpp"
+#include "hep/ps/random_numbers.hpp"
 
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <iterator>
-#include <utility>
+#include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hep
 {
 
 template <class T, class M, class C, class R, class P, class S, class D>
-class observables_born_like
+class observables_born : public observables<T>
 {
 public:
 	template <
@@ -47,7 +50,7 @@ public:
 		typename Pdf,
 		typename ScaleSetter,
 		typename Distributions>
-	observables_born_like(
+	observables_born(
 		MatrixElements&& matrix_elements,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
@@ -66,11 +69,12 @@ public:
 	{
 	}
 
-	T operator()(
+	T eval(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
+		random_numbers<T>&,
 		initial_state_set set
-	) {
+	) override {
 		std::vector<T> aux_phase_space(phase_space.size());
 
 		auto const recombined = recombiner_.recombine(
@@ -148,14 +152,13 @@ private:
 };
 
 template <class T, class M, class C, class R, class P, class S, class D>
-using observables_born_like_type = observables_born_like<T,
+using observables_born_t = observables_born<T,
 	typename std::decay<M>::type, typename std::decay<C>::type,
 	typename std::decay<R>::type, typename std::decay<P>::type,
 	typename std::decay<S>::type, typename std::decay<D>::type>;
 
 template <class T, class M, class C, class R, class P, class S, class D>
-inline observables_born_like_type<T, M, C, R, P, S, D>
-make_observables_born_like(
+inline std::unique_ptr<observables<T>> make_observables_born(
 	M&& matrix_elements,
 	C&& cuts,
 	R&& recombiner,
@@ -164,15 +167,16 @@ make_observables_born_like(
 	D&& distributions,
 	T hbarc2
 ) {
-	return observables_born_like_type<T, M, C, R, P, S, D>(
-		std::forward<M>(matrix_elements),
-		std::forward<C>(cuts),
-		std::forward<R>(recombiner),
-		std::forward<P>(pdf),
-		std::forward<S>(scale_setter),
-		std::forward<D>(distributions),
-		hbarc2
-	);
+	return std::unique_ptr<observables_born_t<T, M, C, R, P, S, D>>(
+		new observables_born_t<T, M, C, R, P, S, D>(
+			std::forward<M>(matrix_elements),
+			std::forward<C>(cuts),
+			std::forward<R>(recombiner),
+			std::forward<P>(pdf),
+			std::forward<S>(scale_setter),
+			std::forward<D>(distributions),
+			hbarc2
+	));
 }
 
 }

@@ -42,6 +42,7 @@
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
+#include "hep/ps/observables.hpp"
 #include "hep/ps/observables_born_like.hpp"
 #include "hep/ps/observables_finite_insertion.hpp"
 #include "hep/ps/observables_real.hpp"

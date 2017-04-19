@@ -1,6 +1,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_real.hpp"
+#include "hep/ps/random_numbers.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
 #include "test_structures.hpp"
@@ -8,6 +9,7 @@
 #include "catch.hpp"
 
 #include <cstddef>
+#include <vector>
 
 using T = HEP_TYPE_T;
 
@@ -19,7 +21,7 @@ void test_observables_real(
 	std::size_t spectator,
 	bool inclusive
 ) {
-	auto observables_real = hep::make_observables_real<T>(
+	auto observables = hep::make_observables_real<T>(
 		test_matrix_elements<T>(set, count, emitter, unresolved, spectator),
 		test_subtraction<T>(emitter, unresolved, spectator),
 		test_cuts<T>(count, inclusive),
@@ -35,7 +37,9 @@ void test_observables_real(
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
 	T const test_result = T(inclusive ? 0.5 : -0.5) / T(1024.0);
-	T const result = observables_real(real_phase_space_point, info, set);
+	std::vector<T> numbers;
+	hep::random_numbers<T> rans(numbers);
+	T const result = observables->eval(real_phase_space_point, info, rans, set);
 
 	REQUIRE( result == test_result );
 }
