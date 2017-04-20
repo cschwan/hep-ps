@@ -1,7 +1,6 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_real.hpp"
-#include "hep/ps/random_numbers.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
 #include "test_structures.hpp"
@@ -37,9 +36,7 @@ void test_observables_real(
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
 	T const test_result = T(inclusive ? 0.5 : -0.5) / T(1024.0);
-	std::vector<T> numbers;
-	hep::random_numbers<T> rans(numbers);
-	T const result = observables->eval(real_phase_space_point, info, rans, set);
+	T const result = observables->eval(real_phase_space_point, info, set);
 
 	REQUIRE( result == test_result );
 }

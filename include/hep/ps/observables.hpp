@@ -21,7 +21,6 @@
 
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include <vector>
 
@@ -42,7 +41,6 @@ public:
 	virtual T eval(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
-		random_numbers<T>& extra_random_numbers,
 		initial_state_set set
 	) = 0;
 };

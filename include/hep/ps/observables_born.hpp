@@ -25,7 +25,6 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/observables.hpp"
 #include "hep/ps/particle_type.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -72,7 +71,6 @@ public:
 	T eval(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
-		random_numbers<T>&,
 		initial_state_set set
 	) override {
 		std::vector<T> aux_phase_space(phase_space.size());

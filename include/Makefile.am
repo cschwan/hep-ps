@@ -36,7 +36,6 @@ nobase_include_HEADERS = \
 	hep/ps/parton.hpp \
 	hep/ps/permutation.hpp \
 	hep/ps/proton_pdf.hpp \
-	hep/ps/random_numbers.hpp \
 	hep/ps/renormalization_scheme.hpp \
 	hep/ps/scales.hpp \
 	hep/ps/silence_third_party_libs.hpp \

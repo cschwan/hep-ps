@@ -21,7 +21,6 @@
 
 #include "hep/ps/hh_phase_space_generator.hpp"
 #include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -83,11 +82,11 @@ public:
 	/// that are used to generate the channels the integrater uses to generate
 	/// phase space, with the masses and decay widths specified in `constants`.
 	/// The parameter `extra_random_numbers` specifies the number of extra
-	/// random numbers that should be generated. This number increases the value
-	/// \ref dimensions returns and leaves \ref map_dimensions unchanged. The
-	/// random numbers that the generator uses to generate the phase space
-	/// points are the first \f$ 3 n - 4 \f$ numbers, where \f$ n \f$ are the
-	/// number of final state particles.
+	/// random numbers that should be generated. This number increases both the
+	/// value \ref dimensions and \ref map_dimensions returns. The random
+	/// numbers that the generator uses to generate the phase space points are
+	/// the first \f$ 3 n - 4 \f$ numbers, where \f$ n \f$ are the number of
+	/// final state particles.
 	lusifer_phase_space_generator(
 		std::vector<std::string> const& processes,
 		lusifer_constants<T> const& constants,
@@ -123,7 +122,7 @@ public:
 	/// as a set of four-vectors into `momenta` using the specified `channel`
 	/// for the given center-of-mass frame energy `cmf_energy`.
 	void generate(
-		random_numbers<T>& numbers,
+		std::vector<T> const& random_numbers,
 		std::vector<T>& momenta,
 		T cmf_energy,
 		std::size_t channel

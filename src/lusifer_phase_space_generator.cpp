@@ -3,6 +3,7 @@
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "lusifer_interfaces.hpp"
 
+#include <algorithm>
 #include <bitset>
 #include <cassert>
 #include <cmath>
@@ -865,7 +866,7 @@ std::size_t lusifer_phase_space_generator<T>::dimensions() const
 
 template <typename T>
 void lusifer_phase_space_generator<T>::generate(
-	random_numbers<T>& numbers,
+	std::vector<T> const& random_numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
 	std::size_t channel
@@ -883,6 +884,8 @@ void lusifer_phase_space_generator<T>::generate(
 	{
 		momentum[0] = T();
 	}
+
+	auto r = random_numbers.begin();
 
 	std::size_t const allbinary = (1 << pimpl->particles) - 1;
 
@@ -949,7 +952,7 @@ void lusifer_phase_space_generator<T>::generate(
 			pimpl->particle_infos.at(invariant.idhep).power,
 			pimpl->particle_infos.at(invariant.idhep).mass,
 			pimpl->particle_infos.at(invariant.idhep).width,
-			numbers.front(),
+			*r++,
 			smin,
 			smax
 		);
@@ -976,12 +979,12 @@ void lusifer_phase_space_generator<T>::generate(
 			tmax = T();
 		}
 
-		T phi = T(2.0) * acos(T(-1.0)) * numbers.front();
+		T phi = T(2.0) * acos(T(-1.0)) * *r++;
 		T const h = map(
 			 pimpl->particle_infos.at(process.idhep).power,
 			-pimpl->particle_infos.at(process.idhep).mass,
 			 pimpl->particle_infos.at(process.idhep).width,
-			numbers.front(),
+			*r++,
 			-tmax,
 			-tmin
 		);
@@ -1047,8 +1050,8 @@ void lusifer_phase_space_generator<T>::generate(
 		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
 			T(0.5) * sqrt(kaellen(s, s1, s2)) / sqrts };
 
-		T const phi = T(2.0) * acos(T(-1.0)) * numbers.front();
-		T const cos_theta = T(2.0) * numbers.front() - T(1.0);
+		T const phi = T(2.0) * acos(T(-1.0)) * *r++;
+		T const cos_theta = T(2.0) * *r++ - T(1.0);
 
 		decay_momenta(sqrts, p[decay.in], phi, cos_theta, p1, p[decay.out2]);
 	}
@@ -1072,6 +1075,10 @@ void lusifer_phase_space_generator<T>::generate(
 	}
 
 	pimpl->cmf_energy_ = cmf_energy;
+
+	// append the extra remaining random numbers to the end of `momenta`
+	std::copy_n(r, pimpl->extra_random_numbers,
+		std::prev(momenta.end(), pimpl->extra_random_numbers));
 }
 
 template <typename T>
@@ -1083,7 +1090,7 @@ luminosity_info<T> lusifer_phase_space_generator<T>::info() const
 template <typename T>
 std::size_t lusifer_phase_space_generator<T>::map_dimensions() const
 {
-	return 4 * pimpl->particles;
+	return 4 * pimpl->particles + pimpl->extra_random_numbers;
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

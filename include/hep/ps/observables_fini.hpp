@@ -27,7 +27,6 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/observables.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -78,7 +77,6 @@ public:
 	T eval(
 		std::vector<T> const& phase_space,
 		luminosity_info<T> const& info,
-		random_numbers<T>& extra_random_numbers,
 		initial_state_set set
 	) override {
 		std::vector<T> aux_phase_space(phase_space.size());
@@ -113,7 +111,8 @@ public:
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
-		T const x = extra_random_numbers.front();
+		T const x = phase_space.back();
+
 		T const eta[] = {
 			info.x1(),
 			info.x2()

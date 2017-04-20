@@ -1,7 +1,6 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_born.hpp"
-#include "hep/ps/random_numbers.hpp"
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
@@ -33,9 +32,7 @@ void test_trivial_cutter_and_recombiner(
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
 	T const test_result = T(1.0) / T(1024.0);
-	std::vector<T> numbers;
-	hep::random_numbers<T> rans(numbers);
-	T const result = observables->eval(phase_space_point, info, rans, set);
+	T const result = observables->eval(phase_space_point, info, set);
 
 	REQUIRE( result == test_result );
 }

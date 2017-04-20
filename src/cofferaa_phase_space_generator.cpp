@@ -165,7 +165,7 @@ std::size_t cofferaa_phase_space_generator<T>::dimensions() const
 
 template <typename T>
 void cofferaa_phase_space_generator<T>::generate(
-	random_numbers<T>& numbers,
+	std::vector<T> const& random_numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
 	std::size_t channel
@@ -181,16 +181,8 @@ void cofferaa_phase_space_generator<T>::generate(
 	int generator = 1;
 	int switch_ = 1;
 
-	constexpr std::size_t max_particles = 9;
-	assert( max_particles <= pimpl->max_particles );
-	std::array<T, max_particles * 4> data;
-
-	std::generate_n(data.begin(), dimensions(), [&]() {
-		return numbers.front();
-	});
-
 	cofferaa_generation(
-		data.data(),
+		random_numbers.data(),
 		&kbeam[0],
 		pimpl->current_point.data(),
 		&g,

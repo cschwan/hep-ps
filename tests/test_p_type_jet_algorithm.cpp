@@ -1,6 +1,5 @@
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/JetDefinition.hh"
@@ -35,7 +34,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 
 	std::vector<std::size_t> proto_jets = { 6, 7, 8 };
 
-	std::vector<T> numbers(psg.dimensions());
+	std::vector<T> random_numbers(psg.dimensions());
 	std::vector<T> momenta(psg.map_dimensions());
 	std::vector<T> recombined_momenta;
 	std::mt19937 rng;
@@ -54,12 +53,11 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 		{
 			for (std::size_t i = 0; i != 100; ++i)
 			{
-				std::generate(numbers.begin(), numbers.end(), [&]() {
+				std::generate(random_numbers.begin(), random_numbers.end(), [&]() {
 					return std::generate_canonical<T,
 						std::numeric_limits<T>::max_digits10>(rng);
 				});
 
-				hep::random_numbers<T> random_numbers(numbers);
 				psg.generate(random_numbers, momenta, cmf_energy, channel);
 
 				auto const recombinations = jet_algorithm.recombine(

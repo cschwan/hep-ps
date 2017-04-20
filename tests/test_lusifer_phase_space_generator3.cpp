@@ -1,5 +1,4 @@
 #include "hep/ps/lusifer_phase_space_generator.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include "catch.hpp"
 
@@ -26,9 +25,9 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	);
 
 	std::mt19937 rng;
-	std::vector<T> numbers(psg.dimensions());
+	std::vector<T> random_numbers(psg.dimensions());
 
-	std::generate(numbers.begin(), numbers.end(), [&](){
+	std::generate(random_numbers.begin(), random_numbers.end(), [&](){
 		return std::generate_canonical<T, std::numeric_limits<T>::digits>(rng);
 	});
 
@@ -44,13 +43,10 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 //
 //	for (std::size_t channel = 0; channel != psg.channels(); ++channel)
 //	{
-//		hep::random_numbers<T> random_numbers(numbers);
 //		psg.generate(random_numbers, p, energy, channel);
 //		psg.densities(d);
 //
 //		std::cout << "\t// channel " << channel << "\n";
-//		std::cout << "\t{\n\n";
-//		std::cout << "\thep::random_numbers<T> random_numbers(numbers);\n";
 //		std::cout << "\tpsg.generate(random_numbers, p, energy, " << channel
 //			<< ");\n";
 //		std::cout << "\tpsg.densities(d);\n\n";
@@ -61,13 +57,10 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 //				<< std::setw(std::cout.precision() + 7) << d.at(i) << " );\n";
 //		}
 //
-//		std::cout << "\n\t}\n\n";
+//		std::cout << "\n";
 //	}
 
 	// channel 0
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 0);
 	psg.densities(d);
 
@@ -165,12 +158,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.37966143618790686e-24 );
 	CHECK( d.at(92) ==  1.48510745613739130e-25 );
 
-	}
-
 	// channel 1
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 1);
 	psg.densities(d);
 
@@ -268,12 +256,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.51876991816649317e-24 );
 	CHECK( d.at(92) ==  4.24879973711706390e-25 );
 
-	}
-
 	// channel 2
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 2);
 	psg.densities(d);
 
@@ -371,12 +354,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.51876991816649317e-24 );
 	CHECK( d.at(92) ==  4.24879973711706390e-25 );
 
-	}
-
 	// channel 3
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 3);
 	psg.densities(d);
 
@@ -474,12 +452,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.51876991816649317e-24 );
 	CHECK( d.at(92) ==  4.24879973711706390e-25 );
 
-	}
-
 	// channel 4
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 4);
 	psg.densities(d);
 
@@ -577,12 +550,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.51876991816649317e-24 );
 	CHECK( d.at(92) ==  4.24879973711706390e-25 );
 
-	}
-
 	// channel 5
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 5);
 	psg.densities(d);
 
@@ -680,12 +648,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.90580698814469665e-24 );
 	CHECK( d.at(92) ==  1.17765599539331160e-24 );
 
-	}
-
 	// channel 6
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 6);
 	psg.densities(d);
 
@@ -783,12 +746,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.47490233276657153e-24 );
 	CHECK( d.at(92) ==  1.80037236090031762e-24 );
 
-	}
-
 	// channel 7
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 7);
 	psg.densities(d);
 
@@ -886,12 +844,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.47490233276657153e-24 );
 	CHECK( d.at(92) ==  1.80037236090031762e-24 );
 
-	}
-
 	// channel 8
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 8);
 	psg.densities(d);
 
@@ -989,12 +942,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.47490233276657153e-24 );
 	CHECK( d.at(92) ==  1.80037236090031762e-24 );
 
-	}
-
 	// channel 9
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 9);
 	psg.densities(d);
 
@@ -1092,12 +1040,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.47490233276657153e-24 );
 	CHECK( d.at(92) ==  1.80037236090031762e-24 );
 
-	}
-
 	// channel 10
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 10);
 	psg.densities(d);
 
@@ -1195,12 +1138,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.47416146338085262e-21 );
 	CHECK( d.at(92) ==  2.32050059708017829e-21 );
 
-	}
-
 	// channel 11
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 11);
 	psg.densities(d);
 
@@ -1298,12 +1236,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.36656956879768563e-21 );
 	CHECK( d.at(92) ==  2.30832623522464301e-21 );
 
-	}
-
 	// channel 12
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 12);
 	psg.densities(d);
 
@@ -1401,12 +1334,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.36656956879768563e-21 );
 	CHECK( d.at(92) ==  2.30832623522464301e-21 );
 
-	}
-
 	// channel 13
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 13);
 	psg.densities(d);
 
@@ -1504,12 +1432,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.88797303283226658e-19 );
 	CHECK( d.at(92) ==  2.09452659748343819e-19 );
 
-	}
-
 	// channel 14
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 14);
 	psg.densities(d);
 
@@ -1607,12 +1530,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.31021012277320587e-20 );
 	CHECK( d.at(92) ==  1.45355357450401180e-20 );
 
-	}
-
 	// channel 15
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 15);
 	psg.densities(d);
 
@@ -1710,12 +1628,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.31021012277320587e-20 );
 	CHECK( d.at(92) ==  1.45355357450401180e-20 );
 
-	}
-
 	// channel 16
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 16);
 	psg.densities(d);
 
@@ -1813,12 +1726,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.14352228936656042e-20 );
 	CHECK( d.at(92) ==  5.56027782969215275e-21 );
 
-	}
-
 	// channel 17
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 17);
 	psg.densities(d);
 
@@ -1916,12 +1824,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.72120035990937710e-20 );
 	CHECK( d.at(92) ==  1.48756939214746073e-20 );
 
-	}
-
 	// channel 18
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 18);
 	psg.densities(d);
 
@@ -2019,12 +1922,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.72120035990937710e-20 );
 	CHECK( d.at(92) ==  1.48756939214746073e-20 );
 
-	}
-
 	// channel 19
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 19);
 	psg.densities(d);
 
@@ -2122,12 +2020,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.20203415170784305e-19 );
 	CHECK( d.at(92) ==  1.39527364933526671e-19 );
 
-	}
-
 	// channel 20
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 20);
 	psg.densities(d);
 
@@ -2225,12 +2118,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  6.35774637978567924e-21 );
 	CHECK( d.at(92) ==  5.24736924957708278e-22 );
 
-	}
-
 	// channel 21
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 21);
 	psg.densities(d);
 
@@ -2328,12 +2216,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.69120158991285871e-21 );
 	CHECK( d.at(92) ==  2.85060402871138655e-22 );
 
-	}
-
 	// channel 22
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 22);
 	psg.densities(d);
 
@@ -2431,12 +2314,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  6.35774637978567924e-21 );
 	CHECK( d.at(92) ==  5.24736924957708278e-22 );
 
-	}
-
 	// channel 23
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 23);
 	psg.densities(d);
 
@@ -2534,12 +2412,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.69120158991285871e-21 );
 	CHECK( d.at(92) ==  2.85060402871138655e-22 );
 
-	}
-
 	// channel 24
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 24);
 	psg.densities(d);
 
@@ -2637,12 +2510,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  9.60094395814481182e-19 );
 	CHECK( d.at(92) ==  9.28312008762559872e-19 );
 
-	}
-
 	// channel 25
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 25);
 	psg.densities(d);
 
@@ -2740,12 +2608,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  9.60094395814481182e-19 );
 	CHECK( d.at(92) ==  9.28312008762559872e-19 );
 
-	}
-
 	// channel 26
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 26);
 	psg.densities(d);
 
@@ -2843,12 +2706,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  9.60094395814481182e-19 );
 	CHECK( d.at(92) ==  9.28312008762559872e-19 );
 
-	}
-
 	// channel 27
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 27);
 	psg.densities(d);
 
@@ -2946,12 +2804,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.13157180821182784e-21 );
 	CHECK( d.at(92) ==  1.15684767493216830e-22 );
 
-	}
-
 	// channel 28
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 28);
 	psg.densities(d);
 
@@ -3049,12 +2902,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.40474267629880178e-22 );
 	CHECK( d.at(92) ==  9.54039691129026630e-23 );
 
-	}
-
 	// channel 29
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 29);
 	psg.densities(d);
 
@@ -3152,12 +3000,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.40474267629880178e-22 );
 	CHECK( d.at(92) ==  9.54039691129026630e-23 );
 
-	}
-
 	// channel 30
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 30);
 	psg.densities(d);
 
@@ -3255,12 +3098,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  9.82805337515963084e-21 );
 	CHECK( d.at(92) ==  4.69658659725125834e-21 );
 
-	}
-
 	// channel 31
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 31);
 	psg.densities(d);
 
@@ -3358,12 +3196,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.74853868806978432e-19 );
 	CHECK( d.at(92) ==  9.70527990944911279e-21 );
 
-	}
-
 	// channel 32
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 32);
 	psg.densities(d);
 
@@ -3461,12 +3294,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.30030442484301672e-21 );
 	CHECK( d.at(92) ==  1.24342524611216192e-21 );
 
-	}
-
 	// channel 33
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 33);
 	psg.densities(d);
 
@@ -3564,12 +3392,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  9.82805337515963084e-21 );
 	CHECK( d.at(92) ==  4.69658659725125834e-21 );
 
-	}
-
 	// channel 34
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 34);
 	psg.densities(d);
 
@@ -3667,12 +3490,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.30030442484301672e-21 );
 	CHECK( d.at(92) ==  1.24342524611216192e-21 );
 
-	}
-
 	// channel 35
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 35);
 	psg.densities(d);
 
@@ -3770,12 +3588,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.63117187739660764e-20 );
 	CHECK( d.at(92) ==  1.27653521496558517e-19 );
 
-	}
-
 	// channel 36
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 36);
 	psg.densities(d);
 
@@ -3873,12 +3686,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.94573964582681006e-20 );
 	CHECK( d.at(92) ==  3.76983366293484431e-20 );
 
-	}
-
 	// channel 37
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 37);
 	psg.densities(d);
 
@@ -3976,12 +3784,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.94573964582681006e-20 );
 	CHECK( d.at(92) ==  3.76983366293484431e-20 );
 
-	}
-
 	// channel 38
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 38);
 	psg.densities(d);
 
@@ -4079,12 +3882,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.50841967255485465e-23 );
 	CHECK( d.at(92) ==  1.09849417863908983e-24 );
 
-	}
-
 	// channel 39
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 39);
 	psg.densities(d);
 
@@ -4182,12 +3980,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.50865095168618526e-23 );
 	CHECK( d.at(92) ==  1.09852097609471289e-24 );
 
-	}
-
 	// channel 40
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 40);
 	psg.densities(d);
 
@@ -4285,12 +4078,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.50865095168618526e-23 );
 	CHECK( d.at(92) ==  1.09852097609471289e-24 );
 
-	}
-
 	// channel 41
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 41);
 	psg.densities(d);
 
@@ -4388,12 +4176,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.22827827844494973e-19 );
 	CHECK( d.at(92) ==  1.19905306420693065e-19 );
 
-	}
-
 	// channel 42
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 42);
 	psg.densities(d);
 
@@ -4491,12 +4274,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.24786740399663817e-19 );
 	CHECK( d.at(92) ==  1.24026238990337928e-19 );
 
-	}
-
 	// channel 43
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 43);
 	psg.densities(d);
 
@@ -4594,12 +4372,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.24786740399663817e-19 );
 	CHECK( d.at(92) ==  1.24026238990337928e-19 );
 
-	}
-
 	// channel 44
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 44);
 	psg.densities(d);
 
@@ -4697,12 +4470,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  7.52162081671200585e-20 );
 	CHECK( d.at(92) ==  5.27733759983069567e-21 );
 
-	}
-
 	// channel 45
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 45);
 	psg.densities(d);
 
@@ -4800,12 +4568,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.66682428460058833e-19 );
 	CHECK( d.at(92) ==  2.84695640278586062e-20 );
 
-	}
-
 	// channel 46
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 46);
 	psg.densities(d);
 
@@ -4903,12 +4666,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.35432837807272539e-18 );
 	CHECK( d.at(92) ==  1.43979530641441277e-19 );
 
-	}
-
 	// channel 47
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 47);
 	psg.densities(d);
 
@@ -5006,12 +4764,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.28129614786762136e-18 );
 	CHECK( d.at(92) ==  5.34279866277448377e-19 );
 
-	}
-
 	// channel 48
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 48);
 	psg.densities(d);
 
@@ -5109,12 +4862,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.31861214372051679e-20 );
 	CHECK( d.at(92) ==  4.20957223433263000e-21 );
 
-	}
-
 	// channel 49
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 49);
 	psg.densities(d);
 
@@ -5212,12 +4960,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.04731621604090510e-19 );
 	CHECK( d.at(92) ==  2.64689054033900934e-20 );
 
-	}
-
 	// channel 50
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 50);
 	psg.densities(d);
 
@@ -5315,12 +5058,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.03981742092946879e-16 );
 	CHECK( d.at(92) ==  2.40403988817259556e-16 );
 
-	}
-
 	// channel 51
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 51);
 	psg.densities(d);
 
@@ -5418,12 +5156,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.03981742092946879e-16 );
 	CHECK( d.at(92) ==  2.40403988817259556e-16 );
 
-	}
-
 	// channel 52
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 52);
 	psg.densities(d);
 
@@ -5521,12 +5254,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.32590085899489817e-17 );
 	CHECK( d.at(92) ==  1.74493703871278206e-17 );
 
-	}
-
 	// channel 53
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 53);
 	psg.densities(d);
 
@@ -5624,12 +5352,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.32590085899489817e-17 );
 	CHECK( d.at(92) ==  1.74493703871278206e-17 );
 
-	}
-
 	// channel 54
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 54);
 	psg.densities(d);
 
@@ -5727,12 +5450,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.66436258775277401e-19 );
 	CHECK( d.at(92) ==  1.58206791150349687e-20 );
 
-	}
-
 	// channel 55
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 55);
 	psg.densities(d);
 
@@ -5830,12 +5548,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.27561069902320159e-18 );
 	CHECK( d.at(92) ==  9.76224693319230104e-19 );
 
-	}
-
 	// channel 56
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 56);
 	psg.densities(d);
 
@@ -5933,12 +5646,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.43722052985527638e-17 );
 	CHECK( d.at(92) ==  7.53589556942364154e-19 );
 
-	}
-
 	// channel 57
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 57);
 	psg.densities(d);
 
@@ -6036,12 +5744,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  7.73471713378200603e-18 );
 	CHECK( d.at(92) ==  4.86225802463020501e-19 );
 
-	}
-
 	// channel 58
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 58);
 	psg.densities(d);
 
@@ -6139,12 +5842,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.04122927435612744e-16 );
 	CHECK( d.at(92) ==  8.50865238596746442e-17 );
 
-	}
-
 	// channel 59
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 59);
 	psg.densities(d);
 
@@ -6242,12 +5940,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  7.44438000919260859e-17 );
 	CHECK( d.at(92) ==  1.30179488572231340e-17 );
 
-	}
-
 	// channel 60
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 60);
 	psg.densities(d);
 
@@ -6345,12 +6038,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  6.09711910867815645e-18 );
 	CHECK( d.at(92) ==  1.90686242095860292e-18 );
 
-	}
-
 	// channel 61
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 61);
 	psg.densities(d);
 
@@ -6448,12 +6136,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.98678509047179698e-18 );
 	CHECK( d.at(92) ==  2.52406821540740450e-19 );
 
-	}
-
 	// channel 62
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 62);
 	psg.densities(d);
 
@@ -6551,12 +6234,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.02744537504807984e-18 );
 	CHECK( d.at(92) ==  2.27317807465543634e-19 );
 
-	}
-
 	// channel 63
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 63);
 	psg.densities(d);
 
@@ -6654,12 +6332,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.21291029731761431e-22 );
 	CHECK( d.at(92) ==  7.45078118654914320e-22 );
 
-	}
-
 	// channel 64
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 64);
 	psg.densities(d);
 
@@ -6757,12 +6430,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.21553442397412257e-22 );
 	CHECK( d.at(92) ==  7.45432978794016690e-22 );
 
-	}
-
 	// channel 65
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 65);
 	psg.densities(d);
 
@@ -6860,12 +6528,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  8.21553442397412257e-22 );
 	CHECK( d.at(92) ==  7.45432978794016690e-22 );
 
-	}
-
 	// channel 66
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 66);
 	psg.densities(d);
 
@@ -6963,12 +6626,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.04280379962200239e-21 );
 	CHECK( d.at(92) ==  1.82535087797751214e-21 );
 
-	}
-
 	// channel 67
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 67);
 	psg.densities(d);
 
@@ -7066,12 +6724,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.04721381458497250e-21 );
 	CHECK( d.at(92) ==  1.82945181885781546e-21 );
 
-	}
-
 	// channel 68
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 68);
 	psg.densities(d);
 
@@ -7169,12 +6822,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.04721381458497250e-21 );
 	CHECK( d.at(92) ==  1.82945181885781546e-21 );
 
-	}
-
 	// channel 69
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 69);
 	psg.densities(d);
 
@@ -7272,12 +6920,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.35516961929985462e-20 );
 	CHECK( d.at(92) ==  7.26030663355867616e-22 );
 
-	}
-
 	// channel 70
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 70);
 	psg.densities(d);
 
@@ -7375,12 +7018,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.21569991593478442e-20 );
 	CHECK( d.at(92) ==  6.52714615668196796e-22 );
 
-	}
-
 	// channel 71
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 71);
 	psg.densities(d);
 
@@ -7478,12 +7116,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.59910486917431109e-21 );
 	CHECK( d.at(92) ==  2.86021609932198726e-22 );
 
-	}
-
 	// channel 72
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 72);
 	psg.densities(d);
 
@@ -7581,12 +7214,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.37314242754480108e-21 );
 	CHECK( d.at(92) ==  4.12615320291933532e-22 );
 
-	}
-
 	// channel 73
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 73);
 	psg.densities(d);
 
@@ -7684,12 +7312,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.36890550914580240e-21 );
 	CHECK( d.at(92) ==  3.98675692039506028e-22 );
 
-	}
-
 	// channel 74
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 74);
 	psg.densities(d);
 
@@ -7787,12 +7410,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.06692427252141632e-20 );
 	CHECK( d.at(92) ==  2.39814612067235993e-21 );
 
-	}
-
 	// channel 75
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 75);
 	psg.densities(d);
 
@@ -7890,12 +7508,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.25273698191330208e-20 );
 	CHECK( d.at(92) ==  1.54594950434917021e-20 );
 
-	}
-
 	// channel 76
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 76);
 	psg.densities(d);
 
@@ -7993,12 +7606,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.25273698191330208e-20 );
 	CHECK( d.at(92) ==  1.54594950434917021e-20 );
 
-	}
-
 	// channel 77
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 77);
 	psg.densities(d);
 
@@ -8096,12 +7704,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.45294819691153065e-20 );
 	CHECK( d.at(92) ==  6.21268160883665017e-20 );
 
-	}
-
 	// channel 78
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 78);
 	psg.densities(d);
 
@@ -8199,12 +7802,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.45294819691153065e-20 );
 	CHECK( d.at(92) ==  6.21268160883665017e-20 );
 
-	}
-
 	// channel 79
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 79);
 	psg.densities(d);
 
@@ -8302,12 +7900,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.53369827713947375e-18 );
 	CHECK( d.at(92) ==  1.24974481339133286e-18 );
 
-	}
-
 	// channel 80
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 80);
 	psg.densities(d);
 
@@ -8405,12 +7998,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.53195781275349081e-18 );
 	CHECK( d.at(92) ==  1.24918088188710002e-18 );
 
-	}
-
 	// channel 81
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 81);
 	psg.densities(d);
 
@@ -8508,12 +8096,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.88560518130396285e-18 );
 	CHECK( d.at(92) ==  4.98171379375025823e-18 );
 
-	}
-
 	// channel 82
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 82);
 	psg.densities(d);
 
@@ -8611,12 +8194,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.93201055028085942e-18 );
 	CHECK( d.at(92) ==  1.72325205639721884e-18 );
 
-	}
-
 	// channel 83
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 83);
 	psg.densities(d);
 
@@ -8714,12 +8292,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.94453427513197308e-18 );
 	CHECK( d.at(92) ==  1.74278642753282957e-18 );
 
-	}
-
 	// channel 84
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 84);
 	psg.densities(d);
 
@@ -8817,12 +8390,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.28305679224851634e-18 );
 	CHECK( d.at(92) ==  2.33768194447240734e-18 );
 
-	}
-
 	// channel 85
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 85);
 	psg.densities(d);
 
@@ -8920,12 +8488,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  4.65810495266635866e-17 );
 	CHECK( d.at(92) ==  8.34087730735277824e-17 );
 
-	}
-
 	// channel 86
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 86);
 	psg.densities(d);
 
@@ -9023,12 +8586,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.98299776726500602e-18 );
 	CHECK( d.at(92) ==  3.12285588107891662e-18 );
 
-	}
-
 	// channel 87
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 87);
 	psg.densities(d);
 
@@ -9126,12 +8684,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  3.01283283274935328e-17 );
 	CHECK( d.at(92) ==  5.05760054430784495e-17 );
 
-	}
-
 	// channel 88
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 88);
 	psg.densities(d);
 
@@ -9229,12 +8782,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.48286589750920607e-18 );
 	CHECK( d.at(92) ==  3.69134084671620848e-18 );
 
-	}
-
 	// channel 89
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 89);
 	psg.densities(d);
 
@@ -9332,12 +8880,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  1.34061453914149571e-21 );
 	CHECK( d.at(92) ==  1.68248346758764508e-22 );
 
-	}
-
 	// channel 90
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 90);
 	psg.densities(d);
 
@@ -9435,12 +8978,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  2.04236435875975874e-21 );
 	CHECK( d.at(92) ==  1.96430079746355402e-22 );
 
-	}
-
 	// channel 91
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 91);
 	psg.densities(d);
 
@@ -9538,12 +9076,7 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(91) ==  5.69523909456109073e-20 );
 	CHECK( d.at(92) ==  3.59027682112797777e-20 );
 
-	}
-
 	// channel 92
-	{
-
-	hep::random_numbers<T> random_numbers(numbers);
 	psg.generate(random_numbers, p, energy, 92);
 	psg.densities(d);
 
@@ -9640,6 +9173,4 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(90) ==  6.49175283697284585e-20 );
 	CHECK( d.at(91) ==  1.42668363549598933e-19 );
 	CHECK( d.at(92) ==  2.20373864925391265e-19 );
-
-	}
 }

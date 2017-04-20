@@ -22,7 +22,6 @@
 #include "hep/ps/hh_phase_space_generator.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -73,7 +72,7 @@ public:
 	/// as a set of four-vectors into `momenta` using the specified `channel`
 	/// for the given center-of-mass frame energy `cmf_energy`.
 	void generate(
-		random_numbers<T>& numbers,
+		std::vector<T> const& random_numbers,
 		std::vector<T>& momenta,
 		T cmf_energy,
 		std::size_t channel

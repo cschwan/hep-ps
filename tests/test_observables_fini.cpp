@@ -33,9 +33,9 @@ void test_observables_fint(
 	T const test_result = T();
 
 	T const x = T(0.5);
-	std::vector<T> numbers = { x };
-	hep::random_numbers<T> rans(numbers);
-	T const result = observables->eval(phase_space_point, info, rans, set);
+	phase_space_point.push_back(x);
+
+	T const result = observables->eval(phase_space_point, info, set);
 
 	REQUIRE( result == test_result );
 }

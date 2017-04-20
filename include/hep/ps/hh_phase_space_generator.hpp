@@ -20,7 +20,6 @@
  */
 
 #include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/random_numbers.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -73,13 +72,13 @@ public:
 
 	/// Generates a phase space point.
 	void generate(
-		random_numbers<numeric_type>& numbers,
+		std::vector<numeric_type> const& random_numbers,
 		std::vector<numeric_type>& momenta,
 		numeric_type cmf_energy,
 		std::size_t channel
 	) {
-		auto const r2 = numbers.back();
-		auto const r1 = numbers.back();
+		auto const r1 = random_numbers.at(psg.dimensions() + 0);
+		auto const r2 = random_numbers.at(psg.dimensions() + 1);
 
 		using std::log;
 		using std::pow;
@@ -98,7 +97,7 @@ public:
 
 		jacobian_ = r1 * log_tau0 * log_tau0 * tau;
 		info_ = luminosity_info<numeric_type>(x1, x2, shat, rapidity_shift);
-		psg.generate(numbers, momenta, energy, channel);
+		psg.generate(random_numbers, momenta, energy, channel);
 	}
 
 	/// Returns an instance of \ref luminosity_info that captures the data from
