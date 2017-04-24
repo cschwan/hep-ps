@@ -29,7 +29,7 @@ void test_observables_real(
 		test_scale_setter<T>(),
 		hep::trivial_distributions<T>(),
 		T(1.0),
-		inclusive
+		T()
 	);
 
 	std::vector<T> real_phase_space_point(4 * (count + 3));
