@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/abc_terms.hpp"
+#include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state.hpp"
@@ -72,6 +73,8 @@ public:
 		, hbarc2_(hbarc2)
 		, insertion2_(insertion2)
 	{
+		static_assert (std::is_base_of<hep::distributions<T>, D>::value,
+			"`D` must be a type deriving from `hep::distributions<T>`");
 	}
 
 	T eval(
@@ -194,12 +197,7 @@ public:
 		return result.neg + result.pos;
 	}
 
-	D const& distributions() const
-	{
-		return distributions_;
-	}
-
-	D& distributions()
+	hep::distributions<T>& distributions() override
 	{
 		return distributions_;
 	}

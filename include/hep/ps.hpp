@@ -28,6 +28,7 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/dipole_with_set.hpp"
+#include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/fold.hpp"

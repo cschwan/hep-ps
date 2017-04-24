@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/distributions.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 
@@ -43,6 +44,9 @@ public:
 		luminosity_info<T> const& info,
 		initial_state_set set
 	) = 0;
+
+	/// Returns the distributions that the observable object was created with.
+	virtual hep::distributions<T>& distributions() = 0;
 };
 
 }
