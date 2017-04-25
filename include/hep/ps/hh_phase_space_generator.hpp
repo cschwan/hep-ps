@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/phase_space_generator.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -35,6 +36,7 @@ namespace hep
 /// integration over the momentum fractions.
 template <typename PhaseSpaceGenerator>
 class hh_phase_space_generator
+	: public phase_space_generator<typename PhaseSpaceGenerator::numeric_type>
 {
 public:
 	/// Numeric type used for phase space computations.
@@ -51,21 +53,21 @@ public:
 	}
 
 	/// Returns the number of channels of `PhaseSpaceGenerator`.
-	std::size_t channels() const
+	std::size_t channels() const override
 	{
 		return psg.channels();
 	}
 
 	/// Write the densities for each channel of the last generated phase space
 	/// point into `densities` and returns an additional jacobian.
-	numeric_type densities(std::vector<numeric_type>& densities)
+	numeric_type densities(std::vector<numeric_type>& densities) override
 	{
 		return psg.densities(densities) * jacobian_;
 	}
 
 	/// Returns the number of dimensions of `PhaseSpaceGenerator` plus two,
 	/// which are needed to generate the momentum fractions.
-	std::size_t dimensions() const
+	std::size_t dimensions() const override
 	{
 		return psg.dimensions() + 2;
 	}
@@ -76,7 +78,7 @@ public:
 		std::vector<numeric_type>& momenta,
 		numeric_type cmf_energy,
 		std::size_t channel
-	) {
+	) override {
 		auto const r1 = random_numbers.at(psg.dimensions() + 0);
 		auto const r2 = random_numbers.at(psg.dimensions() + 1);
 
@@ -102,13 +104,13 @@ public:
 
 	/// Returns an instance of \ref luminosity_info that captures the data from
 	/// the last generated point.
-	luminosity_info<numeric_type> info() const
+	luminosity_info<numeric_type> info() const override
 	{
 		return info_;
 	}
 
 	/// Returns `map_dimensions()` of `PhaseSpaceGenerator`.
-	std::size_t map_dimensions() const
+	std::size_t map_dimensions() const override
 	{
 		return psg.map_dimensions();
 	}

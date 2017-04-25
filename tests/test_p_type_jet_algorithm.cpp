@@ -24,18 +24,20 @@ hep::lusifer_constants<T> constants(
 
 TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 {
-	hep::lusifer_phase_space_generator<T> psg(
+	T const min_energy = T(10.0);
+	T const cmf_energy = T(1000.0);
+	T const R = T(0.7);
+
+	auto psg = hep::make_lusifer_phase_space_generator<T>(
+		min_energy,
 		"sq~uq ne el~nm mu~dq cq~gl ",
 		constants
 	);
 
-	T const R = T(0.7);
-	T const cmf_energy = T(1000.0);
-
 	std::vector<std::size_t> proto_jets = { 6, 7, 8 };
 
-	std::vector<T> random_numbers(psg.dimensions());
-	std::vector<T> momenta(psg.map_dimensions());
+	std::vector<T> random_numbers(psg->dimensions());
+	std::vector<T> momenta(psg->map_dimensions());
 	std::vector<T> recombined_momenta;
 	std::mt19937 rng;
 
@@ -49,7 +51,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 
 		fastjet::JetDefinition jet_definition(fastjet::genkt_algorithm, R, p);
 
-		for (std::size_t channel = 0; channel != psg.channels(); ++channel)
+		for (std::size_t channel = 0; channel != psg->channels(); ++channel)
 		{
 			for (std::size_t i = 0; i != 100; ++i)
 			{
@@ -58,7 +60,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 						std::numeric_limits<T>::max_digits10>(rng);
 				});
 
-				psg.generate(random_numbers, momenta, cmf_energy, channel);
+				psg->generate(random_numbers, momenta, cmf_energy, channel);
 
 				auto const recombinations = jet_algorithm.recombine(
 					momenta,

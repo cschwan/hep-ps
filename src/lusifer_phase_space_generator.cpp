@@ -394,8 +394,86 @@ lusifer_constants<T>::lusifer_constants(
 {
 }
 
+/// A modified version of the phase space generator used in LUSIFER, see
+/// \cite Dittmaier:2002ap .
 template <typename T>
-class lusifer_phase_space_generator<T>::impl
+class lusifer_phase_space_generator_impl
+{
+public:
+	/// The numeric type used to perform phase space generation.
+	using numeric_type = T;
+
+	/// Constructor. The parameter `processes` specify the partonic processes
+	/// that are used to generate the channels the integrater uses to generate
+	/// phase space, with the masses and decay widths specified in `constants`.
+	/// The parameter `extra_random_numbers` specifies the number of extra
+	/// random numbers that should be generated. This number increases both the
+	/// value \ref dimensions and \ref map_dimensions returns. The random
+	/// numbers that the generator uses to generate the phase space points are
+	/// the first \f$ 3 n - 4 \f$ numbers, where \f$ n \f$ are the number of
+	/// final state particles.
+	lusifer_phase_space_generator_impl(
+		std::vector<std::string> const& processes,
+		lusifer_constants<T> const& constants,
+		std::size_t extra_random_numbers = 0
+	);
+
+	/// Constructor.
+	lusifer_phase_space_generator_impl(
+		std::string const& process,
+		lusifer_constants<T> const& constants,
+		std::size_t extra_random_numbers = 0
+	);
+
+	/// Move constructor.
+	lusifer_phase_space_generator_impl(lusifer_phase_space_generator_impl<T>&& psg);
+
+	/// Destructor.
+	~lusifer_phase_space_generator_impl();
+
+	/// Returns the number of channels this generators supports.
+	std::size_t channels() const;
+
+	/// Evaluates all densities for the previously generated phase space point
+	/// and writes them into `densities`. This vector must have the size given
+	/// by \ref channels. The return value is an additional jacobian.
+	T densities(std::vector<T>& densities);
+
+	/// Returns how many random numbers are needed to construct a phase space
+	/// point.
+	std::size_t dimensions() const;
+
+	/// Uses `random_numbers` to construct a phase space point which is written
+	/// as a set of four-vectors into `momenta` using the specified `channel`
+	/// for the given center-of-mass frame energy `cmf_energy`.
+	void generate(
+		std::vector<T> const& random_numbers,
+		std::vector<T>& momenta,
+		T cmf_energy,
+		std::size_t channel
+	);
+
+	/// Returns an object of class \ref luminosity_info that contains the energy
+	/// of the previously generated phase space point.
+	luminosity_info<T> info() const;
+
+	/// Returns the size of the vector `momenta` that has to be passed to
+	/// \ref generate.
+	std::size_t map_dimensions() const;
+
+private:
+	class impl;
+	std::unique_ptr<impl> pimpl;
+};
+
+/// The phase space generator \ref lusifer_phase_space_generator for
+/// hadron-hadron collisions.
+template <typename T>
+using lusifer_phase_space_generator =
+	hh_phase_space_generator<lusifer_phase_space_generator_impl<T>>;
+
+template <typename T>
+class lusifer_phase_space_generator_impl<T>::impl
 {
 public:
 	impl(
@@ -423,7 +501,7 @@ public:
 };
 
 template <typename T>
-lusifer_phase_space_generator<T>::impl::impl(
+lusifer_phase_space_generator_impl<T>::impl::impl(
 	std::size_t particles,
 	std::size_t max_particles,
 	std::size_t channels,
@@ -549,7 +627,7 @@ lusifer_phase_space_generator<T>::impl::impl(
 }
 
 template <typename T>
-lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
+lusifer_phase_space_generator_impl<T>::lusifer_phase_space_generator_impl(
 	std::vector<std::string> const& processes,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers
@@ -630,12 +708,12 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 }
 
 template <typename T>
-lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
+lusifer_phase_space_generator_impl<T>::lusifer_phase_space_generator_impl(
 	std::string const& process,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers
 )
-	: lusifer_phase_space_generator(
+	: lusifer_phase_space_generator_impl(
 		std::vector<std::string>{process},
 		constants,
 		extra_random_numbers
@@ -644,24 +722,24 @@ lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
 }
 
 template <typename T>
-lusifer_phase_space_generator<T>::lusifer_phase_space_generator(
-	lusifer_phase_space_generator<T>&& psg
+lusifer_phase_space_generator_impl<T>::lusifer_phase_space_generator_impl(
+	lusifer_phase_space_generator_impl<T>&& psg
 )
 	: pimpl(std::move(psg.pimpl))
 {
 }
 
 template <typename T>
-lusifer_phase_space_generator<T>::~lusifer_phase_space_generator() = default;
+lusifer_phase_space_generator_impl<T>::~lusifer_phase_space_generator_impl() = default;
 
 template <typename T>
-std::size_t lusifer_phase_space_generator<T>::channels() const
+std::size_t lusifer_phase_space_generator_impl<T>::channels() const
 {
 	return pimpl->channels.size();
 }
 
 template <typename T>
-T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
+T lusifer_phase_space_generator_impl<T>::densities(std::vector<T>& densities)
 {
 	using std::acos;
 	using std::fabs;
@@ -859,13 +937,13 @@ T lusifer_phase_space_generator<T>::densities(std::vector<T>& densities)
 }
 
 template <typename T>
-std::size_t lusifer_phase_space_generator<T>::dimensions() const
+std::size_t lusifer_phase_space_generator_impl<T>::dimensions() const
 {
 	return 3 * (pimpl->particles - 4) + 2 + pimpl->extra_random_numbers;
 }
 
 template <typename T>
-void lusifer_phase_space_generator<T>::generate(
+void lusifer_phase_space_generator_impl<T>::generate(
 	std::vector<T> const& random_numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
@@ -1082,20 +1160,67 @@ void lusifer_phase_space_generator<T>::generate(
 }
 
 template <typename T>
-luminosity_info<T> lusifer_phase_space_generator<T>::info() const
+luminosity_info<T> lusifer_phase_space_generator_impl<T>::info() const
 {
 	return luminosity_info<T>(pimpl->cmf_energy_ * pimpl->cmf_energy_);
 }
 
 template <typename T>
-std::size_t lusifer_phase_space_generator<T>::map_dimensions() const
+std::size_t lusifer_phase_space_generator_impl<T>::map_dimensions() const
 {
 	return 4 * pimpl->particles + pimpl->extra_random_numbers;
+}
+
+template <typename T>
+std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
+	T min_energy,
+	std::vector<std::string> const& processes,
+	lusifer_constants<T> const& constants,
+	std::size_t extra_random_numbers = 0
+) {
+	return std::unique_ptr<phase_space_generator<T>>(
+		new lusifer_phase_space_generator<T>(
+			min_energy,
+			processes,
+			constants,
+			extra_random_numbers
+	));
+}
+
+template <typename T>
+std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
+	T min_energy,
+	std::string const& process,
+	lusifer_constants<T> const& constants,
+	std::size_t extra_random_numbers = 0
+) {
+	return make_lusifer_phase_space_generator(
+		min_energy,
+		std::vector<std::string>{process},
+		constants,
+		extra_random_numbers
+	);
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template class lusifer_constants<double>;
-template class lusifer_phase_space_generator<double>;
+template class lusifer_phase_space_generator_impl<double>;
+
+template std::unique_ptr<phase_space_generator<double>>
+make_lusifer_phase_space_generator(
+	double,
+	std::vector<std::string> const&,
+	lusifer_constants<double> const&,
+	std::size_t
+);
+
+template std::unique_ptr<phase_space_generator<double>>
+make_lusifer_phase_space_generator(
+	double,
+	std::string const&,
+	lusifer_constants<double> const&,
+	std::size_t
+);
 
 }

@@ -30,12 +30,13 @@ TEST_CASE("test make_mc_observables_born", "[mc_observables]")
 	std::size_t count = 2;
 	T cmf_energy = T(1000.0);
 
-	auto generator = hep::mc_phase_space_adapter<
-		hep::hh_lusifer_phase_space_generator<T>>(
-			cmf_energy,
+	auto generator = hep::mc_phase_space_adapter<T>(
+		cmf_energy,
+		hep::make_lusifer_phase_space_generator<T>(
 			T(10.0),
 			"el~el mu mu~",
 			constants
+		)
 	);
 
 	auto observables = hep::make_mc_observables_born(
@@ -71,13 +72,14 @@ TEST_CASE("test make_mc_observables_fini", "[mc_observables]")
 	std::size_t count = 2;
 	T cmf_energy = T(1000.0);
 
-	auto generator = hep::mc_phase_space_adapter<
-		hep::hh_lusifer_phase_space_generator<T>>(
-			cmf_energy,
+	auto generator = hep::mc_phase_space_adapter<T>(
+		cmf_energy,
+		hep::make_lusifer_phase_space_generator<T>(
 			T(10.0),
 			"el~el mu mu~",
 			constants,
 			1
+		)
 	);
 
 	auto observables = hep::make_mc_observables_fini(
@@ -115,12 +117,13 @@ TEST_CASE("test make_mc_observables_real", "[mc_observables]")
 	std::size_t count = 2;
 	T cmf_energy = T(1000.0);
 
-	auto generator = hep::mc_phase_space_adapter<
-		hep::hh_lusifer_phase_space_generator<T>>(
-			cmf_energy,
+	auto generator = hep::mc_phase_space_adapter<T>(
+		cmf_energy,
+		hep::make_lusifer_phase_space_generator<T>(
 			T(10.0),
 			"el~el mu mu~ga ",
 			constants
+		)
 	);
 
 	auto observables = hep::make_mc_observables_real(

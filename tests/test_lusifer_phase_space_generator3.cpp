@@ -22,36 +22,36 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	T const min_energy = T(10.0);
 	T const cmf_energy = T(1000.0);
 
-	hep::hh_lusifer_phase_space_generator<T> psg(
+	auto psg = hep::make_lusifer_phase_space_generator<T>(
 		min_energy,
 		"sq~uq ne el~nm mu~dq cq~",
 		constants
 	);
 
 	std::mt19937 rng;
-	std::vector<T> random_numbers(psg.dimensions());
+	std::vector<T> random_numbers(psg->dimensions());
 
 	std::generate(random_numbers.begin(), random_numbers.end(), [&](){
 		return std::generate_canonical<T, std::numeric_limits<T>::digits>(rng);
 	});
 
-	std::vector<T> p(psg.map_dimensions());
-	std::vector<T> d(psg.channels());
+	std::vector<T> p(psg->map_dimensions());
+	std::vector<T> d(psg->channels());
 
 //	// generate the test code
 //	std::cout.precision(std::numeric_limits<T>::max_digits10);
 //	std::cout.setf(std::ios_base::scientific);
 //	std::cout.setf(std::ios_base::right);
 //
-//	for (std::size_t channel = 0; channel != psg.channels(); ++channel)
+//	for (std::size_t channel = 0; channel != psg->channels(); ++channel)
 //	{
-//		psg.generate(random_numbers, p, cmf_energy, channel);
-//		psg.densities(d);
+//		psg->generate(random_numbers, p, cmf_energy, channel);
+//		psg->densities(d);
 //
 //		std::cout << "\t// channel " << channel << "\n";
-//		std::cout << "\tpsg.generate(random_numbers, p, cmf_energy, " << channel
-//			<< ");\n";
-//		std::cout << "\tpsg.densities(d);\n\n";
+//		std::cout << "\tpsg->generate(random_numbers, p, cmf_energy, "
+//			<< channel << ");\n";
+//		std::cout << "\tpsg->densities(d);\n\n";
 //
 //		for (std::size_t i = 0; i != d.size(); ++i)
 //		{
@@ -63,8 +63,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 //	}
 
 	// channel 0
-	psg.generate(random_numbers, p, cmf_energy, 0);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 0);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.05562158210907453e-12 );
 	CHECK( d.at( 1) ==  7.20250132377658777e-13 );
@@ -161,8 +161,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.35918576716753191e-17 );
 
 	// channel 1
-	psg.generate(random_numbers, p, cmf_energy, 1);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 1);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.30073378400042483e-12 );
 	CHECK( d.at( 1) ==  1.04746085387962384e-12 );
@@ -259,8 +259,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  6.70131701966792718e-18 );
 
 	// channel 2
-	psg.generate(random_numbers, p, cmf_energy, 2);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 2);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.71158442824840498e-11 );
 	CHECK( d.at( 1) ==  1.36815681918265254e-11 );
@@ -357,8 +357,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  6.70131701966720149e-18 );
 
 	// channel 3
-	psg.generate(random_numbers, p, cmf_energy, 3);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 3);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  7.27904089399269866e-14 );
 	CHECK( d.at( 1) ==  7.92814374849484716e-14 );
@@ -455,8 +455,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  6.70131701966792718e-18 );
 
 	// channel 4
-	psg.generate(random_numbers, p, cmf_energy, 4);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 4);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  5.28409106433180173e-13 );
 	CHECK( d.at( 1) ==  3.63914301657639776e-13 );
@@ -553,8 +553,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  6.70131701966720149e-18 );
 
 	// channel 5
-	psg.generate(random_numbers, p, cmf_energy, 5);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 5);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.62790513007348572e-12 );
 	CHECK( d.at( 1) ==  2.12873483540203119e-12 );
@@ -651,8 +651,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.62573259748219273e-17 );
 
 	// channel 6
-	psg.generate(random_numbers, p, cmf_energy, 6);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 6);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.48209293819470941e-12 );
 	CHECK( d.at( 1) ==  1.88610270686329662e-12 );
@@ -749,8 +749,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.13677751631939476e-17 );
 
 	// channel 7
-	psg.generate(random_numbers, p, cmf_energy, 7);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 7);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  9.06345188274402651e-12 );
 	CHECK( d.at( 1) ==  1.17172983131966719e-11 );
@@ -847,8 +847,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.13677751631939476e-17 );
 
 	// channel 8
-	psg.generate(random_numbers, p, cmf_energy, 8);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 8);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.56711264529985933e-13 );
 	CHECK( d.at( 1) ==  1.48803215064493723e-13 );
@@ -945,8 +945,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.13677751631939476e-17 );
 
 	// channel 9
-	psg.generate(random_numbers, p, cmf_energy, 9);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 9);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  6.60615683829416123e-13 );
 	CHECK( d.at( 1) ==  8.01739601577645722e-13 );
@@ -1043,8 +1043,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.13677751631939476e-17 );
 
 	// channel 10
-	psg.generate(random_numbers, p, cmf_energy, 10);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 10);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  7.59566387993804734e-16 );
 	CHECK( d.at( 1) ==  9.90618045919658845e-16 );
@@ -1141,8 +1141,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  5.21181982212902947e-15 );
 
 	// channel 11
-	psg.generate(random_numbers, p, cmf_energy, 11);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 11);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  7.65247877905530759e-16 );
 	CHECK( d.at( 1) ==  9.97824015629385946e-16 );
@@ -1239,8 +1239,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  5.15778322979422581e-15 );
 
 	// channel 12
-	psg.generate(random_numbers, p, cmf_energy, 12);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 12);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.29355137634374578e-15 );
 	CHECK( d.at( 1) ==  2.02395835089690661e-15 );
@@ -1337,8 +1337,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  5.15778322979422581e-15 );
 
 	// channel 13
-	psg.generate(random_numbers, p, cmf_energy, 13);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 13);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  5.87766473522013685e-18 );
 	CHECK( d.at( 1) ==  7.86992192773314432e-18 );
@@ -1435,8 +1435,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.70476554127510190e-16 );
 
 	// channel 14
-	psg.generate(random_numbers, p, cmf_energy, 14);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 14);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  5.03625697382139830e-18 );
 	CHECK( d.at( 1) ==  6.65897748506733219e-18 );
@@ -1533,8 +1533,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.85627144322066267e-16 );
 
 	// channel 15
-	psg.generate(random_numbers, p, cmf_energy, 15);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 15);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.85678960501327823e-18 );
 	CHECK( d.at( 1) ==  2.02791008628097544e-18 );
@@ -1631,8 +1631,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.85627144322066267e-16 );
 
 	// channel 16
-	psg.generate(random_numbers, p, cmf_energy, 16);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 16);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.10343597421093496e-13 );
 	CHECK( d.at( 1) ==  4.82513421207449380e-13 );
@@ -1729,8 +1729,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.20523096167648566e-14 );
 
 	// channel 17
-	psg.generate(random_numbers, p, cmf_energy, 17);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 17);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.43095396717331033e-13 );
 	CHECK( d.at( 1) ==  5.19616126111352035e-13 );
@@ -1827,8 +1827,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.26419378684423216e-14 );
 
 	// channel 18
-	psg.generate(random_numbers, p, cmf_energy, 18);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 18);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.67106245339206711e-12 );
 	CHECK( d.at( 1) ==  1.29293939884605477e-12 );
@@ -1925,8 +1925,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.26419378684423216e-14 );
 
 	// channel 19
-	psg.generate(random_numbers, p, cmf_energy, 19);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 19);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.42725939902211071e-11 );
 	CHECK( d.at( 1) ==  5.94218535390923882e-11 );
@@ -2023,8 +2023,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.48761562833013693e-15 );
 
 	// channel 20
-	psg.generate(random_numbers, p, cmf_energy, 20);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 20);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.62012795889565491e-11 );
 	CHECK( d.at( 1) ==  2.32691411929767384e-11 );
@@ -2121,8 +2121,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.99184923884196682e-15 );
 
 	// channel 21
-	psg.generate(random_numbers, p, cmf_energy, 21);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 21);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.05203631321425584e-12 );
 	CHECK( d.at( 1) ==  6.32732897938129265e-13 );
@@ -2219,8 +2219,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.69532815615287792e-13 );
 
 	// channel 22
-	psg.generate(random_numbers, p, cmf_energy, 22);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 22);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.29244385660564091e-12 );
 	CHECK( d.at( 1) ==  1.37104437714410151e-12 );
@@ -2317,8 +2317,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.99184923884204255e-15 );
 
 	// channel 23
-	psg.generate(random_numbers, p, cmf_energy, 23);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 23);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  5.02226344317204301e-14 );
 	CHECK( d.at( 1) ==  4.78220294337909317e-14 );
@@ -2415,8 +2415,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.69532815615308795e-13 );
 
 	// channel 24
-	psg.generate(random_numbers, p, cmf_energy, 24);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 24);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  9.32244381206185816e-16 );
 	CHECK( d.at( 1) ==  9.34024166950384612e-16 );
@@ -2513,8 +2513,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.64712235094919215e-13 );
 
 	// channel 25
-	psg.generate(random_numbers, p, cmf_energy, 25);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 25);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  9.36798458177507902e-16 );
 	CHECK( d.at( 1) ==  9.38711536756457913e-16 );
@@ -2611,8 +2611,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.64712235094919215e-13 );
 
 	// channel 26
-	psg.generate(random_numbers, p, cmf_energy, 26);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 26);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  9.59668623987933981e-16 );
 	CHECK( d.at( 1) ==  1.04554811873333960e-15 );
@@ -2709,8 +2709,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.64712235094919215e-13 );
 
 	// channel 27
-	psg.generate(random_numbers, p, cmf_energy, 27);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 27);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.02467700434441123e-18 );
 	CHECK( d.at( 1) ==  1.17929628154971157e-18 );
@@ -2807,8 +2807,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.66335196153247981e-18 );
 
 	// channel 28
-	psg.generate(random_numbers, p, cmf_energy, 28);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 28);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.89189174827149030e-18 );
 	CHECK( d.at( 1) ==  1.12794582168397341e-18 );
@@ -2905,8 +2905,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.93868546725935719e-18 );
 
 	// channel 29
-	psg.generate(random_numbers, p, cmf_energy, 29);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 29);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.94905770278367910e-19 );
 	CHECK( d.at( 1) ==  3.56902986425715920e-19 );
@@ -3003,8 +3003,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.93868546725935719e-18 );
 
 	// channel 30
-	psg.generate(random_numbers, p, cmf_energy, 30);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 30);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.39814472969348116e-11 );
 	CHECK( d.at( 1) ==  4.40380654260085409e-11 );
@@ -3101,8 +3101,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  5.58797324881123556e-13 );
 
 	// channel 31
-	psg.generate(random_numbers, p, cmf_energy, 31);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 31);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.35545910912250083e-12 );
 	CHECK( d.at( 1) ==  1.14223608525512386e-12 );
@@ -3199,8 +3199,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  9.29449057519001607e-16 );
 
 	// channel 32
-	psg.generate(random_numbers, p, cmf_energy, 32);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 32);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.08003391719955255e-12 );
 	CHECK( d.at( 1) ==  1.05494469819082961e-12 );
@@ -3297,8 +3297,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.02799535556478278e-15 );
 
 	// channel 33
-	psg.generate(random_numbers, p, cmf_energy, 33);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 33);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.71978156560892097e-13 );
 	CHECK( d.at( 1) ==  5.40232407950962116e-13 );
@@ -3395,8 +3395,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  5.58797324881123556e-13 );
 
 	// channel 34
-	psg.generate(random_numbers, p, cmf_energy, 34);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 34);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.62058815903252799e-14 );
 	CHECK( d.at( 1) ==  3.08789737475374605e-14 );
@@ -3493,8 +3493,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.02799535556478278e-15 );
 
 	// channel 35
-	psg.generate(random_numbers, p, cmf_energy, 35);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 35);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.48200240363709286e-12 );
 	CHECK( d.at( 1) ==  3.26601843290473963e-12 );
@@ -3591,8 +3591,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.16360679870106220e-14 );
 
 	// channel 36
-	psg.generate(random_numbers, p, cmf_energy, 36);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 36);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.50791706832988333e-12 );
 	CHECK( d.at( 1) ==  3.30837547031879134e-12 );
@@ -3689,8 +3689,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.01489328395689089e-14 );
 
 	// channel 37
-	psg.generate(random_numbers, p, cmf_energy, 37);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 37);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  6.14840876201026277e-12 );
 	CHECK( d.at( 1) ==  7.73754508985781601e-12 );
@@ -3787,8 +3787,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.01489328395689089e-14 );
 
 	// channel 38
-	psg.generate(random_numbers, p, cmf_energy, 38);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 38);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.66192150672563750e-19 );
 	CHECK( d.at( 1) ==  1.48217064234194094e-19 );
@@ -3885,8 +3885,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.45889262557158412e-18 );
 
 	// channel 39
-	psg.generate(random_numbers, p, cmf_energy, 39);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 39);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.66153993040745650e-19 );
 	CHECK( d.at( 1) ==  1.48183366981257294e-19 );
@@ -3983,8 +3983,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.45896598155911590e-18 );
 
 	// channel 40
-	psg.generate(random_numbers, p, cmf_energy, 40);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 40);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.01784902293976175e-19 );
 	CHECK( d.at( 1) ==  1.98399511804533116e-19 );
@@ -4081,8 +4081,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  3.45896598155911590e-18 );
 
 	// channel 41
-	psg.generate(random_numbers, p, cmf_energy, 41);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 41);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.56867333902751353e-18 );
 	CHECK( d.at( 1) ==  4.74744159906165078e-18 );
@@ -4179,8 +4179,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.97460160007427408e-11 );
 
 	// channel 42
-	psg.generate(random_numbers, p, cmf_energy, 42);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 42);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.02334367867829684e-17 );
 	CHECK( d.at( 1) ==  2.35229768080427635e-17 );
@@ -4277,8 +4277,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.97828882040735173e-11 );
 
 	// channel 43
-	psg.generate(random_numbers, p, cmf_energy, 43);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 43);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.57853157606755519e-18 );
 	CHECK( d.at( 1) ==  4.75756629772472807e-18 );
@@ -4375,8 +4375,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.97828882040735173e-11 );
 
 	// channel 44
-	psg.generate(random_numbers, p, cmf_energy, 44);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 44);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.75939990428069331e-20 );
 	CHECK( d.at( 1) ==  1.51609985581793615e-20 );
@@ -4473,8 +4473,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.32207603815937674e-16 );
 
 	// channel 45
-	psg.generate(random_numbers, p, cmf_energy, 45);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 45);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.89648888882966580e-20 );
 	CHECK( d.at( 1) ==  1.63160595158179180e-20 );
@@ -4571,8 +4571,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.35412111611191705e-16 );
 
 	// channel 46
-	psg.generate(random_numbers, p, cmf_energy, 46);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 46);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  7.83673574162585779e-18 );
 	CHECK( d.at( 1) ==  5.31198259935062922e-18 );
@@ -4669,8 +4669,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.90514628765664229e-15 );
 
 	// channel 47
-	psg.generate(random_numbers, p, cmf_energy, 47);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 47);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  7.90154884790477774e-18 );
 	CHECK( d.at( 1) ==  5.42044543767815365e-18 );
@@ -4767,8 +4767,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.55585137454645197e-15 );
 
 	// channel 48
-	psg.generate(random_numbers, p, cmf_energy, 48);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 48);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.50967889883726792e-20 );
 	CHECK( d.at( 1) ==  1.35460211245699659e-20 );
@@ -4865,8 +4865,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.62461715099012144e-16 );
 
 	// channel 49
-	psg.generate(random_numbers, p, cmf_energy, 49);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 49);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.63867389551038853e-20 );
 	CHECK( d.at( 1) ==  1.46979030703749740e-20 );
@@ -4963,8 +4963,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.68759951654739670e-16 );
 
 	// channel 50
-	psg.generate(random_numbers, p, cmf_energy, 50);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 50);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.19936664400483290e-17 );
 	CHECK( d.at( 1) ==  1.28952644036839129e-17 );
@@ -5061,8 +5061,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.99677313666293205e-13 );
 
 	// channel 51
-	psg.generate(random_numbers, p, cmf_energy, 51);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 51);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.12790793296135852e-17 );
 	CHECK( d.at( 1) ==  1.20692718322987125e-17 );
@@ -5159,8 +5159,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.99677313666293205e-13 );
 
 	// channel 52
-	psg.generate(random_numbers, p, cmf_energy, 52);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 52);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.35222600771832106e-18 );
 	CHECK( d.at( 1) ==  1.37699592496845787e-18 );
@@ -5257,8 +5257,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.55969774341109160e-14 );
 
 	// channel 53
-	psg.generate(random_numbers, p, cmf_energy, 53);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 53);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.39864519335453834e-18 );
 	CHECK( d.at( 1) ==  1.42646067992990751e-18 );
@@ -5355,8 +5355,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.55969774341109160e-14 );
 
 	// channel 54
-	psg.generate(random_numbers, p, cmf_energy, 54);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 54);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.28491988033796114e-19 );
 	CHECK( d.at( 1) ==  2.69147855377614282e-19 );
@@ -5453,8 +5453,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.20726753208402686e-16 );
 
 	// channel 55
-	psg.generate(random_numbers, p, cmf_energy, 55);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 55);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.64338388487084460e-19 );
 	CHECK( d.at( 1) ==  2.99453881628092101e-19 );
@@ -5551,8 +5551,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  8.02778171763437550e-16 );
 
 	// channel 56
-	psg.generate(random_numbers, p, cmf_energy, 56);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 56);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.46066880287740426e-14 );
 	CHECK( d.at( 1) ==  8.05611957399181340e-15 );
@@ -5649,8 +5649,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  6.38687235681670513e-14 );
 
 	// channel 57
-	psg.generate(random_numbers, p, cmf_energy, 57);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 57);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.74476792796993766e-14 );
 	CHECK( d.at( 1) ==  9.90315672251429098e-15 );
@@ -5747,8 +5747,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.23238263121001011e-14 );
 
 	// channel 58
-	psg.generate(random_numbers, p, cmf_energy, 58);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 58);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.09338235402318415e-14 );
 	CHECK( d.at( 1) ==  1.24297025894373216e-14 );
@@ -5845,8 +5845,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  8.41655470964323226e-14 );
 
 	// channel 59
-	psg.generate(random_numbers, p, cmf_energy, 59);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 59);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.80229944405974381e-14 );
 	CHECK( d.at( 1) ==  1.03097453455385869e-14 );
@@ -5943,8 +5943,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.43423389611411571e-14 );
 
 	// channel 60
-	psg.generate(random_numbers, p, cmf_energy, 60);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 60);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.42573992600205690e-14 );
 	CHECK( d.at( 1) ==  3.61578698017202082e-14 );
@@ -6041,8 +6041,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  9.79805556641218743e-14 );
 
 	// channel 61
-	psg.generate(random_numbers, p, cmf_energy, 61);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 61);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.38157633578990777e-14 );
 	CHECK( d.at( 1) ==  1.41943927497786506e-14 );
@@ -6139,8 +6139,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  6.32548197345420815e-14 );
 
 	// channel 62
-	psg.generate(random_numbers, p, cmf_energy, 62);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 62);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.76301095033676698e-14 );
 	CHECK( d.at( 1) ==  2.91293408003202807e-14 );
@@ -6237,8 +6237,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  8.88993392623742575e-14 );
 
 	// channel 63
-	psg.generate(random_numbers, p, cmf_energy, 63);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 63);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.54764064895447721e-18 );
 	CHECK( d.at( 1) ==  1.73813622314113781e-18 );
@@ -6335,8 +6335,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.45561391268218384e-16 );
 
 	// channel 64
-	psg.generate(random_numbers, p, cmf_energy, 64);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 64);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.54740614273649171e-18 );
 	CHECK( d.at( 1) ==  1.73786546226655971e-18 );
@@ -6433,8 +6433,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.45571678036376120e-16 );
 
 	// channel 65
-	psg.generate(random_numbers, p, cmf_energy, 65);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 65);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.63370349316385087e-18 );
 	CHECK( d.at( 1) ==  5.25442460287194168e-18 );
@@ -6531,8 +6531,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.45571678036376120e-16 );
 
 	// channel 66
-	psg.generate(random_numbers, p, cmf_energy, 66);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 66);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  8.17299048583980167e-17 );
 	CHECK( d.at( 1) ==  1.16231881393487215e-16 );
@@ -6629,8 +6629,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.25301207328067630e-16 );
 
 	// channel 67
-	psg.generate(random_numbers, p, cmf_energy, 67);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 67);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.57924188181311989e-16 );
 	CHECK( d.at( 1) ==  4.22771467327136907e-16 );
@@ -6727,8 +6727,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.25452799816056307e-16 );
 
 	// channel 68
-	psg.generate(random_numbers, p, cmf_energy, 68);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 68);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  8.16648029665396144e-17 );
 	CHECK( d.at( 1) ==  1.16173995352100810e-16 );
@@ -6825,8 +6825,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.25452799816056307e-16 );
 
 	// channel 69
-	psg.generate(random_numbers, p, cmf_energy, 69);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 69);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  8.62626582808885591e-19 );
 	CHECK( d.at( 1) ==  7.52657055106981850e-19 );
@@ -6923,8 +6923,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.49355621755692251e-17 );
 
 	// channel 70
-	psg.generate(random_numbers, p, cmf_energy, 70);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 70);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  8.62626158096826250e-19 );
 	CHECK( d.at( 1) ==  7.52656683762341312e-19 );
@@ -7021,8 +7021,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.49339772941738847e-17 );
 
 	// channel 71
-	psg.generate(random_numbers, p, cmf_energy, 71);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 71);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.85278565043133150e-19 );
 	CHECK( d.at( 1) ==  2.46237572701502373e-19 );
@@ -7119,8 +7119,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.89705401936651832e-18 );
 
 	// channel 72
-	psg.generate(random_numbers, p, cmf_energy, 72);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 72);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.57266453054420929e-19 );
 	CHECK( d.at( 1) ==  2.24718110464013082e-19 );
@@ -7217,8 +7217,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.71556687390737869e-18 );
 
 	// channel 73
-	psg.generate(random_numbers, p, cmf_energy, 73);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 73);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.57275361876127640e-19 );
 	CHECK( d.at( 1) ==  2.24725148047234886e-19 );
@@ -7315,8 +7315,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.71564123889074155e-18 );
 
 	// channel 74
-	psg.generate(random_numbers, p, cmf_energy, 74);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 74);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  6.55147682455740692e-17 );
 	CHECK( d.at( 1) ==  9.89877937985983900e-17 );
@@ -7413,8 +7413,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.19989600709600679e-11 );
 
 	// channel 75
-	psg.generate(random_numbers, p, cmf_energy, 75);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 75);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  7.54089563287917400e-17 );
 	CHECK( d.at( 1) ==  9.75867731429224769e-17 );
@@ -7511,8 +7511,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.19069877222322723e-11 );
 
 	// channel 76
-	psg.generate(random_numbers, p, cmf_energy, 76);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 76);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.38300128301056963e-17 );
 	CHECK( d.at( 1) ==  4.32985403978716242e-17 );
@@ -7609,8 +7609,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.19069877222322723e-11 );
 
 	// channel 77
-	psg.generate(random_numbers, p, cmf_energy, 77);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 77);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  7.53728718250968619e-17 );
 	CHECK( d.at( 1) ==  9.75712664111288405e-17 );
@@ -7707,8 +7707,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.19655190941682989e-11 );
 
 	// channel 78
-	psg.generate(random_numbers, p, cmf_energy, 78);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 78);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.38674047275111619e-17 );
 	CHECK( d.at( 1) ==  4.33604112450410635e-17 );
@@ -7805,8 +7805,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.19655190941682989e-11 );
 
 	// channel 79
-	psg.generate(random_numbers, p, cmf_energy, 79);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 79);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.76656759505637788e-18 );
 	CHECK( d.at( 1) ==  2.72226768667661837e-18 );
@@ -7903,8 +7903,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  9.82871535695054629e-15 );
 
 	// channel 80
-	psg.generate(random_numbers, p, cmf_energy, 80);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 80);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  2.76651497408114784e-18 );
 	CHECK( d.at( 1) ==  2.72221670891933454e-18 );
@@ -8001,8 +8001,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  9.82825840505631005e-15 );
 
 	// channel 81
-	psg.generate(random_numbers, p, cmf_energy, 81);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 81);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.03965037687193525e-18 );
 	CHECK( d.at( 1) ==  1.05720456813523003e-18 );
@@ -8099,8 +8099,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.04168817262190285e-15 );
 
 	// channel 82
-	psg.generate(random_numbers, p, cmf_energy, 82);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 82);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.38203794049042603e-19 );
 	CHECK( d.at( 1) ==  4.32599110327492670e-19 );
@@ -8197,8 +8197,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.63910821128584021e-15 );
 
 	// channel 83
-	psg.generate(random_numbers, p, cmf_energy, 83);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 83);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  4.38151827662069278e-19 );
 	CHECK( d.at( 1) ==  4.32573647847351405e-19 );
@@ -8295,8 +8295,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.64113877958864980e-15 );
 
 	// channel 84
-	psg.generate(random_numbers, p, cmf_energy, 84);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 84);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  9.24709007398793360e-17 );
 	CHECK( d.at( 1) ==  1.17275363341672852e-16 );
@@ -8393,8 +8393,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.50008322883674863e-14 );
 
 	// channel 85
-	psg.generate(random_numbers, p, cmf_energy, 85);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 85);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.24631082097950525e-16 );
 	CHECK( d.at( 1) ==  1.70623018737720047e-16 );
@@ -8491,8 +8491,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.37416596429585638e-14 );
 
 	// channel 86
-	psg.generate(random_numbers, p, cmf_energy, 86);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 86);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  6.75024103268643778e-17 );
 	CHECK( d.at( 1) ==  8.75008804622469202e-17 );
@@ -8589,8 +8589,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  1.96592964820916509e-14 );
 
 	// channel 87
-	psg.generate(random_numbers, p, cmf_energy, 87);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 87);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  1.18463286620612283e-16 );
 	CHECK( d.at( 1) ==  1.62626690369312822e-16 );
@@ -8687,8 +8687,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  7.24711714385336621e-14 );
 
 	// channel 88
-	psg.generate(random_numbers, p, cmf_energy, 88);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 88);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  6.56291306041574466e-17 );
 	CHECK( d.at( 1) ==  8.52994995231196465e-17 );
@@ -8785,8 +8785,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  2.00595170163041050e-14 );
 
 	// channel 89
-	psg.generate(random_numbers, p, cmf_energy, 89);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 89);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  6.53508594947560979e-19 );
 	CHECK( d.at( 1) ==  5.70260886700883951e-19 );
@@ -8883,8 +8883,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  8.22652653141190070e-18 );
 
 	// channel 90
-	psg.generate(random_numbers, p, cmf_energy, 90);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 90);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  6.53436167802244000e-19 );
 	CHECK( d.at( 1) ==  5.70132963145910742e-19 );
@@ -8981,8 +8981,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  8.21930155714942954e-18 );
 
 	// channel 91
-	psg.generate(random_numbers, p, cmf_energy, 91);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 91);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.46527689784836886e-17 );
 	CHECK( d.at( 1) ==  4.43491762188867367e-17 );
@@ -9079,8 +9079,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 	CHECK( d.at(92) ==  4.22036468913236594e-11 );
 
 	// channel 92
-	psg.generate(random_numbers, p, cmf_energy, 92);
-	psg.densities(d);
+	psg->generate(random_numbers, p, cmf_energy, 92);
+	psg->densities(d);
 
 	CHECK( d.at( 0) ==  3.46920673741955938e-17 );
 	CHECK( d.at( 1) ==  4.44138523860958315e-17 );
