@@ -22,58 +22,65 @@ hep::lusifer_constants<T> constants(
 
 TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 {
+	T const min_energy = T(10.0);
+
 	// e+e- -> muon pair
-	hep::lusifer_phase_space_generator<T> psg1(
+	hep::hh_lusifer_phase_space_generator<T> psg1(
+		min_energy,
 		"el~el mu mu~",
 		constants
 	);
 
 	// two s-channels with a photon or Z boson
 	REQUIRE( psg1.channels()       ==  2 );
-	REQUIRE( psg1.dimensions()     ==  2 );
+	REQUIRE( psg1.dimensions()     ==  4 );
 	REQUIRE( psg1.map_dimensions() == 16 );
 
 	for (std::size_t extra = 0; extra != 4; ++extra)
 	{
 		// e+e- -> muon pair + extra random numbers
-		hep::lusifer_phase_space_generator<T> psg(
+		hep::hh_lusifer_phase_space_generator<T> psg(
+			min_energy,
 			"el~el mu mu~",
 			constants,
 			extra
 		);
 
 		REQUIRE( psg.channels()       ==  2 );
-		REQUIRE( psg.dimensions()     ==  2 + extra );
+		REQUIRE( psg.dimensions()     ==  4 + extra );
 		REQUIRE( psg.map_dimensions() == 16 + extra );
 	}
 
-	hep::lusifer_phase_space_generator<T> psg2(
+	hep::hh_lusifer_phase_space_generator<T> psg2(
+		min_energy,
 		"sq~uq W+ W+ dq cq~",
 		constants
 	);
 
 	REQUIRE( psg2.channels()       == 43 );
-	REQUIRE( psg2.dimensions()     ==  8 );
+	REQUIRE( psg2.dimensions()     == 10 );
 	REQUIRE( psg2.map_dimensions() == 24 );
 
 	// pp -> 2 jets + two pairs of leptons
-	hep::lusifer_phase_space_generator<T> psg3(
+	hep::hh_lusifer_phase_space_generator<T> psg3(
+		min_energy,
 		"sq~uq ne el~nm mu~dq cq~",
 		constants
 	);
 
 	REQUIRE( psg3.channels()       == 93 );
-	REQUIRE( psg3.dimensions()     == 14 );
+	REQUIRE( psg3.dimensions()     == 16 );
 	REQUIRE( psg3.map_dimensions() == 32 );
 
 	// pp -> 3 jets + two pairs of leptons
-	hep::lusifer_phase_space_generator<T> psg4(
+	hep::hh_lusifer_phase_space_generator<T> psg4(
+		min_energy,
 		"sq~uq ne el~nm mu~dq cq~gl ",
 		constants
 	);
 
 	REQUIRE( psg4.channels()       == 452 );
-	REQUIRE( psg4.dimensions()     == 17 );
+	REQUIRE( psg4.dimensions()     == 19 );
 	REQUIRE( psg4.map_dimensions() == 36 );
 
 	// pp -> 2jets
@@ -81,58 +88,67 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	// NOTE: generator does not generate three-gluon vertices
 
 	// four-gluon vertex
-	hep::lusifer_phase_space_generator<T> psg5a(
+	hep::hh_lusifer_phase_space_generator<T> psg5a(
+		min_energy,
 		"gl gl gl gl ",
 		constants
 	);
 
 	REQUIRE( psg5a.channels()       == 1 );
-	REQUIRE( psg5a.dimensions()     == 2 );
+	REQUIRE( psg5a.dimensions()     == 4 );
 	REQUIRE( psg5a.map_dimensions() == 16 );
 
 	// t- and u-channel
-	hep::lusifer_phase_space_generator<T> psg5b(
+	hep::hh_lusifer_phase_space_generator<T> psg5b(
+		min_energy,
 		"uq~uq gl gl ",
 		constants
 	);
 
 	REQUIRE( psg5b.channels()       == 2 );
-	REQUIRE( psg5b.dimensions()     == 2 );
+	REQUIRE( psg5b.dimensions()     == 4 );
 	REQUIRE( psg5b.map_dimensions() == 16 );
 
 	// s-channels with gluon/photon and Z, and t-channel with W
-	hep::lusifer_phase_space_generator<T> psg5c(
+	hep::hh_lusifer_phase_space_generator<T> psg5c(
+		min_energy,
 		"uq~uq dq dq~",
 		constants
 	);
 
 	REQUIRE( psg5c.channels()       == 3 );
-	REQUIRE( psg5c.dimensions()     == 2 );
+	REQUIRE( psg5c.dimensions()     == 4 );
 	REQUIRE( psg5c.map_dimensions() == 16 );
 
 	// s- and t-channels with gluon/photon and Z
-	hep::lusifer_phase_space_generator<T> psg5d(
+	hep::hh_lusifer_phase_space_generator<T> psg5d(
+		min_energy,
 		"uq~uq uq uq~",
 		constants
 	);
 
 	REQUIRE( psg5d.channels()       == 4 );
-	REQUIRE( psg5d.dimensions()     == 2 );
+	REQUIRE( psg5d.dimensions()     == 4 );
 	REQUIRE( psg5d.map_dimensions() == 16 );
 
-	hep::lusifer_phase_space_generator<T> psg5(
-		{ "gl gl gl gl ", "uq~uq gl gl ", "uq~uq dq dq~", "uq~uq uq uq~" },
+	hep::hh_lusifer_phase_space_generator<T> psg5(
+		min_energy,
+		std::vector<std::string>{ "gl gl gl gl ", "uq~uq gl gl ",
+			"uq~uq dq dq~", "uq~uq uq uq~" },
 		constants
 	);
 
 	REQUIRE( psg5.channels()       == 7 );
-	REQUIRE( psg5.dimensions()     == 2 );
+	REQUIRE( psg5.dimensions()     == 4 );
 	REQUIRE( psg5.map_dimensions() == 16 );
 }
 
 TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
 {
-	hep::lusifer_phase_space_generator<T> psg(
+	T const min_energy = T(10.0);
+
+	hep::hh_lusifer_phase_space_generator<T> psg(
+		min_energy,
 		"sq~uq ne el~nm mu~dq cq~",
 		constants
 	);
