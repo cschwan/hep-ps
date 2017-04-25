@@ -32,9 +32,9 @@ class test_pdf
 public:
 	hep::parton_array<T> pdf(T x, T scale)
 	{
-		REQUIRE( x >= T() );
-		REQUIRE( x < T(1.0) );
-		REQUIRE( scale > T() );
+		CHECK( x >= T() );
+		CHECK( x < T(1.0) );
+		CHECK( scale > T() );
 
 		hep::parton_array<T> result;
 
@@ -76,11 +76,11 @@ public:
 		std::vector<T> const& dipole_phase_space,
 		hep::initial_state_set set
 	) const {
-		REQUIRE( dipole_phase_space.size() == 4 * (final_states_ + 2) );
-		REQUIRE( set_ == set );
-		REQUIRE( dipole_info.emitter() == emitter_ );
-		REQUIRE( dipole_info.unresolved() == unresolved_ );
-		REQUIRE( dipole_info.spectator() == spectator_ );
+		CHECK( dipole_phase_space.size() == 4 * (final_states_ + 2) );
+		CHECK( set_ == set );
+		CHECK( dipole_info.emitter() == emitter_ );
+		CHECK( dipole_info.unresolved() == unresolved_ );
+		CHECK( dipole_info.spectator() == spectator_ );
 
 		hep::initial_state_array<T> result;
 
@@ -104,8 +104,8 @@ public:
 		std::vector<T> const& phase_space,
 		hep::initial_state_set set
 	) const {
-		REQUIRE( phase_space.size() == 4 * (final_states_ + 2) );
-		REQUIRE( set == set_ );
+		CHECK( phase_space.size() == 4 * (final_states_ + 2) );
+		CHECK( set == set_ );
 
 		hep::initial_state_array<T> result;
 
@@ -124,8 +124,8 @@ public:
 		std::vector<T> const& real_phase_space,
 		hep::initial_state_set set
 	) const {
-		REQUIRE( real_phase_space.size() == 4 * (final_states_ + 3) );
-		REQUIRE( set == set_ );
+		CHECK( real_phase_space.size() == 4 * (final_states_ + 3) );
+		CHECK( set == set_ );
 
 		hep::initial_state_array<T> result;
 
@@ -218,10 +218,10 @@ public:
 		std::vector<T>& dipole_phase_space,
 		hep::dipole const& dipole_info
 	) const {
-		REQUIRE( (dipole_phase_space.size() + 4) == real_phase_space.size() );
-		REQUIRE( dipole_info.emitter() == emitter_ );
-		REQUIRE( dipole_info.unresolved() == unresolved_ );
-		REQUIRE( dipole_info.spectator() == spectator_ );
+		CHECK( (dipole_phase_space.size() + 4) == real_phase_space.size() );
+		CHECK( dipole_info.emitter() == emitter_ );
+		CHECK( dipole_info.unresolved() == unresolved_ );
+		CHECK( dipole_info.spectator() == spectator_ );
 
 		return hep::dipole_invariants<T>(1.0, 2.0, 4.0, 8.0);
 	}
@@ -230,14 +230,14 @@ public:
 		hep::dipole const& dipole_info,
 		hep::dipole_invariants<T> const& invariants
 	) const {
-		REQUIRE( dipole_info.emitter() == emitter_ );
-		REQUIRE( dipole_info.unresolved() == unresolved_ );
-		REQUIRE( dipole_info.spectator() == spectator_ );
+		CHECK( dipole_info.emitter() == emitter_ );
+		CHECK( dipole_info.unresolved() == unresolved_ );
+		CHECK( dipole_info.spectator() == spectator_ );
 
-		REQUIRE( invariants.one == T(1.0) );
-		REQUIRE( invariants.two == T(2.0) );
-		REQUIRE( invariants.sij == T(4.0) );
-		REQUIRE( invariants.adipole == T(8.0) );
+		CHECK( invariants.one == T(1.0) );
+		CHECK( invariants.two == T(2.0) );
+		CHECK( invariants.sij == T(4.0) );
+		CHECK( invariants.adipole == T(8.0) );
 
 		return T(1.0);
 	}
@@ -284,12 +284,12 @@ public:
 	) const {
 		if (type == hep::event_type::inclusive_n_plus_1)
 		{
-			REQUIRE( phase_space.size() == 4 * (final_states_ + 3) );
+			CHECK( phase_space.size() == 4 * (final_states_ + 3) );
 		}
 		else if (type == hep::event_type::born_like_n)
 		{
 			// FIXME: this check fails for finite insertion terms
-//			REQUIRE( phase_space.size() == 4 * (final_states_ + 2) );
+//			CHECK( phase_space.size() == 4 * (final_states_ + 2) );
 		}
 		else
 		{
@@ -324,8 +324,8 @@ public:
 		std::vector<std::size_t> const& recombination_candidates,
 		std::size_t
 	) const {
-		REQUIRE( phase_space.size() == recombined_phase_space.size() );
-		REQUIRE( recombination_candidates.size() ==
+		CHECK( phase_space.size() == recombined_phase_space.size() );
+		CHECK( recombination_candidates.size() ==
 			(phase_space.size() / 4 - 2) );
 
 		// TODO: improve the test
@@ -333,7 +333,7 @@ public:
 		std::size_t last_index = 1;
 		for (auto const index : recombination_candidates)
 		{
-			REQUIRE( index > last_index );
+			CHECK( index > last_index );
 			last_index = index;
 		}
 
