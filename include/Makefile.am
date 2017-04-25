@@ -25,6 +25,8 @@ nobase_include_HEADERS = \
 	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
+	hep/ps/mc_distributions.hpp \
+	hep/ps/mc_observables.hpp \
 	hep/ps/mc_phase_space_adapter.hpp \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/non_zero_dipole.hpp \

@@ -1,5 +1,5 @@
-#ifndef HEP_PS_MC_HPP
-#define HEP_PS_MC_HPP
+#ifndef HEP_PS_MC_DISTRIBUTIONS_HPP
+#define HEP_PS_MC_DISTRIBUTIONS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -19,8 +19,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/mc_distributions.hpp"
-#include "hep/ps/mc_observables.hpp"
-#include "hep/ps/mc_phase_space_adapter.hpp"
+#include "hep/ps/cut_result.hpp"
+#include "hep/ps/distributions.hpp"
+#include "hep/ps/event_type.hpp"
+#include "hep/ps/neg_pos_results.hpp"
+
+#include "hep/mc/projector.hpp"
+
+namespace hep
+{
+
+template <typename T>
+class mc_distributions : public distributions<T>
+{
+public:
+	/// Set the projector for the next call
+	virtual void set_projector(hep::projector<T>& projector) = 0;
+};
+
+template <typename T>
+class mc_trivial_distributions : public mc_distributions<T>
+{
+public:
+	void set_projector(hep::projector<T>&) override
+	{
+	}
+
+	template <typename I>
+	void operator()(
+		std::vector<T> const&,
+		cut_result_with_info<I> const&,
+		neg_pos_results<T> const&,
+		T,
+		event_type
+	) {
+	}
+};
+
+}
 
 #endif
