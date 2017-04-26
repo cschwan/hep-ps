@@ -8,26 +8,22 @@
 #include <array>
 #include <cassert>
 
-namespace hep
+namespace
 {
 
 template <typename T>
-class cofferaa_phase_space_generator_impl
+class cofferaa_psg
 {
 public:
 	using numeric_type = T;
 
-	cofferaa_phase_space_generator_impl(
+	cofferaa_psg(
 		std::vector<int> const& process,
-		lusifer_constants<T> const& constants,
+		hep::lusifer_constants<T> const& constants,
 		std::vector<std::tuple<int, int, int>> const& dipoles
 			= std::vector<std::tuple<int, int, int>>{},
 		std::size_t extra_random_numbers = 0
 	);
-
-	cofferaa_phase_space_generator_impl(cofferaa_phase_space_generator_impl&& psg);
-
-	~cofferaa_phase_space_generator_impl();
 
 	std::size_t channels() const;
 
@@ -42,52 +38,39 @@ public:
 		std::size_t channel
 	);
 
-	luminosity_info<T> info() const;
-
 	std::size_t map_dimensions() const;
 
 private:
-	class impl;
-	std::unique_ptr<impl> pimpl;
-};
+	T cmf_energy_;
 
+	std::size_t channels_;
+	std::size_t max_particles_;
+	std::size_t particles_;
 
-template <typename T>
-class cofferaa_phase_space_generator_impl<T>::impl
-{
-public:
-	T energy;
-
-	std::size_t channels;
-	std::size_t max_particles;
-	std::size_t particles;
-
-	std::vector<T> current_point;
+	std::vector<T> current_point_;
 };
 
 template <typename T>
-cofferaa_phase_space_generator_impl<T>::cofferaa_phase_space_generator_impl(
+cofferaa_psg<T>::cofferaa_psg(
 	std::vector<int> const& process,
-	lusifer_constants<T> const& constants,
+	hep::lusifer_constants<T> const& constants,
 	std::vector<std::tuple<int, int, int>> const& dipoles,
 	std::size_t extra_random_numbers
-)
-	: pimpl(new impl())
-{
+) {
 	// TODO: NYI
 	assert( extra_random_numbers == 0 );
 
-	pimpl->particles = process.size();
+	particles_ = process.size();
 
 	int maxex;
 	int maxgen;
 	cofferaa_extra_max(&maxex, &maxgen);
 
-	pimpl->max_particles = maxex;
+	max_particles_ = maxex;
 
-	assert( pimpl->max_particles >= pimpl->particles );
+	assert( max_particles_ >= particles_ );
 
-	pimpl->current_point.resize(4 * maxex);
+	current_point_.resize(4 * maxex);
 
 	// FORTRAN counting: use the first generator
 	int generator = 1;
@@ -158,55 +141,44 @@ cofferaa_phase_space_generator_impl<T>::cofferaa_phase_space_generator_impl(
 
 	assert( channels > 0 );
 
-	pimpl->channels = channels;
+	channels_ = channels;
 }
 
 template <typename T>
-cofferaa_phase_space_generator_impl<T>::cofferaa_phase_space_generator_impl(
-	cofferaa_phase_space_generator_impl&& psg
-)
-	: pimpl(std::move(psg.pimpl))
+std::size_t cofferaa_psg<T>::channels() const
 {
+	return channels_;
 }
 
 template <typename T>
-cofferaa_phase_space_generator_impl<T>::~cofferaa_phase_space_generator_impl() = default;
-
-template <typename T>
-std::size_t cofferaa_phase_space_generator_impl<T>::channels() const
+T cofferaa_psg<T>::densities(std::vector<T>& densities)
 {
-	return pimpl->channels;
-}
+	using std::acos;
+	using std::pow;
 
-template <typename T>
-T cofferaa_phase_space_generator_impl<T>::densities(std::vector<T>& densities)
-{
-	assert( densities.size() >= channels() );
+	assert( densities.size() >= channels_ );
 
 	int generator = 1;
 	int switch_ = 2;
 
 	cofferaa_density(
-		pimpl->current_point.data(),
+		current_point_.data(),
 		densities.data(),
 		&generator,
 		&switch_
 	);
 
-	using std::acos;
-	using std::pow;
-
-	return pow(T(0.5) / acos(T(-1.0)), T(3 * pimpl->particles - 10));
+	return pow(T(0.5) / acos(T(-1.0)), T(3 * particles_ - 10));
 }
 
 template <typename T>
-std::size_t cofferaa_phase_space_generator_impl<T>::dimensions() const
+std::size_t cofferaa_psg<T>::dimensions() const
 {
-	return 3 * (pimpl->particles - 4) + 2;
+	return 3 * (particles_ - 4) + 2;
 }
 
 template <typename T>
-void cofferaa_phase_space_generator_impl<T>::generate(
+void cofferaa_psg<T>::generate(
 	std::vector<T> const& random_numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
@@ -226,33 +198,28 @@ void cofferaa_phase_space_generator_impl<T>::generate(
 	cofferaa_generation(
 		random_numbers.data(),
 		&kbeam[0],
-		pimpl->current_point.data(),
+		current_point_.data(),
 		&g,
 		&channel_,
 		&generator,
 		&switch_
 	);
 
-	momenta = pimpl->current_point;
-	fortran_ordering_to_cpp(momenta);
+	momenta = current_point_;
+	hep::fortran_ordering_to_cpp(momenta);
 	momenta.resize(map_dimensions());
 }
 
 template <typename T>
-luminosity_info<T> cofferaa_phase_space_generator_impl<T>::info() const
+std::size_t cofferaa_psg<T>::map_dimensions() const
 {
-	return luminosity_info<T>(pimpl->energy * pimpl->energy);
+	return 4 * particles_;
 }
 
-template <typename T>
-std::size_t cofferaa_phase_space_generator_impl<T>::map_dimensions() const
-{
-	return 4 * pimpl->particles;
 }
 
-template <typename T>
-using cofferaa_phase_space_generator =
-	hadron_hadron_psg_adapter<cofferaa_phase_space_generator_impl<T>>;
+namespace hep
+{
 
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
@@ -264,7 +231,7 @@ std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
 	std::size_t extra_random_numbers
 ) {
 	return std::unique_ptr<phase_space_generator<T>>(
-		new cofferaa_phase_space_generator<T>(
+		new hadron_hadron_psg_adapter<cofferaa_psg<T>>(
 			min_energy,
 			cmf_energy,
 			process,
@@ -275,8 +242,6 @@ std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
-
-template class cofferaa_phase_space_generator_impl<double>;
 
 template std::unique_ptr<phase_space_generator<double>>
 make_cofferaa_phase_space_generator(

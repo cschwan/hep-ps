@@ -369,85 +369,24 @@ void decay_momenta(
 	p2[3] = q[3] - p1[3];
 }
 
-}
-
-namespace hep
-{
-
 template <typename T>
-lusifer_constants<T>::lusifer_constants(
-	T mass_h,
-	T width_h,
-	T mass_t,
-	T width_t,
-	T mass_w,
-	T width_w,
-	T mass_z,
-	T width_z
-)
-	: mass_h(mass_h)
-	, width_h(width_h)
-	, mass_t(mass_t)
-	, width_t(width_t)
-	, mass_w(mass_w)
-	, width_w(width_w)
-	, mass_z(mass_z)
-	, width_z(width_z)
-{
-}
-
-/// A modified version of the phase space generator used in LUSIFER, see
-/// \cite Dittmaier:2002ap .
-template <typename T>
-class lusifer_phase_space_generator_impl
+class lusifer_psg
 {
 public:
-	/// The numeric type used to perform phase space generation.
 	using numeric_type = T;
 
-	/// Constructor. The parameter `processes` specify the partonic processes
-	/// that are used to generate the channels the integrater uses to generate
-	/// phase space, with the masses and decay widths specified in `constants`.
-	/// The parameter `extra_random_numbers` specifies the number of extra
-	/// random numbers that should be generated. This number increases both the
-	/// value \ref dimensions and \ref map_dimensions returns. The random
-	/// numbers that the generator uses to generate the phase space points are
-	/// the first \f$ 3 n - 4 \f$ numbers, where \f$ n \f$ are the number of
-	/// final state particles.
-	lusifer_phase_space_generator_impl(
+	lusifer_psg(
 		std::vector<std::string> const& processes,
-		lusifer_constants<T> const& constants,
+		hep::lusifer_constants<T> const& constants,
 		std::size_t extra_random_numbers = 0
 	);
 
-	/// Constructor.
-	lusifer_phase_space_generator_impl(
-		std::string const& process,
-		lusifer_constants<T> const& constants,
-		std::size_t extra_random_numbers = 0
-	);
-
-	/// Move constructor.
-	lusifer_phase_space_generator_impl(lusifer_phase_space_generator_impl<T>&& psg);
-
-	/// Destructor.
-	~lusifer_phase_space_generator_impl();
-
-	/// Returns the number of channels this generators supports.
 	std::size_t channels() const;
 
-	/// Evaluates all densities for the previously generated phase space point
-	/// and writes them into `densities`. This vector must have the size given
-	/// by \ref channels. The return value is an additional jacobian.
 	T densities(std::vector<T>& densities);
 
-	/// Returns how many random numbers are needed to construct a phase space
-	/// point.
 	std::size_t dimensions() const;
 
-	/// Uses `random_numbers` to construct a phase space point which is written
-	/// as a set of four-vectors into `momenta` using the specified `channel`
-	/// for the given center-of-mass frame energy `cmf_energy`.
 	void generate(
 		std::vector<T> const& random_numbers,
 		std::vector<T>& momenta,
@@ -455,39 +394,12 @@ public:
 		std::size_t channel
 	);
 
-	/// Returns an object of class \ref luminosity_info that contains the energy
-	/// of the previously generated phase space point.
-	luminosity_info<T> info() const;
-
-	/// Returns the size of the vector `momenta` that has to be passed to
-	/// \ref generate.
 	std::size_t map_dimensions() const;
 
 private:
-	class impl;
-	std::unique_ptr<impl> pimpl;
-};
-
-/// The phase space generator \ref lusifer_phase_space_generator for
-/// hadron-hadron collisions.
-template <typename T>
-using lusifer_phase_space_generator =
-	hadron_hadron_psg_adapter<lusifer_phase_space_generator_impl<T>>;
-
-template <typename T>
-class lusifer_phase_space_generator_impl<T>::impl
-{
-public:
-	impl(
-		std::size_t particles,
-		std::size_t max_particles,
-		std::size_t channels,
-		std::size_t extra_random_numbers
-	);
-
-	std::vector<channel> channels;
+	std::vector<channel> channels_;
 	std::vector<invariant_info> invariants;
-	std::vector<process_info> processes;
+	std::vector<process_info> processes_;
 	std::vector<decay_info> decays;
 	std::vector<particle_info<T>> particle_infos;
 	std::vector<T> mcut;
@@ -503,135 +415,9 @@ public:
 };
 
 template <typename T>
-lusifer_phase_space_generator_impl<T>::impl::impl(
-	std::size_t particles,
-	std::size_t max_particles,
-	std::size_t channels,
-	std::size_t extra_random_numbers
-)
-	: s(1 << particles)
-	, p(1 << particles)
-	, particles(particles)
-	, max_particles(max_particles)
-	, extra_random_numbers(extra_random_numbers)
-{
-	this->channels.resize(channels);
-
-	for (std::size_t i = 0; i != channels; ++i)
-	{
-		auto& channel = this->channels.at(i);
-
-		channel.invariants.reserve(lusifer_cinv_.ninv[0][i]);
-		channel.processes.reserve(lusifer_cprocess_.nprocess[0][i]);
-		channel.decays.reserve(lusifer_cdecay_.ndecay[0][i]);
-
-		for (std::size_t j = 0; j != channel.invariants.capacity(); ++j)
-		{
-			decltype (invariant::lmin) lmin;
-			decltype (invariant::lmax) lmax;
-
-			for (std::size_t k = 0; k != maxe; ++k)
-			{
-				lmin.set(k, lusifer_cinv_.lmin[0][i][j][k]);
-				lmax.set(k, lusifer_cinv_.lmax[0][i][j][k]);
-			}
-
-			channel.invariants.emplace_back(
-				lusifer_cinv_.ininv[0][i][j] - 1,
-				lusifer_cinv_.idhepinv[0][i][j],
-				lmin,
-				lmax,
-				lusifer_cdensity_.numinv[0][i][j] - 1
-			);
-		}
-
-		for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
-		{
-			channel.processes.emplace_back(
-				lusifer_cprocess_.in1process[0][i][j] - 1,
-				lusifer_cprocess_.in2process[0][i][j] - 1,
-				lusifer_cprocess_.out1process[0][i][j] - 1,
-				lusifer_cprocess_.out2process[0][i][j] - 1,
-				lusifer_cprocess_.inprocess[0][i][j] - 1,
-				lusifer_cprocess_.virtprocess[0][i][j] - 1,
-				lusifer_cprocess_.idhepprocess[0][i][j],
-				lusifer_cdensity_.numprocess[0][i][j] - 1
-			);
-		}
-
-		for (std::size_t j = 0; j != channel.decays.capacity(); ++j)
-		{
-			channel.decays.emplace_back(
-				lusifer_cdecay_.indecay[0][i][j] - 1,
-				lusifer_cdecay_.out1decay[0][i][j] - 1,
-				lusifer_cdecay_.out2decay[0][i][j] - 1,
-				lusifer_cdensity_.numdecay[0][i][j] - 1
-			);
-		}
-	}
-
-	invariants.reserve(lusifer_cdensity_.maxinv[0]);
-
-	for (std::size_t i = 0; i != invariants.capacity(); ++i)
-	{
-		invariants.emplace_back(
-			lusifer_cdensity_.nsinv[0][i] - 1,
-			lusifer_cdensity_.chinv[0][i] - 1
-		);
-	}
-
-	processes.reserve(lusifer_cdensity_.maxprocess[0]);
-
-	for (std::size_t i = 0; i != processes.capacity(); ++i)
-	{
-		processes.emplace_back(
-			lusifer_cdensity_.ntprocess[0][i] - 1,
-			lusifer_cdensity_.chprocess[0][i] - 1
-		);
-	}
-
-	decays.reserve(lusifer_cdensity_.maxdecay[0]);
-
-	for (std::size_t i = 0; i != decays.capacity(); ++i)
-	{
-		decays.emplace_back(
-			lusifer_cdensity_.nsdecay[0][i] - 1,
-			lusifer_cdensity_.chdecay[0][i] - 1
-		);
-	}
-
-	particle_infos.reserve(maxv + 1);
-
-	for (std::size_t i = 0; i != particle_infos.capacity(); ++i)
-	{
-		// TODO: make this parameter available from outside
-		T power = T(0.9);
-		T mass  = lusifer_general_.mass[i];
-		T width = lusifer_general_.width[i];
-
-		if ((width > T()) || (i == 0) || ((i >= 30) && (i < 33)))
-		{
-			power = T();
-		}
-
-		particle_infos.emplace_back(power, mass, width);
-	}
-
-	// TODO: is the following needed?
-	mcut.assign(
-		std::begin(lusifer_cinv_.mcutinv[0]),
-		std::end(lusifer_cinv_.mcutinv[0])
-	);
-
-	invariant_jacobians.reserve(invariants.size());
-	process_jacobians.reserve(processes.size());
-	decay_jacobians.reserve(decays.size());
-}
-
-template <typename T>
-lusifer_phase_space_generator_impl<T>::lusifer_phase_space_generator_impl(
+lusifer_psg<T>::lusifer_psg(
 	std::vector<std::string> const& processes,
-	lusifer_constants<T> const& constants,
+	hep::lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers
 ) {
 	int maxex;
@@ -701,57 +487,140 @@ lusifer_phase_space_generator_impl<T>::lusifer_phase_space_generator_impl(
 	// there must be at least one channel, otherwise something went wrong
 	assert( channels > 0 );
 
-	pimpl = std::move(std::unique_ptr<impl>(new impl(
-		nex,
-		maxe,
-		channels,
-		extra_random_numbers
-	)));
+	s.resize(1 << nex);
+	p.resize(1 << nex);
+
+	this->particles = nex;
+	this->max_particles = maxe;
+	this->extra_random_numbers = extra_random_numbers;
+	this->channels_.resize(channels);
+
+	for (std::size_t i = 0; i != static_cast <std::size_t> (channels); ++i)
+	{
+		auto& channel = this->channels_.at(i);
+
+		channel.invariants.reserve(lusifer_cinv_.ninv[0][i]);
+		channel.processes.reserve(lusifer_cprocess_.nprocess[0][i]);
+		channel.decays.reserve(lusifer_cdecay_.ndecay[0][i]);
+
+		for (std::size_t j = 0; j != channel.invariants.capacity(); ++j)
+		{
+			decltype (invariant::lmin) lmin;
+			decltype (invariant::lmax) lmax;
+
+			for (std::size_t k = 0; k != maxe; ++k)
+			{
+				lmin.set(k, lusifer_cinv_.lmin[0][i][j][k]);
+				lmax.set(k, lusifer_cinv_.lmax[0][i][j][k]);
+			}
+
+			channel.invariants.emplace_back(
+				lusifer_cinv_.ininv[0][i][j] - 1,
+				lusifer_cinv_.idhepinv[0][i][j],
+				lmin,
+				lmax,
+				lusifer_cdensity_.numinv[0][i][j] - 1
+			);
+		}
+
+		for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
+		{
+			channel.processes.emplace_back(
+				lusifer_cprocess_.in1process[0][i][j] - 1,
+				lusifer_cprocess_.in2process[0][i][j] - 1,
+				lusifer_cprocess_.out1process[0][i][j] - 1,
+				lusifer_cprocess_.out2process[0][i][j] - 1,
+				lusifer_cprocess_.inprocess[0][i][j] - 1,
+				lusifer_cprocess_.virtprocess[0][i][j] - 1,
+				lusifer_cprocess_.idhepprocess[0][i][j],
+				lusifer_cdensity_.numprocess[0][i][j] - 1
+			);
+		}
+
+		for (std::size_t j = 0; j != channel.decays.capacity(); ++j)
+		{
+			channel.decays.emplace_back(
+				lusifer_cdecay_.indecay[0][i][j] - 1,
+				lusifer_cdecay_.out1decay[0][i][j] - 1,
+				lusifer_cdecay_.out2decay[0][i][j] - 1,
+				lusifer_cdensity_.numdecay[0][i][j] - 1
+			);
+		}
+	}
+
+	invariants.reserve(lusifer_cdensity_.maxinv[0]);
+
+	for (std::size_t i = 0; i != invariants.capacity(); ++i)
+	{
+		invariants.emplace_back(
+			lusifer_cdensity_.nsinv[0][i] - 1,
+			lusifer_cdensity_.chinv[0][i] - 1
+		);
+	}
+
+	processes_.reserve(lusifer_cdensity_.maxprocess[0]);
+
+	for (std::size_t i = 0; i != processes_.capacity(); ++i)
+	{
+		processes_.emplace_back(
+			lusifer_cdensity_.ntprocess[0][i] - 1,
+			lusifer_cdensity_.chprocess[0][i] - 1
+		);
+	}
+
+	decays.reserve(lusifer_cdensity_.maxdecay[0]);
+
+	for (std::size_t i = 0; i != decays.capacity(); ++i)
+	{
+		decays.emplace_back(
+			lusifer_cdensity_.nsdecay[0][i] - 1,
+			lusifer_cdensity_.chdecay[0][i] - 1
+		);
+	}
+
+	particle_infos.reserve(maxv + 1);
+
+	for (std::size_t i = 0; i != particle_infos.capacity(); ++i)
+	{
+		// TODO: make this parameter available from outside
+		T power = T(0.9);
+		T mass  = lusifer_general_.mass[i];
+		T width = lusifer_general_.width[i];
+
+		if ((width > T()) || (i == 0) || ((i >= 30) && (i < 33)))
+		{
+			power = T();
+		}
+
+		particle_infos.emplace_back(power, mass, width);
+	}
+
+	// TODO: is the following needed?
+	mcut.assign(
+		std::begin(lusifer_cinv_.mcutinv[0]),
+		std::end(lusifer_cinv_.mcutinv[0])
+	);
+
+	invariant_jacobians.reserve(invariants.size());
+	process_jacobians.reserve(processes_.size());
+	decay_jacobians.reserve(decays.size());
 }
 
 template <typename T>
-lusifer_phase_space_generator_impl<T>::lusifer_phase_space_generator_impl(
-	std::string const& process,
-	lusifer_constants<T> const& constants,
-	std::size_t extra_random_numbers
-)
-	: lusifer_phase_space_generator_impl(
-		std::vector<std::string>{process},
-		constants,
-		extra_random_numbers
-	)
+std::size_t lusifer_psg<T>::channels() const
 {
+	return channels_.size();
 }
 
 template <typename T>
-lusifer_phase_space_generator_impl<T>::lusifer_phase_space_generator_impl(
-	lusifer_phase_space_generator_impl<T>&& psg
-)
-	: pimpl(std::move(psg.pimpl))
-{
-}
-
-template <typename T>
-lusifer_phase_space_generator_impl<T>::~lusifer_phase_space_generator_impl() = default;
-
-template <typename T>
-std::size_t lusifer_phase_space_generator_impl<T>::channels() const
-{
-	return pimpl->channels.size();
-}
-
-template <typename T>
-T lusifer_phase_space_generator_impl<T>::densities(std::vector<T>& densities)
+T lusifer_psg<T>::densities(std::vector<T>& densities)
 {
 	using std::acos;
 	using std::fabs;
 	using std::pow;
 	using std::sqrt;
 
-	auto& p = pimpl->p;
-	auto& s = pimpl->s;
-
-	std::size_t const allbinary = (1 << pimpl->particles) - 1;
+	std::size_t const allbinary = (1 << particles) - 1;
 
 	// skip first three and last four elements; they are computed already
 	for (std::size_t i = 0; i != allbinary - 1u; ++i)
@@ -807,30 +676,30 @@ T lusifer_phase_space_generator_impl<T>::densities(std::vector<T>& densities)
 		}
 	}
 
-	for (auto const& info : pimpl->invariants)
+	for (auto const& info : invariants)
 	{
-		auto const& invariant = pimpl->channels.at(info.channel).invariants.at(info.index);
+		auto const& invariant = channels_.at(info.channel).invariants.at(info.index);
 
 		// index corresponding to the ns'th invariant
 		std::size_t inv1 = invariant.in;
 		// `inv1 + inv2 = allbinary - 3`
 		std::size_t inv2 = (allbinary - 3 - inv1) - 2;
 
-		T mmin = pimpl->mcut.at(inv1);
-		T mmax = pimpl->mcut.at(inv2);
+		T mmin = mcut.at(inv1);
+		T mmax = mcut.at(inv2);
 
 		for (std::size_t i = 0;
-			&pimpl->channels[info.channel].invariants[i] != &invariant; ++i)
+			&channels_[info.channel].invariants[i] != &invariant; ++i)
 		{
-			std::size_t const virt = pimpl->channels[info.channel].invariants[i].in;
-			bool const condition = s[virt] > pimpl->mcut[virt] * pimpl->mcut[virt];
+			std::size_t const virt = channels_[info.channel].invariants[i].in;
+			bool const condition = s[virt] > mcut[virt] * mcut[virt];
 
 			// is there a minimum limit on this invariant?
 			if (invariant.lmin.test(i) && condition)
 			{
 				// TODO: is `>` the right condition here?
 				std::size_t const inv3 = inv1 - virt;
-				mmin += sqrt(s[virt]) - pimpl->mcut.at(inv1) + pimpl->mcut.at(inv3);
+				mmin += sqrt(s[virt]) - mcut.at(inv1) + mcut.at(inv3);
 				inv1 = inv3;
 			}
 
@@ -838,37 +707,37 @@ T lusifer_phase_space_generator_impl<T>::densities(std::vector<T>& densities)
 			if (invariant.lmax.test(i) && condition)
 			{
 				std::size_t const inv3 = inv2 - virt;
-				mmax += sqrt(s[virt]) - pimpl->mcut.at(inv2) + pimpl->mcut.at(inv3);
+				mmax += sqrt(s[virt]) - mcut.at(inv2) + mcut.at(inv3);
 				inv2 = inv3;
 			}
 		}
 
 		T const smin = mmin * mmin;
-		T const smax = (pimpl->cmf_energy_ - mmax) * (pimpl->cmf_energy_ - mmax);
+		T const smax = (cmf_energy_ - mmax) * (cmf_energy_ - mmax);
 
-		pimpl->invariant_jacobians.push_back(jacobian(
-			pimpl->particle_infos.at(invariant.idhep).power,
-			pimpl->particle_infos.at(invariant.idhep).mass,
-			pimpl->particle_infos.at(invariant.idhep).width,
+		invariant_jacobians.push_back(jacobian(
+			particle_infos.at(invariant.idhep).power,
+			particle_infos.at(invariant.idhep).mass,
+			particle_infos.at(invariant.idhep).width,
 			s[invariant.in],
 			smin,
 			smax
 		));
 	}
 
-	for (auto const& info : pimpl->processes)
+	for (auto const& info : processes_)
 	{
-		auto const& process = pimpl->channels[info.channel].processes[info.index];
+		auto const& process = channels_[info.channel].processes[info.index];
 
-		T const s  = pimpl->s[process.in];
-		T const s1 = pimpl->s[process.out1];
-		T const s2 = pimpl->s[process.out2];
-		T const t  = pimpl->s[process.virt];
-		T const t1 = pimpl->s[process.in1];
-		T const t2 = pimpl->s[process.in2];
+		T const s  = this->s[process.in];
+		T const s1 = this->s[process.out1];
+		T const s2 = this->s[process.out2];
+		T const t  = this->s[process.virt];
+		T const t1 = this->s[process.in1];
+		T const t2 = this->s[process.in2];
 
-		T const lambdas = sqrt(kaellen(s, s1, s2));
-		T const lambdat = sqrt(kaellen(s, t1, t2));
+		T const lambdas = sqrt(hep::kaellen(s, s1, s2));
+		T const lambdat = sqrt(hep::kaellen(s, t1, t2));
 
 		T const tmp = (s + s1 - s2) * (s + t1 - t2);
 		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
@@ -882,70 +751,70 @@ T lusifer_phase_space_generator_impl<T>::densities(std::vector<T>& densities)
 
 		T const factor = T(2.0) * lambdat / acos(T(-1.0));
 
-		pimpl->process_jacobians.push_back(factor * jacobian(
-			 pimpl->particle_infos.at(process.idhep).power,
-			-pimpl->particle_infos.at(process.idhep).mass,
-			 pimpl->particle_infos.at(process.idhep).width,
+		process_jacobians.push_back(factor * jacobian(
+			 particle_infos.at(process.idhep).power,
+			-particle_infos.at(process.idhep).mass,
+			 particle_infos.at(process.idhep).width,
 			-t,
 			-tmax,
 			-tmin
 		));
 	}
 
-	for (auto const& info : pimpl->decays)
+	for (auto const& info : decays)
 	{
-		auto const& decay = pimpl->channels[info.channel].decays[info.index];
+		auto const& decay = channels_[info.channel].decays[info.index];
 
-		T const s  = pimpl->s[decay.in];
-		T const s1 = pimpl->s[decay.out1];
-		T const s2 = pimpl->s[decay.out2];
+		T const s  = this->s[decay.in];
+		T const s1 = this->s[decay.out1];
+		T const s2 = this->s[decay.out2];
 
 		T const jacobian = T(2.0) * s / (acos(T(-1.0)) *
-			sqrt(kaellen(s, s1, s2)));
+			sqrt(hep::kaellen(s, s1, s2)));
 
-		pimpl->decay_jacobians.push_back(jacobian);
+		decay_jacobians.push_back(jacobian);
 	}
 
 	densities.clear();
 
-	pimpl->invariant_jacobians.clear();
-	pimpl->process_jacobians.clear();
-	pimpl->decay_jacobians.clear();
+	invariant_jacobians.clear();
+	process_jacobians.clear();
+	decay_jacobians.clear();
 
 	// compute the jacobians for each channel
-	for (auto const& channel : pimpl->channels)
+	for (auto const& channel : channels_)
 	{
 		T jacobian = T(1.0);
 
 		for (auto const& invariant : channel.invariants)
 		{
-			jacobian *= pimpl->invariant_jacobians[invariant.index];
+			jacobian *= invariant_jacobians[invariant.index];
 		}
 
 		for (auto const& process : channel.processes)
 		{
-			jacobian *= pimpl->process_jacobians[process.index];
+			jacobian *= process_jacobians[process.index];
 		}
 
 		for (auto const& decay : channel.decays)
 		{
-			jacobian *= pimpl->decay_jacobians[decay.index];
+			jacobian *= decay_jacobians[decay.index];
 		}
 
 		densities.push_back(jacobian);
 	}
 
-	return pow(T(0.5) / acos(T(-1.0)), T(3 * pimpl->particles - 10));
+	return pow(T(0.5) / acos(T(-1.0)), T(3 * particles - 10));
 }
 
 template <typename T>
-std::size_t lusifer_phase_space_generator_impl<T>::dimensions() const
+std::size_t lusifer_psg<T>::dimensions() const
 {
-	return 3 * (pimpl->particles - 4) + 2 + pimpl->extra_random_numbers;
+	return 3 * (particles - 4) + 2 + extra_random_numbers;
 }
 
 template <typename T>
-void lusifer_phase_space_generator_impl<T>::generate(
+void lusifer_psg<T>::generate(
 	std::vector<T> const& random_numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
@@ -957,9 +826,6 @@ void lusifer_phase_space_generator_impl<T>::generate(
 	using std::fabs;
 	using std::sqrt;
 
-	auto& s = pimpl->s;
-	auto& p = pimpl->p;
-
 	for (auto& momentum : p)
 	{
 		momentum[0] = T();
@@ -967,7 +833,7 @@ void lusifer_phase_space_generator_impl<T>::generate(
 
 	auto r = random_numbers.begin();
 
-	std::size_t const allbinary = (1 << pimpl->particles) - 1;
+	std::size_t const allbinary = (1 << particles) - 1;
 
 	// first momentum: negative of the first beam momentum
 	p[0] = { T(-0.5) * cmf_energy, T(), T(), T(0.5) * cmf_energy };
@@ -990,27 +856,27 @@ void lusifer_phase_space_generator_impl<T>::generate(
 	s[allbinary - 4] = s[2];
 
 	// iteratively construct the time-like invariants
-	for (auto const& invariant : pimpl->channels[channel].invariants)
+	for (auto const& invariant : channels_[channel].invariants)
 	{
 		// index corresponding to the ns'th invariant
 		std::size_t inv1 = invariant.in;
 		// `inv1 + inv2 = allbinary - 3`
 		std::size_t inv2 = (allbinary - 3 - inv1) - 2;
 
-		T mmin = pimpl->mcut[inv1];
-		T mmax = pimpl->mcut[inv2];
+		T mmin = mcut[inv1];
+		T mmax = mcut[inv2];
 
 		for (std::size_t i = 0;
-			&pimpl->channels[channel].invariants[i] != &invariant; ++i)
+			&channels_[channel].invariants[i] != &invariant; ++i)
 		{
-			std::size_t const virt = pimpl->channels[channel].invariants[i].in;
-			bool const condition = s[virt] > pimpl->mcut[virt] * pimpl->mcut[virt];
+			std::size_t const virt = channels_[channel].invariants[i].in;
+			bool const condition = s[virt] > mcut[virt] * mcut[virt];
 
 			// is there a minimum limit on this invariant?
 			if (invariant.lmin.test(i) && condition)
 			{
 				std::size_t const inv3 = inv1 - virt;
-				mmin += sqrt(s[virt]) - pimpl->mcut[inv1] + pimpl->mcut[inv3];
+				mmin += sqrt(s[virt]) - mcut[inv1] + mcut[inv3];
 				inv1 = inv3;
 			}
 
@@ -1018,7 +884,7 @@ void lusifer_phase_space_generator_impl<T>::generate(
 			if (invariant.lmax.test(i) && condition)
 			{
 				std::size_t const inv3 = inv2 - virt;
-				mmax += sqrt(s[virt]) - pimpl->mcut[inv2] + pimpl->mcut[inv3];
+				mmax += sqrt(s[virt]) - mcut[inv2] + mcut[inv3];
 				inv2 = inv3;
 			}
 		}
@@ -1029,25 +895,25 @@ void lusifer_phase_space_generator_impl<T>::generate(
 		// TODO: replace particle_infos calls with model
 
 		s[invariant.in] = map(
-			pimpl->particle_infos.at(invariant.idhep).power,
-			pimpl->particle_infos.at(invariant.idhep).mass,
-			pimpl->particle_infos.at(invariant.idhep).width,
+			particle_infos.at(invariant.idhep).power,
+			particle_infos.at(invariant.idhep).mass,
+			particle_infos.at(invariant.idhep).width,
 			*r++,
 			smin,
 			smax
 		);
 	}
 
-	for (auto const& process : pimpl->channels[channel].processes)
+	for (auto const& process : channels_[channel].processes)
 	{
-		T const s  = pimpl->s[process.in];
-		T const s1 = pimpl->s[process.out1];
-		T const s2 = pimpl->s[process.out2];
-		T const t1 = pimpl->s[process.in1];
-		T const t2 = pimpl->s[process.in2];
+		T const s  = this->s[process.in];
+		T const s1 = this->s[process.out1];
+		T const s2 = this->s[process.out2];
+		T const t1 = this->s[process.in1];
+		T const t2 = this->s[process.in2];
 
-		T const lambdas = sqrt(kaellen(s, s1, s2));
-		T const lambdat = sqrt(kaellen(s, t1, t2));
+		T const lambdas = sqrt(hep::kaellen(s, s1, s2));
+		T const lambdat = sqrt(hep::kaellen(s, t1, t2));
 
 		T const tmp = (s + s1 - s2) * (s + t1 - t2);
 		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
@@ -1061,9 +927,9 @@ void lusifer_phase_space_generator_impl<T>::generate(
 
 		T phi = T(2.0) * acos(T(-1.0)) * *r++;
 		T const h = map(
-			 pimpl->particle_infos.at(process.idhep).power,
-			-pimpl->particle_infos.at(process.idhep).mass,
-			 pimpl->particle_infos.at(process.idhep).width,
+			 particle_infos.at(process.idhep).power,
+			-particle_infos.at(process.idhep).mass,
+			 particle_infos.at(process.idhep).width,
 			*r++,
 			-tmax,
 			-tmin
@@ -1114,21 +980,21 @@ void lusifer_phase_space_generator_impl<T>::generate(
 		auto& qt = p[process.virt];
 		qt = { q1[0] - p1[0], q1[1] - p1[1], q1[2] - p1[2], q1[3] - p1[3] };
 
-		T& t = pimpl->s[process.virt];
+		T& t = this->s[process.virt];
 		t = qt[0] * qt[0] - qt[1] * qt[1] - qt[2] * qt[2] - qt[3] * qt[3];
 	}
 
-	for (auto const& decay : pimpl->channels[channel].decays)
+	for (auto const& decay : channels_[channel].decays)
 	{
-		T const s  = pimpl->s[decay.in];
-		T const s1 = pimpl->s[decay.out1];
-		T const s2 = pimpl->s[decay.out2];
+		T const s  = this->s[decay.in];
+		T const s1 = this->s[decay.out1];
+		T const s2 = this->s[decay.out2];
 
 		auto& p1 = p[decay.out1];
 		T const sqrts = sqrt(s);
 
 		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
-			T(0.5) * sqrt(kaellen(s, s1, s2)) / sqrts };
+			T(0.5) * sqrt(hep::kaellen(s, s1, s2)) / sqrts };
 
 		T const phi = T(2.0) * acos(T(-1.0)) * *r++;
 		T const cos_theta = T(2.0) * *r++ - T(1.0);
@@ -1146,7 +1012,7 @@ void lusifer_phase_space_generator_impl<T>::generate(
 	momenta.at(6) = T();
 	momenta.at(7) = T( 0.5) * cmf_energy;
 
-	for (std::size_t i = 2; i != pimpl->particles; ++i)
+	for (std::size_t i = 2; i != particles; ++i)
 	{
 		momenta.at(4 * i + 0) = p[(1 << i) - 1][0];
 		momenta.at(4 * i + 1) = p[(1 << i) - 1][1];
@@ -1154,23 +1020,44 @@ void lusifer_phase_space_generator_impl<T>::generate(
 		momenta.at(4 * i + 3) = p[(1 << i) - 1][3];
 	}
 
-	pimpl->cmf_energy_ = cmf_energy;
+	cmf_energy_ = cmf_energy;
 
 	// append the extra remaining random numbers to the end of `momenta`
-	std::copy_n(r, pimpl->extra_random_numbers,
-		std::prev(momenta.end(), pimpl->extra_random_numbers));
+	std::copy_n(r, extra_random_numbers,
+		std::prev(momenta.end(), extra_random_numbers));
 }
 
 template <typename T>
-luminosity_info<T> lusifer_phase_space_generator_impl<T>::info() const
+std::size_t lusifer_psg<T>::map_dimensions() const
 {
-	return luminosity_info<T>(pimpl->cmf_energy_ * pimpl->cmf_energy_);
+	return 4 * particles + extra_random_numbers;
 }
 
-template <typename T>
-std::size_t lusifer_phase_space_generator_impl<T>::map_dimensions() const
+}
+
+namespace hep
 {
-	return 4 * pimpl->particles + pimpl->extra_random_numbers;
+
+template <typename T>
+lusifer_constants<T>::lusifer_constants(
+	T mass_h,
+	T width_h,
+	T mass_t,
+	T width_t,
+	T mass_w,
+	T width_w,
+	T mass_z,
+	T width_z
+)
+	: mass_h(mass_h)
+	, width_h(width_h)
+	, mass_t(mass_t)
+	, width_t(width_t)
+	, mass_w(mass_w)
+	, width_w(width_w)
+	, mass_z(mass_z)
+	, width_z(width_z)
+{
 }
 
 template <typename T>
@@ -1182,7 +1069,7 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	std::size_t extra_random_numbers = 0
 ) {
 	return std::unique_ptr<phase_space_generator<T>>(
-		new lusifer_phase_space_generator<T>(
+		new hadron_hadron_psg_adapter<lusifer_psg<T>>(
 			min_energy,
 			cmf_energy,
 			processes,
@@ -1211,7 +1098,6 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template class lusifer_constants<double>;
-template class lusifer_phase_space_generator_impl<double>;
 
 template std::unique_ptr<phase_space_generator<double>>
 make_lusifer_phase_space_generator(
