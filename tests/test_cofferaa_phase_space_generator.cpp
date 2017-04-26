@@ -22,38 +22,43 @@ hep::lusifer_constants<T> constants(
 
 TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 {
+	T const min_energy = T(10.0);
+
 	// e+e- -> muon pair
-	hep::cofferaa_phase_space_generator<T> psg1(
+	auto psg1 = hep::make_cofferaa_phase_space_generator<T>(
+		min_energy,
 		std::vector<int>{11, -11, 13, -13},
 		constants
 	);
 
 	// two s-channels with a photon or Z boson
-	CHECK( psg1.channels()       ==  2 );
-	CHECK( psg1.dimensions()     ==  2 );
-	CHECK( psg1.map_dimensions() == 16 );
+	CHECK( psg1->channels()       ==  2 );
+	CHECK( psg1->dimensions()     ==  4 );
+	CHECK( psg1->map_dimensions() == 16 );
 
 	// e+e- -> up-quark pair
-	hep::cofferaa_phase_space_generator<T> psg2(
+	auto psg2 = hep::make_cofferaa_phase_space_generator<T>(
+		min_energy,
 		std::vector<int>{11, -11, 2, -2},
 		constants
 	);
 
 	// two s-channels with a photon or Z boson
-	CHECK( psg2.channels()       ==  2 );
-	CHECK( psg2.dimensions()     ==  2 );
-	CHECK( psg2.map_dimensions() == 16 );
+	CHECK( psg2->channels()       ==  2 );
+	CHECK( psg2->dimensions()     ==  4 );
+	CHECK( psg2->map_dimensions() == 16 );
 
 	// pp -> 2 jets + two pairs of leptons
-	hep::cofferaa_phase_space_generator<T> psg3(
+	auto psg3 = hep::make_cofferaa_phase_space_generator<T>(
+		min_energy,
 		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4},
 		constants
 	);
 
 	// TODO: why are there one channel less than what LUSIFER's PSG returns?
-	CHECK( psg3.channels()       == 93-1 );
-	CHECK( psg3.dimensions()     == 14 );
-	CHECK( psg3.map_dimensions() == 32 );
+	CHECK( psg3->channels()       == 93-1 );
+	CHECK( psg3->dimensions()     == 16 );
+	CHECK( psg3->map_dimensions() == 32 );
 
 	std::vector<std::tuple<int, int, int>> dipoles = {
 		std::make_tuple(1, 9, 8),
@@ -63,33 +68,35 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	};
 
 	// pp -> 2 jets + two pairs of leptons + gluon
-	hep::cofferaa_phase_space_generator<T> psg4(
+	auto psg4 = hep::make_cofferaa_phase_space_generator<T>(
+		min_energy,
 		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4, 26},
 		constants,
 		dipoles
 	);
 
-	CHECK( psg4.channels()       == (456+4*92) );
-	CHECK( psg4.dimensions()     == 17 );
-	CHECK( psg4.map_dimensions() == 36 );
+	CHECK( psg4->channels()       == (456+4*92) );
+	CHECK( psg4->dimensions()     == 19 );
+	CHECK( psg4->map_dimensions() == 36 );
 }
 
 TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
 {
-	hep::cofferaa_phase_space_generator<T> psg(
+	T const min_energy = T(10.0);
+	T const cmf_energy = T(1000.0);
+
+	auto psg = hep::make_cofferaa_phase_space_generator<T>(
+		min_energy,
 		std::vector<int>{11, -11, 13, -13},
 		constants
 	);
 
 	std::mt19937 rng;
-	std::vector<T> random_numbers(psg.dimensions());
+	std::vector<T> random_numbers(psg->dimensions());
 
-	// energy should not be much smaller than the masses we specified
-	T const energy = T(1000.0);
-
-	std::vector<T> p(psg.map_dimensions());
-	std::vector<T> densities(psg.channels());
-	std::size_t const particles = psg.map_dimensions() / 4;
+	std::vector<T> p(psg->map_dimensions());
+	std::vector<T> densities(psg->channels());
+	std::size_t const particles = psg->map_dimensions() / 4;
 
 	for (std::size_t i = 0; i != 100; ++i)
 	{
@@ -98,9 +105,9 @@ TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
 				std::numeric_limits<T>::digits>(rng);
 		});
 
-		for (std::size_t channel = 0; channel != psg.channels(); ++channel)
+		for (std::size_t channel = 0; channel != psg->channels(); ++channel)
 		{
-			psg.generate(random_numbers, p, energy, channel);
+			psg->generate(random_numbers, p, cmf_energy, channel);
 
 			std::array<T, 4> sums = { T(), T(), T(), T() };
 
@@ -141,7 +148,7 @@ TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
 			}
 
 			std::fill(densities.begin(), densities.end(), T());
-			psg.densities(densities);
+			psg->densities(densities);
 
 			for (std::size_t index = 0; index != densities.size(); ++index)
 			{

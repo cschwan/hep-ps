@@ -1,5 +1,6 @@
 #include "hep/ps/cofferaa_phase_space_generator.hpp"
 #include "hep/ps/fortran_helper.hpp"
+#include "hep/ps/hh_phase_space_generator.hpp"
 
 #include "cofferaa_interfaces.hpp"
 
@@ -11,7 +12,51 @@ namespace hep
 {
 
 template <typename T>
-class cofferaa_phase_space_generator<T>::impl
+class cofferaa_phase_space_generator_impl
+{
+public:
+	using numeric_type = T;
+
+	cofferaa_phase_space_generator_impl(
+		std::vector<int> const& process,
+		lusifer_constants<T> const& constants,
+		std::vector<std::tuple<int, int, int>> const& dipoles
+			= std::vector<std::tuple<int, int, int>>{},
+		std::size_t extra_random_numbers = 0
+	);
+
+	cofferaa_phase_space_generator_impl(cofferaa_phase_space_generator_impl&& psg);
+
+	~cofferaa_phase_space_generator_impl();
+
+	std::size_t channels() const;
+
+	T densities(std::vector<T>& densities);
+
+	std::size_t dimensions() const;
+
+	void generate(
+		std::vector<T> const& random_numbers,
+		std::vector<T>& momenta,
+		T cmf_energy,
+		std::size_t channel
+	);
+
+	luminosity_info<T> info() const;
+
+	std::size_t map_dimensions() const;
+
+private:
+	class impl;
+	std::unique_ptr<impl> pimpl;
+};
+
+template <typename T>
+using cofferaa_phase_space_generator =
+	hh_phase_space_generator<cofferaa_phase_space_generator_impl<T>>;
+
+template <typename T>
+class cofferaa_phase_space_generator_impl<T>::impl
 {
 public:
 	T energy;
@@ -24,7 +69,7 @@ public:
 };
 
 template <typename T>
-cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
+cofferaa_phase_space_generator_impl<T>::cofferaa_phase_space_generator_impl(
 	std::vector<int> const& process,
 	lusifer_constants<T> const& constants,
 	std::vector<std::tuple<int, int, int>> const& dipoles,
@@ -120,24 +165,24 @@ cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
 }
 
 template <typename T>
-cofferaa_phase_space_generator<T>::cofferaa_phase_space_generator(
-	cofferaa_phase_space_generator&& psg
+cofferaa_phase_space_generator_impl<T>::cofferaa_phase_space_generator_impl(
+	cofferaa_phase_space_generator_impl&& psg
 )
 	: pimpl(std::move(psg.pimpl))
 {
 }
 
 template <typename T>
-cofferaa_phase_space_generator<T>::~cofferaa_phase_space_generator() = default;
+cofferaa_phase_space_generator_impl<T>::~cofferaa_phase_space_generator_impl() = default;
 
 template <typename T>
-std::size_t cofferaa_phase_space_generator<T>::channels() const
+std::size_t cofferaa_phase_space_generator_impl<T>::channels() const
 {
 	return pimpl->channels;
 }
 
 template <typename T>
-T cofferaa_phase_space_generator<T>::densities(std::vector<T>& densities)
+T cofferaa_phase_space_generator_impl<T>::densities(std::vector<T>& densities)
 {
 	assert( densities.size() >= channels() );
 
@@ -158,13 +203,13 @@ T cofferaa_phase_space_generator<T>::densities(std::vector<T>& densities)
 }
 
 template <typename T>
-std::size_t cofferaa_phase_space_generator<T>::dimensions() const
+std::size_t cofferaa_phase_space_generator_impl<T>::dimensions() const
 {
 	return 3 * (pimpl->particles - 4) + 2;
 }
 
 template <typename T>
-void cofferaa_phase_space_generator<T>::generate(
+void cofferaa_phase_space_generator_impl<T>::generate(
 	std::vector<T> const& random_numbers,
 	std::vector<T>& momenta,
 	T cmf_energy,
@@ -197,19 +242,46 @@ void cofferaa_phase_space_generator<T>::generate(
 }
 
 template <typename T>
-luminosity_info<T> cofferaa_phase_space_generator<T>::info() const
+luminosity_info<T> cofferaa_phase_space_generator_impl<T>::info() const
 {
 	return luminosity_info<T>(pimpl->energy * pimpl->energy);
 }
 
 template <typename T>
-std::size_t cofferaa_phase_space_generator<T>::map_dimensions() const
+std::size_t cofferaa_phase_space_generator_impl<T>::map_dimensions() const
 {
 	return 4 * pimpl->particles;
 }
 
+template <typename T>
+std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
+	T min_energy,
+	std::vector<int> const& process,
+	lusifer_constants<T> const& constants,
+	std::vector<std::tuple<int, int, int>> const& dipoles,
+	std::size_t extra_random_numbers
+) {
+	return std::unique_ptr<phase_space_generator<T>>(
+		new cofferaa_phase_space_generator<T>(
+			min_energy,
+			process,
+			constants,
+			dipoles,
+			extra_random_numbers
+	));
+}
+
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
-template class cofferaa_phase_space_generator<double>;
+template class cofferaa_phase_space_generator_impl<double>;
+
+template std::unique_ptr<phase_space_generator<double>>
+make_cofferaa_phase_space_generator(
+	double,
+	std::vector<int> const&,
+	lusifer_constants<double> const&,
+	std::vector<std::tuple<int, int, int>> const&,
+	std::size_t
+);
 
 }
