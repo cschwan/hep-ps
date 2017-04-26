@@ -31,22 +31,22 @@ namespace hep
 {
 
 /// A phase space generator adapter for hadron-hadron collisions. This class
-/// takes another phase space generator `PhaseSpaceGenerator` to generate the
-/// momenta of the partons and the class itself takes care of the additional
-/// integration over the momentum fractions.
-template <typename PhaseSpaceGenerator>
-class hh_phase_space_generator
-	: public phase_space_generator<typename PhaseSpaceGenerator::numeric_type>
+/// takes another phase space generator `G` to generate the momenta of the
+/// partons while the class takes care of the additional integration over the
+/// momentum fractions.
+template <typename G>
+class hadron_hadron_psg_adapter
+	: public phase_space_generator<typename G::numeric_type>
 {
 public:
 	/// Numeric type used for phase space computations.
-	using numeric_type = typename PhaseSpaceGenerator::numeric_type;
+	using numeric_type = typename G::numeric_type;
 
 	/// Constructor. The argument `min_energy` is the minimal energy that can be
 	/// generated for the partons and `args...` are the arguments for the
-	/// constructor of `PhaseSpaceGenerator`.
+	/// constructor of `G`.
 	template <typename... Args>
-	hh_phase_space_generator(
+	hadron_hadron_psg_adapter(
 		numeric_type min_energy,
 		numeric_type cmf_energy,
 		Args&&... args
@@ -57,7 +57,7 @@ public:
 	{
 	}
 
-	/// Returns the number of channels of `PhaseSpaceGenerator`.
+	/// Returns the number of channels of `G`.
 	std::size_t channels() const override
 	{
 		return psg.channels();
@@ -70,8 +70,8 @@ public:
 		return psg.densities(densities) * jacobian_;
 	}
 
-	/// Returns the number of dimensions of `PhaseSpaceGenerator` plus two,
-	/// which are needed to generate the momentum fractions.
+	/// Returns the number of dimensions of `G` plus two, which are needed to
+	/// generate the momentum fractions.
 	std::size_t dimensions() const override
 	{
 		return psg.dimensions() + 2;
@@ -120,7 +120,7 @@ public:
 	}
 
 private:
-	PhaseSpaceGenerator psg;
+	G psg;
 	numeric_type min_energy_;
 	numeric_type cmf_energy_;
 	numeric_type jacobian_;

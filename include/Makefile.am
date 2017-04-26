@@ -17,7 +17,6 @@ nobase_include_HEADERS = \
 	hep/ps/fold.hpp \
 	hep/ps/fortran_helper.hpp \
 	hep/ps/find_hep_ps.hpp \
-	hep/ps/hh_phase_space_generator.hpp \
 	hep/ps/initial_state.hpp \
 	hep/ps/initial_state_set.hpp \
 	hep/ps/insertion_term.hpp \

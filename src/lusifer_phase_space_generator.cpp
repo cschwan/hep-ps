@@ -1,6 +1,8 @@
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/kaellen.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
+
+#include "hadron_hadron_psg_adapter.hpp"
 #include "lusifer_interfaces.hpp"
 
 #include <algorithm>
@@ -470,7 +472,7 @@ private:
 /// hadron-hadron collisions.
 template <typename T>
 using lusifer_phase_space_generator =
-	hh_phase_space_generator<lusifer_phase_space_generator_impl<T>>;
+	hadron_hadron_psg_adapter<lusifer_phase_space_generator_impl<T>>;
 
 template <typename T>
 class lusifer_phase_space_generator_impl<T>::impl

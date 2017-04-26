@@ -10,6 +10,7 @@ libhep_ps_la_SOURCES = \
 	find_hep_ps.cpp \
 	fortran_helper.cpp \
 	generator.f \
+	hadron_hadron_psg_adapter.hpp \
 	lusifer_extra.f \
 	lusifer_interfaces.hpp \
 	lusifer_phase_space_generator.cpp \

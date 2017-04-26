@@ -19,8 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/hh_phase_space_generator.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/phase_space_generator.hpp"
 
 #include <cstddef>
 #include <memory>

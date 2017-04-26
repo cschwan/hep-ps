@@ -1,8 +1,8 @@
 #include "hep/ps/cofferaa_phase_space_generator.hpp"
 #include "hep/ps/fortran_helper.hpp"
-#include "hep/ps/hh_phase_space_generator.hpp"
 
 #include "cofferaa_interfaces.hpp"
+#include "hadron_hadron_psg_adapter.hpp"
 
 #include <algorithm>
 #include <array>
@@ -51,9 +51,6 @@ private:
 	std::unique_ptr<impl> pimpl;
 };
 
-template <typename T>
-using cofferaa_phase_space_generator =
-	hh_phase_space_generator<cofferaa_phase_space_generator_impl<T>>;
 
 template <typename T>
 class cofferaa_phase_space_generator_impl<T>::impl
@@ -252,6 +249,10 @@ std::size_t cofferaa_phase_space_generator_impl<T>::map_dimensions() const
 {
 	return 4 * pimpl->particles;
 }
+
+template <typename T>
+using cofferaa_phase_space_generator =
+	hadron_hadron_psg_adapter<cofferaa_phase_space_generator_impl<T>>;
 
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
