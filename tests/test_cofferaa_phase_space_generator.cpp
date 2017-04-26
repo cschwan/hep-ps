@@ -23,10 +23,12 @@ hep::lusifer_constants<T> constants(
 TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 {
 	T const min_energy = T(10.0);
+	T const cmf_energy = T(1000.0);
 
 	// e+e- -> muon pair
-	auto psg1 = hep::make_cofferaa_phase_space_generator<T>(
+	auto psg1 = hep::make_cofferaa_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		std::vector<int>{11, -11, 13, -13},
 		constants
 	);
@@ -37,8 +39,9 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	CHECK( psg1->map_dimensions() == 16 );
 
 	// e+e- -> up-quark pair
-	auto psg2 = hep::make_cofferaa_phase_space_generator<T>(
+	auto psg2 = hep::make_cofferaa_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		std::vector<int>{11, -11, 2, -2},
 		constants
 	);
@@ -49,8 +52,9 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	CHECK( psg2->map_dimensions() == 16 );
 
 	// pp -> 2 jets + two pairs of leptons
-	auto psg3 = hep::make_cofferaa_phase_space_generator<T>(
+	auto psg3 = hep::make_cofferaa_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4},
 		constants
 	);
@@ -68,8 +72,9 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	};
 
 	// pp -> 2 jets + two pairs of leptons + gluon
-	auto psg4 = hep::make_cofferaa_phase_space_generator<T>(
+	auto psg4 = hep::make_cofferaa_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4, 26},
 		constants,
 		dipoles
@@ -85,8 +90,9 @@ TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
 	T const min_energy = T(10.0);
 	T const cmf_energy = T(1000.0);
 
-	auto psg = hep::make_cofferaa_phase_space_generator<T>(
+	auto psg = hep::make_cofferaa_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		std::vector<int>{11, -11, 13, -13},
 		constants
 	);
@@ -107,7 +113,7 @@ TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
 
 		for (std::size_t channel = 0; channel != psg->channels(); ++channel)
 		{
-			psg->generate(random_numbers, p, cmf_energy, channel);
+			psg->generate(random_numbers, p, channel);
 
 			std::array<T, 4> sums = { T(), T(), T(), T() };
 

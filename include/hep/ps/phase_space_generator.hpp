@@ -58,7 +58,6 @@ public:
 	virtual void generate(
 		std::vector<T> const& random_numbers,
 		std::vector<T>& momenta,
-		T cmf_energy,
 		std::size_t channel
 	) = 0;
 

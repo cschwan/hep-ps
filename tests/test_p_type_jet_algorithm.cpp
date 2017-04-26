@@ -30,6 +30,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 
 	auto psg = hep::make_lusifer_phase_space_generator<T>(
 		min_energy,
+		cmf_energy,
 		"sq~uq ne el~nm mu~dq cq~gl ",
 		constants
 	);
@@ -60,7 +61,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 						std::numeric_limits<T>::max_digits10>(rng);
 				});
 
-				psg->generate(random_numbers, momenta, cmf_energy, channel);
+				psg->generate(random_numbers, momenta, channel);
 
 				auto const recombinations = jet_algorithm.recombine(
 					momenta,

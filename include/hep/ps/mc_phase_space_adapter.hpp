@@ -19,9 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/mc/multi_channel_map.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/phase_space_generator.hpp"
+
+#include "hep/mc/multi_channel_map.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -37,12 +38,8 @@ class mc_phase_space_adapter
 {
 public:
 	/// Constructor.
-	mc_phase_space_adapter(
-		T cmf_energy,
-		std::unique_ptr<phase_space_generator<T>>&& psg
-	)
-		: cmf_energy_(cmf_energy)
-		, psg_(std::move(psg))
+	mc_phase_space_adapter(std::unique_ptr<phase_space_generator<T>>&& psg)
+		: psg_(std::move(psg))
 	{
 	}
 
@@ -60,7 +57,7 @@ public:
 			return psg_->densities(densities);
 		}
 
-		psg_->generate(random_numbers, momenta, cmf_energy_, channel);
+		psg_->generate(random_numbers, momenta, channel);
 
 		// value gets ignored
 		return T(1.0);
@@ -87,7 +84,6 @@ public:
 	}
 
 private:
-	T cmf_energy_;
 	std::unique_ptr<phase_space_generator<T>> psg_;
 };
 

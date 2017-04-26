@@ -72,6 +72,7 @@ struct lusifer_constants
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	T min_energy,
+	T cmf_energy,
 	std::vector<std::string> const& processes,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers = 0
@@ -80,6 +81,7 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	T min_energy,
+	T cmf_energy,
 	std::string const& process,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers = 0

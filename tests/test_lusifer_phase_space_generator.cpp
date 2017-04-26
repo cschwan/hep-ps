@@ -23,10 +23,12 @@ hep::lusifer_constants<T> constants(
 TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 {
 	T const min_energy = T(10.0);
+	T const cmf_energy = T(1000.0);
 
 	// e+e- -> muon pair
-	auto psg1 = hep::make_lusifer_phase_space_generator<T>(
+	auto psg1 = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"el~el mu mu~",
 		constants
 	);
@@ -39,8 +41,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	for (std::size_t extra = 0; extra != 4; ++extra)
 	{
 		// e+e- -> muon pair + extra random numbers
-		auto psg = hep::make_lusifer_phase_space_generator<T>(
+		auto psg = hep::make_lusifer_phase_space_generator(
 			min_energy,
+			cmf_energy,
 			"el~el mu mu~",
 			constants,
 			extra
@@ -51,8 +54,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 		REQUIRE( psg->map_dimensions() == 16 + extra );
 	}
 
-	auto psg2 = hep::make_lusifer_phase_space_generator<T>(
+	auto psg2 = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"sq~uq W+ W+ dq cq~",
 		constants
 	);
@@ -62,8 +66,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg2->map_dimensions() == 24 );
 
 	// pp -> 2 jets + two pairs of leptons
-	auto psg3 = hep::make_lusifer_phase_space_generator<T>(
+	auto psg3 = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"sq~uq ne el~nm mu~dq cq~",
 		constants
 	);
@@ -73,8 +78,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg3->map_dimensions() == 32 );
 
 	// pp -> 3 jets + two pairs of leptons
-	auto psg4 = hep::make_lusifer_phase_space_generator<T>(
+	auto psg4 = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"sq~uq ne el~nm mu~dq cq~gl ",
 		constants
 	);
@@ -88,8 +94,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	// NOTE: generator does not generate three-gluon vertices
 
 	// four-gluon vertex
-	auto psg5a = hep::make_lusifer_phase_space_generator<T>(
+	auto psg5a = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"gl gl gl gl ",
 		constants
 	);
@@ -99,8 +106,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg5a->map_dimensions() == 16 );
 
 	// t- and u-channel
-	auto psg5b = hep::make_lusifer_phase_space_generator<T>(
+	auto psg5b = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"uq~uq gl gl ",
 		constants
 	);
@@ -110,8 +118,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg5b->map_dimensions() == 16 );
 
 	// s-channels with gluon/photon and Z, and t-channel with W
-	auto psg5c = hep::make_lusifer_phase_space_generator<T>(
+	auto psg5c = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"uq~uq dq dq~",
 		constants
 	);
@@ -121,8 +130,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg5c->map_dimensions() == 16 );
 
 	// s- and t-channels with gluon/photon and Z
-	auto psg5d = hep::make_lusifer_phase_space_generator<T>(
+	auto psg5d = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"uq~uq uq uq~",
 		constants
 	);
@@ -131,8 +141,9 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 	REQUIRE( psg5d->dimensions()     == 4 );
 	REQUIRE( psg5d->map_dimensions() == 16 );
 
-	auto psg5 = hep::make_lusifer_phase_space_generator<T>(
+	auto psg5 = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		std::vector<std::string>{ "gl gl gl gl ", "uq~uq gl gl ",
 			"uq~uq dq dq~", "uq~uq uq uq~" },
 		constants
@@ -146,18 +157,17 @@ TEST_CASE("constructors", "[lusifer_phase_space_generator]")
 TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
 {
 	T const min_energy = T(10.0);
+	T const cmf_energy = T(1000.0);
 
-	auto psg = hep::make_lusifer_phase_space_generator<T>(
+	auto psg = hep::make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		"sq~uq ne el~nm mu~dq cq~",
 		constants
 	);
 
 	std::mt19937 rng;
 	std::vector<T> random_numbers(psg->dimensions());
-
-	// energy should not be much smaller than the masses we specified
-	T const energy = T(1000.0);
 
 	std::vector<T> p(psg->map_dimensions());
 	std::vector<T> densities(psg->channels());
@@ -172,7 +182,7 @@ TEST_CASE("phase space generation", "[lusifer_phase_space_generator]")
 
 		for (std::size_t channel = 0; channel != psg->channels(); ++channel)
 		{
-			psg->generate(random_numbers, p, energy, channel);
+			psg->generate(random_numbers, p, channel);
 
 			std::array<T, 4> sums = { T(), T(), T(), T() };
 

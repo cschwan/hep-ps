@@ -1174,6 +1174,7 @@ std::size_t lusifer_phase_space_generator_impl<T>::map_dimensions() const
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	T min_energy,
+	T cmf_energy,
 	std::vector<std::string> const& processes,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers = 0
@@ -1181,6 +1182,7 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	return std::unique_ptr<phase_space_generator<T>>(
 		new lusifer_phase_space_generator<T>(
 			min_energy,
+			cmf_energy,
 			processes,
 			constants,
 			extra_random_numbers
@@ -1190,12 +1192,14 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	T min_energy,
+	T cmf_energy,
 	std::string const& process,
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers = 0
 ) {
 	return make_lusifer_phase_space_generator(
 		min_energy,
+		cmf_energy,
 		std::vector<std::string>{process},
 		constants,
 		extra_random_numbers
@@ -1210,6 +1214,7 @@ template class lusifer_phase_space_generator_impl<double>;
 template std::unique_ptr<phase_space_generator<double>>
 make_lusifer_phase_space_generator(
 	double,
+	double,
 	std::vector<std::string> const&,
 	lusifer_constants<double> const&,
 	std::size_t
@@ -1217,6 +1222,7 @@ make_lusifer_phase_space_generator(
 
 template std::unique_ptr<phase_space_generator<double>>
 make_lusifer_phase_space_generator(
+	double,
 	double,
 	std::string const&,
 	lusifer_constants<double> const&,

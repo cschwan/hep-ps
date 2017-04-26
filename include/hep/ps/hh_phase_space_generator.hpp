@@ -46,9 +46,14 @@ public:
 	/// generated for the partons and `args...` are the arguments for the
 	/// constructor of `PhaseSpaceGenerator`.
 	template <typename... Args>
-	hh_phase_space_generator(numeric_type min_energy, Args&&... args)
+	hh_phase_space_generator(
+		numeric_type min_energy,
+		numeric_type cmf_energy,
+		Args&&... args
+	)
 		: psg(std::forward<Args>(args)...)
 		, min_energy_(min_energy)
+		, cmf_energy_(cmf_energy)
 	{
 	}
 
@@ -76,17 +81,16 @@ public:
 	void generate(
 		std::vector<numeric_type> const& random_numbers,
 		std::vector<numeric_type>& momenta,
-		numeric_type cmf_energy,
 		std::size_t channel
 	) override {
-		auto const r1 = random_numbers.at(psg.dimensions() + 0);
-		auto const r2 = random_numbers.at(psg.dimensions() + 1);
-
 		using std::log;
 		using std::pow;
 		using std::sqrt;
 
-		auto const s = cmf_energy * cmf_energy;
+		auto const r1 = random_numbers.at(psg.dimensions() + 0);
+		auto const r2 = random_numbers.at(psg.dimensions() + 1);
+
+		auto const s = cmf_energy_ * cmf_energy_;
 		auto const tau0 = (min_energy_ * min_energy_) / s;
 		auto const tau = pow(tau0, r1);
 		auto const y = pow(tau, numeric_type(1.0) - r2);
@@ -117,9 +121,10 @@ public:
 
 private:
 	PhaseSpaceGenerator psg;
-	luminosity_info<numeric_type> info_;
 	numeric_type min_energy_;
+	numeric_type cmf_energy_;
 	numeric_type jacobian_;
+	luminosity_info<numeric_type> info_;
 };
 
 }

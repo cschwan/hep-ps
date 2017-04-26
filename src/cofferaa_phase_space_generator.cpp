@@ -256,6 +256,7 @@ std::size_t cofferaa_phase_space_generator_impl<T>::map_dimensions() const
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
 	T min_energy,
+	T cmf_energy,
 	std::vector<int> const& process,
 	lusifer_constants<T> const& constants,
 	std::vector<std::tuple<int, int, int>> const& dipoles,
@@ -264,6 +265,7 @@ std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
 	return std::unique_ptr<phase_space_generator<T>>(
 		new cofferaa_phase_space_generator<T>(
 			min_energy,
+			cmf_energy,
 			process,
 			constants,
 			dipoles,
@@ -277,6 +279,7 @@ template class cofferaa_phase_space_generator_impl<double>;
 
 template std::unique_ptr<phase_space_generator<double>>
 make_cofferaa_phase_space_generator(
+	double,
 	double,
 	std::vector<int> const&,
 	lusifer_constants<double> const&,
