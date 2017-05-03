@@ -24,6 +24,7 @@
 
 #include "hep/mc/multi_channel_map.hpp"
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
 #include <utility>
@@ -64,6 +65,8 @@ public:
 		std::vector<T>& densities,
 		hep::multi_channel_map action
 	) {
+		assert( psg_.get() != nullptr );
+
 		if (action == hep::multi_channel_map::calculate_densities)
 		{
 			return psg_->densities(densities);

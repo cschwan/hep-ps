@@ -26,6 +26,7 @@
 #include "hep/mc/multi_channel_point.hpp"
 #include "hep/mc/projector.hpp"
 
+#include <cassert>
 #include <memory>
 #include <utility>
 
@@ -79,6 +80,8 @@ public:
 		hep::multi_channel_point2<T, P> const& point,
 		hep::projector<T>& projector
 	) {
+		assert( observables_.get() != nullptr );
+
 		if (distributions_ == nullptr)
 		{
 			distributions_ = dynamic_cast <mc_distributions<T>*>
