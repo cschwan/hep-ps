@@ -40,20 +40,22 @@ TEST_CASE("test make_mc_observables_born", "[mc_observables]")
 		)
 	);
 
-	auto observables = hep::make_mc_observables_born(
-		test_matrix_elements<T>(set, count, 0, 0, 0),
-		test_cuts<T>(count, false),
-		test_recombiner<T>(count),
-		test_pdf<T>(),
-		test_scale_setter<T>(),
-		hep::mc_trivial_distributions<T>(),
-		T(1.0),
+	hep::mc_observables<T> observables{
+		hep::make_observables_born(
+			test_matrix_elements<T>(set, count, 0, 0, 0),
+			test_cuts<T>(count, false),
+			test_recombiner<T>(count),
+			test_pdf<T>(),
+			test_scale_setter<T>(),
+			hep::mc_trivial_distributions<T>(),
+			T(1.0)
+		),
 		set
-	);
+	};
 
 	auto const results = hep::multi_channel(
 		hep::make_multi_channel_integrand<T>(
-			std::ref(*observables),
+			std::ref(observables),
 			generator.dimensions(),
 			std::ref(generator),
 			generator.map_dimensions(),
@@ -84,22 +86,24 @@ TEST_CASE("test make_mc_observables_fini", "[mc_observables]")
 		)
 	);
 
-	auto observables = hep::make_mc_observables_fini(
-		test_matrix_elements<T>(set, count, 0, 0, 0),
-		test_subtraction<T>(0, 0, 0),
-		test_cuts<T>(count, false),
-		test_recombiner<T>(count),
-		test_pdf<T>(),
-		test_scale_setter<T>(),
-		hep::mc_trivial_distributions<T>(),
-		T(1.0),
-		false,
+	hep::mc_observables<T> observables{
+		hep::make_observables_fini(
+			test_matrix_elements<T>(set, count, 0, 0, 0),
+			test_subtraction<T>(0, 0, 0),
+			test_cuts<T>(count, false),
+			test_recombiner<T>(count),
+			test_pdf<T>(),
+			test_scale_setter<T>(),
+			hep::mc_trivial_distributions<T>(),
+			T(1.0),
+			false
+		),
 		set
-	);
+	};
 
 	auto const results = hep::multi_channel(
 		hep::make_multi_channel_integrand<T>(
-			std::ref(*observables),
+			std::ref(observables),
 			generator.dimensions(),
 			std::ref(generator),
 			generator.map_dimensions(),
@@ -129,22 +133,24 @@ TEST_CASE("test make_mc_observables_real", "[mc_observables]")
 		)
 	);
 
-	auto observables = hep::make_mc_observables_real(
-		test_matrix_elements<T>(set, count, 2, 4, 3),
-		test_subtraction<T>(2, 4, 3),
-		test_cuts<T>(count, false),
-		test_recombiner<T>(count),
-		test_pdf<T>(),
-		test_scale_setter<T>(),
-		hep::mc_trivial_distributions<T>(),
-		T(1.0),
-		T(0.0),
+	hep::mc_observables<T> observables{
+		hep::make_observables_real(
+			test_matrix_elements<T>(set, count, 2, 4, 3),
+			test_subtraction<T>(2, 4, 3),
+			test_cuts<T>(count, false),
+			test_recombiner<T>(count),
+			test_pdf<T>(),
+			test_scale_setter<T>(),
+			hep::mc_trivial_distributions<T>(),
+			T(1.0),
+			T(0.0)
+		),
 		set
-	);
+	};
 
 	auto const results = hep::multi_channel(
 		hep::make_multi_channel_integrand<T>(
-			std::ref(*observables),
+			std::ref(observables),
 			generator.dimensions(),
 			std::ref(generator),
 			generator.map_dimensions(),

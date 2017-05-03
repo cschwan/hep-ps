@@ -21,9 +21,6 @@
 
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables.hpp"
-#include "hep/ps/observables_born.hpp"
-#include "hep/ps/observables_fini.hpp"
-#include "hep/ps/observables_real.hpp"
 #include "hep/ps/mc_distributions.hpp"
 
 #include "hep/mc/multi_channel_point.hpp"
@@ -87,93 +84,6 @@ private:
 	mc_distributions<T>* distributions_;
 	initial_state_set set_;
 };
-
-template <class T, class M, class C, class R, class P, class S, class D>
-inline std::unique_ptr<mc_observables<T>> make_mc_observables_born(
-	M&& matrix_elements,
-	C&& cuts,
-	R&& recombiner,
-	P&& pdf,
-	S&& scale_setter,
-	D&& distributions,
-	T hbarc2,
-	initial_state_set set
-) {
-	return std::unique_ptr<mc_observables<T>>(new mc_observables<T>(
-		make_observables_born(
-			std::forward<M>(matrix_elements),
-			std::forward<C>(cuts),
-			std::forward<R>(recombiner),
-			std::forward<P>(pdf),
-			std::forward<S>(scale_setter),
-			std::forward<D>(distributions),
-			hbarc2
-		),
-		set
-	));
-}
-
-template <class T, class M, class S, class C, class R, class P, class U,
-	class D>
-inline std::unique_ptr<mc_observables<T>> make_mc_observables_fini(
-	M&& matrix_elements,
-	S&& subtraction,
-	C&& cuts,
-	R&& recombiner,
-	P&& pdf,
-	U&& scale_setter,
-	D&& distributions,
-	T hbarc2,
-	bool insertion2,
-	initial_state_set set
-) {
-	return std::unique_ptr<mc_observables<T>>(new mc_observables<T>(
-		make_observables_fini(
-			std::forward<M>(matrix_elements),
-			std::forward<S>(subtraction),
-			std::forward<C>(cuts),
-			std::forward<R>(recombiner),
-			std::forward<P>(pdf),
-			std::forward<U>(scale_setter),
-			std::forward<D>(distributions),
-			hbarc2,
-			insertion2
-		),
-		set
-	));
-}
-
-template <class T, class M, class S, class C, class R, class P, class U,
-	class D>
-inline std::unique_ptr<mc_observables<T>> make_mc_observables_real(
-	M&& matrix_elements,
-	S&& subtraction,
-	C&& cuts,
-	R&& recombiner,
-	P&& pdf,
-	U&& scale_setter,
-	D&& distributions,
-	T hbarc2,
-	T alpha_min,
-	initial_state_set set
-) {
-	auto observable = make_observables_real(
-		std::forward<M>(matrix_elements),
-		std::forward<S>(subtraction),
-		std::forward<C>(cuts),
-		std::forward<R>(recombiner),
-		std::forward<P>(pdf),
-		std::forward<U>(scale_setter),
-		std::forward<D>(distributions),
-		hbarc2,
-		alpha_min
-	);
-
-	return std::unique_ptr<mc_observables<T>>(new mc_observables<T>(
-		std::move(observable),
-		set
-	));
-}
 
 }
 
