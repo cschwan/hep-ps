@@ -64,6 +64,16 @@ public:
 	{
 	}
 
+	mc_observables() = default;
+
+	mc_observables(mc_observables<T> const&) = delete;
+
+	mc_observables(mc_observables<T>&& other) = default;
+
+	mc_observables<T>& operator=(mc_observables<T> const&) = delete;
+
+	mc_observables<T>& operator=(mc_observables<T>&& other) = default;
+
 	template <typename P>
 	T operator()(
 		hep::multi_channel_point2<T, P> const& point,

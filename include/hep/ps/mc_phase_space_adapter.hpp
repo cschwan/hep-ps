@@ -43,6 +43,18 @@ public:
 	{
 	}
 
+	mc_phase_space_adapter() = default;
+
+	mc_phase_space_adapter(mc_phase_space_adapter<T> const&) = delete;
+
+	mc_phase_space_adapter(mc_phase_space_adapter<T>&& other) = default;
+
+	mc_phase_space_adapter<T>& operator=(mc_phase_space_adapter<T> const&) =
+		delete;
+
+	mc_phase_space_adapter<T>& operator=(mc_phase_space_adapter<T>&& other) =
+		default;
+
 	/// Generates the phase space if `action` is `calculate_momenta` and
 	/// calculates the densities otherwise.
 	T operator()(
