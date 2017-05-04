@@ -24,6 +24,7 @@ void test_observables_fint(
 		test_pdf<T>(),
 		test_scale_setter<T>(),
 		hep::trivial_distributions<T>(),
+		set,
 		T(1.0)
 	);
 
@@ -35,7 +36,7 @@ void test_observables_fint(
 	T const x = T(0.5);
 	phase_space_point.push_back(x);
 
-	T const result = observables->eval(phase_space_point, info, set);
+	T const result = observables->eval(phase_space_point, info);
 
 	REQUIRE( result == test_result );
 }

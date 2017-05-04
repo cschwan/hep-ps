@@ -57,6 +57,7 @@ public:
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
 		Distributions&& distributions,
+		initial_state_set set,
 		T hbarc2
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
@@ -65,6 +66,7 @@ public:
 		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, distributions_(std::forward<Distributions>(distributions))
+		, set_(set)
 		, hbarc2_(hbarc2)
 	{
 		static_assert (std::is_base_of<hep::distributions<T>, D>::value,
@@ -73,8 +75,7 @@ public:
 
 	T eval(
 		std::vector<T> const& phase_space,
-		luminosity_info<T> const& info,
-		initial_state_set set
+		luminosity_info<T> const& info
 	) override {
 		std::vector<T> aux_phase_space(phase_space.size());
 
@@ -108,11 +109,11 @@ public:
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
-		auto const borns = matrix_elements_.borns(phase_space, set);
+		auto const borns = matrix_elements_.borns(phase_space, set_);
 		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
 		auto const pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
-		auto const result = fold(pdfx1, pdfx2, borns, set, factor, cut_result);
+		auto const result = fold(pdfx1, pdfx2, borns, set_, factor, cut_result);
 
 		distributions_(phase_space, cut_result, result, rapidity_shift,
 			event_type::born_like_n);
@@ -142,6 +143,7 @@ private:
 	P pdf_;
 	S scale_setter_;
 	D distributions_;
+	initial_state_set set_;
 	T hbarc2_;
 
 	T old_renormalization_scale_;
@@ -161,6 +163,7 @@ inline std::unique_ptr<observables<T>> make_observables_born(
 	P&& pdf,
 	S&& scale_setter,
 	D&& distributions,
+	initial_state_set set,
 	T hbarc2
 ) {
 	return std::unique_ptr<observables_born_t<T, M, C, R, P, S, D>>(
@@ -171,6 +174,7 @@ inline std::unique_ptr<observables<T>> make_observables_born(
 			std::forward<P>(pdf),
 			std::forward<S>(scale_setter),
 			std::forward<D>(distributions),
+			set,
 			hbarc2
 	));
 }

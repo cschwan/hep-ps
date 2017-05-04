@@ -89,6 +89,7 @@ public:
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
 		Distributions&& distributions,
+		initial_state_set set,
 		T hbarc2,
 		T alpha_min
 	)
@@ -99,6 +100,7 @@ public:
 		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, distributions_(std::forward<Distributions>(distributions))
+		, set_(set)
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
 	{
@@ -108,8 +110,7 @@ public:
 
 	T eval(
 		std::vector<T> const& real_phase_space,
-		luminosity_info<T> const& info,
-		initial_state_set set
+		luminosity_info<T> const& info
 	) override {
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
@@ -143,6 +144,8 @@ public:
 			real_cut_result = cuts_.cut(recombined_real_phase_space, shift,
 				event);
 		}
+
+		auto set = set_;
 
 		using info_type = typename cut_result_type::info_t;
 
@@ -303,6 +306,7 @@ private:
 	P pdf_;
 	U scale_setter_;
 	D distributions_;
+	initial_state_set set_;
 	T hbarc2_;
 	T alpha_min_;
 
@@ -327,6 +331,7 @@ inline std::unique_ptr<observables<T>> make_observables_real(
 	P&& pdf,
 	U&& scale_setter,
 	D&& distributions,
+	initial_state_set set,
 	T hbarc2,
 	T alpha_min = T()
 ) {
@@ -339,6 +344,7 @@ inline std::unique_ptr<observables<T>> make_observables_real(
 			std::forward<P>(pdf),
 			std::forward<U>(scale_setter),
 			std::forward<D>(distributions),
+			set,
 			hbarc2,
 			alpha_min
 	));

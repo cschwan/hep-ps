@@ -21,6 +21,7 @@ void test_observables_born(hep::initial_state_set set, std::size_t count)
 		test_pdf<T>(),
 		test_scale_setter<T>(),
 		hep::trivial_distributions<T>(),
+		set,
 		T(1.0)
 	);
 
@@ -28,7 +29,7 @@ void test_observables_born(hep::initial_state_set set, std::size_t count)
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
 	T const test_result = T(1.0) / T(1024.0);
-	T const result = observables->eval(phase_space_point, info, set);
+	T const result = observables->eval(phase_space_point, info);
 
 	REQUIRE( result == test_result );
 }

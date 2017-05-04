@@ -60,6 +60,7 @@ public:
 		Pdf&& pdf,
 		ScaleSetter&& scale_setter,
 		Distributions&& distributions,
+		initial_state_set set,
 		T hbarc2,
 		bool insertion2
 	)
@@ -70,6 +71,7 @@ public:
 		, pdf_(std::forward<Pdf>(pdf))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, distributions_(std::forward<Distributions>(distributions))
+		, set_(set)
 		, hbarc2_(hbarc2)
 		, insertion2_(insertion2)
 	{
@@ -79,8 +81,7 @@ public:
 
 	T eval(
 		std::vector<T> const& phase_space,
-		luminosity_info<T> const& info,
-		initial_state_set set
+		luminosity_info<T> const& info
 	) override {
 		std::vector<T> aux_phase_space(phase_space.size());
 
@@ -133,7 +134,7 @@ public:
 			pdf_.pdf(eta[1] / xprime[1], scales.factorization())
 		};
 
-		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set);
+		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
@@ -171,11 +172,11 @@ public:
 
 				if (i == 0)
 				{
-					result += fold(d, pdfa[1], me, set, factor, cut_result);
+					result += fold(d, pdfa[1], me, set_, factor, cut_result);
 				}
 				else
 				{
-					result += fold(pdfa[0], d, me, set, factor, cut_result);
+					result += fold(pdfa[0], d, me, set_, factor, cut_result);
 				}
 			}
 
@@ -187,7 +188,7 @@ public:
 					phase_space
 				);
 
-				result += fold(pdfa[0], pdfa[1], me, set, ins, cut_result);
+				result += fold(pdfa[0], pdfa[1], me, set_, ins, cut_result);
 			}
 		}
 
@@ -220,6 +221,7 @@ private:
 	P pdf_;
 	U scale_setter_;
 	D distributions_;
+	initial_state_set set_;
 	T hbarc2_;
 
 	T old_renormalization_scale_;
@@ -244,6 +246,7 @@ inline std::unique_ptr<observables<T>> make_observables_fini(
 	P&& pdf,
 	U&& scale_setter,
 	D&& distributions,
+	initial_state_set set,
 	T hbarc2,
 	bool insertion2 = false
 ) {
@@ -256,6 +259,7 @@ inline std::unique_ptr<observables<T>> make_observables_fini(
 			std::forward<P>(pdf),
 			std::forward<U>(scale_setter),
 			std::forward<D>(distributions),
+			set,
 			hbarc2,
 			insertion2
 	));

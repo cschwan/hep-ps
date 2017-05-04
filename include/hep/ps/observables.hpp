@@ -37,12 +37,10 @@ public:
 	/// Evaluates the observables this instances represents for the given
 	/// `phase_space` point and luminosity information in `info`. If the
 	/// observables need extra random numbers these will be supplied in
-	/// `extra_random_numbers`. If only restricted set of initial states are
-	/// needed those will be given in `set`.
+	/// `extra_random_numbers`.
 	virtual T eval(
 		std::vector<T> const& phase_space,
-		luminosity_info<T> const& info,
-		initial_state_set set
+		luminosity_info<T> const& info
 	) = 0;
 
 	/// Returns the distributions that the observable object was created with.

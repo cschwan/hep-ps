@@ -28,6 +28,7 @@ void test_observables_real(
 		test_pdf<T>(),
 		test_scale_setter<T>(),
 		hep::trivial_distributions<T>(),
+		set,
 		T(1.0),
 		T()
 	);
@@ -36,7 +37,7 @@ void test_observables_real(
 	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
 
 	T const test_result = T(inclusive ? 0.5 : -0.5) / T(1024.0);
-	T const result = observables->eval(real_phase_space_point, info, set);
+	T const result = observables->eval(real_phase_space_point, info);
 
 	REQUIRE( result == test_result );
 }

@@ -55,13 +55,9 @@ template <typename T>
 class mc_observables
 {
 public:
-	mc_observables(
-		std::unique_ptr<observables<T>>&& observables,
-		initial_state_set set
-	)
+	mc_observables(std::unique_ptr<observables<T>>&& observables)
 		: observables_(std::move(observables))
 		, distributions_(nullptr)
-		, set_(set)
 	{
 	}
 
@@ -89,13 +85,12 @@ public:
 		}
 
 		distributions_->set_projector(projector);
-		return observables_->eval(point.coordinates(), info(point), set_);
+		return observables_->eval(point.coordinates(), info(point));
 	}
 
 private:
 	std::unique_ptr<observables<T>> observables_;
 	mc_distributions<T>* distributions_;
-	initial_state_set set_;
 };
 
 }
