@@ -23,6 +23,7 @@ nobase_include_HEADERS = \
 	hep/ps/insertion_term_type.hpp \
 	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \
+	hep/ps/lusifer_constants.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
 	hep/ps/mc_distributions.hpp \
 	hep/ps/mc_observables.hpp \
