@@ -2296,7 +2296,7 @@ c local variables
       integer maxe,maxg,maxch
       parameter(maxe=9,maxg=4,maxch=20000)
       real*8 k(maxe,0:3),kt(maxe,0:3),g,h,denum,cofferaa_jacobian
-      real*8 x,z,y,v,kk(7,7),pi,ck(0:3),ckt(0:3),st
+      real*8 x,z,y,v,kk(maxe,maxe),pi,ck(0:3),ckt(0:3),st
       integer i1,i2,j,em,sp,ga,next,switch
 c mcoutput
       integer nout,numout,maxout
