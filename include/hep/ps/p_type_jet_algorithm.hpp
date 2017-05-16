@@ -36,11 +36,17 @@ public:
 		std::vector<T>& recombined_phase_space,
 		std::vector<std::size_t> const& recombination_candidates,
 		std::size_t max_recombinations
-	) const;
+	);
 
 private:
+	bool find_jet(std::vector<T>&);
+
 	T p_;
 	T radius_;
+
+	std::vector<std::size_t> candidates_;
+	std::vector<T> dib_;
+	std::vector<T> dij_;
 };
 
 }

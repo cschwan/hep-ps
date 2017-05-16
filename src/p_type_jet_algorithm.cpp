@@ -65,60 +65,66 @@ constexpr std::ptrdiff_t reconstruct_distance(
 	return ((2 * n - i - 3) * i) / 2 + j - 1;
 }
 
+}
+
+namespace hep
+{
+
 template <typename T>
-bool find_jet(
-	std::vector<T>& phase_space,
-	std::vector<std::size_t>& indices,
-	T p,
-	T radius
-) {
-	std::size_t const n = indices.size();
+p_type_jet_algorithm<T>::p_type_jet_algorithm(T p, T radius)
+	: p_(p)
+	, radius_(radius)
+{
+}
+
+template <typename T>
+bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
+{
+	std::size_t const n = candidates_.size();
 
 	if (n == 1)
 	{
 		return true;
 	}
 
-	std::vector<T> dib;
-	dib.reserve(n);
-	std::vector<T> dij;
-	dij.reserve((n * (n - 1)) >> 1);
+	dib_.clear();
+	dij_.clear();
 
 	for (std::size_t i = 0; i != n; ++i)
 	{
-		std::size_t const index = indices.at(i);
-		dib.push_back(std::pow(pt2(phase_space, index), p));
+		std::size_t const index = candidates_.at(i);
+		dib_.push_back(std::pow(pt2(phase_space, index), p_));
 	}
 
 	for (std::size_t i = 0; i != (n-1); ++i)
 	{
-		T const dib_ib = dib.at(i);
-		std::size_t const index_i = indices.at(i);
+		T const dib_ib = dib_.at(i);
+		std::size_t const index_i = candidates_.at(i);
 
 		for (std::size_t j = i + 1; j < n; ++j)
 		{
-			T const dib_jb = dib.at(j);
+			T const dib_jb = dib_.at(j);
 			T const min = std::fmin(dib_ib, dib_jb);
-			std::size_t const index_j = indices.at(j);
+			std::size_t const index_j = candidates_.at(j);
 			T const factor = dist2(phase_space, index_i, index_j) /
-				(radius * radius);
+				(radius_ * radius_);
 
-			dij.push_back(min * factor);
+			dij_.push_back(min * factor);
 		}
 	}
 
-	auto const min_dib = std::min_element(dib.begin(), dib.end());
-	auto const min_dij = std::min_element(dij.begin(), dij.end());
+	auto const min_dib = std::min_element(dib_.begin(), dib_.end());
+	auto const min_dij = std::min_element(dij_.begin(), dij_.end());
 
 	if (*min_dib < *min_dij)
 	{
-		std::size_t const index = std::distance(dib.begin(), min_dib);
-		indices.erase(std::next(indices.begin(), index));
+		std::size_t const index = std::distance(dib_.begin(), min_dib);
+		candidates_.erase(std::next(candidates_.begin(), index));
 
 		return true;
 	}
 
-	auto const distance = std::distance(dij.begin(), min_dij);
+	auto const distance = std::distance(dij_.begin(), min_dij);
 
 	std::size_t i = 0;
 	std::size_t j = 1;
@@ -133,8 +139,8 @@ bool find_jet(
 
 	j += distance - reconstruct_distance(n, i, j);
 
-	auto const index_i = indices.at(i);
-	auto const index_j = indices.at(j);
+	auto const index_i = candidates_.at(i);
+	auto const index_j = candidates_.at(j);
 
 	phase_space.at(4 * index_i + 0) += phase_space.at(4 * index_j + 0);
 	phase_space.at(4 * index_i + 1) += phase_space.at(4 * index_j + 1);
@@ -146,27 +152,15 @@ bool find_jet(
 		std::next(phase_space.begin(), 4 * index_j + 4)
 	);
 
-	auto begin = std::next(indices.begin(), j);
+	auto begin = std::next(candidates_.begin(), j);
 	auto next = std::next(begin);
-	auto end = indices.end();
+	auto end = candidates_.end();
 
 	std::transform(next, end, next, [](std::size_t v) { return v - 1; });
 	std::rotate(begin, next, end);
-	indices.erase(std::prev(end));
+	candidates_.erase(std::prev(end));
 
 	return false;
-}
-
-}
-
-namespace hep
-{
-
-template <typename T>
-p_type_jet_algorithm<T>::p_type_jet_algorithm(T p, T radius)
-	: p_(p)
-	, radius_(radius)
-{
 }
 
 template <typename T>
@@ -175,17 +169,21 @@ std::size_t p_type_jet_algorithm<T>::recombine(
 	std::vector<T>& recombined_phase_space,
 	std::vector<std::size_t> const& recombination_candidates,
 	std::size_t max_recombinations
-) const {
+) {
 	std::size_t recombinations = 0;
-	std::vector<std::size_t> candidates = recombination_candidates;
+	candidates_ = recombination_candidates;
 
 	recombined_phase_space = phase_space;
 
+	std::size_t const n = candidates_.size();
+	dib_.reserve(n);
+	dij_.reserve((n * (n - 1)) >> 1);
+
 	for (;;)
 	{
-		if (find_jet(recombined_phase_space, candidates, p_, radius_))
+		if (find_jet(recombined_phase_space))
 		{
-			if (candidates.size() == 1)
+			if (candidates_.size() == 1)
 			{
 				break;
 			}
