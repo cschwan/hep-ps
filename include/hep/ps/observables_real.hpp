@@ -40,11 +40,12 @@
 namespace
 {
 
-inline std::vector<std::size_t> adjust_indices(
+inline void adjust_indices(
 	std::vector<std::size_t> const& indices,
-	std::size_t unresolved
+	std::size_t unresolved,
+	std::vector<std::size_t>& result
 ) {
-	std::vector<std::size_t> result(indices);
+	result = indices;
 
 	auto const begin = std::find(result.begin(), result.end(), unresolved);
 	auto end = result.end();
@@ -59,8 +60,6 @@ inline std::vector<std::size_t> adjust_indices(
 	std::rotate(begin, next, end);
 	// remove the unresolved index
 	result.erase(std::prev(end));
-
-	return result;
 }
 
 }
@@ -103,6 +102,7 @@ public:
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
+		, dipole_recombination_candidates_()
 	{
 		static_assert (std::is_base_of<hep::distributions<T>, D>::value,
 			"`D` must be a type deriving from `hep::distributions<T>`");
@@ -147,9 +147,7 @@ public:
 
 		auto set = set_;
 
-		using info_type = typename cut_result_type::info_t;
-
-		std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles;
+		non_zero_dipoles_.clear();
 
 		for (auto const dipole_with_set : matrix_elements_.dipoles())
 		{
@@ -168,14 +166,16 @@ public:
 				continue;
 			}
 
-			auto const dipole_recombination_candidates = adjust_indices(
+			adjust_indices(
 				matrix_elements_.real_recombination_candidates(),
-				dipole.unresolved());
+				dipole.unresolved(),
+				dipole_recombination_candidates_
+			);
 
 			auto const dipole_recombined = recombiner_.recombine(
 				phase_space,
 				phase_space,
-				dipole_recombination_candidates,
+				dipole_recombination_candidates_,
 				0
 			);
 
@@ -194,7 +194,7 @@ public:
 				continue;
 			}
 
-			non_zero_dipoles.emplace_back(
+			non_zero_dipoles_.emplace_back(
 				std::move(phase_space),
 				invariants,
 				dipole,
@@ -203,7 +203,7 @@ public:
 		}
 
 		// if there are neither dipoles nor real matrix elements stop here
-		if (set.empty() || (non_zero_dipoles.empty() &&
+		if (set.empty() || (non_zero_dipoles_.empty() &&
 			real_cut_result.neg_cutted() && real_cut_result.pos_cutted()))
 		{
 			return T();
@@ -232,7 +232,7 @@ public:
 
 		neg_pos_results<T> result;
 
-		for (auto const non_zero_dipole : non_zero_dipoles)
+		for (auto const non_zero_dipole : non_zero_dipoles_)
 		{
 			auto const& dipole = non_zero_dipole.dipole();
 			auto const& dipole_cut_result = non_zero_dipole.cut_result();
@@ -311,6 +311,12 @@ private:
 	T alpha_min_;
 
 	T old_renormalization_scale_;
+
+	using info_type = typename decltype (cuts_.cut(std::vector<T>(), T{},
+		event_type{}))::info_t;
+
+	std::vector<std::size_t> dipole_recombination_candidates_;
+	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U,
