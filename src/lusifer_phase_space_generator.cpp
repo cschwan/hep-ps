@@ -1,3 +1,4 @@
+#include "hep/ps/boost.hpp"
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/kaellen.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
@@ -331,27 +332,6 @@ void rotate(std::array<T, 4>& p, T phi, T cos_theta)
 }
 
 template <typename T>
-void boost(T m, std::array<T, 4>& p, std::array<T, 4> const& q, bool inverse)
-{
-	T const sign = inverse ? T(1.0) : T(-1.0);
-	T const bx = sign * q[1] / m;
-	T const by = sign * q[2] / m;
-	T const bz = sign * q[3] / m;
-	T const gamma = q[0] / m;
-	T const a = T(1.0) / (T(1.0) + gamma);
-	T const p0 = p[0];
-	T const px = p[1];
-	T const py = p[2];
-	T const pz = p[3];
-	T const bp = bx * px + by * py + bz * pz;
-
-	p[0] = gamma * p0 + bp;
-	p[1] = px + bx * p0 + a * bp * bx;
-	p[2] = py + by * p0 + a * bp * by;
-	p[3] = pz + bz * p0 + a * bp * bz;
-}
-
-template <typename T>
 void decay_momenta(
 	T m,
 	std::array<T, 4> const& q,
@@ -361,7 +341,7 @@ void decay_momenta(
 	std::array<T, 4>& p2
 ) {
 	rotate(p1, phi, cos_theta);
-	boost(m, p1, q, true);
+	hep::boost(m, p1, q, true);
 
 	p2[0] = q[0] - p1[0];
 	p2[1] = q[1] - p1[1];
@@ -959,7 +939,7 @@ void lusifer_psg<T>::generate(
 
 		std::array<T, 4> k1 = { q1[0], q1[1], q1[2], q1[3] };
 
-		boost(sqrts, k1, q, false);
+		hep::boost(sqrts, k1, q, false);
 
 		// the following can not be abbreviated with a single call to atan2, is
 		// this choice of phi consistent?

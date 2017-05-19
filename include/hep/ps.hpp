@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/abc_terms.hpp"
+#include "hep/ps/boost.hpp"
 #include "hep/ps/cofferaa_phase_space_generator.hpp"
 #include "hep/ps/constants.hpp"
 #include "hep/ps/cs_subtraction.hpp"
