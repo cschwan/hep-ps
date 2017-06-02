@@ -7,6 +7,7 @@ nobase_include_HEADERS = \
 	hep/ps/constants.hpp \
 	hep/ps/cs_subtraction.hpp \
 	hep/ps/cut_result.hpp \
+	hep/ps/diagram.hpp \
 	hep/ps/dipole.hpp \
 	hep/ps/dipole_invariants.hpp \
 	hep/ps/dipole_type.hpp \
@@ -25,6 +26,7 @@ nobase_include_HEADERS = \
 	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/lusifer_constants.hpp \
+	hep/ps/lusifer_diagram_generator.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
 	hep/ps/mc_distributions.hpp \
 	hep/ps/mc_observables.hpp \
@@ -41,12 +43,14 @@ nobase_include_HEADERS = \
 	hep/ps/permutation.hpp \
 	hep/ps/phase_space_generator.hpp \
 	hep/ps/proton_pdf.hpp \
+	hep/ps/propagator.hpp \
 	hep/ps/renormalization_scheme.hpp \
 	hep/ps/scales.hpp \
 	hep/ps/silence_third_party_libs.hpp \
 	hep/ps/trivial_cutter.hpp \
 	hep/ps/trivial_distributions.hpp \
-	hep/ps/trivial_recombiner.hpp
+	hep/ps/trivial_recombiner.hpp \
+	hep/ps/vertex.hpp
 
 # create a timestamp file so we can depend on it instead of depending on every
 # single header
