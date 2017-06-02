@@ -1024,7 +1024,7 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	T cmf_energy,
 	std::vector<std::string> const& processes,
 	lusifer_constants<T> const& constants,
-	std::size_t extra_random_numbers = 0
+	std::size_t extra_random_numbers
 ) {
 	return std::unique_ptr<phase_space_generator<T>>(
 		new hadron_hadron_psg_adapter<lusifer_psg<T>>(
@@ -1042,7 +1042,7 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	T cmf_energy,
 	std::string const& process,
 	lusifer_constants<T> const& constants,
-	std::size_t extra_random_numbers = 0
+	std::size_t extra_random_numbers
 ) {
 	return make_lusifer_phase_space_generator(
 		min_energy,
