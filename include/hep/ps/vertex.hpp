@@ -19,9 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/inv_idx.hpp"
+
 #include <array>
-#include <bitset>
-#include <cstddef>
 
 namespace hep
 {
@@ -30,20 +30,22 @@ namespace hep
 class vertex
 {
 public:
-	/// Constructor. Creates a vertex connecting particles represented by the
-	/// indices `p1`, `p2`, `p3`, and p4`.
+	/// Constructor. Creates a vertex connecting particles with invariants
+	/// `inv1`, `inv2`, `inv3`, and `inv4`. If one of the invariants represents
+	/// the null-invariant this vertex is a three-valent vertex, otherwise a
+	/// four-valent vertex.
 	vertex(
-		std::size_t p1,
-		std::size_t p2,
-		std::size_t p3,
-		std::size_t p4 = 0
+		inv_idx const& inv1,
+		inv_idx const& inv2,
+		inv_idx const& inv3,
+		inv_idx const& inv4 = inv_idx()
 	);
 
 	/// Returns an array of invariants associated with the vertex.
-	std::array<std::size_t, 4> const& p() const;
+	std::array<inv_idx, 4> const& invariants() const;
 
 private:
-	std::array<std::size_t, 4> p_;
+	std::array<inv_idx, 4> invariants_;
 };
 
 }

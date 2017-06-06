@@ -23,6 +23,7 @@ nobase_include_HEADERS = \
 	hep/ps/initial_state_set.hpp \
 	hep/ps/insertion_term.hpp \
 	hep/ps/insertion_term_type.hpp \
+	hep/ps/inv_idx.hpp \
 	hep/ps/kaellen.hpp \
 	hep/ps/luminosity_info.hpp \
 	hep/ps/lusifer_constants.hpp \

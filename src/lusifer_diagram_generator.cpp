@@ -91,9 +91,9 @@ std::vector<diagram> lusifer_diagram_generator(
 		for (int j = 0; j != lusifer_cdecay_.ndecay[0][i]; ++j)
 		{
 			vertices.emplace_back(
-				lusifer_cdecay_.indecay[0][i][j],
-				lusifer_cdecay_.out1decay[0][i][j],
-				lusifer_cdecay_.out2decay[0][i][j]
+				inv_idx(lusifer_cdecay_.indecay[0][i][j], nex),
+				inv_idx(lusifer_cdecay_.out1decay[0][i][j], nex),
+				inv_idx(lusifer_cdecay_.out2decay[0][i][j], nex)
 			);
 
 			int k = 0;
@@ -110,30 +110,30 @@ std::vector<diagram> lusifer_diagram_generator(
 
 			propagators.emplace_back(
 				lusifer_cdecay_.indecay[0][i][j],
-				lusifer_cinv_.idhepinv[0][i][k]
+				inv_idx(lusifer_cinv_.idhepinv[0][i][k], nex)
 			);
 		}
 
 		for (int j = 0; j != lusifer_cprocess_.nprocess[0][i]; ++j)
 		{
 			vertices.emplace_back(
-				lusifer_cprocess_.in1process[0][i][j],
-				lusifer_cprocess_.out1process[0][i][j],
-				lusifer_cprocess_.virtprocess[0][i][j]
+				inv_idx(lusifer_cprocess_.in1process[0][i][j], nex),
+				inv_idx(lusifer_cprocess_.out1process[0][i][j], nex),
+				inv_idx(lusifer_cprocess_.virtprocess[0][i][j], nex)
 			);
 
 			propagators.emplace_back(
 				lusifer_cprocess_.idhepprocess[0][i][j],
-				lusifer_cprocess_.virtprocess[0][i][j]
+				inv_idx(lusifer_cprocess_.virtprocess[0][i][j], nex)
 			);
 		}
 
 		int last = lusifer_cprocess_.nprocess[0][i] - 1;
 
 		vertices.emplace_back(
-			lusifer_cprocess_.in1process[0][i][last],
-			lusifer_cprocess_.out1process[0][i][last],
-			lusifer_cprocess_.virtprocess[0][i][last]
+			inv_idx(lusifer_cprocess_.in1process[0][i][last], nex),
+			inv_idx(lusifer_cprocess_.out1process[0][i][last], nex),
+			inv_idx(lusifer_cprocess_.virtprocess[0][i][last], nex)
 		);
 
 		if (lusifer_cprocess_.nprocess[0][i] == 0)

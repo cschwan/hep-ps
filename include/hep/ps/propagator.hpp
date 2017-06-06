@@ -19,6 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/inv_idx.hpp"
+
 #include <cstddef>
 
 namespace hep
@@ -29,18 +31,18 @@ class propagator
 {
 public:
 	/// Constructor.
-	propagator(std::size_t type, std::size_t momenta);
+	propagator(std::size_t type, inv_idx const& invariant);
 
 	/// Returns the type of propagator.
 	std::size_t type() const;
 
 	/// Returns an index representation of momenta flowing through this
 	/// propagator.
-	std::size_t momenta() const;
+	inv_idx const& invariant() const;
 
 private:
 	std::size_t type_;
-	std::size_t momenta_;
+	inv_idx invariant_;
 };
 
 }

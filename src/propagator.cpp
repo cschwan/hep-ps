@@ -3,9 +3,9 @@
 namespace hep
 {
 
-propagator::propagator(std::size_t type, std::size_t momenta)
+propagator::propagator(std::size_t type, inv_idx const& invariant)
 	: type_{type}
-	, momenta_{momenta}
+	, invariant_{invariant}
 {
 }
 
@@ -14,9 +14,9 @@ std::size_t propagator::type() const
 	return type_;
 }
 
-std::size_t propagator::momenta() const
+inv_idx const& propagator::invariant() const
 {
-	return momenta_;
+	return invariant_;
 }
 
 

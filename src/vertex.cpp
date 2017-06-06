@@ -6,18 +6,18 @@ namespace hep
 {
 
 vertex::vertex(
-	std::size_t p1,
-	std::size_t p2,
-	std::size_t p3,
-	std::size_t p4
+	inv_idx const& inv1,
+	inv_idx const& inv2,
+	inv_idx const& inv3,
+	inv_idx const& inv4
 )
-	: p_{p1, p2, p3, p4}
+	: invariants_{inv1, inv2, inv3, inv4}
 {
 }
 
-std::array<std::size_t, 4> const& vertex::p() const
+std::array<inv_idx, 4> const& vertex::invariants() const
 {
-	return p_;
+	return invariants_;
 }
 
 }
