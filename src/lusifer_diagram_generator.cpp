@@ -1,9 +1,11 @@
+#include "hep/ps/inv_idx.hpp"
 #include "hep/ps/lusifer_diagram_generator.hpp"
 
 #include "lusifer_interfaces.hpp"
 
 #include <algorithm>
 #include <cassert>
+#include <iterator>
 
 namespace hep
 {
@@ -57,7 +59,7 @@ std::vector<diagram> lusifer_diagram_generator(
 		std::string process0 = process;
 		process0.append(3 * (maxex - nex), ' ');
 
-		// TODO: what is the meaning of this parameter?
+		// do not couple the Higgs to light fermions
 		int lightfermions = 0;
 		// do not include cuts in the phase space generation
 		int includecuts = 0;
@@ -88,7 +90,12 @@ std::vector<diagram> lusifer_diagram_generator(
 		std::vector<vertex> vertices;
 		std::vector<propagator> propagators;
 
-		for (int j = 0; j != lusifer_cdecay_.ndecay[0][i]; ++j)
+		// the number of decays is always smaller or equal than the number of
+		// invariants because the PS generator must generate invariants that do
+		// not belong to a decay in the diagram
+		int const decays = lusifer_cdecay_.ndecay[0][i];
+
+		for (int j = 0; j != decays; ++j)
 		{
 			vertices.emplace_back(
 				inv_idx(lusifer_cdecay_.indecay[0][i][j], nex),
@@ -96,21 +103,20 @@ std::vector<diagram> lusifer_diagram_generator(
 				inv_idx(lusifer_cdecay_.out2decay[0][i][j], nex)
 			);
 
-			int k = 0;
-			for (; k != lusifer_cinv_.ninv[0][i]; ++k)
-			{
-				if (lusifer_cdecay_.indecay[0][i][j] ==
-					lusifer_cinv_.ininv[0][i][k])
-				{
-					break;
-				}
-			}
+			auto const begin = std::begin(lusifer_cinv_.ininv[0][i]);
+			auto const end = begin + decays;
 
-			assert( k != lusifer_cinv_.ninv[0][i] );
+			// find the invariant corresponding to the decay
+			auto const result = std::find(begin, end,
+				lusifer_cdecay_.indecay[0][i][j]);
+
+			// there must be a valid search result, otherwise something went
+			// wrong in the initialization of the phase space generator
+			assert( result != end );
 
 			propagators.emplace_back(
-				lusifer_cdecay_.indecay[0][i][j],
-				inv_idx(lusifer_cinv_.idhepinv[0][i][k], nex)
+				*result,
+				inv_idx(lusifer_cdecay_.indecay[0][i][j], nex)
 			);
 		}
 
@@ -135,12 +141,6 @@ std::vector<diagram> lusifer_diagram_generator(
 			inv_idx(lusifer_cprocess_.out1process[0][i][last], nex),
 			inv_idx(lusifer_cprocess_.virtprocess[0][i][last], nex)
 		);
-
-		if (lusifer_cprocess_.nprocess[0][i] == 0)
-		{
-			// TODO: if there are no t-channel propagators, add initial state
-			// s-channel propagator
-		}
 
 		diagrams.emplace_back(vertices, propagators);
 	}
