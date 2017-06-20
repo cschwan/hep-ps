@@ -543,7 +543,7 @@ c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine cofferaa_initgenerator(energy,smin,hepnum,generator,
-     *  next,smodel,sincludecuts,ssub,dipole_count,dipole_emitter,
+     *  next,smself,sincludecuts,ssub,dipole_count,dipole_emitter,
      *  dipole_unresolved,dipole_spectator)
       implicit none
 c local variables
@@ -555,7 +555,7 @@ c local variables
       integer binary3,in1(maxe),in2(maxe),out1(maxe),out2(maxe),
      * cofferaa_pid
       integer virt(maxe),channel,generator,sincludecuts,prop2,prop3
-      integer smodel,smap,noutgen,hepnum(maxe),naux,nmap,next,ssub
+      integer smself,smap,noutgen,hepnum(maxe),naux,nmap,next,ssub
       integer em,sp,ga,n
       logical cofferaa_vertex,cofferaa_included,exist,
      * cofferaa_comparechannel,cofferaa_compareinv
@@ -779,7 +779,7 @@ c output of couplings
         do i1=-naux+1,naux-1
         do i2=i1+1,naux
         do i3=i2+1,naux
-        if(cofferaa_vertex(i1,i2,i3,schannel).and.
+        if(cofferaa_vertex(i1,i2,i3,schannel,smself).and.
      *    (gname(i1)(3:3).ne.' '.or.i1.gt.0).and.
      *    (gname(i2)(3:3).ne.' '.or.i2.gt.0).and.
      *    (gname(i3)(3:3).ne.' '.or.i3.gt.0))then
@@ -802,12 +802,12 @@ c output of couplings
         do i2=-naux+1,naux-1
         do i3=i2+1,naux-1
         schannel=.true.
-        if(cofferaa_vertex(i1,i2,i3,schannel).and.
+        if(cofferaa_vertex(i1,i2,i3,schannel,smself).and.
      *    (gname(i2)(3:3).ne.' '.or.i2.gt.0).and.
      *    (gname(i3)(3:3).ne.' '.or.i3.gt.0))then
           do i4=-naux+1,naux-1
           do i5=i4+1,naux-1
-          if(cofferaa_vertex(-i1,i4,i5,schannel).and.
+          if(cofferaa_vertex(-i1,i4,i5,schannel,smself).and.
      *      (gname(i4)(3:3).ne.' '.or.i4.gt.0).and.
      *      (gname(i5)(3:3).ne.' '.or.i5.gt.0))then
             vertices=vertices(1:i6)//' ('//pname(i2)//','//
@@ -951,8 +951,8 @@ c      do ga=0,nexternal(generator)
      *  em.gt.0.and.sp.gt.0.and.ga.gt.0)then
         if(pname(hepnum(ga)).eq.'gl '.and.ga.ge.3.and.
      *    cofferaa_vertex(hepnum(em),-hepnum(em),hepnum(ga),
-     *    schannel).and.cofferaa_vertex(hepnum(sp),-hepnum(sp),
-     *    hepnum(ga),schannel))then
+     *    schannel,smself).and.cofferaa_vertex(hepnum(sp),-hepnum(sp),
+     *    hepnum(ga),schannel,smself))then
           n=nexternal(generator)-1
           idhep(ga,1)=0
         endif
@@ -985,10 +985,10 @@ c virtual particle for ns'th decay
 c checking whether 3-particle vertex exists
         schannel=.true.
         if(.not.cofferaa_vertex(idhep(out1(ns),ns),idhep(out2(ns),ns),
-     *    virt(ns),schannel))goto 1500
+     *    virt(ns),schannel,smself))goto 1500
 c checking last 3-particle vertex
         if(ns.eq.n-3.and..not.cofferaa_vertex(idhep(in1(ns),ns),
-     *    idhep(in2(ns),ns),-virt(ns),schannel))goto 1500
+     *    idhep(in2(ns),ns),-virt(ns),schannel,smself))goto 1500
 c initializing next step
         do i2=1,n
           binary(i2,ns+1)=binary(i2,ns)
@@ -1035,7 +1035,7 @@ c avoid doube counting of diagrams
 c checking whether 3-particle vertex exists
         schannel=.false.
         if(.not.cofferaa_vertex(idhep(in1(nt),nt),idhep(out1(nt),nt),
-     *    virt(nt),schannel))goto 1300
+     *    virt(nt),schannel,smself))goto 1300
 c initializing n step
         do i2=1,n
           binary(i2,nt+1)=binary(i2,nt)
@@ -1061,7 +1061,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         schannel=.true.
         if(gname(idhep(i3,i1)).eq.'   '.or..not.
      *    cofferaa_vertex(idhep(1,i1),idhep(2,i1),idhep(i3,i1),
-     *    schannel)) goto 1300
+     *    schannel,smself)) goto 1300
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c                                                                 c
 c     initializing channels                                       c
@@ -2553,12 +2553,12 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function cofferaa_vertex(i1,i2,i3,schannel)
+      function cofferaa_vertex(i1,i2,i3,schannel,smself)
       implicit none
 c local variables
       integer maxv
       parameter(maxv=200)
-      integer i1,i2,i3
+      integer i1,i2,i3,smself
       logical cofferaa_vertex,cofferaa_vertexg,schannel
 c mcparticle
       integer family(-maxv:maxv,6),light(-maxv:maxv)
@@ -2577,12 +2577,12 @@ c family conservation
       if(family(i1,6)+family(i2,6)+family(i3,6).ne.0)return
       cofferaa_vertex=.true.
 c testing vertex
-      if(cofferaa_vertexg(i1,i2,i3,schannel))return
-      if(cofferaa_vertexg(i1,i3,i2,schannel))return
-      if(cofferaa_vertexg(i2,i1,i3,schannel))return
-      if(cofferaa_vertexg(i2,i3,i1,schannel))return
-      if(cofferaa_vertexg(i3,i1,i2,schannel))return
-      if(cofferaa_vertexg(i3,i2,i1,schannel))return
+      if(cofferaa_vertexg(i1,i2,i3,schannel,smself))return
+      if(cofferaa_vertexg(i1,i3,i2,schannel,smself))return
+      if(cofferaa_vertexg(i2,i1,i3,schannel,smself))return
+      if(cofferaa_vertexg(i2,i3,i1,schannel,smself))return
+      if(cofferaa_vertexg(i3,i1,i2,schannel,smself))return
+      if(cofferaa_vertexg(i3,i2,i1,schannel,smself))return
       cofferaa_vertex=.false.
       end
 
@@ -2593,12 +2593,12 @@ c                                                                 c
 c     written by Markus Roth                                      c
 c                                                                 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function cofferaa_vertexg(i1,i2,i3,schannel)
+      function cofferaa_vertexg(i1,i2,i3,schannel,smself)
       implicit none
 c local variables
       integer maxv
       parameter(maxv=200)
-      integer i1,i2,i3
+      integer i1,i2,i3,smself
       character*3 p1,p2,p3,g1,g2,g3
       logical cofferaa_vertexg,nonstandardcoup,schannel
 c mcparticle
@@ -2622,18 +2622,25 @@ c 2 quarks - higgs
         if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'h0 ')return
       endif
 c 2 leptons - gauge boson
+      if(g1.eq.'ne '.and.g2.eq.'el~'.and.g3.eq.'W- ')return
+      if(g1.eq.'ne~'.and.g2.eq.'el '.and.g3.eq.'W-~')return
+c 2 quarks - gauge boson
+      if(g1.eq.'uq '.and.g2.eq.'dq~'.and.g3.eq.'W- ')return
+      if(g1.eq.'uq~'.and.g2.eq.'dq '.and.g3.eq.'W-~')return
+c 2 quarks - gluon
+      if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'gl ')return
+      if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'gl ')return
+
+      if(smself.eq.12)then
+c 2 leptons - gauge boson
       if(g1.eq.'el '.and.g2.eq.'el~'.and.g3.eq.'ph ')return
       if(g1.eq.'ne '.and.g2.eq.'ne~'.and.g3.eq.'Z0 ')return
       if(g1.eq.'el '.and.g2.eq.'el~'.and.g3.eq.'Z0 ')return
-      if(g1.eq.'ne '.and.g2.eq.'el~'.and.g3.eq.'W- ')return
-      if(g1.eq.'ne~'.and.g2.eq.'el '.and.g3.eq.'W-~')return
 c 2 quarks - gauge boson
       if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'ph ')return
       if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'ph ')return
       if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'Z0 ')return
       if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'Z0 ')return
-      if(g1.eq.'uq '.and.g2.eq.'dq~'.and.g3.eq.'W- ')return
-      if(g1.eq.'uq~'.and.g2.eq.'dq '.and.g3.eq.'W-~')return
 c 3 higgs
       if(g1.eq.'h0 '.and.g2.eq.'h0 '.and.g3.eq.'h0 ')return
 c higgs - 2 gauge bosons
@@ -2642,13 +2649,7 @@ c higgs - 2 gauge bosons
 c 3 gauge bosons
       if(g1.eq.'ph '.and.g2.eq.'W- '.and.g3.eq.'W-~')return
       if(g1.eq.'Z0 '.and.g2.eq.'W- '.and.g3.eq.'W-~')return
-c 2 quarks - gluon
-      if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'gl ')return
-      if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'gl ')return
-c 3 gluons
-      if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.'gl ')return
 c 4 particle vertices
-      if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.' 1~')return
       if(g1.eq.'gl '.and.g2.eq.'ph '.and.g3.eq.' 1~')return
       if(g1.eq.'gl '.and.g2.eq.'Z0 '.and.g3.eq.' 1~')return
       if(g1.eq.'gl '.and.g2.eq.'W- '.and.g3.eq.' 2~')return
@@ -2681,6 +2682,12 @@ c 4 particle vertices
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'13~')return
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'14~')return
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'15~')return
+      endif
+
+c 3 gluons
+      if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.'gl ')return
+c 4 particle vertices
+      if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.' 1~')return
 c add non-standard couplings (with family conservation!)
 c      if(nonstandardcoup(p1,p2,p3,g1,g2,g3,schannel))return
       cofferaa_vertexg=.false.

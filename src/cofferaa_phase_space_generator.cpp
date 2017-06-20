@@ -19,6 +19,7 @@ public:
 
 	cofferaa_psg(
 		std::vector<int> const& process,
+		bool all_diagrams,
 		hep::lusifer_constants<T> const& constants,
 		std::vector<std::tuple<int, int, int>> const& dipoles
 			= std::vector<std::tuple<int, int, int>>{},
@@ -53,6 +54,7 @@ private:
 template <typename T>
 cofferaa_psg<T>::cofferaa_psg(
 	std::vector<int> const& process,
+	bool all_diagrams,
 	hep::lusifer_constants<T> const& constants,
 	std::vector<std::tuple<int, int, int>> const& dipoles,
 	std::size_t extra_random_numbers
@@ -102,8 +104,7 @@ cofferaa_psg<T>::cofferaa_psg(
 	double smin;
 	// number of external particles
 	int next = process.size();
-	// EW SM + QCD
-	int smodel = 12;
+	int smodel = all_diagrams ? 12 : 0;
 	int sincludecuts = 0;
 	// generate phase space according to the dipole mappings
 	int ssub = (dipoles.size() != 0) ? 1 : 0;
@@ -235,6 +236,28 @@ std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
 			min_energy,
 			cmf_energy,
 			process,
+			true,
+			constants,
+			dipoles,
+			extra_random_numbers
+	));
+}
+
+template <typename T>
+std::unique_ptr<phase_space_generator<T>> make_minimal_cofferaa_phase_space_generator(
+	T min_energy,
+	T cmf_energy,
+	std::vector<int> const& process,
+	lusifer_constants<T> const& constants,
+	std::vector<std::tuple<int, int, int>> const& dipoles,
+	std::size_t extra_random_numbers
+) {
+	return std::unique_ptr<phase_space_generator<T>>(
+		new hadron_hadron_psg_adapter<cofferaa_psg<T>>(
+			min_energy,
+			cmf_energy,
+			process,
+			false,
 			constants,
 			dipoles,
 			extra_random_numbers
@@ -245,6 +268,16 @@ std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
 
 template std::unique_ptr<phase_space_generator<double>>
 make_cofferaa_phase_space_generator(
+	double,
+	double,
+	std::vector<int> const&,
+	lusifer_constants<double> const&,
+	std::vector<std::tuple<int, int, int>> const&,
+	std::size_t
+);
+
+template std::unique_ptr<phase_space_generator<double>>
+make_minimal_cofferaa_phase_space_generator(
 	double,
 	double,
 	std::vector<int> const&,

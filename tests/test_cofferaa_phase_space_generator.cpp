@@ -83,6 +83,33 @@ TEST_CASE("constructors", "[cofferaa_phase_space_generator]")
 	CHECK( psg4->channels()       == (456+4*92) );
 	CHECK( psg4->dimensions()     == 19 );
 	CHECK( psg4->map_dimensions() == 36 );
+
+	// pp -> 2 jets + two pairs of leptons
+	auto psg5 = hep::make_minimal_cofferaa_phase_space_generator(
+		min_energy,
+		cmf_energy,
+		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4},
+		constants
+	);
+
+	// TODO: why are there 16 and not 8 channels?
+	CHECK( psg5->channels()       == 16 );
+	CHECK( psg5->dimensions()     == 16 );
+	CHECK( psg5->map_dimensions() == 32 );
+
+	// pp -> 2 jets + two pairs of leptons + gluon
+	auto psg6 = hep::make_minimal_cofferaa_phase_space_generator(
+		min_energy,
+		cmf_energy,
+		std::vector<int>{-3, 2, 12, -11, 14, -13, 1, -4, 26},
+		constants,
+		dipoles
+	);
+
+	// TODO: why are there 96 and not 56/2*56 channels?
+	CHECK( psg6->channels()       == (96+4*16) );
+	CHECK( psg6->dimensions()     == 19 );
+	CHECK( psg6->map_dimensions() == 36 );
 }
 
 TEST_CASE("phase space generation", "[cofferaa_phase_space_generator]")
