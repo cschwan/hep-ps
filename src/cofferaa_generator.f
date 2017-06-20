@@ -682,37 +682,37 @@ c name, generic name, anti-field, family
       particle(25)='h0 h0 n  '
       particle(26)='gl gl n  '
 c supersymmetric particles
-      particle(31)='D1 DQ y 1'
-      particle(32)='U1 UQ y 1'
-      particle(33)='S1 DQ y 2'
-      particle(34)='C1 UQ y 2'
-      particle(35)='B1 DQ y 3'
-      particle(36)='T1 UQ y 3'
-      particle(41)='D2 DQ y 1'
-      particle(42)='U2 UQ y 1'
-      particle(43)='S2 DQ y 2'
-      particle(44)='C2 UQ y 2'
-      particle(45)='B2 DQ y 3'
-      particle(46)='T2 UQ y 3'
-      particle(51)='E1 EL y 4'
-      particle(52)='NE NE y 4'
-      particle(53)='M1 EL y 5'
-      particle(54)='NM NE y 5'
-      particle(55)='T1 EL y 6'
-      particle(56)='NT NE y 6'
-      particle(61)='E2 EL y 4'
-      particle(63)='M2 EL y 5'
-      particle(65)='T2 EL y 6'
-      particle(71)='N1 C0 n  '
-      particle(72)='N2 C0 n  '
-      particle(73)='N3 C0 n  '
-      particle(74)='N4 C0 n  '
-      particle(70)='C1 C- y  '
-      particle(76)='C2 C- y  '
-      particle(81)='A0 A0 n  '
-      particle(82)='H0 H0 n  '
-      particle(83)='H- H- y  '   
-      particle(84)='GL GL n  '
+      particle(31)=''
+      particle(32)=''
+      particle(33)=''
+      particle(34)=''
+      particle(35)=''
+      particle(36)=''
+      particle(41)=''
+      particle(42)=''
+      particle(43)=''
+      particle(44)=''
+      particle(45)=''
+      particle(46)=''
+      particle(51)=''
+      particle(52)=''
+      particle(53)=''
+      particle(54)=''
+      particle(55)=''
+      particle(56)=''
+      particle(61)=''
+      particle(63)=''
+      particle(65)=''
+      particle(71)=''
+      particle(72)=''
+      particle(73)=''
+      particle(74)=''
+      particle(70)=''
+      particle(76)=''
+      particle(81)=''
+      particle(82)=''
+      particle(83)=''
+      particle(84)=''
 c auxiliary particles
       naux=100
       particle(101)=' 1  1 y  '
@@ -723,42 +723,14 @@ c auxiliary particles
       particle(106)=' 6  6 y  '
       particle(107)=' 7  7 y  '
       particle(108)=' 8  8 y  '
-      particle(109)=' 9  9 y  '
-      particle(110)='10 10 y  '
+      particle(109)=''
+      particle(110)=''
       particle(111)='11 11 y  '
       particle(112)='12 12 y  '
       particle(113)='13 13 y  '
       particle(114)='14 14 y  '
       particle(115)='15 15 y  '
-      particle(116)='16 16 y  '  ! non-standard couplings
-c model settings
-      if(smodel.eq.1)then        ! sm
-        do i1=26,84
-          particle(i1)=' '
-        enddo
-      elseif(smodel.eq.12)then   ! sm and qcd 
-        do i1=31,84
-          particle(i1)=' '
-        enddo
-      elseif(smodel.eq.2)then    ! qcd
-        do i1=22,25  
-          particle(i1)=' '
-        enddo
-        do i1=31,84
-          particle(i1)=' '
-        enddo
-      elseif(smodel.eq.3)then    ! mssm
-        particle(26)=' '
-        particle(84)=' '
-      elseif(smodel.eq.34)then   ! mssm and sqcd
-      elseif(smodel.eq.4)then    ! sqcd
-        do i1=22,25
-          particle(i1)=' '
-        enddo
-        do i1=71,83
-          particle(i1)=' '
-        enddo
-      endif
+      particle(116)=''  ! non-standard couplings
 c additional particles for unstable particles
       nmap=150
       if(smap.eq.2)then
@@ -2640,67 +2612,21 @@ c mcparticle
       g1=gname(i1)
       g2=gname(i2)
       g3=gname(i3) 
-c 2 charginos - higgs
-      if(g1.eq.'C- '.and.g2.eq.'C-~'.and.g3.eq.'h0 ')return
-      if(g1.eq.'C- '.and.g2.eq.'C-~'.and.g3.eq.'H0 ')return
-      if(g1.eq.'C- '.and.g2.eq.'C-~'.and.g3.eq.'A0 ')return
 c 2 leptons - higgs
       if(light(i2).eq.0)then
         if(g1.eq.'el '.and.g2.eq.'el~'.and.g3.eq.'h0 ')return
-        if(g1.eq.'el '.and.g2.eq.'el~'.and.g3.eq.'H0 ')return
-        if(g1.eq.'el '.and.g2.eq.'el~'.and.g3.eq.'A0 ')return
-        if(g1.eq.'ne '.and.g2.eq.'el~'.and.g3.eq.'H- ')return
-        if(g1.eq.'ne~'.and.g2.eq.'el '.and.g3.eq.'H-~')return
       endif
-c 2 neutralinos - higgs
-      if(g1.eq.'C0 '.and.g2.eq.'C0 '.and.g3.eq.'h0 ')return
-      if(g1.eq.'C0 '.and.g2.eq.'C0 '.and.g3.eq.'H0 ')return
-      if(g1.eq.'C0 '.and.g2.eq.'C0 '.and.g3.eq.'A0 ')return
 c 2 quarks - higgs
       if(light(i1).eq.0.and.light(i2).eq.0)then
         if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'h0 ')return
         if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'h0 ')return
-        if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'H0 ')return
-        if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'H0 ')return
-        if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'A0 ')return
-        if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'A0 ')return
-        if(g1.eq.'uq '.and.g2.eq.'dq~'.and.g3.eq.'H- ')return
-        if(g1.eq.'uq~'.and.g2.eq.'dq '.and.g3.eq.'H-~')return
       endif
-c chargino - lepton - slepton
-      if(g1.eq.'ne '.and.g2.eq.'EL~'.and.g3.eq.'C- ')return
-      if(g1.eq.'ne~'.and.g2.eq.'EL '.and.g3.eq.'C-~')return
-      if(g1.eq.'NE '.and.g2.eq.'el~'.and.g3.eq.'C- ')return
-      if(g1.eq.'NE~'.and.g2.eq.'el '.and.g3.eq.'C-~')return
-c chargino - neutralino - higgs
-      if(g1.eq.'C0 '.and.g2.eq.'C-~'.and.g3.eq.'H- ')return
-      if(g1.eq.'C0 '.and.g2.eq.'C- '.and.g3.eq.'H-~')return
-c chargino - quark - squark
-      if(g1.eq.'uq '.and.g2.eq.'DQ~'.and.g3.eq.'C- ')return
-      if(g1.eq.'uq~'.and.g2.eq.'DQ '.and.g3.eq.'C-~')return
-      if(g1.eq.'UQ '.and.g2.eq.'dq~'.and.g3.eq.'C- ')return
-      if(g1.eq.'UQ~'.and.g2.eq.'dq '.and.g3.eq.'C-~')return
-c lepton - neutralino - slepton
-      if(g1.eq.'ne '.and.g2.eq.'NE~'.and.g3.eq.'C0 ')return
-      if(g1.eq.'ne~'.and.g2.eq.'NE '.and.g3.eq.'C0 ')return
-      if(g1.eq.'el '.and.g2.eq.'EL~'.and.g3.eq.'C0 ')return
-      if(g1.eq.'el~'.and.g2.eq.'EL '.and.g3.eq.'C0 ')return
-c neutralino - quark - squark
-      if(g1.eq.'uq '.and.g2.eq.'UQ~'.and.g3.eq.'C0 ')return
-      if(g1.eq.'uq~'.and.g2.eq.'UQ '.and.g3.eq.'C0 ')return
-      if(g1.eq.'dq '.and.g2.eq.'DQ~'.and.g3.eq.'C0 ')return
-      if(g1.eq.'dq~'.and.g2.eq.'DQ '.and.g3.eq.'C0 ')return
-c 2 charginos - gauge boson
-      if(g1.eq.'C- '.and.g2.eq.'C-~'.and.g3.eq.'ph ')return
-      if(g1.eq.'C- '.and.g2.eq.'C-~'.and.g3.eq.'Z0 ')return
 c 2 leptons - gauge boson
       if(g1.eq.'el '.and.g2.eq.'el~'.and.g3.eq.'ph ')return
       if(g1.eq.'ne '.and.g2.eq.'ne~'.and.g3.eq.'Z0 ')return
       if(g1.eq.'el '.and.g2.eq.'el~'.and.g3.eq.'Z0 ')return
       if(g1.eq.'ne '.and.g2.eq.'el~'.and.g3.eq.'W- ')return
       if(g1.eq.'ne~'.and.g2.eq.'el '.and.g3.eq.'W-~')return
-c 2 neutralinos - gauge bosons
-      if(g1.eq.'C0 '.and.g2.eq.'C0 '.and.g3.eq.'Z0 ')return
 c 2 quarks - gauge boson
       if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'ph ')return
       if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'ph ')return
@@ -2708,158 +2634,52 @@ c 2 quarks - gauge boson
       if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'Z0 ')return
       if(g1.eq.'uq '.and.g2.eq.'dq~'.and.g3.eq.'W- ')return
       if(g1.eq.'uq~'.and.g2.eq.'dq '.and.g3.eq.'W-~')return
-c chargino - neutralino - gauge boson
-      if(g1.eq.'C0 '.and.g2.eq.'C-~'.and.g3.eq.'W- ')return
-      if(g1.eq.'C0 '.and.g2.eq.'C- '.and.g3.eq.'W-~')return
 c 3 higgs
       if(g1.eq.'h0 '.and.g2.eq.'h0 '.and.g3.eq.'h0 ')return
-      if(g1.eq.'h0 '.and.g2.eq.'h0 '.and.g3.eq.'H0 ')return
-      if(g1.eq.'h0 '.and.g2.eq.'H0 '.and.g3.eq.'H0 ')return
-      if(g1.eq.'H0 '.and.g2.eq.'H0 '.and.g3.eq.'H0 ')return
-      if(g1.eq.'h0 '.and.g2.eq.'A0 '.and.g3.eq.'A0 ')return
-      if(g1.eq.'H0 '.and.g2.eq.'A0 '.and.g3.eq.'A0 ')return
-      if(g1.eq.'h0 '.and.g2.eq.'H-~'.and.g3.eq.'H- ')return
-      if(g1.eq.'H0 '.and.g2.eq.'H-~'.and.g3.eq.'H- ')return
-c higgs - 2 sleptons
-      if(light(i2).eq.0)then
-        if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'h0 ')return
-        if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'H0 ')return
-        if(g1.eq.'EL '.and.g2.eq.'EL~'.and.g3.eq.'h0 ')return
-        if(g1.eq.'EL '.and.g2.eq.'EL~'.and.g3.eq.'H0 ')return
-        if(g1.eq.'EL '.and.g2.eq.'EL~'.and.g3.eq.'A0 ')return
-        if(g1.eq.'NE '.and.g2.eq.'EL~'.and.g3.eq.'H- ')return
-        if(g1.eq.'NE~'.and.g2.eq.'EL '.and.g3.eq.'H-~')return
-      endif
-c higgs - 2 squarks
-      if(light(i1).eq.0.and.light(i2).eq.0)then
-        if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.'h0 ')return
-        if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.'H0 ')return
-        if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.'A0 ')return
-        if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.'h0 ')return
-        if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.'H0 ')return
-        if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.'A0 ')return
-        if(g1.eq.'UQ '.and.g2.eq.'DQ~'.and.g3.eq.'H- ')return
-        if(g1.eq.'UQ~'.and.g2.eq.'DQ '.and.g3.eq.'H-~')return
-      endif
-c 2 higgs - gauge boson
-      if(g1.eq.'h0 '.and.g2.eq.'A0 '.and.g3.eq.'Z0 ')return
-      if(g1.eq.'H0 '.and.g2.eq.'A0 '.and.g3.eq.'Z0 ')return
-      if(g1.eq.'H- '.and.g2.eq.'H-~'.and.g3.eq.'ph ')return
-      if(g1.eq.'H- '.and.g2.eq.'H-~'.and.g3.eq.'Z0 ')return
-      if(g1.eq.'h0 '.and.g2.eq.'H-~'.and.g3.eq.'W- ')return
-      if(g1.eq.'h0 '.and.g2.eq.'H- '.and.g3.eq.'W-~')return
-      if(g1.eq.'H0 '.and.g2.eq.'H-~'.and.g3.eq.'W- ')return
-      if(g1.eq.'H0 '.and.g2.eq.'H- '.and.g3.eq.'W-~')return
-      if(g1.eq.'A0 '.and.g2.eq.'H-~'.and.g3.eq.'W- ')return
-      if(g1.eq.'A0 '.and.g2.eq.'H- '.and.g3.eq.'W-~')return
-c 2 sleptons - gauge boson
-      if(g1.eq.'EL '.and.g2.eq.'EL~'.and.g3.eq.'ph ')return
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'Z0 ')return
-      if(g1.eq.'EL '.and.g2.eq.'EL~'.and.g3.eq.'Z0 ')return
-      if(g1.eq.'NE '.and.g2.eq.'EL~'.and.g3.eq.'W- ')return
-      if(g1.eq.'NE~'.and.g2.eq.'EL '.and.g3.eq.'W-~')return
-c 2 squarks - gauge boson
-      if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.'ph ')return
-      if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.'ph ')return
-      if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.'Z0 ')return
-      if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.'Z0 ')return
-      if(g1.eq.'UQ '.and.g2.eq.'DQ~'.and.g3.eq.'W- ')return
-      if(g1.eq.'UQ~'.and.g2.eq.'DQ '.and.g3.eq.'W-~')return
 c higgs - 2 gauge bosons
       if(g1.eq.'h0 '.and.g2.eq.'Z0 '.and.g3.eq.'Z0 ')return
-      if(g1.eq.'H0 '.and.g2.eq.'Z0 '.and.g3.eq.'Z0 ')return
       if(g1.eq.'h0 '.and.g2.eq.'W- '.and.g3.eq.'W-~')return
-      if(g1.eq.'H0 '.and.g2.eq.'W- '.and.g3.eq.'W-~')return
 c 3 gauge bosons
       if(g1.eq.'ph '.and.g2.eq.'W- '.and.g3.eq.'W-~')return
       if(g1.eq.'Z0 '.and.g2.eq.'W- '.and.g3.eq.'W-~')return
-c gluino - quark - squark
-      if(g1.eq.'uq '.and.g2.eq.'UQ~'.and.g3.eq.'GL ')return
-      if(g1.eq.'uq~'.and.g2.eq.'UQ '.and.g3.eq.'GL ')return
-      if(g1.eq.'dq '.and.g2.eq.'DQ~'.and.g3.eq.'GL ')return
-      if(g1.eq.'dq~'.and.g2.eq.'DQ '.and.g3.eq.'GL ')return
-c 2 gluinos - gluon
-      if(g1.eq.'GL '.and.g2.eq.'GL '.and.g3.eq.'gl ')return
 c 2 quarks - gluon
       if(g1.eq.'uq '.and.g2.eq.'uq~'.and.g3.eq.'gl ')return
       if(g1.eq.'dq '.and.g2.eq.'dq~'.and.g3.eq.'gl ')return
-c 2 squarks - gluon
-      if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.'gl ')return
-      if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.'gl ')return
 c 3 gluons
       if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.'gl ')return
 c 4 particle vertices
-      if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.' 1 ')return
-      if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.' 1 ')return
       if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.' 1~')return
       if(g1.eq.'gl '.and.g2.eq.'ph '.and.g3.eq.' 1~')return
       if(g1.eq.'gl '.and.g2.eq.'Z0 '.and.g3.eq.' 1~')return
-      if(g1.eq.'UQ '.and.g2.eq.'DQ~'.and.g3.eq.' 2 ')return
       if(g1.eq.'gl '.and.g2.eq.'W- '.and.g3.eq.' 2~')return
-      if(g1.eq.'UQ~'.and.g2.eq.'DQ '.and.g3.eq.' 3~')return
       if(g1.eq.'gl '.and.g2.eq.'W-~'.and.g3.eq.' 3 ')return
       if(schannel)then
         if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.' 4 ')return
         if(g1.eq.'gl '.and.g2.eq.'gl '.and.g3.eq.' 4~')return
       endif
-      if(g1.eq.'NE '.and.g2.eq.'EL~'.and.g3.eq.' 5 ')return
-      if(g1.eq.'UQ '.and.g2.eq.'DQ~'.and.g3.eq.' 5 ')return
       if(g1.eq.'ph '.and.g2.eq.'W-~'.and.g3.eq.' 5 ')return
       if(g1.eq.'Z0 '.and.g2.eq.'W-~'.and.g3.eq.' 5 ')return
       if(g1.eq.'ph '.and.g2.eq.'W- '.and.g3.eq.' 5~')return
       if(g1.eq.'Z0 '.and.g2.eq.'W- '.and.g3.eq.' 5~')return
-      if(g1.eq.'NE~'.and.g2.eq.'EL '.and.g3.eq.' 6~')return
-      if(g1.eq.'UQ~'.and.g2.eq.'DQ '.and.g3.eq.' 6~')return
       if(g1.eq.'ph '.and.g2.eq.'W- '.and.g3.eq.' 6~')return
       if(g1.eq.'Z0 '.and.g2.eq.'W- '.and.g3.eq.' 6~')return
       if(g1.eq.'ph~'.and.g2.eq.'W-~'.and.g3.eq.' 6 ')return
       if(g1.eq.'Z0 '.and.g2.eq.'W-~'.and.g3.eq.' 6 ')return
-      if(g1.eq.'H+ '.and.g2.eq.'H- '.and.g3.eq.' 7 ')return
       if(g1.eq.'W+ '.and.g2.eq.'W- '.and.g3.eq.' 7 ')return
-      if(g1.eq.'EL '.and.g2.eq.'EL~'.and.g3.eq.' 7 ')return
-      if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.' 7 ')return
-      if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.' 7 ')return
-      if(g1.eq.'H+ '.and.g2.eq.'H- '.and.g3.eq.' 7~')return
       if(g1.eq.'W+ '.and.g2.eq.'W- '.and.g3.eq.' 7~')return
-      if(g1.eq.'EL '.and.g2.eq.'EL~'.and.g3.eq.' 7~')return
-      if(g1.eq.'UQ '.and.g2.eq.'UQ~'.and.g3.eq.' 7~')return
-      if(g1.eq.'DQ '.and.g2.eq.'DQ~'.and.g3.eq.' 7~')return
       if(g1.eq.'h0 '.and.g2.eq.'h0 '.and.g3.eq.' 7~')return
-      if(g1.eq.'h0 '.and.g2.eq.'H0 '.and.g3.eq.' 7~')return
-      if(g1.eq.'H0 '.and.g2.eq.'H0 '.and.g3.eq.' 7~')return
-      if(g1.eq.'A0 '.and.g2.eq.'A0 '.and.g3.eq.' 7~')return
       if(g1.eq.'ph '.and.g2.eq.'ph '.and.g3.eq.' 7~')return
       if(g1.eq.'ph '.and.g2.eq.'Z0 '.and.g3.eq.' 7~')return
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.' 7~')return
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.' 7~')return
       if(schannel)then
         if(g1.eq.'h0 '.and.g2.eq.'h0 '.and.g3.eq.' 8 ')return
         if(g1.eq.'h0 '.and.g2.eq.'h0 '.and.g3.eq.' 8~')return
-        if(g1.eq.'H0 '.and.g2.eq.'H0 '.and.g3.eq.' 9 ')return
-        if(g1.eq.'H0 '.and.g2.eq.'H0 '.and.g3.eq.' 9~')return
-        if(g1.eq.'A0 '.and.g2.eq.'A0 '.and.g3.eq.'10 ')return
-        if(g1.eq.'A0 '.and.g2.eq.'A0 '.and.g3.eq.'10~')return
       endif
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'11 ')return
       if(g1.eq.'ph '.and.g2.eq.'ph '.and.g3.eq.'11 ')return
       if(g1.eq.'h0 '.and.g2.eq.'h0 '.and.g3.eq.'11 ')return
-      if(g1.eq.'h0 '.and.g2.eq.'H0 '.and.g3.eq.'11~')return
-      if(g1.eq.'H0 '.and.g2.eq.'H0 '.and.g3.eq.'11~')return
-      if(g1.eq.'A0 '.and.g2.eq.'A0 '.and.g3.eq.'11~')return
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'11~')return
-      if(g1.eq.'h0 '.and.g2.eq.'H0 '.and.g3.eq.'12 ')return
-      if(g1.eq.'H0 '.and.g2.eq.'H0 '.and.g3.eq.'12~')return
-      if(g1.eq.'A0 '.and.g2.eq.'A0 '.and.g3.eq.'12~')return
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'12~')return
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'12~')return
-      if(g1.eq.'H0 '.and.g2.eq.'H0 '.and.g3.eq.'13 ')return
-      if(g1.eq.'A0 '.and.g2.eq.'A0 '.and.g3.eq.'13~')return
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'13~')return
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'13~')return
-      if(g1.eq.'A0 '.and.g2.eq.'A0 '.and.g3.eq.'14 ')return
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'14~')return
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'14~')return
-      if(g1.eq.'NE '.and.g2.eq.'NE~'.and.g3.eq.'15 ')return
       if(g1.eq.'Z0 '.and.g2.eq.'Z0 '.and.g3.eq.'15~')return
 c add non-standard couplings (with family conservation!)
 c      if(nonstandardcoup(p1,p2,p3,g1,g2,g3,schannel))return
