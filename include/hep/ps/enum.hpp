@@ -21,9 +21,11 @@
 
 #include <array>
 #include <cstddef>
+#include <tuple>
 
 /// Returns the number of arguments given to this preprocessor macro.
-#define HEP_SIZEOF_ENUM(...) sizeof ((int[]){ __VA_ARGS__ }) / sizeof (int)
+#define HEP_SIZEOF_ENUM(...) \
+	std::tuple_size<decltype (std::make_tuple(__VA_ARGS__))>::value
 
 // TODO: make the `enum` an `enum class`
 
