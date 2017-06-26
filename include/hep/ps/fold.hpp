@@ -60,35 +60,6 @@ inline neg_pos_results<T> fold(
 	return { factor * neg , factor * pos };
 }
 
-template <typename T, typename I>
-inline neg_pos_results<T> fold(
-	parton_array<T> const& pdfx1,
-	parton_array<T> const& pdfx2,
-	T matrix_element,
-	initial_state state,
-	T factor,
-	cut_result_with_info<I> const& cut
-) {
-	T neg{};
-	T pos{};
-
-	auto const one = state_parton_one(state);
-	auto const two = state_parton_two(state);
-	auto const sym = (one == two) ? T(0.5) : T(1.0);
-
-	if (!cut.pos_cutted())
-	{
-		pos += sym * pdfx1[one] * pdfx2[two] * matrix_element;
-	}
-
-	if (!cut.neg_cutted())
-	{
-		neg += sym * pdfx1[two] * pdfx2[one] * matrix_element;
-	}
-
-	return { factor * neg , factor * pos };
-}
-
 }
 
 #endif
