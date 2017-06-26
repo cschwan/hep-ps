@@ -21,14 +21,16 @@
 
 #include <array>
 #include <cstddef>
-#include <initializer_list>
+
+/// Returns the number of arguments given to this preprocessor macro.
+#define HEP_SIZEOF_ENUM(...) sizeof ((int[]){ __VA_ARGS__ }) / sizeof (int)
 
 // TODO: make the `enum` an `enum class`
 
 /// Defines an enumeration `name`, a `constexpr` function `name_list()`, and a
 /// template class `name_array<T>`. The arguments for this macro after `name`
 /// are the possible values of the enumeration. The function returns a
-/// `std::initializer_list` with the possible values of the enumeration. The
+/// `std::array<name, ...>` with the possible values of the enumeration. The
 /// class `name_array<T>` is a wrapper over `std::array<T, ...>` that supports
 /// access to its values by keys that are values of the enumeration.
 #define HEP_ENUM(name, ...)                                                    \
@@ -36,7 +38,7 @@
 	{                                                                          \
 		__VA_ARGS__                                                            \
 	};                                                                         \
-	constexpr std::initializer_list<name> name ## _list()                      \
+	constexpr std::array<name, HEP_SIZEOF_ENUM(__VA_ARGS__)> name ## _list()   \
 	{                                                                          \
 		return { __VA_ARGS__ };                                                \
 	}                                                                          \
