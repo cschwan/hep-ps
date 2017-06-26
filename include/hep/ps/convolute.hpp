@@ -1,5 +1,5 @@
-#ifndef HEP_PS_FOLD_HPP
-#define HEP_PS_FOLD_HPP
+#ifndef HEP_PS_CONVOLUTE_HPP
+#define HEP_PS_CONVOLUTE_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -29,7 +29,7 @@ namespace hep
 {
 
 template <typename T, typename I>
-inline neg_pos_results<T> fold(
+inline neg_pos_results<T> convolute(
 	parton_array<T> const& pdfx1,
 	parton_array<T> const& pdfx2,
 	initial_state_array<T> const& matrix_elements,

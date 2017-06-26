@@ -19,9 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/convolute.hpp"
 #include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
@@ -264,7 +264,7 @@ public:
 
 			auto const dipole_me = matrix_elements_.dipole_me(dipole,
 				phase_space, set);
-			auto const dipole_result = fold(pdfx1, pdfx2, dipole_me, set,
+			auto const dipole_result = convolute(pdfx1, pdfx2, dipole_me, set,
 				-function * factor, dipole_cut_result);
 
 			distributions_(phase_space, dipole_cut_result, dipole_result,
@@ -273,7 +273,7 @@ public:
 			result += dipole_result;
 		}
 
-		auto const real_result = fold(pdfx1, pdfx2, reals, set, factor,
+		auto const real_result = convolute(pdfx1, pdfx2, reals, set, factor,
 			real_cut_result);
 		result += real_result;
 

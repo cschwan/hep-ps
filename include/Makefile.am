@@ -5,6 +5,7 @@ nobase_include_HEADERS = \
 	hep/ps/boost.hpp \
 	hep/ps/cofferaa_phase_space_generator.hpp \
 	hep/ps/constants.hpp \
+	hep/ps/convolute.hpp \
 	hep/ps/cs_subtraction.hpp \
 	hep/ps/cut_result.hpp \
 	hep/ps/diagram.hpp \
@@ -16,7 +17,6 @@ nobase_include_HEADERS = \
 	hep/ps/enum.hpp \
 	hep/ps/event_type.hpp \
 	hep/ps/factorization_scheme.hpp \
-	hep/ps/fold.hpp \
 	hep/ps/fortran_helper.hpp \
 	hep/ps/find_hep_ps.hpp \
 	hep/ps/initial_state.hpp \

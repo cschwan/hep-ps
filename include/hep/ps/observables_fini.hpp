@@ -20,9 +20,9 @@
  */
 
 #include "hep/ps/abc_terms.hpp"
+#include "hep/ps/convolute.hpp"
 #include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/insertion_term_type.hpp"
@@ -172,11 +172,13 @@ public:
 
 				if (i == 0)
 				{
-					result += fold(d, pdfa[1], me, set_, factor, cut_result);
+					result += convolute(d, pdfa[1], me, set_, factor,
+						cut_result);
 				}
 				else
 				{
-					result += fold(pdfa[0], d, me, set_, factor, cut_result);
+					result += convolute(pdfa[0], d, me, set_, factor,
+						cut_result);
 				}
 			}
 
@@ -188,7 +190,8 @@ public:
 					phase_space
 				);
 
-				result += fold(pdfa[0], pdfa[1], me, set_, ins, cut_result);
+				result += convolute(pdfa[0], pdfa[1], me, set_, ins,
+					cut_result);
 			}
 		}
 

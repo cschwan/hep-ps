@@ -19,9 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/convolute.hpp"
 #include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/fold.hpp"
 #include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/observables.hpp"
@@ -113,7 +113,8 @@ public:
 		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
 		auto const pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
-		auto const result = fold(pdfx1, pdfx2, borns, set_, factor, cut_result);
+		auto const result = convolute(pdfx1, pdfx2, borns, set_, factor,
+			cut_result);
 
 		distributions_(phase_space, cut_result, result, rapidity_shift,
 			event_type::born_like_n);
