@@ -1,5 +1,4 @@
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_born.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 

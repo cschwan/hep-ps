@@ -9,7 +9,6 @@
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/particle_type.hpp"

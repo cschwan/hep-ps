@@ -36,6 +36,8 @@ HEP_ENUM(parton,
 	strange
 );
 
+HEP_ENUM_ARRAY(parton);
+
 }
 
 #endif

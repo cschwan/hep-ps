@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/initial_state.hpp"
 #include "hep/ps/observables.hpp"
 #include "hep/ps/mc_distributions.hpp"
 

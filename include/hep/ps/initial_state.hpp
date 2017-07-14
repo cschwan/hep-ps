@@ -47,6 +47,10 @@ HEP_ENUM(initial_state,
 	q13_sg
 );
 
+HEP_ENUM_ARRAY(initial_state);
+
+HEP_ENUM_SET(initial_state);
+
 // TODO: make function `constexpr` in C++14
 
 /// Returns the second parton of the given initial_state `state`.

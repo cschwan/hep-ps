@@ -21,7 +21,6 @@
 
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
 

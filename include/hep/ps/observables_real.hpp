@@ -22,7 +22,7 @@
 #include "hep/ps/convolute.hpp"
 #include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/observables.hpp"

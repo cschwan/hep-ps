@@ -1,4 +1,4 @@
-#include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/initial_state.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/mc_distributions.hpp"
 #include "hep/ps/mc_observables.hpp"

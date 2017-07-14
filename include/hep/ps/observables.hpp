@@ -20,7 +20,7 @@
  */
 
 #include "hep/ps/distributions.hpp"
-#include "hep/ps/initial_state_set.hpp"
+#include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
 
 #include <vector>

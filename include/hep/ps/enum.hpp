@@ -20,30 +20,42 @@
  */
 
 #include <array>
+#include <cassert>
 #include <cstddef>
+#include <cstdint>
+#include <initializer_list>
+#include <limits>
+#include <numeric>
 #include <tuple>
+#include <type_traits>
+#include <utility>
 
 /// Returns the number of arguments given to this preprocessor macro.
-#define HEP_SIZEOF_ENUM(...) \
+#define HEP_ENUM_SIZEOF(...) \
 	std::tuple_size<decltype (std::make_tuple(__VA_ARGS__))>::value
 
 // TODO: make the `enum` an `enum class`
 
-/// Defines an enumeration `name`, a `constexpr` function `name_list()`, and a
-/// template class `name_array<T>`. The arguments for this macro after `name`
-/// are the possible values of the enumeration. The function returns a
-/// `std::array<name, ...>` with the possible values of the enumeration. The
-/// class `name_array<T>` is a wrapper over `std::array<T, ...>` that supports
-/// access to its values by keys that are values of the enumeration.
+/// Defines an enumeration `name` and a `constexpr` function `name_list()`. The
+/// arguments for this macro after `name` are the possible values of the
+/// enumeration. The function returns a `std::array<name, ...>` with the
+/// possible values of the enumeration.
 #define HEP_ENUM(name, ...)                                                    \
 	enum name : std::size_t                                                    \
 	{                                                                          \
 		__VA_ARGS__                                                            \
 	};                                                                         \
-	constexpr std::array<name, HEP_SIZEOF_ENUM(__VA_ARGS__)> name ## _list()   \
+	constexpr std::array<name, HEP_ENUM_SIZEOF(__VA_ARGS__)> name ## _list()   \
 	{                                                                          \
 		return { __VA_ARGS__ };                                                \
-	}                                                                          \
+	}
+
+/// Defines a template class `name_array` for a previously defined enumeration
+/// defined with \ref HEP_ENUM. The class `name_array<T>` is a wrapper over
+/// `std::array<T, ...>` that supports access to its values by keys that are
+/// values of the enumeration. A default constructor is provided that
+/// zero-initializes all elements of the array.
+#define HEP_ENUM_ARRAY(name)                                                   \
 	template <typename T>                                                      \
 	class name ## _array                                                       \
 	{                                                                          \
@@ -52,7 +64,7 @@
 			: array_{{}}                                                       \
 		{                                                                      \
 		}                                                                      \
-	                                                                           \
+		                                                                       \
 		T& operator[](name index)                                              \
 		{                                                                      \
 			return array_[static_cast <std::size_t> (index)];                  \
@@ -64,6 +76,144 @@
 		}                                                                      \
 	private:                                                                   \
 		std::array<T, name ## _list().size()> array_;                          \
+	}
+
+/// Defines a class that is able to contain a unique element of the given
+/// enumeration `name` that must be previously declared with \ref HEP_ENUM.
+#define HEP_ENUM_SET(name)                                                     \
+	class name ## _set                                                         \
+	{                                                                          \
+	public:                                                                    \
+		class const_iterator                                                   \
+		{                                                                      \
+		public:                                                                \
+			using iterator_category = std::input_iterator_tag;                 \
+			using value_type        = name;                                    \
+			using difference_type   = std::ptrdiff_t;                          \
+			using pointer           = name const*;                             \
+			using reference         = name;                                    \
+                                                                               \
+			const_iterator()                                                   \
+				: set_{}                                                       \
+			{                                                                  \
+			}                                                                  \
+                                                                               \
+			const_iterator(const_iterator const&) = default;                   \
+                                                                               \
+			~const_iterator() = default;                                       \
+                                                                               \
+			const_iterator& operator=(const const_iterator&) = default;        \
+                                                                               \
+			explicit const_iterator(std::size_t set)                           \
+				: set_{set}                                                    \
+			{                                                                  \
+			}                                                                  \
+                                                                               \
+			friend void swap(const_iterator& a, const_iterator& b)             \
+			{                                                                  \
+				std::swap(a.set_, b.set_);                                     \
+			}                                                                  \
+                                                                               \
+			const_iterator& operator++()                                       \
+			{                                                                  \
+				std::size_t const least_significant_bit = set_ &               \
+					-static_cast <std::make_signed<std::size_t>::type> (set_); \
+				set_ ^= least_significant_bit;                                 \
+                                                                               \
+				return *this;                                                  \
+			}                                                                  \
+                                                                               \
+			const_iterator operator++(int)                                     \
+			{                                                                  \
+				auto const result = *this;                                     \
+				++(*this);                                                     \
+				return result;                                                 \
+			}                                                                  \
+                                                                               \
+			bool operator==(const_iterator other) const                        \
+			{                                                                  \
+				return set_ == other.set_;                                     \
+			}                                                                  \
+                                                                               \
+			bool operator!=(const_iterator other) const                        \
+			{                                                                  \
+				return !(*this == other);                                      \
+			}                                                                  \
+                                                                               \
+			reference operator*() const                                        \
+			{                                                                  \
+				assert( set_ <= std::numeric_limits<std::int32_t>::max() );    \
+                                                                               \
+				std::size_t v = set_;                                          \
+				std::size_t c = 32;                                            \
+				v &= -static_cast <std::make_signed<std::size_t>::type> (v);   \
+                                                                               \
+				if (v) c--;                                                    \
+				if (v & 0x0000FFFF) c -= 16;                                   \
+				if (v & 0x00FF00FF) c -= 8;                                    \
+				if (v & 0x0F0F0F0F) c -= 4;                                    \
+				if (v & 0x33333333) c -= 2;                                    \
+				if (v & 0x55555555) c -= 1;                                    \
+                                                                               \
+				return static_cast <name> (c);                                 \
+			}                                                                  \
+                                                                               \
+		private:                                                               \
+			std::size_t set_;                                                  \
+		};                                                                     \
+                                                                               \
+		const_iterator begin() const                                           \
+		{                                                                      \
+			return const_iterator(set_);                                       \
+		}                                                                      \
+                                                                               \
+		const_iterator end() const                                             \
+		{                                                                      \
+			return const_iterator();                                           \
+		}                                                                      \
+                                                                               \
+		name ## _set()                                                         \
+			: set_{}                                                           \
+		{                                                                      \
+		}                                                                      \
+                                                                               \
+		name ## _set(std::initializer_list<name> list)                         \
+			: set_(std::accumulate(list.begin(), list.end(), 0u,               \
+				[](std::size_t set, name object) {                             \
+					return set | (1 << static_cast <std::size_t> (object));    \
+			  }))                                                              \
+		{                                                                      \
+		}                                                                      \
+                                                                               \
+		bool empty() const                                                     \
+		{                                                                      \
+			return set_ == 0;                                                  \
+		}                                                                      \
+                                                                               \
+		void subtract(name ## _set other_set)                                  \
+		{                                                                      \
+			set_ ^= (set_ & other_set.set_);                                   \
+		}                                                                      \
+                                                                               \
+		void add(name object)                                                  \
+		{                                                                      \
+			auto const index = static_cast <std::size_t> (object);             \
+			set_ |= (1 << index);                                              \
+		}                                                                      \
+                                                                               \
+		bool includes(name object) const                                       \
+		{                                                                      \
+			auto const index = static_cast <std::size_t> (object);             \
+			return set_ & (1 << index);                                        \
+		}                                                                      \
+                                                                               \
+		bool operator==(name ## _set other) const                              \
+		{                                                                      \
+			return set_ == other.set_;                                         \
+		}                                                                      \
+                                                                               \
+	private:                                                                   \
+		std::size_t set_;                                                      \
 	}
 
 #endif

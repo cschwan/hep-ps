@@ -1,5 +1,4 @@
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/initial_state_set.hpp"
 #include "hep/ps/observables_fini.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
