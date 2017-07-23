@@ -49,6 +49,11 @@ public:
 
 		return result;
 	}
+
+	int alphas()
+	{
+		return 0;
+	}
 };
 
 template <typename T>
@@ -185,7 +190,7 @@ public:
 		};
 	}
 
-	void scale(T, test_pdf<T>&)
+	void scale(T, int)
 	{
 	}
 

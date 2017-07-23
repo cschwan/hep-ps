@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PROTON_PDF_HPP
-#define HEP_PS_PROTON_PDF_HPP
+#ifndef HEP_PS_ALPHAS_CALC_HPP
+#define HEP_PS_ALPHAS_CALC_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -19,41 +19,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/alphas_calc.hpp"
-#include "hep/ps/parton.hpp"
-
-#include <cstddef>
-#include <memory>
-#include <string>
-
 namespace hep
 {
 
-/// Class that gives access to the proton pdfs.
+/// Calculates the strong coupling at different scales.
 template <typename T>
-class proton_pdf
+class alphas_calc
 {
 public:
-	/// Constructor.
-	proton_pdf(std::string const& name, std::size_t pdf_member);
+	/// Constructor. Do not call, use of member functions of PDF classes
+	/// instead.
+	alphas_calc(void* pdf);
 
-	/// Move constructor.
-	proton_pdf(proton_pdf<T>&& pdf);
+	alphas_calc(alphas_calc<T> const&) = delete;
 
-	/// Destructor.
-	~proton_pdf();
+	alphas_calc(alphas_calc<T>&&) = delete;
 
-	/// Returns a reference to an instance that allows the calculation of the
-	/// strong coupling at arbitrary scales.
-	alphas_calc<T>& alphas();
+	alphas_calc& operator=(alphas_calc<T> const&) = delete;
 
-	/// Returns the value of the parton distribution function for the given \f$
-	/// x \f$ and \f$ Q \f$, the last given by `scale`.
-	parton_array<T> pdf(T x, T scale);
+	alphas_calc& operator=(alphas_calc<T>&&) = delete;
+
+	/// Returns the strong coupling for the given `scale`.
+	T alphas(T scale);
 
 private:
-	class impl;
-	std::unique_ptr<impl> pimpl;
+	void* pdf_;
 };
 
 }

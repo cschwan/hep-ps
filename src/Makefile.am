@@ -2,6 +2,7 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libhep-ps.la
 libhep_ps_la_SOURCES = \
+	alphas_calc.cpp \
 	boost.cpp \
 	cofferaa_generator.f \
 	cofferaa_extra.f \

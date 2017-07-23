@@ -16,6 +16,7 @@ public:
 
 	std::unique_ptr<LHAPDF::PDF> pdf;
 	std::vector<double> xfx;
+	alphas_calc<T> alphas;
 };
 
 template <typename T>
@@ -26,6 +27,7 @@ proton_pdf<T>::impl::impl(
 	: pdf(LHAPDF::mkPDF(pdf_name, pdf_member))
 	// TODO: is it possible to extract this number from LHAPDF?
 	, xfx(13)
+	, alphas(pdf.get())
 {
 }
 
@@ -49,9 +51,9 @@ template <typename T>
 proton_pdf<T>::~proton_pdf() = default;
 
 template <typename T>
-T proton_pdf<T>::alphas(T scale)
+alphas_calc<T>& proton_pdf<T>::alphas()
 {
-	return pimpl->pdf->alphasQ(scale);
+	return pimpl->alphas;
 }
 
 template <typename T>
