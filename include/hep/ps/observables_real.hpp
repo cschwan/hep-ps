@@ -159,7 +159,7 @@ public:
 			auto const invariants = subtraction_.map_phase_space(
 				real_phase_space, phase_space, dipole);
 
-			if (invariants.adipole < alpha_min_)
+			if (invariants.alpha < alpha_min_)
 			{
 				// remove all initial states from the set that share this dipole
 				set.subtract(dipole_with_set.set());

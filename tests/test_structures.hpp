@@ -241,7 +241,7 @@ public:
 		CHECK( invariants.one == T(1.0) );
 		CHECK( invariants.two == T(2.0) );
 		CHECK( invariants.sij == T(4.0) );
-		CHECK( invariants.adipole == T(8.0) );
+		CHECK( invariants.alpha == T(8.0) );
 
 		return T(1.0);
 	}

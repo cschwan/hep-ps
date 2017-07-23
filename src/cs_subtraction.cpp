@@ -78,30 +78,30 @@ dipole_invariants<T> cs_subtraction<T>::map_phase_space(
 		switch (dipole_info.type())
 		{
 		case dipole_type::final_final:
-			invariants.one     = sij / (sij + sik + sjk);
-			invariants.two     = sik / (      sik + sjk);
-			invariants.adipole = invariants.one;
+			invariants.one   = sij / (sij + sik + sjk);
+			invariants.two   = sik / (      sik + sjk);
+			invariants.alpha = invariants.one;
 
 			break;
 
 		case dipole_type::final_initial:
-			invariants.adipole = sij / (sik + sjk);
-			invariants.two     = sik / (sik + sjk);
-			invariants.one     = T(1.0) - invariants.adipole;
+			invariants.alpha = sij / (sik + sjk);
+			invariants.two   = sik / (sik + sjk);
+			invariants.one   = T(1.0) - invariants.alpha;
 
 			break;
 
 		case dipole_type::initial_final:
-			invariants.one     = T(1.0) - sjk / (sij + sik);
-			invariants.two     =          sij / (sij + sik);
-			invariants.adipole = invariants.two;
+			invariants.one   = T(1.0) - sjk / (sij + sik);
+			invariants.two   =          sij / (sij + sik);
+			invariants.alpha = invariants.two;
 
 			break;
 
 		case dipole_type::initial_initial:
-			invariants.one     = T(1.0) - (sij + sjk) / sik;
-			invariants.two     =           sij        / sik;
-			invariants.adipole = invariants.two;
+			invariants.one   = T(1.0) - (sij + sjk) / sik;
+			invariants.two   =           sij        / sik;
+			invariants.alpha = invariants.two;
 
 			break;
 		}

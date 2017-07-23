@@ -25,20 +25,19 @@ namespace hep
 template <typename T>
 struct dipole_invariants
 {
-	dipole_invariants() = default;
-
-	dipole_invariants(T one, T two, T sij, T adipole)
-		: one(one)
-		, two(two)
-		, sij(sij)
-		, adipole(adipole)
+	dipole_invariants(T one = T(), T two = T(), T sij = T(), T alpha = T())
+		: one{one}
+		, two{two}
+		, sij{sij}
+		, alpha{alpha}
 	{
 	}
 
 	T one;
 	T two;
 	T sij;
-	T adipole;
+
+	T alpha;
 };
 
 }
