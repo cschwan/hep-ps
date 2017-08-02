@@ -18,6 +18,7 @@ check_PROGRAMS = \
 	test_observables_fini \
 	test_observables_real \
 	test_permutation \
+	test_phase_space_quality \
 	test_trivial_cutter_and_recombiner
 
 if ADDITIONAL_TESTS
