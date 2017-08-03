@@ -222,16 +222,8 @@ public:
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
-		initial_state_array<T> reals;
-
-		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
-		{
-			reals = matrix_elements_.reals(real_phase_space, set);
-		}
-
 		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
 		auto const pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
-
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		neg_pos_results<T> result;
@@ -277,12 +269,17 @@ public:
 			result += dipole_result;
 		}
 
-		auto const real_result = convolute(pdfx1, pdfx2, reals, set, factor,
-			real_cut_result);
-		result += real_result;
+		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
+		{
+			auto const reals = matrix_elements_.reals(real_phase_space, set);
+			auto const real_result = convolute(pdfx1, pdfx2, reals, set, factor,
+				real_cut_result);
 
-		distributions_(recombined_real_phase_space, real_cut_result, real_result,
-			shift, event);
+			result += real_result;
+
+			distributions_(recombined_real_phase_space, real_cut_result,
+				real_result, shift, event);
+		}
 
 		return result.neg + result.pos;
 	}
