@@ -106,6 +106,10 @@ public:
 	{
 		static_assert (std::is_base_of<hep::distributions<T>, D>::value,
 			"`D` must be a type deriving from `hep::distributions<T>`");
+
+		dipole_recombination_candidates_.reserve(
+			matrix_elements_.real_recombination_candidates().size());
+		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
 	}
 
 	T eval(
