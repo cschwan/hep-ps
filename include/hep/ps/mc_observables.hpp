@@ -34,13 +34,13 @@ namespace
 {
 
 template <typename T, typename P>
-hep::luminosity_info<T> info(hep::multi_channel_point2<T, P> const& x)
+inline hep::luminosity_info<T> info(hep::multi_channel_point2<T, P> const& x)
 {
 	return x.map().info();
 }
 
 template <typename T, typename P>
-hep::luminosity_info<T> info(
+inline hep::luminosity_info<T> info(
 	hep::multi_channel_point2<T, std::reference_wrapper<P>> const& x
 ) {
 	return x.map().get().info();
