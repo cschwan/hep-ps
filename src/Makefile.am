@@ -21,6 +21,7 @@ libhep_ps_la_SOURCES = \
 	lusifer_interfaces.hpp \
 	lusifer_phase_space_generator.cpp \
 	p_type_jet_algorithm.cpp \
+	phase_space_generator.cpp \
 	proton_pdf.cpp \
 	propagator.cpp \
 	silence_third_party_libs.cpp \

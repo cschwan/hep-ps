@@ -36,9 +36,7 @@ public:
 	using numeric_type = T;
 
 	/// Virtual destructor.
-	virtual ~phase_space_generator()
-	{
-	}
+	virtual ~phase_space_generator();
 
 	/// Returns the number of channels this generators supports.
 	virtual std::size_t channels() const = 0;
