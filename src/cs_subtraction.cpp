@@ -317,8 +317,7 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 	scales<T> const& mu,
 	std::vector<T> const& phase_space,
 	T x,
-	T eta,
-	std::size_t initial_state
+	T eta
 ) const {
 	using std::acos;
 	using std::log;
@@ -394,12 +393,6 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 
 	case insertion_term_type::final_initial:
 	{
-		// initial states must agree
-		if (term.spectator() != initial_state)
-		{
-			return result;
-		}
-
 		T const ca = n_;
 		T const gamma = (term.emitter_type() == particle_type::fermion)
 			? T(1.5) * cf
@@ -445,12 +438,6 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 
 	case insertion_term_type::initial_final:
 	{
-		// initial states must agree
-		if (term.emitter() != initial_state)
-		{
-			return result;
-		}
-
 		T const omx = T(1.0) - x;
 		T const sai = invariant(phase_space, term.emitter(), term.spectator());
 		T const mu2 = mu.factorization() * mu.factorization();
@@ -505,10 +492,6 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		break;
 
 	case insertion_term_type::initial_initial:
-		if (term.emitter() != initial_state)
-		{
-			return result;
-		}
 
 		T const omx = T(1.0) - x;
 		T const sai = invariant(phase_space, term.emitter(), term.spectator());

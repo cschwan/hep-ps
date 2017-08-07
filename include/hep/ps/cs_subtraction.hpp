@@ -61,8 +61,7 @@ public:
 		scales<T> const& mu,
 		std::vector<T> const& phase_space,
 		T x,
-		T eta,
-		std::size_t initial_state
+		T eta
 	) const;
 
 	T insertion_terms2(

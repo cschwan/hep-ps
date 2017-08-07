@@ -143,17 +143,25 @@ public:
 		for (std::size_t index = 0; index != insertion_terms.size(); ++index)
 		{
 			auto const me = corr_me.at(index);
+			auto const& term = insertion_terms.at(index);
 
 			// loop over both initial state partons
-			for (auto const i : { 0, 1 })
+			for (auto const i : { 0u, 1u })
 			{
+				if (((term.type() == insertion_term_type::final_initial) &&
+					(term.spectator() != i)) ||
+					((term.type() != insertion_term_type::born) &&
+					(term.emitter() != i)))
+				{
+					continue;
+				}
+
 				auto const& abc = subtraction_.insertion_terms(
-					insertion_terms.at(index),
+					term,
 					scales,
 					phase_space,
 					xprime[i],
-					eta[i],
-					i
+					eta[i]
 				);
 
 				parton_array<T> d;
@@ -184,7 +192,7 @@ public:
 			if (insertion2_)
 			{
 				T const ins = factor * subtraction_.insertion_terms2(
-					insertion_terms.at(index),
+					term,
 					scales,
 					phase_space
 				);

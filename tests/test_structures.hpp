@@ -251,8 +251,7 @@ public:
 		hep::scales<T> const&,
 		std::vector<T> const&,
 		T,
-		T,
-		std::size_t
+		T
 	) const {
 		return hep::abc_terms<T>();
 	}
