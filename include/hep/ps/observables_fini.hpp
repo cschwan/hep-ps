@@ -148,12 +148,27 @@ public:
 			// loop over both initial state partons
 			for (auto const i : { 0u, 1u })
 			{
-				if (((term.type() == insertion_term_type::final_initial) &&
-					(term.spectator() != i)) ||
-					((term.type() != insertion_term_type::born) &&
-					(term.emitter() != i)))
+				switch (term.type())
 				{
-					continue;
+				case insertion_term_type::final_initial:
+					if (term.spectator() != i)
+					{
+						continue;
+					}
+
+					break;
+
+				case insertion_term_type::initial_final:
+				case insertion_term_type::initial_initial:
+					if (term.emitter() != i)
+					{
+						continue;
+					}
+
+					break;
+
+				default:
+					break;
 				}
 
 				auto const& abc = subtraction_.insertion_terms(
