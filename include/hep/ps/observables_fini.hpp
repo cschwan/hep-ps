@@ -24,6 +24,7 @@
 #include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
+#include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/observables.hpp"
@@ -115,27 +116,51 @@ public:
 		}
 
 		T const x = phase_space.back();
+		T const muf = scales.factorization();
 
-		T const eta[] = {
-			info.x1(),
-			info.x2()
-		};
-		T const xprime[] = {
-			eta[0] + (T(1.0) - eta[0]) * x,
-			eta[1] + (T(1.0) - eta[1]) * x
-		};
 		parton_array<T> const pdfa[] = {
-			pdf_.pdf(eta[0], scales.factorization()),
-			pdf_.pdf(eta[1], scales.factorization())
+			pdf_.pdf(info.x1(), muf),
+			pdf_.pdf(info.x2(), muf)
 		};
 		parton_array<T> const pdfb[] = {
-			pdf_.pdf(eta[0] / xprime[0], scales.factorization()),
-			pdf_.pdf(eta[1] / xprime[1], scales.factorization())
+			pdf_.pdf(info.x1() / (info.x1() * (T(1.0) - x) + x), muf),
+			pdf_.pdf(info.x2() / (info.x2() * (T(1.0) - x) + x), muf)
 		};
 
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
+
+		auto effective_pdf = [&](
+			insertion_term const& term,
+			T eta,
+			parton_array<T> const& pdfa,
+			parton_array<T> const& pdfb
+		) {
+			T const ome = (T(1.0) - eta);
+			T const xprime = eta + ome * x;
+			auto const& abc = subtraction_.insertion_terms(
+				term,
+				scales,
+				phase_space,
+				xprime,
+				eta
+			);
+
+			parton_array<T> pdf;
+
+			for (auto const a : parton_list())
+			{
+				for (auto const ap : parton_list())
+				{
+					pdf[a] += pdfb[ap] * abc.a[ap][a] * ome / xprime;
+					pdf[a] -= pdfa[ap] * abc.b[ap][a] * ome;
+					pdf[a] += pdfa[ap] * abc.c[ap][a];
+				}
+			}
+
+			return pdf;
+		};
 
 		neg_pos_results<T> result;
 
@@ -144,6 +169,10 @@ public:
 		{
 			auto const me = corr_me.at(index);
 			auto const& term = insertion_terms.at(index);
+
+			// meaning of indices: 0 pdf for first particle, 1 = for second
+			parton_array<T> dneg[2];
+			parton_array<T> dpos[2];
 
 			// loop over both initial state partons
 			for (auto const i : { 0u, 1u })
@@ -171,38 +200,25 @@ public:
 					break;
 				}
 
-				auto const& abc = subtraction_.insertion_terms(
+				dneg[i] = effective_pdf(
 					term,
-					scales,
-					phase_space,
-					xprime[i],
-					eta[i]
+					(i == 0) ? info.x2() : info.x1(),
+					pdfa[1u - i],
+					pdfb[1u - i]
 				);
 
-				parton_array<T> d;
-
-				for (auto const a : parton_list())
-				{
-					for (auto const ap : parton_list())
-					{
-						d[a] += pdfb[i][ap] * abc.a[ap][a] * (T(1.0) - eta[i]) /
-							xprime[i];
-						d[a] -= pdfa[i][ap] * abc.b[ap][a] * (T(1.0) - eta[i]);
-						d[a] += pdfa[i][ap] * abc.c[ap][a];
-					}
-				}
-
-				if (i == 0)
-				{
-					result += convolute(d, pdfa[1], me, set_, factor,
-						cut_result);
-				}
-				else
-				{
-					result += convolute(pdfa[0], d, me, set_, factor,
-						cut_result);
-				}
+				dpos[i] = effective_pdf(
+					term,
+					(i == 0) ? info.x1() : info.x2(),
+					pdfa[i],
+					pdfb[i]
+				);
 			}
+
+			result += convolute(dneg[0], pdfa[0], dpos[0], pdfa[1], me, set_,
+				factor, cut_result);
+			result += convolute(pdfa[1], dneg[1], pdfa[0], dpos[1], me, set_,
+				factor, cut_result);
 
 			if (insertion2_)
 			{

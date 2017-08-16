@@ -59,6 +59,40 @@ inline neg_pos_results<T> convolute(
 	return { factor * neg , factor * pos };
 }
 
+template <typename T, typename I>
+inline neg_pos_results<T> convolute(
+	parton_array<T> const& pdfx1_neg,
+	parton_array<T> const& pdfx2_neg,
+	parton_array<T> const& pdfx1_pos,
+	parton_array<T> const& pdfx2_pos,
+	initial_state_array<T> const& matrix_elements,
+	initial_state_set set,
+	T factor,
+	cut_result_with_info<I> const& cut
+) {
+	T neg{};
+	T pos{};
+
+	for (auto const state : set)
+	{
+		auto const one = state_parton_one(state);
+		auto const two = state_parton_two(state);
+		auto const sym = (one == two) ? T(0.5) : T(1.0);
+
+		if (!cut.pos_cutted())
+		{
+			pos += sym * pdfx1_pos[one] * pdfx2_pos[two] * matrix_elements[state];
+		}
+
+		if (!cut.neg_cutted())
+		{
+			neg += sym * pdfx1_neg[one] * pdfx2_neg[two] * matrix_elements[state];
+		}
+	}
+
+	return { factor * neg , factor * pos };
+}
+
 }
 
 #endif
