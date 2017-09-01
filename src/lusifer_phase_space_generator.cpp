@@ -348,14 +348,14 @@ lusifer_psg<T>::lusifer_psg(
 
 			nex = process.size() / 3;
 
-			double mw = constants.mass_w;
-			double gw = constants.width_w;
-			double mz = constants.mass_z;
-			double gz = constants.width_z;
-			double mh = constants.mass_h;
-			double gh = constants.width_h;
-			double mt = constants.mass_t;
-			double gt = constants.width_t;
+			double mw = static_cast <double> (constants.mass_w);
+			double gw = static_cast <double> (constants.width_w);
+			double mz = static_cast <double> (constants.mass_z);
+			double gz = static_cast <double> (constants.width_z);
+			double mh = static_cast <double> (constants.mass_h);
+			double gh = static_cast <double> (constants.width_h);
+			double mt = static_cast <double> (constants.mass_t);
+			double gt = static_cast <double> (constants.width_t);
 
 			// set constants and the number of particles
 			lusifer_extra_set(&g, &nex, &mw, &gw, &mz, &gz, &mh, &gh, &mt, &gt);
