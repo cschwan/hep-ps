@@ -22,9 +22,12 @@
 namespace hep
 {
 
+/// Structure capturing the invariants for a dipole for a specific phase space
+/// point.
 template <typename T>
 struct dipole_invariants
 {
+	/// Constructor. Initializes this object
 	dipole_invariants(T one = T(), T two = T(), T sij = T(), T alpha = T())
 		: one{one}
 		, two{two}
@@ -33,10 +36,17 @@ struct dipole_invariants
 	{
 	}
 
+	/// Invariant.
 	T one;
+
+	/// Other invariant.
 	T two;
+
+	/// Propagator invariant of the dipole.
 	T sij;
 
+	/// The value of the parameter \f$ \alpha \f$ on which a technical cut is
+	/// applied if the value is too small.
 	T alpha;
 };
 
