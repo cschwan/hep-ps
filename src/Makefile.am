@@ -24,6 +24,7 @@ libhep_ps_la_SOURCES = \
 	phase_space_generator.cpp \
 	proton_pdf.cpp \
 	propagator.cpp \
+	rambo_phase_space_generator.cpp \
 	silence_third_party_libs.cpp \
 	trivial_cutter.cpp \
 	trivial_recombiner.cpp \

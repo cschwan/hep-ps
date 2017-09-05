@@ -45,6 +45,7 @@ nobase_include_HEADERS = \
 	hep/ps/phase_space_generator.hpp \
 	hep/ps/proton_pdf.hpp \
 	hep/ps/propagator.hpp \
+	hep/ps/rambo_phase_space_generator.hpp \
 	hep/ps/renormalization_scheme.hpp \
 	hep/ps/scales.hpp \
 	hep/ps/silence_third_party_libs.hpp \

@@ -57,6 +57,7 @@
 #include "hep/ps/phase_space_generator.hpp"
 #include "hep/ps/proton_pdf.hpp"
 #include "hep/ps/propagator.hpp"
+#include "hep/ps/rambo_phase_space_generator.hpp"
 #include "hep/ps/renormalization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/silence_third_party_libs.hpp"
