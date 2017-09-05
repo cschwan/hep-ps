@@ -26,7 +26,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/observables.hpp"
-#include "hep/ps/particle_type.hpp"
+#include "hep/ps/parton.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -48,14 +48,14 @@ public:
 		typename MatrixElements,
 		typename Cuts,
 		typename Recombiner,
-		typename Pdf,
+		typename Pdfs,
 		typename ScaleSetter,
 		typename Distributions>
 	observables_born(
 		MatrixElements&& matrix_elements,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
-		Pdf&& pdf,
+		Pdfs&& pdfs,
 		ScaleSetter&& scale_setter,
 		Distributions&& distributions,
 		initial_state_set set,
@@ -64,11 +64,13 @@ public:
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
 		, cuts_(std::forward<Cuts>(cuts))
 		, recombiner_(std::forward<Recombiner>(recombiner))
-		, pdf_(std::forward<Pdf>(pdf))
+		, pdfs_(std::forward<Pdfs>(pdfs))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, distributions_(std::forward<Distributions>(distributions))
 		, set_(set)
 		, hbarc2_(hbarc2)
+		, pdfsx1_(pdfs_.count())
+		, pdfsx2_(pdfs_.count())
 	{
 	}
 
@@ -105,13 +107,16 @@ public:
 		// only set renormalization scale if it changed
 		if (scales.renormalization() != old_renormalization_scale_)
 		{
-			matrix_elements_.scale(scales.renormalization(), pdf_.alphas());
+			matrix_elements_.scale(scales.renormalization(), pdfs_.alphas());
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
+		pdfs_.eval(info.x1(), scales.factorization(), pdfsx1_);
+		pdfs_.eval(info.x2(), scales.factorization(), pdfsx2_);
+
 		auto const borns = matrix_elements_.borns(phase_space, set_);
-		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
-		auto const pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
+		auto const pdfx1 = pdfsx1_.at(0);
+		auto const pdfx2 = pdfsx2_.at(0);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 		auto const result = convolute(pdfx1, pdfx2, borns, set_, factor,
 			cut_result);
@@ -136,13 +141,15 @@ private:
 	M matrix_elements_;
 	C cuts_;
 	R recombiner_;
-	P pdf_;
+	P pdfs_;
 	S scale_setter_;
 	D distributions_;
 	initial_state_set set_;
 	T hbarc2_;
 
 	T old_renormalization_scale_;
+	std::vector<parton_array<T>> pdfsx1_;
+	std::vector<parton_array<T>> pdfsx2_;
 };
 
 template <class T, class M, class C, class R, class P, class S, class D>
@@ -156,7 +163,7 @@ inline std::unique_ptr<observables<T>> make_observables_born(
 	M&& matrix_elements,
 	C&& cuts,
 	R&& recombiner,
-	P&& pdf,
+	P&& pdfs,
 	S&& scale_setter,
 	D&& distributions,
 	initial_state_set set,
@@ -167,7 +174,7 @@ inline std::unique_ptr<observables<T>> make_observables_born(
 			std::forward<M>(matrix_elements),
 			std::forward<C>(cuts),
 			std::forward<R>(recombiner),
-			std::forward<P>(pdf),
+			std::forward<P>(pdfs),
 			std::forward<S>(scale_setter),
 			std::forward<D>(distributions),
 			set,

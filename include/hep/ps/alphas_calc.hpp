@@ -37,7 +37,7 @@ public:
 
 	alphas_calc& operator=(alphas_calc<T> const&) = delete;
 
-	alphas_calc& operator=(alphas_calc<T>&&) = delete;
+	alphas_calc& operator=(alphas_calc<T>&& other);
 
 	/// Returns the strong coupling for the given `scale`.
 	T alphas(T scale);

@@ -22,7 +22,7 @@ libhep_ps_la_SOURCES = \
 	lusifer_phase_space_generator.cpp \
 	p_type_jet_algorithm.cpp \
 	phase_space_generator.cpp \
-	proton_pdf.cpp \
+	proton_pdfs.cpp \
 	propagator.cpp \
 	rambo_phase_space_generator.cpp \
 	silence_third_party_libs.cpp \

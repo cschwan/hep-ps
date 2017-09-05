@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PROTON_PDF_HPP
-#define HEP_PS_PROTON_PDF_HPP
+#ifndef HEP_PS_PROTON_PDFS_HPP
+#define HEP_PS_PROTON_PDFS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -25,31 +25,41 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace hep
 {
 
 /// Class that gives access to the proton pdfs.
 template <typename T>
-class proton_pdf
+class proton_pdfs
 {
 public:
-	/// Constructor.
-	proton_pdf(std::string const& name, std::size_t pdf_member);
+	/// Constructor. This creates a single PDF with index `pdf_member` from the
+	/// set of PDFs called `name`.
+	proton_pdfs(std::string const& name, std::size_t pdf_member);
+
+	/// Constructor. This creates all PDFs from the set of PDFs called `name`.
+	proton_pdfs(std::string const& name);
 
 	/// Move constructor.
-	proton_pdf(proton_pdf<T>&& pdf);
+	proton_pdfs(proton_pdfs<T>&& pdf);
 
 	/// Destructor.
-	~proton_pdf();
+	~proton_pdfs();
 
 	/// Returns a reference to an instance that allows the calculation of the
 	/// strong coupling at arbitrary scales.
 	alphas_calc<T>& alphas();
 
-	/// Returns the value of the parton distribution function for the given \f$
-	/// x \f$ and \f$ Q \f$, the last given by `scale`.
-	parton_array<T> pdf(T x, T scale);
+	/// This function returns the number of PDFs represented with by this
+	/// object.
+	std::size_t count() const;
+
+	/// Returns the values of the parton distribution functions for the given
+	/// \f$ x \f$ and \f$ Q \f$, the last given by `scale`. The size of `pdfs`
+	/// must agree with the number returned by \ref count.
+	void eval(T x, T scale, std::vector<parton_array<T>>& pdfs);
 
 private:
 	class impl;

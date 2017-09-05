@@ -19,8 +19,8 @@
 
 #include <array>
 #include <cstddef>
-#include <vector>
 #include <numeric>
+#include <vector>
 
 namespace
 {
@@ -29,30 +29,32 @@ template <typename T>
 class test_pdf
 {
 public:
-	hep::parton_array<T> pdf(T x, T scale)
+	void eval(T x, T scale, std::vector<hep::parton_array<T>>& pdfs)
 	{
+		CHECK( pdfs.size() == count() );
 		CHECK( x >= T() );
 		CHECK( x < T(1.0) );
 		CHECK( scale > T() );
 
-		hep::parton_array<T> result;
-
-		result[hep::parton::anti_up]      = T(1.0);
-		result[hep::parton::anti_down]    = T(1.0);
-		result[hep::parton::anti_charm]   = T(1.0);
-		result[hep::parton::anti_strange] = T(1.0);
-		result[hep::parton::gluon]        = T(1.0);
-		result[hep::parton::up]           = T(1.0);
-		result[hep::parton::down]         = T(1.0);
-		result[hep::parton::charm]        = T(1.0);
-		result[hep::parton::strange]      = T(1.0);
-
-		return result;
+		pdfs.front()[hep::parton::anti_up]      = T(1.0);
+		pdfs.front()[hep::parton::anti_down]    = T(1.0);
+		pdfs.front()[hep::parton::anti_charm]   = T(1.0);
+		pdfs.front()[hep::parton::anti_strange] = T(1.0);
+		pdfs.front()[hep::parton::gluon]        = T(1.0);
+		pdfs.front()[hep::parton::up]           = T(1.0);
+		pdfs.front()[hep::parton::down]         = T(1.0);
+		pdfs.front()[hep::parton::charm]        = T(1.0);
+		pdfs.front()[hep::parton::strange]      = T(1.0);
 	}
 
 	int alphas()
 	{
 		return 0;
+	}
+
+	std::size_t count() const
+	{
+		return 1;
 	}
 };
 

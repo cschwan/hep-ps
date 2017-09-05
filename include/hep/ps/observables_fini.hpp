@@ -50,7 +50,7 @@ public:
 		typename Subtraction,
 		typename Cuts,
 		typename Recombiner,
-		typename Pdf,
+		typename Pdfs,
 		typename ScaleSetter,
 		typename Distributions>
 	observables_fini(
@@ -58,7 +58,7 @@ public:
 		Subtraction&& subtraction,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
-		Pdf&& pdf,
+		Pdfs&& pdfs,
 		ScaleSetter&& scale_setter,
 		Distributions&& distributions,
 		initial_state_set set,
@@ -69,12 +69,16 @@ public:
 		, subtraction_(std::forward<Subtraction>(subtraction))
 		, cuts_(std::forward<Cuts>(cuts))
 		, recombiner_(std::forward<Recombiner>(recombiner))
-		, pdf_(std::forward<Pdf>(pdf))
+		, pdfs_(std::forward<Pdfs>(pdfs))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, distributions_(std::forward<Distributions>(distributions))
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, insertion2_(insertion2)
+		, pdfsa1_(pdfs_.count())
+		, pdfsa2_(pdfs_.count())
+		, pdfsb1_(pdfs_.count())
+		, pdfsb2_(pdfs_.count())
 	{
 	}
 
@@ -111,21 +115,20 @@ public:
 		// only set renormalization scale if it changed
 		if (scales.renormalization() != old_renormalization_scale_)
 		{
-			matrix_elements_.scale(scales.renormalization(), pdf_.alphas());
+			matrix_elements_.scale(scales.renormalization(), pdfs_.alphas());
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
 		T const x = phase_space.back();
 		T const muf = scales.factorization();
 
-		parton_array<T> const pdfa[] = {
-			pdf_.pdf(info.x1(), muf),
-			pdf_.pdf(info.x2(), muf)
-		};
-		parton_array<T> const pdfb[] = {
-			pdf_.pdf(info.x1() / (info.x1() * (T(1.0) - x) + x), muf),
-			pdf_.pdf(info.x2() / (info.x2() * (T(1.0) - x) + x), muf)
-		};
+		pdfs_.eval(info.x1(), muf, pdfsa1_);
+		pdfs_.eval(info.x2(), muf, pdfsa2_);
+		pdfs_.eval(info.x1() / (info.x1() * (T(1.0) - x) + x), muf, pdfsb1_);
+		pdfs_.eval(info.x2() / (info.x2() * (T(1.0) - x) + x), muf, pdfsb2_);
+
+		parton_array<T> const pdfa[] = { pdfsa1_.at(0), pdfsa2_.at(0) };
+		parton_array<T> const pdfb[] = { pdfsb1_.at(0), pdfsb2_.at(0) };
 
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
@@ -254,7 +257,7 @@ private:
 	S subtraction_;
 	C cuts_;
 	R recombiner_;
-	P pdf_;
+	P pdfs_;
 	U scale_setter_;
 	D distributions_;
 	initial_state_set set_;
@@ -262,6 +265,10 @@ private:
 
 	T old_renormalization_scale_;
 	bool insertion2_;
+	std::vector<parton_array<T>> pdfsa1_;
+	std::vector<parton_array<T>> pdfsa2_;
+	std::vector<parton_array<T>> pdfsb1_;
+	std::vector<parton_array<T>> pdfsb2_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U,
@@ -279,7 +286,7 @@ inline std::unique_ptr<observables<T>> make_observables_fini(
 	S&& subtraction,
 	C&& cuts,
 	R&& recombiner,
-	P&& pdf,
+	P&& pdfs,
 	U&& scale_setter,
 	D&& distributions,
 	initial_state_set set,
@@ -292,7 +299,7 @@ inline std::unique_ptr<observables<T>> make_observables_fini(
 			std::forward<S>(subtraction),
 			std::forward<C>(cuts),
 			std::forward<R>(recombiner),
-			std::forward<P>(pdf),
+			std::forward<P>(pdfs),
 			std::forward<U>(scale_setter),
 			std::forward<D>(distributions),
 			set,

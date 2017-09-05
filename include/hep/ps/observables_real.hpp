@@ -28,6 +28,7 @@
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/observables.hpp"
 #include "hep/ps/particle_type.hpp"
+#include "hep/ps/parton.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -78,7 +79,7 @@ public:
 		typename Subtraction,
 		typename Cuts,
 		typename Recombiner,
-		typename Pdf,
+		typename Pdfs,
 		typename ScaleSetter,
 		typename Distributions>
 	observables_real(
@@ -86,7 +87,7 @@ public:
 		Subtraction&& subtraction,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
-		Pdf&& pdf,
+		Pdfs&& pdfs,
 		ScaleSetter&& scale_setter,
 		Distributions&& distributions,
 		initial_state_set set,
@@ -97,13 +98,14 @@ public:
 		, subtraction_(std::forward<Subtraction>(subtraction))
 		, cuts_(std::forward<Cuts>(cuts))
 		, recombiner_(std::forward<Recombiner>(recombiner))
-		, pdf_(std::forward<Pdf>(pdf))
+		, pdfs_(std::forward<Pdfs>(pdfs))
 		, scale_setter_(std::forward<ScaleSetter>(scale_setter))
 		, distributions_(std::forward<Distributions>(distributions))
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
-		, dipole_recombination_candidates_()
+		, pdfsx1_(pdfs_.count())
+		, pdfsx2_(pdfs_.count())
 	{
 		dipole_recombination_candidates_.reserve(
 			matrix_elements_.real_recombination_candidates().size());
@@ -217,12 +219,15 @@ public:
 		// only set renormalization scale if it changed
 		if (scales.renormalization() != old_renormalization_scale_)
 		{
-			matrix_elements_.scale(scales.renormalization(), pdf_.alphas());
+			matrix_elements_.scale(scales.renormalization(), pdfs_.alphas());
 			old_renormalization_scale_ = scales.renormalization();
 		}
 
-		auto const pdfx1 = pdf_.pdf(info.x1(), scales.factorization());
-		auto const pdfx2 = pdf_.pdf(info.x2(), scales.factorization());
+		pdfs_.eval(info.x1(), scales.factorization(), pdfsx1_);
+		pdfs_.eval(info.x2(), scales.factorization(), pdfsx2_);
+
+		auto const pdfx1 = pdfsx1_.at(0);
+		auto const pdfx2 = pdfsx2_.at(0);
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		neg_pos_results<T> result;
@@ -298,7 +303,7 @@ private:
 	S subtraction_;
 	C cuts_;
 	R recombiner_;
-	P pdf_;
+	P pdfs_;
 	U scale_setter_;
 	D distributions_;
 	initial_state_set set_;
@@ -310,6 +315,8 @@ private:
 	using info_type = typename decltype (cuts_.cut(std::vector<T>(), T{},
 		event_type{}))::info_t;
 
+	std::vector<parton_array<T>> pdfsx1_;
+	std::vector<parton_array<T>> pdfsx2_;
 	std::vector<std::size_t> dipole_recombination_candidates_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 };
@@ -329,7 +336,7 @@ inline std::unique_ptr<observables<T>> make_observables_real(
 	S&& subtraction,
 	C&& cuts,
 	R&& recombiner,
-	P&& pdf,
+	P&& pdfs,
 	U&& scale_setter,
 	D&& distributions,
 	initial_state_set set,
@@ -342,7 +349,7 @@ inline std::unique_ptr<observables<T>> make_observables_real(
 			std::forward<S>(subtraction),
 			std::forward<C>(cuts),
 			std::forward<R>(recombiner),
-			std::forward<P>(pdf),
+			std::forward<P>(pdfs),
 			std::forward<U>(scale_setter),
 			std::forward<D>(distributions),
 			set,
