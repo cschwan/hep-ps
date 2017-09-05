@@ -19,11 +19,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/distributions.hpp"
+#include "hep/mc/multi_channel_point.hpp"
+#include "hep/mc/projector.hpp"
+
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
 
+#include <functional>
 #include <vector>
+
+namespace
+{
+
+template <typename T, typename P>
+inline hep::luminosity_info<T> info(hep::multi_channel_point2<T, P> const& x)
+{
+	return x.map().info();
+}
+
+template <typename T, typename P>
+inline hep::luminosity_info<T> info(
+	hep::multi_channel_point2<T, std::reference_wrapper<P>> const& x
+) {
+	return x.map().get().info();
+}
+
+}
 
 namespace hep
 {
@@ -40,11 +61,18 @@ public:
 	/// `extra_random_numbers`.
 	virtual T eval(
 		std::vector<T> const& phase_space,
-		luminosity_info<T> const& info
+		luminosity_info<T> const& info,
+		hep::projector<T>& projector
 	) = 0;
 
-	/// Returns the distributions that the observable object was created with.
-	virtual hep::distributions<T>& distributions() = 0;
+	/// Interface for the `hep-mc` Monte Carlo integration routines.
+	template <typename P>
+	T operator()(
+		hep::multi_channel_point2<T, P> const& point,
+		hep::projector<T>& projector
+	) {
+		return eval(point.coordinates(), info(point), projector);
+	}
 };
 
 }

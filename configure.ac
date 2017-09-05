@@ -64,6 +64,9 @@ AC_CHECK_HEADERS([LHAPDF/LHAPDF.h])
 AC_SEARCH_LIBS([_ZN6LHAPDF5mkPDFEi], [LHAPDF], [],
 	AC_MSG_ERROR([LHAPDF is a required dependency]))
 
+AC_CHECK_HEADERS([hep/mc.hpp], [],
+	AC_MSG_ERROR([hep-mc is a required dependency.]))
+
 # if the documentation is enabled find doxygen binary
 AC_ARG_ENABLE([doxygen], AS_HELP_STRING([--enable-doxygen],
 	[Enable generation of Doxygen documentation]))

@@ -24,7 +24,6 @@ check_PROGRAMS = \
 
 if ADDITIONAL_TESTS
 check_PROGRAMS += \
-	test_mc_observables \
 	test_p_type_jet_algorithm
 endif
 

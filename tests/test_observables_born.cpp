@@ -1,5 +1,10 @@
+#include "hep/mc/distribution_parameters.hpp"
+#include "hep/mc/multi_channel.hpp"
+#include "hep/mc/multi_channel_integrand.hpp"
+
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/observables_born.hpp"
+#include "hep/ps/rambo_phase_space_generator.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
 #include "test_structures.hpp"
@@ -7,13 +12,20 @@
 #include "catch.hpp"
 
 #include <cstddef>
+#include <functional>
 #include <vector>
 
 using T = HEP_TYPE_T;
 
 void test_observables_born(hep::initial_state_set set, std::size_t count)
 {
-	auto observables = hep::make_observables_born<T>(
+	auto generator = hep::make_rambo_phase_space_generator<T>(
+		T(1.0),
+		T(100.0),
+		count
+	);
+
+	auto integrand = hep::make_observables_born<T>(
 		test_matrix_elements<T>(set, count, 0, 0, 0),
 		test_cuts<T>(count, false),
 		test_recombiner<T>(count),
@@ -24,20 +36,25 @@ void test_observables_born(hep::initial_state_set set, std::size_t count)
 		T(1.0)
 	);
 
-	std::vector<T> phase_space_point(4 * (count + 2));
-	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
+	auto const result = hep::multi_channel(
+		hep::make_multi_channel_integrand<T>(
+			std::ref(*integrand),
+			generator->dimensions(),
+			std::ref(*generator),
+			generator->map_dimensions(),
+			generator->channels(),
+			test_distribution_parameters<T>()
+		),
+		std::vector<std::size_t>{1}
+	);
 
-	T const test_result = T(1.0) / T(1024.0);
-	T const result = observables->eval(phase_space_point, info);
-
-	REQUIRE( result == test_result );
+	CHECK( result.front().value() == T(0.0015980493564892501) );
 }
 
-TEST_CASE("observables_born_like", "[observables_born_like]")
+TEST_CASE("observables_born", "[observables_born]")
 {
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
 	test_observables_born(set, 4);
 	test_observables_born(set, 4);
 }
-

@@ -1,5 +1,10 @@
+#include "hep/mc/distribution_parameters.hpp"
+#include "hep/mc/multi_channel.hpp"
+#include "hep/mc/multi_channel_integrand.hpp"
+
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/observables_real.hpp"
+#include "hep/ps/rambo_phase_space_generator.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
 #include "test_structures.hpp"
@@ -7,6 +12,7 @@
 #include "catch.hpp"
 
 #include <cstddef>
+#include <functional>
 #include <vector>
 
 using T = HEP_TYPE_T;
@@ -19,7 +25,13 @@ void test_observables_real(
 	std::size_t spectator,
 	bool inclusive
 ) {
-	auto observables = hep::make_observables_real<T>(
+	auto generator = hep::make_rambo_phase_space_generator<T>(
+		T(1.0),
+		T(100.0),
+		count + 1
+	);
+
+	auto integrand = hep::make_observables_real<T>(
 		test_matrix_elements<T>(set, count, emitter, unresolved, spectator),
 		test_subtraction<T>(emitter, unresolved, spectator),
 		test_cuts<T>(count, inclusive),
@@ -32,13 +44,26 @@ void test_observables_real(
 		T()
 	);
 
-	std::vector<T> real_phase_space_point(4 * (count + 3));
-	hep::luminosity_info<T> info{T(0.5), T(0.5), T(1024.0), T()};
+	auto const result = hep::multi_channel(
+		hep::make_multi_channel_integrand<T>(
+			std::ref(*integrand),
+			generator->dimensions(),
+			std::ref(*generator),
+			generator->map_dimensions(),
+			generator->channels(),
+			test_distribution_parameters<T>()
+		),
+		std::vector<std::size_t>{1}
+	);
 
-	T const test_result = T(inclusive ? 0.5 : -0.5) / T(1024.0);
-	T const result = observables->eval(real_phase_space_point, info);
-
-	REQUIRE( result == test_result );
+	if (inclusive)
+	{
+		CHECK( result.front().value() == T(6.3165579739733147e-11) );
+	}
+	else
+	{
+		CHECK( result.front().value() == T(-6.3165579739733147e-11) );
+	}
 }
 
 TEST_CASE("observables_real", "[observables_real]")

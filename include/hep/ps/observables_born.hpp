@@ -19,8 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/mc/projector.hpp"
+
 #include "hep/ps/convolute.hpp"
-#include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
@@ -69,13 +70,12 @@ public:
 		, set_(set)
 		, hbarc2_(hbarc2)
 	{
-		static_assert (std::is_base_of<hep::distributions<T>, D>::value,
-			"`D` must be a type deriving from `hep::distributions<T>`");
 	}
 
 	T eval(
 		std::vector<T> const& phase_space,
-		luminosity_info<T> const& info
+		luminosity_info<T> const& info,
+		hep::projector<T>& projector
 	) override {
 		std::vector<T> aux_phase_space(phase_space.size());
 
@@ -117,14 +117,9 @@ public:
 			cut_result);
 
 		distributions_(phase_space, cut_result, result, rapidity_shift,
-			event_type::born_like_n);
+			event_type::born_like_n, projector);
 
 		return result.neg + result.pos;
-	}
-
-	hep::distributions<T>& distributions() override
-	{
-		return distributions_;
 	}
 
 	M const& matrix_elements() const

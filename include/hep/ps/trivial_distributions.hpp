@@ -19,8 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/mc/projector.hpp"
+
 #include "hep/ps/cut_result.hpp"
-#include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 
@@ -32,7 +33,7 @@ namespace hep
 /// Trivial distribution generator, i.e. this functor does not generate any
 /// distributions at all.
 template <typename T>
-class trivial_distributions : public distributions<T>
+class trivial_distributions
 {
 public:
 	/// Constructor.
@@ -45,7 +46,8 @@ public:
 		cut_result_with_info<I> const&,
 		neg_pos_results<T> const&,
 		T,
-		event_type
+		event_type,
+		projector<T>&
 	) {
 	}
 };

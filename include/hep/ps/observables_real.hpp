@@ -19,8 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/mc/projector.hpp"
+
 #include "hep/ps/convolute.hpp"
-#include "hep/ps/distributions.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
@@ -104,9 +105,6 @@ public:
 		, alpha_min_(alpha_min)
 		, dipole_recombination_candidates_()
 	{
-		static_assert (std::is_base_of<hep::distributions<T>, D>::value,
-			"`D` must be a type deriving from `hep::distributions<T>`");
-
 		dipole_recombination_candidates_.reserve(
 			matrix_elements_.real_recombination_candidates().size());
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
@@ -114,7 +112,8 @@ public:
 
 	T eval(
 		std::vector<T> const& real_phase_space,
-		luminosity_info<T> const& info
+		luminosity_info<T> const& info,
+		hep::projector<T>& projector
 	) override {
 		std::vector<T> recombined_real_phase_space(real_phase_space.size());
 
@@ -264,7 +263,7 @@ public:
 				-function * factor, dipole_cut_result);
 
 			distributions_(phase_space, dipole_cut_result, dipole_result,
-				shift, event_type::born_like_n);
+				shift, event_type::born_like_n, projector);
 
 			result += dipole_result;
 		}
@@ -278,15 +277,10 @@ public:
 			result += real_result;
 
 			distributions_(recombined_real_phase_space, real_cut_result,
-				real_result, shift, event);
+				real_result, shift, event, projector);
 		}
 
 		return result.neg + result.pos;
-	}
-
-	hep::distributions<T>& distributions() override
-	{
-		return distributions_;
 	}
 
 	M const& matrix_elements() const

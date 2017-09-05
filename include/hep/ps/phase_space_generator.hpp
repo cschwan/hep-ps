@@ -19,6 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/mc/multi_channel_map.hpp"
+
 #include "hep/ps/luminosity_info.hpp"
 
 #include <cstddef>
@@ -66,6 +68,25 @@ public:
 	/// Returns the size of the vector `momenta` that has to be passed to
 	/// \ref generate.
 	virtual std::size_t map_dimensions() const = 0;
+
+	/// Interface for the `hep-mc` Monte Carlo integration routines.
+	T operator()(
+		std::size_t channel,
+		std::vector<T> const& random_numbers,
+		std::vector<T>& momenta,
+		std::vector<T>& densities,
+		hep::multi_channel_map action
+	) {
+		if (action == hep::multi_channel_map::calculate_densities)
+		{
+			return this->densities(densities);
+		}
+
+		generate(random_numbers, momenta, channel);
+
+		// value gets ignored
+		return T(1.0);
+	}
 };
 
 }

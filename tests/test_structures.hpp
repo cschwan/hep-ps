@@ -359,6 +359,13 @@ public:
 	}
 };
 
+template <typename T>
+inline std::vector<hep::distribution_parameters<T>>
+test_distribution_parameters()
+{
+	return std::vector<hep::distribution_parameters<T>>();
+}
+
 }
 
 #endif

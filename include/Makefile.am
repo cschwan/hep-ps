@@ -1,5 +1,4 @@
 nobase_include_HEADERS = \
-	hep/ps-mc.hpp \
 	hep/ps.hpp \
 	hep/ps/abc_terms.hpp \
 	hep/ps/alphas_calc.hpp \
@@ -14,7 +13,6 @@ nobase_include_HEADERS = \
 	hep/ps/dipole_invariants.hpp \
 	hep/ps/dipole_type.hpp \
 	hep/ps/dipole_with_set.hpp \
-	hep/ps/distributions.hpp \
 	hep/ps/enum.hpp \
 	hep/ps/event_type.hpp \
 	hep/ps/factorization_scheme.hpp \
@@ -29,9 +27,6 @@ nobase_include_HEADERS = \
 	hep/ps/lusifer_constants.hpp \
 	hep/ps/lusifer_diagram_generator.hpp \
 	hep/ps/lusifer_phase_space_generator.hpp \
-	hep/ps/mc_distributions.hpp \
-	hep/ps/mc_observables.hpp \
-	hep/ps/mc_phase_space_adapter.hpp \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/non_zero_dipole.hpp \
 	hep/ps/observables.hpp \
