@@ -25,6 +25,7 @@
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/observables.hpp"
 #include "hep/ps/parton.hpp"
 
@@ -72,6 +73,7 @@ public:
 		, pdfsx1_(pdfs_.count())
 		, pdfsx2_(pdfs_.count())
 	{
+		results_.reserve(pdfs_.count());
 	}
 
 	T eval(
@@ -115,16 +117,27 @@ public:
 		pdfs_.eval(info.x2(), scales.factorization(), pdfsx2_);
 
 		auto const borns = matrix_elements_.borns(phase_space, set_);
-		auto const pdfx1 = pdfsx1_.at(0);
-		auto const pdfx2 = pdfsx2_.at(0);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
-		auto const result = convolute(pdfx1, pdfx2, borns, set_, factor,
-			cut_result);
 
-		distributions_(phase_space, cut_result, result, rapidity_shift,
+		std::size_t const size = pdfsx1_.size();
+		results_.clear();
+
+		for (std::size_t pdf = 0; pdf != size; ++pdf)
+		{
+			results_.push_back(convolute(
+				pdfsx1_.at(pdf),
+				pdfsx2_.at(pdf),
+				borns,
+				set_,
+				factor,
+				cut_result
+			));
+		}
+
+		distributions_(phase_space, cut_result, results_, rapidity_shift,
 			event_type::born_like_n, projector);
 
-		return result.neg + result.pos;
+		return results_.front().neg + results_.front().pos;
 	}
 
 	M const& matrix_elements() const
@@ -150,6 +163,7 @@ private:
 	T old_renormalization_scale_;
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
+	std::vector<neg_pos_results<T>> results_;
 };
 
 template <class T, class M, class C, class R, class P, class S, class D>
