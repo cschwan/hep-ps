@@ -29,22 +29,22 @@ namespace hep
 
 /// Enumeration listing all possible partonic initial states. The order matters
 /// for the correspoding matrix elements, because of the PDFs. Initial states
-/// with transposed partons are automatically calculated.
+/// with transposed partons are automatically taken into account.
 HEP_ENUM(initial_state,
-	q43_uu,
-	q43_cu,
-	q43_cc,
-	q33_du,
-	q33_dc,
-	q33_su,
-	q33_sc,
-	q23_dd,
-	q23_sd,
-	q23_ss,
-	q23_ug,
-	q23_cg,
-	q13_dg,
-	q13_sg
+	q43_uu, /*!< \f$ Q=4/3 \f$ up/up initial state. */
+	q43_cu, /*!< \f$ Q=4/3 \f$ charm/up initial state. */
+	q43_cc, /*!< \f$ Q=4/3 \f$ charm/charm initial state. */
+	q33_du, /*!< \f$ Q=3/3 \f$ anti-down/up initial state. */
+	q33_dc, /*!< \f$ Q=3/3 \f$ anti-down/charm initial state. */
+	q33_su, /*!< \f$ Q=3/3 \f$ anti-strange/up initial state. */
+	q33_sc, /*!< \f$ Q=3/3 \f$ anti-strange/charm initial state. */
+	q23_dd, /*!< \f$ Q=2/3 \f$ anti-down/anti-down initial state. */
+	q23_sd, /*!< \f$ Q=2/3 \f$ anti-strange/anti-down initial state. */
+	q23_ss, /*!< \f$ Q=2/3 \f$ anti-strange/anti-strange initial state. */
+	q23_ug, /*!< \f$ Q=2/3 \f$ up/gluon initial state. */
+	q23_cg, /*!< \f$ Q=2/3 \f$ charm/gluon initial state. */
+	q13_dg, /*!< \f$ Q=1/3 \f$ anti-down/gluon initial state. */
+	q13_sg  /*!< \f$ Q=1/3 \f$ anti-strange/gluon initial state. */
 );
 
 HEP_ENUM_ARRAY(initial_state);

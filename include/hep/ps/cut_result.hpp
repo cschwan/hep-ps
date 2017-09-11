@@ -92,8 +92,13 @@ private:
 	I pos_info_;
 };
 
+/// If this class is used as the template parameter `I` of \ref
+/// cut_result_with_info this shows that there is no additional information.
 class trivial_cut_info
 {
+public:
+	/// This class has no constructor.
+	trivial_cut_info() = delete;
 };
 
 /// \cond DOXYGEN_IGNORE

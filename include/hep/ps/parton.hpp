@@ -25,15 +25,15 @@ namespace hep
 {
 
 HEP_ENUM(parton,
-	anti_up,
-	anti_down,
-	anti_charm,
-	anti_strange,
-	gluon,
-	up,
-	down,
-	charm,
-	strange
+	anti_up,      /*!< An anti-up quark. */
+	anti_down,    /*!< An anti-down quark. */
+	anti_charm,   /*!< An anti-charm quark. */
+	anti_strange, /*!< An anti-strange quark. */
+	gluon,        /*!< A gluon. */
+	up,           /*!< An up quark. */
+	down,         /*!< A down quark. */
+	charm,        /*!< A charm quark. */
+	strange       /*!< A strange quark. */
 );
 
 HEP_ENUM_ARRAY(parton);

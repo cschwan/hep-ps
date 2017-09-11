@@ -61,16 +61,19 @@
 	class name ## _array                                                       \
 	{                                                                          \
 	public:                                                                    \
+		/** Default constructor */                                             \
 		name ## _array()                                                       \
 			: array_{{}}                                                       \
 		{                                                                      \
 		}                                                                      \
 		                                                                       \
+		/** Uses `index` to access the corresponding element. */               \
 		T& operator[](name index)                                              \
 		{                                                                      \
 			return array_[static_cast <std::size_t> (index)];                  \
 		}                                                                      \
 	                                                                           \
+		/** Uses `index` to access the corresponding element. */               \
 		T operator[](name index) const                                         \
 		{                                                                      \
 			return array_[static_cast <std::size_t> (index)];                  \
