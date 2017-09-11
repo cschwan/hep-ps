@@ -25,6 +25,7 @@
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/observables.hpp"
 #include "hep/ps/particle_type.hpp"
@@ -107,6 +108,7 @@ public:
 		, pdfsx1_(pdfs_.count())
 		, pdfsx2_(pdfs_.count())
 	{
+		results_.reserve(pdfs_.count());
 		dipole_recombination_candidates_.reserve(
 			matrix_elements_.real_recombination_candidates().size());
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
@@ -226,8 +228,6 @@ public:
 		pdfs_.eval(info.x1(), scales.factorization(), pdfsx1_);
 		pdfs_.eval(info.x2(), scales.factorization(), pdfsx2_);
 
-		auto const pdfx1 = pdfsx1_.at(0);
-		auto const pdfx2 = pdfsx2_.at(0);
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		neg_pos_results<T> result;
@@ -264,25 +264,51 @@ public:
 
 			auto const dipole_me = matrix_elements_.dipole_me(dipole,
 				phase_space, set);
-			auto const dipole_result = convolute(pdfx1, pdfx2, dipole_me, set,
-				-function * factor, dipole_cut_result);
 
-			distributions_(phase_space, dipole_cut_result, dipole_result,
-				shift, event_type::born_like_n, projector);
+			std::size_t size = pdfsx1_.size();
+			results_.clear();
 
-			result += dipole_result;
+			for (std::size_t pdf = 0; pdf != size; ++pdf)
+			{
+				results_.push_back(convolute(
+					pdfsx1_.at(pdf),
+					pdfsx2_.at(pdf),
+					dipole_me,
+					set,
+					-function * factor,
+					dipole_cut_result
+				));
+			}
+
+			distributions_(phase_space, dipole_cut_result, results_, shift,
+				event_type::born_like_n, projector);
+
+			result += results_.front();
 		}
 
 		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 		{
 			auto const reals = matrix_elements_.reals(real_phase_space, set);
-			auto const real_result = convolute(pdfx1, pdfx2, reals, set, factor,
-				real_cut_result);
 
-			result += real_result;
+			std::size_t const size = pdfsx1_.size();
+			results_.clear();
+
+			for (std::size_t pdf = 0; pdf != size; ++pdf)
+			{
+				results_.push_back(convolute(
+					pdfsx1_.at(pdf),
+					pdfsx2_.at(pdf),
+					reals,
+					set,
+					factor,
+					real_cut_result
+				));
+			}
+
+			result += results_.front();
 
 			distributions_(recombined_real_phase_space, real_cut_result,
-				real_result, shift, event, projector);
+				results_, shift, event, projector);
 		}
 
 		return result.neg + result.pos;
@@ -317,6 +343,7 @@ private:
 
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
+	std::vector<neg_pos_results<T>> results_;
 	std::vector<std::size_t> dipole_recombination_candidates_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 };
