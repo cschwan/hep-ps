@@ -27,6 +27,6 @@ lusifer_constants<T>::lusifer_constants(
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
-template class lusifer_constants<double>;
+template struct lusifer_constants<double>;
 
 }

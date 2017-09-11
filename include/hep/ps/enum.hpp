@@ -48,7 +48,8 @@
 	constexpr std::array<name, HEP_ENUM_SIZEOF(__VA_ARGS__)> name ## _list()   \
 	{                                                                          \
 		return { __VA_ARGS__ };                                                \
-	}
+	}                                                                          \
+	enum name : std::size_t
 
 /// Defines a template class `name_array` for a previously defined enumeration
 /// defined with \ref HEP_ENUM. The class `name_array<T>` is a wrapper over
