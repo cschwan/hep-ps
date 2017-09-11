@@ -16,8 +16,8 @@ nobase_include_HEADERS = \
 	hep/ps/enum.hpp \
 	hep/ps/event_type.hpp \
 	hep/ps/factorization_scheme.hpp \
-	hep/ps/fortran_helper.hpp \
 	hep/ps/find_hep_ps.hpp \
+	hep/ps/fortran_helper.hpp \
 	hep/ps/initial_state.hpp \
 	hep/ps/insertion_term.hpp \
 	hep/ps/insertion_term_type.hpp \
