@@ -22,20 +22,38 @@
 namespace hep
 {
 
+/**
+ * Instances of this class capture the result of (parts of) perturbative
+ * calculations. The result is subdivided into a positive and negative rapidity
+ * part, which calculated in different reference frames, defined by the
+ * transformation rapidities into the LAB frame:
+ * \f{align}{
+ *     y_\text{neg} &= - y_\text{CMS} + y_\text{PS} \\
+ *     y_\text{pos} &= + y_\text{CMS} + y_\text{PS}
+ * \f}
+ * where \f$ y_\text{CMS} \f$ is the rapidity of any object in the partonic
+ * center-of-mass frame and \f$ y_\text{PS} \f$ is the rapdity shift produced
+ * by the phase space generator. The results \f$ y_\text{neg}, y_\text{pos} \f$
+ * are then the rapidities in the LAB frame.
+ */
 template <typename T>
 struct neg_pos_results
 {
+	/// Constructor.
 	neg_pos_results(T neg_result = T(), T pos_result = T())
 		: neg{neg_result}
 		, pos{pos_result}
 	{
 	}
 
-
+	/// Result for the negative rapidity.
 	T neg;
+
+	/// Result for the positive rapidity.
 	T pos;
 };
 
+/// Addition operator. Adds `other` to `result` and returns `result`.
 template <typename T>
 inline neg_pos_results<T>& operator+=(
 	neg_pos_results<T>& result,
