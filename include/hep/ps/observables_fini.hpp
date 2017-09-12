@@ -28,6 +28,7 @@
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
+#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/observables.hpp"
 
 #include <cassert>
@@ -79,7 +80,12 @@ public:
 		, pdfsa2_(pdfs_.count())
 		, pdfsb1_(pdfs_.count())
 		, pdfsb2_(pdfs_.count())
+		, results_(pdfs_.count())
 	{
+		eff_pdf_neg_[0].resize(pdfs_.count());
+		eff_pdf_neg_[1].resize(pdfs_.count());
+		eff_pdf_pos_[0].resize(pdfs_.count());
+		eff_pdf_pos_[1].resize(pdfs_.count());
 	}
 
 	T eval(
@@ -127,9 +133,6 @@ public:
 		pdfs_.eval(info.x1() / (info.x1() * (T(1.0) - x) + x), muf, pdfsb1_);
 		pdfs_.eval(info.x2() / (info.x2() * (T(1.0) - x) + x), muf, pdfsb2_);
 
-		parton_array<T> const pdfa[] = { pdfsa1_.at(0), pdfsa2_.at(0) };
-		parton_array<T> const pdfb[] = { pdfsb1_.at(0), pdfsb2_.at(0) };
-
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const& insertion_terms = matrix_elements_.insertion_terms();
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
@@ -165,7 +168,9 @@ public:
 			return pdf;
 		};
 
-		neg_pos_results<T> result;
+		std::size_t const size = pdfsa1_.size();
+		results_.clear();
+		results_.resize(size);
 
 		// loop over all Born, FI, IF, and II
 		for (std::size_t index = 0; index != insertion_terms.size(); ++index)
@@ -173,9 +178,14 @@ public:
 			auto const me = corr_me.at(index);
 			auto const& term = insertion_terms.at(index);
 
-			// meaning of indices: 0 pdf for first particle, 1 = for second
-			parton_array<T> dneg[2];
-			parton_array<T> dpos[2];
+			eff_pdf_neg_[0].clear();
+			eff_pdf_neg_[0].resize(size);
+			eff_pdf_neg_[1].clear();
+			eff_pdf_neg_[1].resize(size);
+			eff_pdf_pos_[0].clear();
+			eff_pdf_pos_[0].resize(size);
+			eff_pdf_pos_[1].clear();
+			eff_pdf_pos_[1].resize(size);
 
 			// loop over both initial state partons
 			for (auto const i : { 0u, 1u })
@@ -203,25 +213,48 @@ public:
 					break;
 				}
 
-				dneg[i] = effective_pdf(
-					term,
-					(i == 0) ? info.x2() : info.x1(),
-					pdfa[1u - i],
-					pdfb[1u - i]
-				);
+				for (std::size_t pdf = 0; pdf != size; ++pdf)
+				{
+					eff_pdf_neg_[i].at(pdf) = effective_pdf(
+						term,
+						(i == 0) ? info.x2() : info.x1(),
+						(i == 0) ? pdfsa2_.at(pdf) : pdfsa1_.at(pdf),
+						(i == 0) ? pdfsb2_.at(pdf) : pdfsb1_.at(pdf)
+					);
 
-				dpos[i] = effective_pdf(
-					term,
-					(i == 0) ? info.x1() : info.x2(),
-					pdfa[i],
-					pdfb[i]
-				);
+					eff_pdf_pos_[i].at(pdf) = effective_pdf(
+						term,
+						(i == 0) ? info.x1() : info.x2(),
+						(i == 0) ? pdfsa1_.at(pdf) : pdfsa2_.at(pdf),
+						(i == 0) ? pdfsb1_.at(pdf) : pdfsb2_.at(pdf)
+					);
+				}
 			}
 
-			result += convolute(dneg[0], pdfa[0], dpos[0], pdfa[1], me, set_,
-				factor, cut_result);
-			result += convolute(pdfa[1], dneg[1], pdfa[0], dpos[1], me, set_,
-				factor, cut_result);
+			for (std::size_t pdf = 0; pdf != size; ++pdf)
+			{
+				results_.at(pdf) += convolute(
+					eff_pdf_neg_[0].at(pdf),
+					pdfsa1_.at(pdf),
+					eff_pdf_pos_[0].at(pdf),
+					pdfsa2_.at(pdf),
+					me,
+					set_,
+					factor,
+					cut_result
+				);
+
+				results_.at(pdf) += convolute(
+					pdfsa2_.at(pdf),
+					eff_pdf_neg_[1].at(pdf),
+					pdfsa1_.at(pdf),
+					eff_pdf_pos_[1].at(pdf),
+					me,
+					set_,
+					factor,
+					cut_result
+				);
+			}
 
 			if (insertion2_)
 			{
@@ -231,15 +264,18 @@ public:
 					phase_space
 				);
 
-				result += convolute(pdfa[0], pdfa[1], me, set_, ins,
-					cut_result);
+				for (std::size_t pdf = 0; pdf != size; ++pdf)
+				{
+					results_.at(pdf) += convolute(pdfsa1_.at(pdf),
+						pdfsa2_.at(pdf), me, set_, ins, cut_result);
+				}
 			}
 		}
 
-		distributions_(phase_space, cut_result, result, rapidity_shift,
+		distributions_(phase_space, cut_result, results_, rapidity_shift,
 			event_type::born_like_n, projector);
 
-		return result.neg + result.pos;
+		return results_.front().neg + results_.front().pos;
 	}
 
 	M const& matrix_elements() const
@@ -269,6 +305,9 @@ private:
 	std::vector<parton_array<T>> pdfsa2_;
 	std::vector<parton_array<T>> pdfsb1_;
 	std::vector<parton_array<T>> pdfsb2_;
+	std::vector<parton_array<T>> eff_pdf_neg_[2];
+	std::vector<parton_array<T>> eff_pdf_pos_[2];
+	std::vector<neg_pos_results<T>> results_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U,
