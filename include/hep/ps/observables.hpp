@@ -55,6 +55,9 @@ template <typename T>
 class observables
 {
 public:
+	/// Virtual destructor.
+	virtual ~observables() = default;
+
 	/// Evaluates the observables this instances represents for the given
 	/// `phase_space` point and luminosity information in `info`. If the
 	/// observables need extra random numbers these will be supplied in
