@@ -1,5 +1,5 @@
-#ifndef HEP_PS_PROTON_PDFS_HPP
-#define HEP_PS_PROTON_PDFS_HPP
+#ifndef HEP_PS_PARTON_DFS_HPP
+#define HEP_PS_PARTON_DFS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -30,23 +30,26 @@
 namespace hep
 {
 
-/// Class that gives access to the proton pdfs.
+/// Class that gives access to parton distribution functions (PDFs); depending
+/// on how they are constructed, this class gives access to either the central
+/// PDF or the entire PDF set for calculating a central prediction and its
+/// uncertainty.
 template <typename T>
-class proton_pdfs
+class parton_dfs
 {
 public:
 	/// Constructor. This creates a single PDF with index `pdf_member` from the
 	/// set of PDFs called `name`.
-	proton_pdfs(std::string const& name, std::size_t pdf_member);
+	parton_dfs(std::string const& name, std::size_t pdf_member);
 
 	/// Constructor. This creates all PDFs from the set of PDFs called `name`.
-	proton_pdfs(std::string const& name);
+	parton_dfs(std::string const& name);
 
 	/// Move constructor.
-	proton_pdfs(proton_pdfs<T>&& pdf);
+	parton_dfs(parton_dfs<T>&& pdf);
 
 	/// Destructor.
-	~proton_pdfs();
+	~parton_dfs();
 
 	/// Returns a reference to an instance that allows the calculation of the
 	/// strong coupling at arbitrary scales.

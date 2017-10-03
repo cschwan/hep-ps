@@ -36,10 +36,10 @@ nobase_include_HEADERS = \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/parton.hpp \
+	hep/ps/parton_dfs.hpp \
 	hep/ps/permutation.hpp \
 	hep/ps/phase_space_generator.hpp \
 	hep/ps/propagator.hpp \
-	hep/ps/proton_pdfs.hpp \
 	hep/ps/rambo_phase_space_generator.hpp \
 	hep/ps/renormalization_scheme.hpp \
 	hep/ps/scales.hpp \

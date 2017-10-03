@@ -1,4 +1,4 @@
-#include "hep/ps/proton_pdfs.hpp"
+#include "hep/ps/parton_dfs.hpp"
 
 #include <LHAPDF/PDF.h>
 
@@ -8,7 +8,7 @@ namespace hep
 {
 
 template <typename T>
-class proton_pdfs<T>::impl
+class parton_dfs<T>::impl
 {
 public:
 	impl(std::string const& pdf_name, std::size_t pdf_member);
@@ -20,7 +20,7 @@ public:
 };
 
 template <typename T>
-proton_pdfs<T>::impl::impl(std::string const& pdf_name, std::size_t pdf_member)
+parton_dfs<T>::impl::impl(std::string const& pdf_name, std::size_t pdf_member)
 	: pdfs()
 	// TODO: is it possible to extract this number from LHAPDF?
 	, xfx(13)
@@ -32,7 +32,7 @@ proton_pdfs<T>::impl::impl(std::string const& pdf_name, std::size_t pdf_member)
 
 // TODO: fix the implementation
 template <typename T>
-proton_pdfs<T>::impl::impl(std::string const& pdf_name)
+parton_dfs<T>::impl::impl(std::string const& pdf_name)
 	: pdfs()
 	// TODO: is it possible to extract this number from LHAPDF?
 	, xfx(13)
@@ -47,7 +47,7 @@ proton_pdfs<T>::impl::impl(std::string const& pdf_name)
 }
 
 template <typename T>
-proton_pdfs<T>::proton_pdfs(
+parton_dfs<T>::parton_dfs(
 	std::string const& pdf_name,
 	std::size_t pdf_member
 )
@@ -57,34 +57,34 @@ proton_pdfs<T>::proton_pdfs(
 }
 
 template <typename T>
-proton_pdfs<T>::proton_pdfs(std::string const& pdf_name)
+parton_dfs<T>::parton_dfs(std::string const& pdf_name)
 	: pimpl(new impl(pdf_name))
 {
 }
 
 template <typename T>
-proton_pdfs<T>::proton_pdfs(proton_pdfs<T>&& pdf)
+parton_dfs<T>::parton_dfs(parton_dfs<T>&& pdf)
 	: pimpl(std::move(pdf.pimpl))
 {
 }
 
 template <typename T>
-proton_pdfs<T>::~proton_pdfs() = default;
+parton_dfs<T>::~parton_dfs() = default;
 
 template <typename T>
-alphas_calc<T>& proton_pdfs<T>::alphas()
+alphas_calc<T>& parton_dfs<T>::alphas()
 {
 	return pimpl->alphas;
 }
 
 template <typename T>
-std::size_t proton_pdfs<T>::count() const
+std::size_t parton_dfs<T>::count() const
 {
 	return pimpl->pdfs.size();
 }
 
 template <typename T>
-void proton_pdfs<T>::eval(T x, T scale, std::vector<parton_array<T>>& pdfs)
+void parton_dfs<T>::eval(T x, T scale, std::vector<parton_array<T>>& pdfs)
 {
 	// TODO: is it possible to get these values from LHAPDF?
 	constexpr std::size_t lhapdf_ac = -4 + 6;
@@ -119,6 +119,6 @@ void proton_pdfs<T>::eval(T x, T scale, std::vector<parton_array<T>>& pdfs)
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
-template class proton_pdfs<double>;
+template class parton_dfs<double>;
 
 }
