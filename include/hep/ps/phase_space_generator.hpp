@@ -76,17 +76,7 @@ public:
 		std::vector<T>& momenta,
 		std::vector<T>& densities,
 		hep::multi_channel_map action
-	) {
-		if (action == hep::multi_channel_map::calculate_densities)
-		{
-			return this->densities(densities);
-		}
-
-		generate(random_numbers, momenta, channel);
-
-		// value gets ignored
-		return T(1.0);
-	}
+	);
 };
 
 }
