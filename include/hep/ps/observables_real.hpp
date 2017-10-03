@@ -221,8 +221,10 @@ public:
 		// only set renormalization scale if it changed
 		if (scales.renormalization() != old_renormalization_scale_)
 		{
-			matrix_elements_.scale(scales.renormalization(), pdfs_.alphas());
 			old_renormalization_scale_ = scales.renormalization();
+
+			T const alphas = pdfs_.alphas(scales.renormalization());
+			matrix_elements_.parameters(scales.renormalization(), alphas);
 		}
 
 		pdfs_.eval(info.x1(), scales.factorization(), pdfsx1_);

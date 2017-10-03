@@ -16,7 +16,6 @@ public:
 
 	std::vector<std::unique_ptr<LHAPDF::PDF>> pdfs;
 	std::vector<double> xfx;
-	alphas_calc<T> alphas;
 };
 
 template <typename T>
@@ -24,10 +23,8 @@ parton_dfs<T>::impl::impl(std::string const& pdf_name, std::size_t pdf_member)
 	: pdfs()
 	// TODO: is it possible to extract this number from LHAPDF?
 	, xfx(13)
-	, alphas(nullptr)
 {
 	pdfs.emplace_back(LHAPDF::mkPDF(pdf_name, pdf_member));
-	alphas = alphas_calc<T>(pdfs.front().get());
 }
 
 // TODO: fix the implementation
@@ -36,14 +33,11 @@ parton_dfs<T>::impl::impl(std::string const& pdf_name)
 	: pdfs()
 	// TODO: is it possible to extract this number from LHAPDF?
 	, xfx(13)
-	, alphas(nullptr)
 {
 	for (auto pdf : LHAPDF::mkPDFs(pdf_name))
 	{
 		pdfs.emplace_back(pdf);
 	}
-
-	alphas = alphas_calc<T>(pdfs.front().get());
 }
 
 template <typename T>
@@ -72,9 +66,9 @@ template <typename T>
 parton_dfs<T>::~parton_dfs() = default;
 
 template <typename T>
-alphas_calc<T>& parton_dfs<T>::alphas()
+T parton_dfs<T>::alphas(T renormalization_scale)
 {
-	return pimpl->alphas;
+	return pimpl->pdfs.front()->alphasQ(renormalization_scale);
 }
 
 template <typename T>

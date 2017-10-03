@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/alphas_calc.hpp"
 #include "hep/ps/parton.hpp"
 
 #include <cstddef>
@@ -51,9 +50,8 @@ public:
 	/// Destructor.
 	~parton_dfs();
 
-	/// Returns a reference to an instance that allows the calculation of the
-	/// strong coupling at arbitrary scales.
-	alphas_calc<T>& alphas();
+	/// Calculates the strong coupling at the given `renormalization_scale`.
+	T alphas(T renormalization_scale);
 
 	/// This function returns the number of PDFs represented with by this
 	/// object.

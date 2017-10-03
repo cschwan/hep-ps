@@ -47,9 +47,9 @@ public:
 		pdfs.front()[hep::parton::strange]      = T(1.0);
 	}
 
-	int alphas()
+	T alphas(T)
 	{
-		return 0;
+		return T(1.0);
 	}
 
 	std::size_t count() const
@@ -192,7 +192,7 @@ public:
 		};
 	}
 
-	void scale(T, int)
+	void parameters(T, T)
 	{
 	}
 
