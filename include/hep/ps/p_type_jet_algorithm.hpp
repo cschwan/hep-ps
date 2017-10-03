@@ -56,7 +56,7 @@ private:
 	bool find_jet(std::vector<T>&);
 
 	T p_;
-	T radius_;
+	T radius2_;
 
 	std::vector<std::size_t> candidates_;
 	std::vector<T> dib_;
