@@ -1,5 +1,5 @@
-#ifndef HEP_PS_OBSERVABLES_HPP
-#define HEP_PS_OBSERVABLES_HPP
+#ifndef HEP_PS_PS_INTEGRAND_HPP
+#define HEP_PS_PS_INTEGRAND_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -49,14 +49,13 @@ inline hep::luminosity_info<T> info(
 namespace hep
 {
 
-/// Abstract base class for all classes that perform the calculation of (parts)
-/// of observables.
+/// Abstract base class for all phase space integrands.
 template <typename T>
-class observables
+class ps_integrand
 {
 public:
 	/// Virtual destructor.
-	virtual ~observables() = default;
+	virtual ~ps_integrand() = default;
 
 	/// Evaluates the observables this instances represents for the given
 	/// `phase_space` point and luminosity information in `info`. If the

@@ -2,8 +2,8 @@
 #include "hep/mc/multi_channel.hpp"
 #include "hep/mc/multi_channel_integrand.hpp"
 
+#include "hep/ps/born_integrand.hpp"
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/observables_born.hpp"
 #include "hep/ps/rambo_phase_space_generator.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
@@ -17,7 +17,7 @@
 
 using T = HEP_TYPE_T;
 
-void test_observables_born(hep::initial_state_set set, std::size_t count)
+void test_born_integrand(hep::initial_state_set set, std::size_t count)
 {
 	auto generator = hep::make_rambo_phase_space_generator<T>(
 		T(1.0),
@@ -25,7 +25,7 @@ void test_observables_born(hep::initial_state_set set, std::size_t count)
 		count
 	);
 
-	auto integrand = hep::make_observables_born<T>(
+	auto integrand = hep::make_born_integrand<T>(
 		test_matrix_elements<T>(set, count, 0, 0, 0),
 		test_cuts<T>(count, false),
 		test_recombiner<T>(count),
@@ -51,10 +51,10 @@ void test_observables_born(hep::initial_state_set set, std::size_t count)
 	CHECK( result.front().value() == T(0.0015980493564892501) );
 }
 
-TEST_CASE("observables_born", "[observables_born]")
+TEST_CASE("born integrand", "[born_integrand]")
 {
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
-	test_observables_born(set, 4);
-	test_observables_born(set, 4);
+	test_born_integrand(set, 4);
+	test_born_integrand(set, 4);
 }

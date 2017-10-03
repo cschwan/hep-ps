@@ -2,12 +2,10 @@
 #include "hep/mc/multi_channel.hpp"
 #include "hep/mc/multi_channel_integrand.hpp"
 
-#include "hep/ps/born_integrand.hpp"
 #include "hep/ps/initial_state.hpp"
+#include "hep/ps/fini_integrand.hpp"
 #include "hep/ps/rambo_phase_space_generator.hpp"
-#include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_distributions.hpp"
-#include "hep/ps/trivial_recombiner.hpp"
 
 #include "test_structures.hpp"
 
@@ -19,20 +17,20 @@
 
 using T = HEP_TYPE_T;
 
-void test_trivial_cutter_and_recombiner(
-	hep::initial_state_set set,
-	std::size_t count
-) {
+void test_fini_integrand(hep::initial_state_set set, std::size_t count)
+{
 	auto generator = hep::make_rambo_phase_space_generator<T>(
 		T(1.0),
 		T(100.0),
-		count
+		count,
+		1
 	);
 
-	auto integrand = hep::make_born_integrand<T>(
+	auto integrand = hep::make_fini_integrand<T>(
 		test_matrix_elements<T>(set, count, 0, 0, 0),
-		hep::trivial_cutter<T>(),
-		hep::trivial_recombiner<T>(),
+		test_subtraction<T>(0, 0, 0),
+		test_cuts<T>(count, false),
+		test_recombiner<T>(count),
 		test_pdf<T>(),
 		test_scale_setter<T>(),
 		hep::trivial_distributions<T>(),
@@ -52,13 +50,13 @@ void test_trivial_cutter_and_recombiner(
 		std::vector<std::size_t>{1}
 	);
 
-	CHECK( result.front().value() == T(0.0015980493564892501) );
+	CHECK( result.front().value() == T() );
 }
 
-TEST_CASE("check trivial cutter and recombiner",
-	"[trivial_cutter],[trivial_recombiner]")
+TEST_CASE("fini integrand", "[fini_integrand]")
 {
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
-	test_trivial_cutter_and_recombiner(set, 4);
+	test_fini_integrand(set, 4);
+	test_fini_integrand(set, 4);
 }

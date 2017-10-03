@@ -7,19 +7,19 @@ check_LTLIBRARIES = libcatch.la
 noinst_HEADERS = catch.hpp test_structures.hpp
 
 check_PROGRAMS = \
+	test_born_integrand \
 	test_cofferaa_phase_space_generator \
+	test_fini_integrand \
 	test_fortran_helper \
 	test_headers \
 	test_lusifer_diagram_generator \
 	test_lusifer_phase_space_generator \
 	test_lusifer_phase_space_generator2 \
 	test_lusifer_phase_space_generator3 \
-	test_observables_born \
-	test_observables_fini \
-	test_observables_real \
 	test_permutation \
 	test_phase_space_quality \
 	test_rambo_phase_space_generator \
+	test_real_integrand \
 	test_trivial_cutter_and_recombiner
 
 if ADDITIONAL_TESTS

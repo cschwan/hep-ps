@@ -2,6 +2,7 @@ nobase_include_HEADERS = \
 	hep/ps.hpp \
 	hep/ps/abc_terms.hpp \
 	hep/ps/boost.hpp \
+	hep/ps/born_integrand.hpp \
 	hep/ps/cofferaa_phase_space_generator.hpp \
 	hep/ps/constants.hpp \
 	hep/ps/convolute.hpp \
@@ -16,6 +17,7 @@ nobase_include_HEADERS = \
 	hep/ps/event_type.hpp \
 	hep/ps/factorization_scheme.hpp \
 	hep/ps/find_hep_ps.hpp \
+	hep/ps/fini_integrand.hpp \
 	hep/ps/fortran_helper.hpp \
 	hep/ps/initial_state.hpp \
 	hep/ps/insertion_term.hpp \
@@ -28,10 +30,6 @@ nobase_include_HEADERS = \
 	hep/ps/lusifer_phase_space_generator.hpp \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/non_zero_dipole.hpp \
-	hep/ps/observables.hpp \
-	hep/ps/observables_born.hpp \
-	hep/ps/observables_fini.hpp \
-	hep/ps/observables_real.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/parton.hpp \
@@ -39,7 +37,9 @@ nobase_include_HEADERS = \
 	hep/ps/permutation.hpp \
 	hep/ps/phase_space_generator.hpp \
 	hep/ps/propagator.hpp \
+	hep/ps/ps_integrand.hpp \
 	hep/ps/rambo_phase_space_generator.hpp \
+	hep/ps/real_integrand.hpp \
 	hep/ps/renormalization_scheme.hpp \
 	hep/ps/scales.hpp \
 	hep/ps/silence_third_party_libs.hpp \

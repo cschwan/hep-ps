@@ -1,5 +1,5 @@
-#ifndef HEP_PS_OBSERVABLES_BORN_HPP
-#define HEP_PS_OBSERVABLES_BORN_HPP
+#ifndef HEP_PS_BORN_INTEGRAND_HPP
+#define HEP_PS_BORN_INTEGRAND_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -26,8 +26,8 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/neg_pos_results.hpp"
-#include "hep/ps/observables.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/ps_integrand.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -42,7 +42,7 @@ namespace hep
 {
 
 template <class T, class M, class C, class R, class P, class S, class D>
-class observables_born : public observables<T>
+class born_integrand : public ps_integrand<T>
 {
 public:
 	template <
@@ -52,7 +52,7 @@ public:
 		typename Pdfs,
 		typename ScaleSetter,
 		typename Distributions>
-	observables_born(
+	born_integrand(
 		MatrixElements&& matrix_elements,
 		Cuts&& cuts,
 		Recombiner&& recombiner,
@@ -159,13 +159,13 @@ private:
 };
 
 template <class T, class M, class C, class R, class P, class S, class D>
-using observables_born_t = observables_born<T,
+using born_integrand_t = born_integrand<T,
 	typename std::decay<M>::type, typename std::decay<C>::type,
 	typename std::decay<R>::type, typename std::decay<P>::type,
 	typename std::decay<S>::type, typename std::decay<D>::type>;
 
 template <class T, class M, class C, class R, class P, class S, class D>
-inline std::unique_ptr<observables<T>> make_observables_born(
+inline std::unique_ptr<ps_integrand<T>> make_born_integrand(
 	M&& matrix_elements,
 	C&& cuts,
 	R&& recombiner,
@@ -175,8 +175,8 @@ inline std::unique_ptr<observables<T>> make_observables_born(
 	initial_state_set set,
 	T hbarc2
 ) {
-	return std::unique_ptr<observables_born_t<T, M, C, R, P, S, D>>(
-		new observables_born_t<T, M, C, R, P, S, D>(
+	return std::unique_ptr<born_integrand_t<T, M, C, R, P, S, D>>(
+		new born_integrand_t<T, M, C, R, P, S, D>(
 			std::forward<M>(matrix_elements),
 			std::forward<C>(cuts),
 			std::forward<R>(recombiner),

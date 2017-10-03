@@ -3,8 +3,8 @@
 #include "hep/mc/multi_channel_integrand.hpp"
 
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/observables_fini.hpp"
 #include "hep/ps/rambo_phase_space_generator.hpp"
+#include "hep/ps/real_integrand.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 
 #include "test_structures.hpp"
@@ -17,25 +17,31 @@
 
 using T = HEP_TYPE_T;
 
-void test_observables_fini(hep::initial_state_set set, std::size_t count)
-{
+void test_real_integrand(
+	hep::initial_state_set set,
+	std::size_t count,
+	std::size_t emitter,
+	std::size_t unresolved,
+	std::size_t spectator,
+	bool inclusive
+) {
 	auto generator = hep::make_rambo_phase_space_generator<T>(
 		T(1.0),
 		T(100.0),
-		count,
-		1
+		count + 1
 	);
 
-	auto integrand = hep::make_observables_fini<T>(
-		test_matrix_elements<T>(set, count, 0, 0, 0),
-		test_subtraction<T>(0, 0, 0),
-		test_cuts<T>(count, false),
+	auto integrand = hep::make_real_integrand<T>(
+		test_matrix_elements<T>(set, count, emitter, unresolved, spectator),
+		test_subtraction<T>(emitter, unresolved, spectator),
+		test_cuts<T>(count, inclusive),
 		test_recombiner<T>(count),
 		test_pdf<T>(),
 		test_scale_setter<T>(),
 		hep::trivial_distributions<T>(),
 		set,
-		T(1.0)
+		T(1.0),
+		T()
 	);
 
 	auto const result = hep::multi_channel(
@@ -50,13 +56,20 @@ void test_observables_fini(hep::initial_state_set set, std::size_t count)
 		std::vector<std::size_t>{1}
 	);
 
-	CHECK( result.front().value() == T() );
+	if (inclusive)
+	{
+		CHECK( result.front().value() == T(6.3165579739733147e-11) );
+	}
+	else
+	{
+		CHECK( result.front().value() == T(-6.3165579739733147e-11) );
+	}
 }
 
-TEST_CASE("observables_fini", "[observables_fini]")
+TEST_CASE("real integrand", "[real_integrand]")
 {
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
-	test_observables_fini(set, 4);
-	test_observables_fini(set, 4);
+	test_real_integrand(set, 4, 2, 3, 0, true);
+	test_real_integrand(set, 4, 2, 3, 0, false);
 }

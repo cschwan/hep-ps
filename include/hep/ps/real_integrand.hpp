@@ -1,5 +1,5 @@
-#ifndef HEP_PS_OBSERVABLES_REAL_HPP
-#define HEP_PS_OBSERVABLES_REAL_HPP
+#ifndef HEP_PS_REAL_INTEGRAND_HPP
+#define HEP_PS_REAL_INTEGRAND_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -72,7 +72,7 @@ namespace hep
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-class observables_real : public ps_integrand<T>
+class real_integrand : public ps_integrand<T>
 {
 public:
 	template <
@@ -83,7 +83,7 @@ public:
 		typename Pdfs,
 		typename ScaleSetter,
 		typename Distributions>
-	observables_real(
+	real_integrand(
 		MatrixElements&& matrix_elements,
 		Subtraction&& subtraction,
 		Cuts&& cuts,
@@ -342,7 +342,7 @@ private:
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-using observables_real_type = observables_real<T,
+using real_integrand_type = real_integrand<T,
 	typename std::decay<M>::type, typename std::decay<S>::type,
 	typename std::decay<C>::type, typename std::decay<R>::type,
 	typename std::decay<P>::type, typename std::decay<U>::type,
@@ -350,7 +350,7 @@ using observables_real_type = observables_real<T,
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-inline std::unique_ptr<ps_integrand<T>> make_observables_real(
+inline std::unique_ptr<ps_integrand<T>> make_real_integrand(
 	M&& matrix_elements,
 	S&& subtraction,
 	C&& cuts,
@@ -362,8 +362,8 @@ inline std::unique_ptr<ps_integrand<T>> make_observables_real(
 	T hbarc2,
 	T alpha_min = T()
 ) {
-	return std::unique_ptr<observables_real_type<T, M, S, C, R, P, U, D>>(
-		new observables_real_type<T, M, S, C, R, P, U, D>(
+	return std::unique_ptr<real_integrand_type<T, M, S, C, R, P, U, D>>(
+		new real_integrand_type<T, M, S, C, R, P, U, D>(
 			std::forward<M>(matrix_elements),
 			std::forward<S>(subtraction),
 			std::forward<C>(cuts),

@@ -1,5 +1,5 @@
-#ifndef HEP_PS_OBSERVABLES_FINI_HPP
-#define HEP_PS_OBSERVABLES_FINI_HPP
+#ifndef HEP_PS_FINI_INTEGRAND_HPP
+#define HEP_PS_FINI_INTEGRAND_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -29,7 +29,7 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/neg_pos_results.hpp"
-#include "hep/ps/observables.hpp"
+#include "hep/ps/ps_integrand.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -43,7 +43,7 @@ namespace hep
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-class observables_fini : public observables<T>
+class fini_integrand : public ps_integrand<T>
 {
 public:
 	template <
@@ -54,7 +54,7 @@ public:
 		typename Pdfs,
 		typename ScaleSetter,
 		typename Distributions>
-	observables_fini(
+	fini_integrand(
 		MatrixElements&& matrix_elements,
 		Subtraction&& subtraction,
 		Cuts&& cuts,
@@ -304,7 +304,7 @@ private:
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-using observables_fini_t = observables_fini<T,
+using fini_integrand_t = fini_integrand<T,
 	typename std::decay<M>::type, typename std::decay<S>::type,
 	typename std::decay<C>::type, typename std::decay<R>::type,
 	typename std::decay<P>::type, typename std::decay<U>::type,
@@ -312,7 +312,7 @@ using observables_fini_t = observables_fini<T,
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-inline std::unique_ptr<observables<T>> make_observables_fini(
+inline std::unique_ptr<ps_integrand<T>> make_fini_integrand(
 	M&& matrix_elements,
 	S&& subtraction,
 	C&& cuts,
@@ -324,8 +324,8 @@ inline std::unique_ptr<observables<T>> make_observables_fini(
 	T hbarc2,
 	bool insertion2 = false
 ) {
-	return std::unique_ptr<observables_fini_t<T, M, S, C, R, P, U, D>>(
-		new observables_fini_t<T, M, S, C, R, P, U, D>(
+	return std::unique_ptr<fini_integrand_t<T, M, S, C, R, P, U, D>>(
+		new fini_integrand_t<T, M, S, C, R, P, U, D>(
 			std::forward<M>(matrix_elements),
 			std::forward<S>(subtraction),
 			std::forward<C>(cuts),
