@@ -140,16 +140,6 @@ public:
 		return results_.front().neg + results_.front().pos;
 	}
 
-	M const& matrix_elements() const
-	{
-		return matrix_elements_;
-	}
-
-	M& matrix_elements()
-	{
-		return matrix_elements_;
-	}
-
 private:
 	M matrix_elements_;
 	C cuts_;
