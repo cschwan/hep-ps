@@ -1,6 +1,8 @@
 #ifndef TEST_STRUCTURES_HPP
 #define TEST_STRUCTURES_HPP
 
+#include "hep/mc/distribution_parameters.hpp"
+
 #include "hep/ps/abc_terms.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole.hpp"
