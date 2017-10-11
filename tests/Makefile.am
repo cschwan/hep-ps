@@ -16,6 +16,7 @@ check_PROGRAMS = \
 	test_lusifer_phase_space_generator \
 	test_lusifer_phase_space_generator2 \
 	test_lusifer_phase_space_generator3 \
+	test_parton_dfs \
 	test_permutation \
 	test_phase_space_quality \
 	test_rambo_phase_space_generator \
