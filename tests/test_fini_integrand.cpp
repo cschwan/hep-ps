@@ -32,7 +32,7 @@ void test_fini_integrand(hep::initial_state_set set, std::size_t count)
 		test_cuts<T>(count, false),
 		test_recombiner<T>(count),
 		test_pdf<T>(),
-		test_scale_setter<T>(),
+		test_scale_setter<T>{false},
 		hep::trivial_distributions<T>(),
 		set,
 		T(1.0)

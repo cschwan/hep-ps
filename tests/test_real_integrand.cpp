@@ -37,7 +37,7 @@ void test_real_integrand(
 		test_cuts<T>(count, inclusive),
 		test_recombiner<T>(count),
 		test_pdf<T>(),
-		test_scale_setter<T>(),
+		test_scale_setter<T>{false},
 		hep::trivial_distributions<T>(),
 		set,
 		T(1.0),

@@ -34,7 +34,7 @@ void test_trivial_cutter_and_recombiner(
 		hep::trivial_cutter<T>(),
 		hep::trivial_recombiner<T>(),
 		test_pdf<T>(),
-		test_scale_setter<T>(),
+		test_scale_setter<T>{false},
 		hep::trivial_distributions<T>(),
 		set,
 		T(1.0)

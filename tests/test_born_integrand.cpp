@@ -17,8 +17,11 @@
 
 using T = HEP_TYPE_T;
 
-void test_born_integrand(hep::initial_state_set set, std::size_t count)
-{
+void test_born_integrand(
+	hep::initial_state_set set,
+	std::size_t count,
+	bool dynamic_scale
+) {
 	auto generator = hep::make_rambo_phase_space_generator<T>(
 		T(1.0),
 		T(100.0),
@@ -30,7 +33,7 @@ void test_born_integrand(hep::initial_state_set set, std::size_t count)
 		test_cuts<T>(count, false),
 		test_recombiner<T>(count),
 		test_pdf<T>(),
-		test_scale_setter<T>(),
+		test_scale_setter<T>{dynamic_scale},
 		hep::trivial_distributions<T>(),
 		set,
 		T(1.0)
@@ -55,6 +58,6 @@ TEST_CASE("born integrand", "[born_integrand]")
 {
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
-	test_born_integrand(set, 4);
-	test_born_integrand(set, 4);
+	test_born_integrand(set, 4, true);
+	test_born_integrand(set, 4, false);
 }

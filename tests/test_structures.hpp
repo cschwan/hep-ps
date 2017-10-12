@@ -355,12 +355,32 @@ template <typename T>
 class test_scale_setter
 {
 public:
-	static constexpr T scale = T(1.0);
+	test_scale_setter(bool dynamic)
+		: dynamic_{dynamic}
+	{
+	}
 
 	hep::scales<T> operator()(std::vector<T> const&)
 	{
 		return { scale , scale };
 	}
+
+	hep::scales<T> operator()(
+		std::vector<T> const&,
+		std::vector<hep::scales<T>>&
+	) {
+		return { scale , scale };
+	}
+
+	bool dynamic() const
+	{
+		return dynamic_;
+	}
+
+private:
+	bool dynamic_;
+
+	static constexpr T scale = T(1.0);
 };
 
 template <typename T>
