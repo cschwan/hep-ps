@@ -111,7 +111,7 @@ public:
 		{
 			old_renormalization_scale_ = scales.renormalization();
 
-			T const alphas = pdfs_.alphas(scales.renormalization());
+			T const alphas = pdfs_.eval_alphas(scales.renormalization());
 			matrix_elements_.parameters(scales.renormalization(), alphas);
 		}
 

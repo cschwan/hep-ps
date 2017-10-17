@@ -51,7 +51,7 @@ public:
 	~parton_dfs();
 
 	/// Calculates the strong coupling at the given `renormalization_scale`.
-	T alphas(T renormalization_scale);
+	T eval_alphas(T renormalization_scale);
 
 	/// This function returns the number of PDFs represented with by this
 	/// object.

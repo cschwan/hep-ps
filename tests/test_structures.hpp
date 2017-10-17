@@ -49,8 +49,10 @@ public:
 		pdfs.front()[hep::parton::strange]      = T(1.0);
 	}
 
-	T alphas(T)
+	T eval_alphas(T scale)
 	{
+		CHECK( scale > T() );
+
 		return T(1.0);
 	}
 
