@@ -4,7 +4,10 @@ AM_DEFAULT_SOURCE_EXT = .cpp
 libcatch_la_SOURCES = catch.cpp
 check_LTLIBRARIES = libcatch.la
 
-noinst_HEADERS = catch.hpp test_structures.hpp
+noinst_HEADERS = \
+	catch.hpp \
+	test_phase_space_generator.hpp \
+	test_structures.hpp
 
 check_PROGRAMS = \
 	test_born_integrand \

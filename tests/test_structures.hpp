@@ -49,6 +49,27 @@ public:
 		pdfs.front()[hep::parton::strange]      = T(1.0);
 	}
 
+	hep::parton_array<T> eval(T x, T scale)
+	{
+		CHECK( x >= T() );
+		CHECK( x < T(1.0) );
+		CHECK( scale > T() );
+
+		hep::parton_array<T> pdf;
+
+		pdf[hep::parton::anti_up]      = T(1.0);
+		pdf[hep::parton::anti_down]    = T(1.0);
+		pdf[hep::parton::anti_charm]   = T(1.0);
+		pdf[hep::parton::anti_strange] = T(1.0);
+		pdf[hep::parton::gluon]        = T(1.0);
+		pdf[hep::parton::up]           = T(1.0);
+		pdf[hep::parton::down]         = T(1.0);
+		pdf[hep::parton::charm]        = T(1.0);
+		pdf[hep::parton::strange]      = T(1.0);
+
+		return pdf;
+	}
+
 	T eval_alphas(T scale)
 	{
 		CHECK( scale > T() );
@@ -130,6 +151,14 @@ public:
 		return result;
 	}
 
+	hep::initial_state_array<T> borns(
+		std::vector<T> const&,
+		hep::initial_state_set,
+		T
+	) const {
+		return {};
+	}
+
 	hep::initial_state_array<T> reals(
 		std::vector<T> const& real_phase_space,
 		hep::initial_state_set set
@@ -198,6 +227,15 @@ public:
 
 	void parameters(T, T)
 	{
+	}
+
+	void alphas(T)
+	{
+	}
+
+	std::size_t alphas_power() const
+	{
+		return 0;
 	}
 
 private:

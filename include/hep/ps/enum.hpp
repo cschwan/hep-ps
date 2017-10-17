@@ -72,12 +72,24 @@
 		{                                                                      \
 			return array_[static_cast <std::size_t> (index)];                  \
 		}                                                                      \
-	                                                                           \
+		                                                                       \
 		/** Uses `index` to access the corresponding element. */               \
 		T operator[](name index) const                                         \
 		{                                                                      \
 			return array_[static_cast <std::size_t> (index)];                  \
 		}                                                                      \
+		                                                                       \
+		/** Adds the elements of `other` this objects' elements. */            \
+		name ## _array& operator+=(name ## _array const& other)                \
+		{                                                                      \
+			for (std::size_t i = 0; i != array_.size(); ++i)                   \
+			{                                                                  \
+				array_[i] += other.array_[i];                                  \
+			}                                                                  \
+	                                                                           \
+			return *this;                                                      \
+		}                                                                      \
+	                                                                           \
 	private:                                                                   \
 		std::array<T, name ## _list().size()> array_;                          \
 	}
