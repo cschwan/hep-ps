@@ -73,24 +73,25 @@ public:
 		, hbarc2_(hbarc2)
 		, pdfsx1_(pdfs_.count())
 		, pdfsx2_(pdfs_.count())
-		, pdf_uncertainity_results_(pdfs_.count() - 1)
+		, pdf_results_(pdfs_.count() - 1)
 		, alphas_power_(matrix_elements_.alphas_power())
-		, dynamic_scales_{scale_setter_.dynamic() && (alphas_power_ > T{})}
+		, dynamic_scales_{scale_setter_.dynamic()}
 	{
-		pdf_uncertainity_results_.reserve(pdfs_.count());
+		pdf_results_.reserve(pdfs_.count());
 
 		if (!dynamic_scales_)
 		{
-			auto const central_scale = scale_setter_(std::vector<T>(), scales_);
-			alphas_ = pdfs_.eval_alphas(central_scale.renormalization());
+			scale_setter_(std::vector<T>(), scales_);
+			alphas_ = pdfs_.eval_alphas(scales_.front().renormalization());
 			matrix_elements_.alphas(alphas_);
+			factors_.reserve(scales_.size());
 
 			for (auto const scale : scales_)
 			{
 				using std::pow;
 
 				T const alphas = pdfs_.eval_alphas(scale.renormalization());
-				static_factors_.push_back(pow(alphas / alphas_, alphas_power_));
+				factors_.push_back(pow(alphas / alphas_, alphas_power_));
 			}
 		}
 	}
@@ -123,12 +124,22 @@ public:
 			return T();
 		}
 
-		auto const central_scale = scale_setter_(phase_space, scales_);
-
 		if (dynamic_scales_)
 		{
-			alphas_ = pdfs_.eval_alphas(central_scale.renormalization());
+			scales_.clear();
+			scale_setter_(phase_space, scales_);
+			alphas_ = pdfs_.eval_alphas(scales_.front().renormalization());
 			matrix_elements_.alphas(alphas_);
+			factors_.clear();
+
+			for (auto const scale : scales_)
+			{
+				using std::pow;
+
+				// TODO: avoid evaluating the same alphas
+				T const alphas = pdfs_.eval_alphas(scale.renormalization());
+				factors_.push_back(pow(alphas / alphas_, alphas_power_));
+			}
 		}
 
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
@@ -137,11 +148,10 @@ public:
 		// parts separately
 		auto borns = matrix_elements_.borns(phase_space, set_);
 		auto const scale_dep_me = matrix_elements_.borns(phase_space, set_,
-			central_scale.renormalization());
+			scales_.front().renormalization());
 
-		scale_uncertainty_results_.clear();
+		results_.clear();
 
-		// evaluate PDFs for the non-central scales
 		for (std::size_t i = 0; i != scales_.size(); ++i)
 		{
 			T const muf = scales_.at(i).factorization();
@@ -151,32 +161,16 @@ public:
 			auto const pdfx1 = pdfs_.eval(info.x1(), muf);
 			auto const pdfx2 = pdfs_.eval(info.x2(), muf);
 
-			// rescaling factor from the strong coupling
-			T rescaling = T(1.0);
-
-			if (dynamic_scales_)
-			{
-				using std::pow;
-
-				// TODO: avoid evaluating the same alphas
-				T const alphas = pdfs_.eval_alphas(mur);
-				rescaling = pow(alphas / alphas_, alphas_power_);
-			}
-			else
-			{
-				rescaling = static_factors_.at(i);
-			}
-
 			// TODO: avoid calculating the same matrix elements
 			auto new_borns = matrix_elements_.borns(phase_space, set_, mur);
 			new_borns += borns;
 
-			scale_uncertainty_results_.push_back(convolute(
+			results_.push_back(convolute(
 				pdfx1,
 				pdfx2,
 				new_borns,
 				set_,
-				factor * rescaling,
+				factor * factors_.at(i),
 				cut_result
 			));
 		}
@@ -184,46 +178,38 @@ public:
 		// now we only need the result for the central scale
 		borns += scale_dep_me;
 
-		// evaluate all PDFs for the central scale
-		pdfs_.eval(info.x1(), central_scale.factorization(), pdfsx1_);
-		pdfs_.eval(info.x2(), central_scale.factorization(), pdfsx2_);
-
-		pdf_uncertainity_results_.clear();
-
-		for (std::size_t pdf = 1; pdf < pdfsx1_.size(); ++pdf)
+		if (pdfs_.count() > 1)
 		{
-			pdf_uncertainity_results_.push_back(convolute(
-				pdfsx1_.at(pdf),
-				pdfsx2_.at(pdf),
-				borns,
-				set_,
-				factor,
-				cut_result
-			));
-		}
+			// evaluate all PDFs for the central scale
+			pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
+			pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
 
-		// calculate the central result
-		auto const result = convolute(
-			pdfsx1_.front(),
-			pdfsx2_.front(),
-			borns,
-			set_,
-			factor,
-			cut_result
-		);
+			pdf_results_.clear();
+
+			for (std::size_t pdf = 1; pdf != pdfsx1_.size(); ++pdf)
+			{
+				pdf_results_.push_back(convolute(
+					pdfsx1_.at(pdf),
+					pdfsx2_.at(pdf),
+					borns,
+					set_,
+					factor,
+					cut_result
+				));
+			}
+		}
 
 		distributions_(
 			phase_space,
 			cut_result,
-			result,
-			scale_uncertainty_results_,
-			pdf_uncertainity_results_,
+			results_,
+			pdf_results_,
 			rapidity_shift,
 			event_type::born_like_n,
 			projector
 		);
 
-		return result.neg + result.pos;
+		return results_.front().neg + results_.front().pos;
 	}
 
 private:
@@ -238,10 +224,10 @@ private:
 
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
-	std::vector<neg_pos_results<T>> pdf_uncertainity_results_;
-	std::vector<neg_pos_results<T>> scale_uncertainty_results_;
+	std::vector<neg_pos_results<T>> pdf_results_;
+	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
-	std::vector<T> static_factors_;
+	std::vector<T> factors_;
 	T alphas_power_;
 	T alphas_;
 	bool dynamic_scales_;

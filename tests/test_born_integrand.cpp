@@ -23,13 +23,13 @@
 using T = HEP_TYPE_T;
 
 std::vector<hep::scales<T>> global_scales = {
+	hep::scales<T>{         T(10.0),          T(10.0)},
 	hep::scales<T>{T(0.5) * T(10.0),          T(10.0)},
 	hep::scales<T>{         T(10.0), T(0.5) * T(10.0)},
 	hep::scales<T>{T(2.0) * T(10.0),          T(10.0)},
 	hep::scales<T>{         T(10.0), T(2.0) * T(10.0)},
 	hep::scales<T>{T(0.5) * T(10.0), T(0.5) * T(10.0)},
-	hep::scales<T>{T(2.0) * T(10.0), T(2.0) * T(10.0)},
-	hep::scales<T>{         T(10.0),          T(10.0)},
+	hep::scales<T>{T(2.0) * T(10.0), T(2.0) * T(10.0)}
 };
 
 template <typename T>
@@ -53,8 +53,7 @@ public:
 	void operator()(
 		std::vector<T> const&,
 		hep::cut_result_with_info<I> const&,
-		hep::neg_pos_results<T> result,
-		std::vector<hep::neg_pos_results<T>> scale_uncertainty_results,
+		std::vector<hep::neg_pos_results<T>> results,
 		std::vector<hep::neg_pos_results<T>> /*pdf_uncertainity_results*/,
 		T,
 		hep::event_type event_type,
@@ -62,7 +61,7 @@ public:
 	) {
 		using std::pow;
 
-		CHECK( scale_uncertainty_results.size() == (global_scales.size() - 1) );
+		CHECK( results.size() == global_scales.size() );
 		CHECK( event_type == hep::event_type::born_like_n );
 
 		for (std::size_t i = 0; i != global_scales.size(); ++i)
@@ -77,16 +76,8 @@ public:
 
 			T const ref_result = pdfa * pdfb * (born + born_scale);
 
-			if ((i + 1) != global_scales.size())
-			{
-				CHECK( scale_uncertainty_results.at(i).neg == ref_result );
-				CHECK( scale_uncertainty_results.at(i).pos == ref_result );
-			}
-			else
-			{
-				CHECK( result.neg == ref_result );
-				CHECK( result.pos == ref_result );
-			}
+			CHECK( results.at(i).neg == ref_result );
+			CHECK( results.at(i).pos == ref_result );
 		}
 	}
 
@@ -145,7 +136,7 @@ public:
 
 	// SCALE SETTER MEMBER FUNCTIONS
 
-	hep::scales<T> operator()(
+	void operator()(
 		std::vector<T> const&,
 		std::vector<hep::scales<T>>& scales
 	) {
@@ -160,9 +151,7 @@ public:
 			}
 		}
 
-		scales.assign(global_scales.begin(), global_scales.end() - 1);
-
-		return global_scales.back();
+		scales.assign(global_scales.begin(), global_scales.end());
 	}
 
 	bool dynamic() const
@@ -176,7 +165,7 @@ public:
 	{
 		using std::pow;
 
-		T const central = global_scales.back().renormalization();
+		T const central = global_scales.front().renormalization();
 		return alphas_ * renormalization_scale / central;
 	}
 

@@ -396,7 +396,8 @@ class test_scale_setter
 {
 public:
 	test_scale_setter(bool dynamic)
-		: dynamic_{dynamic}
+		: scale{T(1.0)}
+		, dynamic_{dynamic}
 	{
 	}
 
@@ -405,11 +406,11 @@ public:
 		return { scale , scale };
 	}
 
-	hep::scales<T> operator()(
+	void operator()(
 		std::vector<T> const&,
-		std::vector<hep::scales<T>>&
+		std::vector<hep::scales<T>>& scales
 	) {
-		return { scale , scale };
+		scales.emplace_back(scale, scale);
 	}
 
 	bool dynamic() const
@@ -418,9 +419,8 @@ public:
 	}
 
 private:
+	T scale;
 	bool dynamic_;
-
-	static constexpr T scale = T(1.0);
 };
 
 template <typename T>

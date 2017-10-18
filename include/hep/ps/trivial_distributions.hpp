@@ -68,7 +68,6 @@ public:
 	void operator()(
 		std::vector<T> const&,
 		cut_result_with_info<I> const&,
-		neg_pos_results<T> const&,
 		std::vector<neg_pos_results<T>> const&,
 		std::vector<neg_pos_results<T>> const&,
 		T,
