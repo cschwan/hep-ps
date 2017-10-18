@@ -119,59 +119,48 @@ public:
 			set_scales(phase_space);
 		}
 
-		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
-
-		// for the central scale calculate scale-dependent and scale-independent
-		// parts separately
-		auto const borns = matrix_elements_.borns(phase_space, set_);
-		auto central_borns = borns;
+		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		results_.clear();
-
+		borns_.resize(scales_.size());
 		pdfsx1_.resize(scales_.size());
-		pdfs_.eval(info.x1(), scales_, pdfsx1_);
 		pdfsx2_.resize(scales_.size());
+
+		pdfs_.eval(info.x1(), scales_, pdfsx1_);
 		pdfs_.eval(info.x2(), scales_, pdfsx2_);
+
+		matrix_elements_.borns(phase_space, set_, scales_, borns_);
 
 		for (std::size_t i = 0; i != scales_.size(); ++i)
 		{
-			// TODO: avoid calculating the same matrix elements
-			auto new_borns = matrix_elements_.borns(phase_space, set_,
-				scales_.at(i).renormalization());
-			new_borns += borns;
-
-			if (i == 0)
-			{
-				central_borns += new_borns;
-			}
-
 			results_.push_back(convolute(
 				pdfsx1_.at(i),
 				pdfsx2_.at(i),
-				new_borns,
+				borns_.at(i),
 				set_,
-				factor * factors_.at(i),
+				factors_.at(i) * factor,
 				cut_result
 			));
 		}
 
 		if (pdfs_.count() > 1)
 		{
+			pdf_results_.clear();
 			pdfsx1_.resize(pdfs_.count());
 			pdfsx2_.resize(pdfs_.count());
+
+			// TODO: do not evaluate the central PDF, we don't need it
 
 			// evaluate all PDFs for the central scale
 			pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
 			pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
-
-			pdf_results_.clear();
 
 			for (std::size_t pdf = 1; pdf != pdfsx1_.size(); ++pdf)
 			{
 				pdf_results_.push_back(convolute(
 					pdfsx1_.at(pdf),
 					pdfsx2_.at(pdf),
-					borns,
+					borns_.at(0),
 					set_,
 					factor,
 					cut_result
@@ -228,6 +217,7 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
+	std::vector<initial_state_array<T>> borns_;
 	T alphas_power_;
 	bool dynamic_scales_;
 };

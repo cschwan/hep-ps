@@ -184,11 +184,24 @@ public:
 	}
 
 	hep::initial_state_array<T> borns(
-		std::vector<T> const&,
-		hep::initial_state_set,
-		T
+		std::vector<T> const& phase_space,
+		hep::initial_state_set set,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::initial_state_array<T>>& me
 	) const {
-		return {};
+		CHECK( phase_space.size() == 4 * (final_states_ + 2) );
+		CHECK( set == set_ );
+		CHECK( scales.size() == 1 );
+		CHECK( me.size() == 1 );
+
+		hep::initial_state_array<T> result;
+
+		for (auto const process : set)
+		{
+			me.front()[process] = T(1.0);
+		}
+
+		return result;
 	}
 
 	hep::initial_state_array<T> reals(

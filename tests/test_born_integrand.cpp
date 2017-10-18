@@ -22,15 +22,7 @@
 
 using T = HEP_TYPE_T;
 
-std::vector<hep::scales<T>> global_scales = {
-	hep::scales<T>{         T(10.0),          T(10.0)},
-	hep::scales<T>{T(0.5) * T(10.0),          T(10.0)},
-	hep::scales<T>{         T(10.0), T(0.5) * T(10.0)},
-	hep::scales<T>{T(2.0) * T(10.0),          T(10.0)},
-	hep::scales<T>{         T(10.0), T(2.0) * T(10.0)},
-	hep::scales<T>{T(0.5) * T(10.0), T(0.5) * T(10.0)},
-	hep::scales<T>{T(2.0) * T(10.0), T(2.0) * T(10.0)}
-};
+std::vector<hep::scales<T>> global_scales;
 
 template <typename T>
 class test_born_class
@@ -86,37 +78,26 @@ public:
 
 	// MATRIX ELEMENT MEMBER FUNCTIONS
 
-	hep::initial_state_array<T> borns(
-		std::vector<T> const&,
-		hep::initial_state_set set
-	) const {
-		using std::pow;
-
-		hep::initial_state_array<T> result;
-
-		for (auto const state : set)
-		{
-			result[state] = pow(alphas_, T(alphas_power_)) * T(1.0);
-		}
-
-		return result;
-	}
-
-	hep::initial_state_array<T> borns(
+	void borns(
 		std::vector<T> const&,
 		hep::initial_state_set set,
-		T renormalization_scale
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::initial_state_array<T>>& results
 	) const {
 		using std::pow;
 
-		hep::initial_state_array<T> result;
+		T const central_mur = global_scales.front().renormalization();
 
-		for (auto const state : set)
+		for (std::size_t i = 0; i != scales.size(); ++i)
 		{
-			result[state] = pow(alphas_, alphas_power_) * renormalization_scale;
-		}
+			T const mur = scales.at(i).renormalization();
 
-		return result;
+			for (auto const state : set)
+			{
+				results.at(i)[state] = pow(alphas_,
+					T(alphas_power_)) * (T(1.0) + mur);
+			}
+		}
 	}
 
 	void alphas(T alphas)
@@ -254,6 +235,17 @@ void test_born_integrand(
 	CAPTURE( alphas_power );
 	CAPTURE( alphas );
 	CAPTURE( dynamic_scale );
+
+	// reset scales
+	global_scales = {
+		hep::scales<T>{         T(10.0),          T(10.0)},
+		hep::scales<T>{T(0.5) * T(10.0),          T(10.0)},
+		hep::scales<T>{         T(10.0), T(0.5) * T(10.0)},
+		hep::scales<T>{T(2.0) * T(10.0),          T(10.0)},
+		hep::scales<T>{         T(10.0), T(2.0) * T(10.0)},
+		hep::scales<T>{T(0.5) * T(10.0), T(0.5) * T(10.0)},
+		hep::scales<T>{T(2.0) * T(10.0), T(2.0) * T(10.0)}
+	};
 
 	// number of final states is not really interesting here
 	test_phase_space_generator<T> generator{2};
