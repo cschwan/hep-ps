@@ -91,6 +91,44 @@ std::size_t parton_dfs<T>::count() const
 }
 
 template <typename T>
+void parton_dfs<T>::eval(
+	T x,
+	std::vector<hep::scales<T>> const& scales,
+	std::vector<parton_array<T>>& pdfs
+) {
+	// TODO: is it possible to get these values from LHAPDF?
+	constexpr std::size_t lhapdf_ac = -4 + 6;
+	constexpr std::size_t lhapdf_as = -3 + 6;
+	constexpr std::size_t lhapdf_au = -2 + 6;
+	constexpr std::size_t lhapdf_ad = -1 + 6;
+	constexpr std::size_t lhapdf_g  =  0 + 6;
+	constexpr std::size_t lhapdf_d  =  1 + 6;
+	constexpr std::size_t lhapdf_u  =  2 + 6;
+	constexpr std::size_t lhapdf_s  =  3 + 6;
+	constexpr std::size_t lhapdf_c  =  4 + 6;
+
+	// TODO: implement a cache?
+	for (std::size_t i = 0; i != scales.size(); ++i)
+	{
+		pimpl->pdfs.front()->xfxQ(
+			static_cast <double> (x),
+			static_cast <double> (scales.at(i).factorization()),
+			pimpl->xfx
+		);
+
+		pdfs.at(i)[parton::anti_charm]   = T(pimpl->xfx[lhapdf_ac]) / x;
+		pdfs.at(i)[parton::anti_strange] = T(pimpl->xfx[lhapdf_as]) / x;
+		pdfs.at(i)[parton::anti_up]      = T(pimpl->xfx[lhapdf_au]) / x;
+		pdfs.at(i)[parton::anti_down]    = T(pimpl->xfx[lhapdf_ad]) / x;
+		pdfs.at(i)[parton::gluon]        = T(pimpl->xfx[lhapdf_g])  / x;
+		pdfs.at(i)[parton::down]         = T(pimpl->xfx[lhapdf_d])  / x;
+		pdfs.at(i)[parton::up]           = T(pimpl->xfx[lhapdf_u])  / x;
+		pdfs.at(i)[parton::strange]      = T(pimpl->xfx[lhapdf_s])  / x;
+		pdfs.at(i)[parton::charm]        = T(pimpl->xfx[lhapdf_c])  / x;
+	}
+}
+
+template <typename T>
 void parton_dfs<T>::eval(T x, T scale, std::vector<parton_array<T>>& pdfs)
 {
 	// TODO: is it possible to get these values from LHAPDF?

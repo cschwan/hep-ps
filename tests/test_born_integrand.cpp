@@ -188,6 +188,25 @@ public:
 		return 1;
 	}
 
+	void eval(
+		T x,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::parton_array<T>>& pdfs
+	) {
+		CHECK( x >= T{} );
+		CHECK( x < T(1.0) );
+		CHECK( scales.size() == global_scales.size() );
+		CHECK( pdfs.size() == scales.size() );
+
+		for (std::size_t i = 0; i != scales.size(); ++i)
+		{
+			for (auto const parton : hep::parton_list())
+			{
+				pdfs.at(i)[parton] = scales.at(i).factorization();
+			}
+		}
+	}
+
 	void eval(T x, T scale, std::vector<hep::parton_array<T>>& pdfs)
 	{
 		CHECK( x >= T{} );

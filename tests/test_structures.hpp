@@ -31,6 +31,28 @@ template <typename T>
 class test_pdf
 {
 public:
+	void eval(
+		T x,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::parton_array<T>>& pdfs
+	) {
+		CHECK( x >= T() );
+		CHECK( x < T(1.0) );
+		CHECK( scales.size() == 1 );
+		CHECK( pdfs.size() >= 1 );
+		CHECK( scales.front().factorization() > T() );
+
+		pdfs.front()[hep::parton::anti_up]      = T(1.0);
+		pdfs.front()[hep::parton::anti_down]    = T(1.0);
+		pdfs.front()[hep::parton::anti_charm]   = T(1.0);
+		pdfs.front()[hep::parton::anti_strange] = T(1.0);
+		pdfs.front()[hep::parton::gluon]        = T(1.0);
+		pdfs.front()[hep::parton::up]           = T(1.0);
+		pdfs.front()[hep::parton::down]         = T(1.0);
+		pdfs.front()[hep::parton::charm]        = T(1.0);
+		pdfs.front()[hep::parton::strange]      = T(1.0);
+	}
+
 	void eval(T x, T scale, std::vector<hep::parton_array<T>>& pdfs)
 	{
 		CHECK( pdfs.size() == count() );

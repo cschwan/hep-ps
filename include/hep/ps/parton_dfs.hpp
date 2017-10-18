@@ -65,6 +65,14 @@ public:
 	/// object.
 	std::size_t count() const;
 
+	/// Evaluates the central PDF at \f$ x \f$ for given factorization scales in
+	/// `scales` and writes the results into `pdfs`.
+	void eval(
+		T x,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<parton_array<T>>& pdfs
+	);
+
 	/// Returns the values of all parton distribution functions for the given
 	/// \f$ x \f$ and \f$ Q \f$, the last value given by `scale`. The size of
 	/// `pdfs` must agree with the number returned by \ref count.

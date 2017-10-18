@@ -123,28 +123,31 @@ public:
 
 		// for the central scale calculate scale-dependent and scale-independent
 		// parts separately
-		auto borns = matrix_elements_.borns(phase_space, set_);
-		auto const scale_dep_me = matrix_elements_.borns(phase_space, set_,
-			scales_.front().renormalization());
+		auto const borns = matrix_elements_.borns(phase_space, set_);
+		auto central_borns = borns;
 
 		results_.clear();
 
+		pdfsx1_.resize(scales_.size());
+		pdfs_.eval(info.x1(), scales_, pdfsx1_);
+		pdfsx2_.resize(scales_.size());
+		pdfs_.eval(info.x2(), scales_, pdfsx2_);
+
 		for (std::size_t i = 0; i != scales_.size(); ++i)
 		{
-			T const muf = scales_.at(i).factorization();
-			T const mur = scales_.at(i).renormalization();
-
-			// TODO: avoid evaluating the same PDFs
-			auto const pdfx1 = pdfs_.eval(info.x1(), muf);
-			auto const pdfx2 = pdfs_.eval(info.x2(), muf);
-
 			// TODO: avoid calculating the same matrix elements
-			auto new_borns = matrix_elements_.borns(phase_space, set_, mur);
+			auto new_borns = matrix_elements_.borns(phase_space, set_,
+				scales_.at(i).renormalization());
 			new_borns += borns;
 
+			if (i == 0)
+			{
+				central_borns += new_borns;
+			}
+
 			results_.push_back(convolute(
-				pdfx1,
-				pdfx2,
+				pdfsx1_.at(i),
+				pdfsx2_.at(i),
 				new_borns,
 				set_,
 				factor * factors_.at(i),
@@ -152,11 +155,11 @@ public:
 			));
 		}
 
-		// now we only need the result for the central scale
-		borns += scale_dep_me;
-
 		if (pdfs_.count() > 1)
 		{
+			pdfsx1_.resize(pdfs_.count());
+			pdfsx2_.resize(pdfs_.count());
+
 			// evaluate all PDFs for the central scale
 			pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
 			pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
