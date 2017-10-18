@@ -149,18 +149,16 @@ public:
 			pdfsx1_.resize(pdfs_.count());
 			pdfsx2_.resize(pdfs_.count());
 
-			// TODO: do not evaluate the central PDF, we don't need it
-
 			// evaluate all PDFs for the central scale
 			pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
 			pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
 
-			for (std::size_t pdf = 1; pdf != pdfsx1_.size(); ++pdf)
+			for (std::size_t pdf = 0; pdf != pdfsx1_.size(); ++pdf)
 			{
 				pdf_results_.push_back(convolute(
 					pdfsx1_.at(pdf),
 					pdfsx2_.at(pdf),
-					borns_.at(0),
+					borns_.front(),
 					set_,
 					factor,
 					cut_result

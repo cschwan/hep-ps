@@ -45,8 +45,8 @@ public:
 	void operator()(
 		std::vector<T> const&,
 		hep::cut_result_with_info<I> const&,
-		std::vector<hep::neg_pos_results<T>> results,
-		std::vector<hep::neg_pos_results<T>> /*pdf_uncertainity_results*/,
+		std::vector<hep::neg_pos_results<T>> const& results,
+		std::vector<hep::neg_pos_results<T>> const& pdf_results,
 		T,
 		hep::event_type event_type,
 		hep::projector<T>&
@@ -59,7 +59,7 @@ public:
 		std::vector<T> alphas;
 		eval_alphas(global_scales, alphas);
 
-		for (std::size_t i = 0; i != global_scales.size(); ++i)
+		for (std::size_t i = 0; i != results.size(); ++i)
 		{
 			T const muf = global_scales.at(i).factorization();
 			T const mur = global_scales.at(i).renormalization();
@@ -73,6 +73,22 @@ public:
 
 			CHECK( results.at(i).neg == ref_result );
 			CHECK( results.at(i).pos == ref_result );
+		}
+
+		for (std::size_t i = 0; i != pdf_results.size(); ++i)
+		{
+			T const muf = global_scales.front().factorization();
+			T const mur = global_scales.front().renormalization();
+			T const couplings = pow(alphas.front(), T(alphas_power_));
+			T const pdfa = T(i+1) * muf;
+			T const pdfb = T(i+1) * muf;
+			T const born = couplings;
+			T const born_scale = couplings * mur;
+
+			T const ref_result = pdfa * pdfb * (born + born_scale);
+
+			CHECK( pdf_results.at(i).neg == ref_result );
+			CHECK( pdf_results.at(i).pos == ref_result );
 		}
 	}
 
@@ -165,8 +181,7 @@ public:
 
 	std::size_t count() const
 	{
-		// TODO: implement more PDFs to check the PDF uncertainty code
-		return 1;
+		return 10;
 	}
 
 	void eval(
@@ -195,29 +210,13 @@ public:
 		CHECK( scale > T{} );
 		CHECK( pdfs.size() == count() );
 
-		for (auto& pdf : pdfs)
+		for (std::size_t i = 0; i != count(); ++i)
 		{
 			for (auto const parton : hep::parton_list())
 			{
-				pdf[parton] = scale;
+				pdfs.at(i)[parton] = scale * T(i+1);
 			}
 		}
-	}
-
-	hep::parton_array<T> eval(T x, T scale)
-	{
-		CHECK( x >= T{} );
-		CHECK( x < T(1.0) );
-		CHECK( scale > T{} );
-
-		hep::parton_array<T> pdfs;
-
-		for (auto const parton : hep::parton_list())
-		{
-			pdfs[parton] = scale;
-		}
-
-		return pdfs;
 	}
 
 private:
