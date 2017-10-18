@@ -77,6 +77,16 @@ public:
 		return T(1.0);
 	}
 
+	void eval_alphas(
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<T>& alphas
+	) {
+		CHECK( scales.size() == 1 );
+		CHECK( scales.front().renormalization() > T() );
+
+		alphas.push_back(T(1.0));
+	}
+
 	std::size_t count() const
 	{
 		return 1;

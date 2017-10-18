@@ -64,11 +64,14 @@ public:
 		CHECK( results.size() == global_scales.size() );
 		CHECK( event_type == hep::event_type::born_like_n );
 
+		std::vector<T> alphas;
+		eval_alphas(global_scales, alphas);
+
 		for (std::size_t i = 0; i != global_scales.size(); ++i)
 		{
 			T const muf = global_scales.at(i).factorization();
 			T const mur = global_scales.at(i).renormalization();
-			T const couplings = pow(eval_alphas(mur), T(alphas_power_));
+			T const couplings = pow(alphas.at(i), T(alphas_power_));
 			T const pdfa = muf;
 			T const pdfb = muf;
 			T const born = couplings;
@@ -161,12 +164,22 @@ public:
 
 	// PDF MEMBER FUNCTIONS
 
-	T eval_alphas(T renormalization_scale)
-	{
-		using std::pow;
+	void eval_alphas(
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<T>& alphas
+	) {
+		CHECK( scales.size() == global_scales.size() );
 
-		T const central = global_scales.front().renormalization();
-		return alphas_ * renormalization_scale / central;
+		for (std::size_t i = 0; i != scales.size(); ++i)
+		{
+			CHECK( scales.at(i).factorization() ==
+				global_scales.at(i).factorization() );
+			CHECK( scales.at(i).renormalization() ==
+				global_scales.at(i).renormalization() );
+
+			alphas.push_back(alphas_ * scales.at(i).renormalization() /
+				global_scales.front().renormalization());
+		}
 	}
 
 	std::size_t count() const

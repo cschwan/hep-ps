@@ -81,17 +81,21 @@ public:
 
 		if (!dynamic_scales_)
 		{
+			scales_.clear();
+			factors_.clear();
 			scale_setter_(std::vector<T>(), scales_);
-			alphas_ = pdfs_.eval_alphas(scales_.front().renormalization());
-			matrix_elements_.alphas(alphas_);
 			factors_.reserve(scales_.size());
+			pdfs_.eval_alphas(scales_, factors_);
 
-			for (auto const scale : scales_)
+			T const central_alphas = factors_.front();
+			matrix_elements_.alphas(central_alphas);
+
+			for (T& factor : factors_)
 			{
 				using std::pow;
 
-				T const alphas = pdfs_.eval_alphas(scale.renormalization());
-				factors_.push_back(pow(alphas / alphas_, alphas_power_));
+				T const alphas = factor;
+				factor = pow(alphas / central_alphas, alphas_power_);
 			}
 		}
 	}
@@ -127,18 +131,19 @@ public:
 		if (dynamic_scales_)
 		{
 			scales_.clear();
-			scale_setter_(phase_space, scales_);
-			alphas_ = pdfs_.eval_alphas(scales_.front().renormalization());
-			matrix_elements_.alphas(alphas_);
 			factors_.clear();
+			scale_setter_(phase_space, scales_);
+			pdfs_.eval_alphas(scales_, factors_);
 
-			for (auto const scale : scales_)
+			T const central_alphas = factors_.front();
+			matrix_elements_.alphas(central_alphas);
+
+			for (T& factor : factors_)
 			{
 				using std::pow;
 
-				// TODO: avoid evaluating the same alphas
-				T const alphas = pdfs_.eval_alphas(scale.renormalization());
-				factors_.push_back(pow(alphas / alphas_, alphas_power_));
+				T const alphas = factor;
+				factor = pow(alphas / central_alphas, alphas_power_);
 			}
 		}
 

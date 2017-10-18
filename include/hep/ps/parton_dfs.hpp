@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/parton.hpp"
+#include "hep/ps/scales.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -52,6 +53,13 @@ public:
 
 	/// Calculates the strong coupling at the given `renormalization_scale`.
 	T eval_alphas(T renormalization_scale);
+
+	/// Evaluates the strong coupling for the renormalization scales in `scales`
+	/// and writes the results into `alphas`
+	void eval_alphas(
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<T>& alphas
+	);
 
 	/// This function returns the number of PDFs represented with by this
 	/// object.

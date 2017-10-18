@@ -71,6 +71,20 @@ T parton_dfs<T>::eval_alphas(T renormalization_scale)
 }
 
 template <typename T>
+void parton_dfs<T>::eval_alphas(
+	std::vector<hep::scales<T>> const& scales,
+	std::vector<T>& alphas
+) {
+	auto& pdf = pimpl->pdfs.front();
+
+	// TODO: implement a cache?
+	for (auto const& scale : scales)
+	{
+		alphas.push_back(pdf->alphasQ(scale.renormalization()));
+	}
+}
+
+template <typename T>
 std::size_t parton_dfs<T>::count() const
 {
 	return pimpl->pdfs.size();
