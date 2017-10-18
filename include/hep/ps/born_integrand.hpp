@@ -81,22 +81,7 @@ public:
 
 		if (!dynamic_scales_)
 		{
-			scales_.clear();
-			factors_.clear();
-			scale_setter_(std::vector<T>(), scales_);
-			factors_.reserve(scales_.size());
-			pdfs_.eval_alphas(scales_, factors_);
-
-			T const central_alphas = factors_.front();
-			matrix_elements_.alphas(central_alphas);
-
-			for (T& factor : factors_)
-			{
-				using std::pow;
-
-				T const alphas = factor;
-				factor = pow(alphas / central_alphas, alphas_power_);
-			}
+			set_scales(std::vector<T>());
 		}
 	}
 
@@ -130,21 +115,7 @@ public:
 
 		if (dynamic_scales_)
 		{
-			scales_.clear();
-			factors_.clear();
-			scale_setter_(phase_space, scales_);
-			pdfs_.eval_alphas(scales_, factors_);
-
-			T const central_alphas = factors_.front();
-			matrix_elements_.alphas(central_alphas);
-
-			for (T& factor : factors_)
-			{
-				using std::pow;
-
-				T const alphas = factor;
-				factor = pow(alphas / central_alphas, alphas_power_);
-			}
+			set_scales(phase_space);
 		}
 
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
@@ -215,6 +186,26 @@ public:
 		);
 
 		return results_.front().neg + results_.front().pos;
+	}
+
+protected:
+	void set_scales(std::vector<T> const& phase_space)
+	{
+		using std::pow;
+
+		scales_.clear();
+		factors_.clear();
+		scale_setter_(phase_space, scales_);
+		pdfs_.eval_alphas(scales_, factors_);
+
+		T const central_alphas = factors_.front();
+		matrix_elements_.alphas(central_alphas);
+
+		for (T& factor : factors_)
+		{
+			T const alphas = factor;
+			factor = pow(alphas / central_alphas, alphas_power_);
+		}
 	}
 
 private:
