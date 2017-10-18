@@ -270,13 +270,10 @@ TEST_CASE("born integrand static scale", "[born_integrand]")
 	// choose an initial state that doesn't have a symmetry factor
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
-	// alphas^1, static scale
+	test_born_integrand(set, 0, T(10.0), false);
 	test_born_integrand(set, 1, T(10.0), false);
-	// alphas^2, static scale
 	test_born_integrand(set, 2, T(10.0), false);
-	// alphas^3, static scale
 	test_born_integrand(set, 3, T(10.0), false);
-	// alphas^4, static scale
 	test_born_integrand(set, 4, T(10.0), false);
 }
 
@@ -285,12 +282,9 @@ TEST_CASE("born integrand dynamic scale", "[born_integrand]")
 	// choose an initial state that doesn't have a symmetry factor
 	hep::initial_state_set set{hep::initial_state::q43_cu};
 
-	// alphas^1, static scale
+	test_born_integrand(set, 0, T(10.0), true);
 	test_born_integrand(set, 1, T(10.0), true);
-	// alphas^2, static scale
 	test_born_integrand(set, 2, T(10.0), true);
-	// alphas^3, static scale
 	test_born_integrand(set, 3, T(10.0), true);
-	// alphas^4, static scale
 	test_born_integrand(set, 4, T(10.0), true);
 }
