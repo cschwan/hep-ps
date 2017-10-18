@@ -32,6 +32,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -225,7 +226,6 @@ private:
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
 	T alphas_power_;
-	T alphas_;
 	bool dynamic_scales_;
 };
 
