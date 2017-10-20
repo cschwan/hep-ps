@@ -82,10 +82,16 @@ public:
 		, pdfsb2_(pdfs_.count())
 		, results_(pdfs_.count())
 	{
+		using std::begin;
+		using std::end;
+
 		eff_pdf_neg_[0].resize(pdfs_.count());
 		eff_pdf_neg_[1].resize(pdfs_.count());
 		eff_pdf_pos_[0].resize(pdfs_.count());
 		eff_pdf_pos_[1].resize(pdfs_.count());
+
+		auto const terms = matrix_elements_.insertion_terms();
+		insertion_terms_.assign(begin(terms), end(terms));
 	}
 
 	T eval(
@@ -136,7 +142,6 @@ public:
 		pdfs_.eval(info.x2() / (info.x2() * (T(1.0) - x) + x), muf, pdfsb2_);
 
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
-		auto const& insertion_terms = matrix_elements_.insertion_terms();
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		auto effective_pdf = [&](
@@ -175,10 +180,10 @@ public:
 		results_.resize(size);
 
 		// loop over all Born, FI, IF, and II
-		for (std::size_t index = 0; index != insertion_terms.size(); ++index)
+		for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
 		{
 			auto const me = corr_me.at(index);
-			auto const& term = insertion_terms.at(index);
+			auto const& term = insertion_terms_.at(index);
 
 			eff_pdf_neg_[0].clear();
 			eff_pdf_neg_[0].resize(size);
@@ -300,6 +305,7 @@ private:
 	std::vector<parton_array<T>> eff_pdf_neg_[2];
 	std::vector<parton_array<T>> eff_pdf_pos_[2];
 	std::vector<neg_pos_results<T>> results_;
+	std::vector<insertion_term> insertion_terms_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U,
