@@ -51,6 +51,7 @@
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/parton_dfs.hpp"
+#include "hep/ps/parton_type.hpp"
 #include "hep/ps/permutation.hpp"
 #include "hep/ps/phase_space_generator.hpp"
 #include "hep/ps/propagator.hpp"

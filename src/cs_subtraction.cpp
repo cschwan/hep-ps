@@ -340,36 +340,18 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		T value = T(0.5) * tf_ / pi * ((x * x + omx * omx) * logomxbx +
 			T(2.0) * x * omx);
 
-		result.a[parton::gluon][parton::anti_up]      = value;
-		result.a[parton::gluon][parton::anti_down]    = value;
-		result.a[parton::gluon][parton::anti_charm]   = value;
-		result.a[parton::gluon][parton::anti_strange] = value;
-		result.a[parton::gluon][parton::up]           = value;
-		result.a[parton::gluon][parton::down]         = value;
-		result.a[parton::gluon][parton::charm]        = value;
-		result.a[parton::gluon][parton::strange]      = value;
+		result.a[parton_type::gluon_    ][parton_type::anti_quark] = value;
+		result.a[parton_type::gluon_    ][parton_type::quark]      = value;
 
 		value = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) * logomxbx + omx);
 
-		result.a[parton::anti_up     ][parton::anti_up     ] = value;
-		result.a[parton::anti_down   ][parton::anti_down   ] = value;
-		result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.a[parton::anti_strange][parton::anti_strange] = value;
-		result.a[parton::up          ][parton::up          ] = value;
-		result.a[parton::down        ][parton::down        ] = value;
-		result.a[parton::charm       ][parton::charm       ] = value;
-		result.a[parton::strange     ][parton::strange     ] = value;
+		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.a[parton_type::quark     ][parton_type::quark]      = value;
 
 		value = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
 
-		result.b[parton::anti_up     ][parton::anti_up     ] = value;
-		result.b[parton::anti_down   ][parton::anti_down   ] = value;
-		result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.b[parton::anti_strange][parton::anti_strange] = value;
-		result.b[parton::up          ][parton::up          ] = value;
-		result.b[parton::down        ][parton::down        ] = value;
-		result.b[parton::charm       ][parton::charm       ] = value;
-		result.b[parton::strange     ][parton::strange     ] = value;
+		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.b[parton_type::quark     ][parton_type::quark]      = value;
 
 		T const dilogome = gsl_sf_dilog(T(1.0) - eta);
 		T const logome   = log(T(1.0) - eta);
@@ -377,14 +359,8 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		value = T(0.5) * cf / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
 			T(2.0) * dilogome + logome * logome);
 
-		result.c[parton::anti_up     ][parton::anti_up     ] = value;
-		result.c[parton::anti_down   ][parton::anti_down   ] = value;
-		result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.c[parton::anti_strange][parton::anti_strange] = value;
-		result.c[parton::up          ][parton::up          ] = value;
-		result.c[parton::down        ][parton::down        ] = value;
-		result.c[parton::charm       ][parton::charm       ] = value;
-		result.c[parton::strange     ][parton::strange     ] = value;
+		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.c[parton_type::quark     ][parton_type::quark]      = value;
 
 		// TODO: qg and gg are NYI
 	}
@@ -400,36 +376,18 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 
 		T value = T(0.5) * gamma / pi / (T(1.0) - x);
 
-		result.a[parton::anti_up     ][parton::anti_up     ] = value;
-		result.a[parton::anti_down   ][parton::anti_down   ] = value;
-		result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.a[parton::anti_strange][parton::anti_strange] = value;
-		result.a[parton::up          ][parton::up          ] = value;
-		result.a[parton::down        ][parton::down        ] = value;
-		result.a[parton::charm       ][parton::charm       ] = value;
-		result.a[parton::strange     ][parton::strange     ] = value;
+		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.a[parton_type::quark     ][parton_type::quark]      = value;
 
 		value = T(0.5) * gamma / pi / (T(1.0) - x);
 
-		result.b[parton::anti_up     ][parton::anti_up     ] = value;
-		result.b[parton::anti_down   ][parton::anti_down   ] = value;
-		result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.b[parton::anti_strange][parton::anti_strange] = value;
-		result.b[parton::up          ][parton::up          ] = value;
-		result.b[parton::down        ][parton::down        ] = value;
-		result.b[parton::charm       ][parton::charm       ] = value;
-		result.b[parton::strange     ][parton::strange     ] = value;
+		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.b[parton_type::quark     ][parton_type::quark]      = value;
 
 		value = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
 
-		result.c[parton::anti_up     ][parton::anti_up     ] = value;
-		result.c[parton::anti_down   ][parton::anti_down   ] = value;
-		result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.c[parton::anti_strange][parton::anti_strange] = value;
-		result.c[parton::up          ][parton::up          ] = value;
-		result.c[parton::down        ][parton::down        ] = value;
-		result.c[parton::charm       ][parton::charm       ] = value;
-		result.c[parton::strange     ][parton::strange     ] = value;
+		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.c[parton_type::quark     ][parton_type::quark]      = value;
 
 		// TODO: qg and gg are NYI
 	}
@@ -445,46 +403,21 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 
 		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsai;
 
-		result.a[parton::gluon][parton::anti_up]      = value;
-		result.a[parton::gluon][parton::anti_down]    = value;
-		result.a[parton::gluon][parton::anti_charm]   = value;
-		result.a[parton::gluon][parton::anti_strange] = value;
-		result.a[parton::gluon][parton::up]           = value;
-		result.a[parton::gluon][parton::down]         = value;
-		result.a[parton::gluon][parton::charm]        = value;
-		result.a[parton::gluon][parton::strange]      = value;
+		result.a[parton_type::gluon_    ][parton_type::anti_quark] = value;
+		result.a[parton_type::gluon_    ][parton_type::quark]      = value;
 
 		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * logmu2bsai;
 
-		result.a[parton::anti_up     ][parton::anti_up     ] = value;
-		result.a[parton::anti_down   ][parton::anti_down   ] = value;
-		result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.a[parton::anti_strange][parton::anti_strange] = value;
-		result.a[parton::up          ][parton::up          ] = value;
-		result.a[parton::down        ][parton::down        ] = value;
-		result.a[parton::charm       ][parton::charm       ] = value;
-		result.a[parton::strange     ][parton::strange     ] = value;
-
-		result.b[parton::anti_up     ][parton::anti_up     ] = value;
-		result.b[parton::anti_down   ][parton::anti_down   ] = value;
-		result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.b[parton::anti_strange][parton::anti_strange] = value;
-		result.b[parton::up          ][parton::up          ] = value;
-		result.b[parton::down        ][parton::down        ] = value;
-		result.b[parton::charm       ][parton::charm       ] = value;
-		result.b[parton::strange     ][parton::strange     ] = value;
+		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.a[parton_type::quark     ][parton_type::quark]      = value;
+		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.b[parton_type::quark     ][parton_type::quark]      = value;
 
 		value = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) + T(2.0) *
 			log(T(1.0) - eta)) * logmu2bsai;
 
-		result.c[parton::anti_up     ][parton::anti_up     ] = value;
-		result.c[parton::anti_down   ][parton::anti_down   ] = value;
-		result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.c[parton::anti_strange][parton::anti_strange] = value;
-		result.c[parton::up          ][parton::up          ] = value;
-		result.c[parton::down        ][parton::down        ] = value;
-		result.c[parton::charm       ][parton::charm       ] = value;
-		result.c[parton::strange     ][parton::strange     ] = value;
+		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.c[parton_type::quark     ][parton_type::quark]      = value;
 
 		// TODO: qg and gg are NYI
 	}
@@ -502,52 +435,28 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * (logmu2bsai -
 			logomx);
 
-		result.a[parton::gluon][parton::anti_up]      = value;
-		result.a[parton::gluon][parton::anti_down]    = value;
-		result.a[parton::gluon][parton::anti_charm]   = value;
-		result.a[parton::gluon][parton::anti_strange] = value;
-		result.a[parton::gluon][parton::up]           = value;
-		result.a[parton::gluon][parton::down]         = value;
-		result.a[parton::gluon][parton::charm]        = value;
-		result.a[parton::gluon][parton::strange]      = value;
+		result.a[parton_type::gluon_    ][parton_type::anti_quark] = value;
+		result.a[parton_type::gluon_    ][parton_type::quark]      = value;
 
 		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * (logmu2bsai -
 			logomx);
 
-		result.a[parton::anti_up     ][parton::anti_up     ] = value;
-		result.a[parton::anti_down   ][parton::anti_down   ] = value;
-		result.a[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.a[parton::anti_strange][parton::anti_strange] = value;
-		result.a[parton::up          ][parton::up          ] = value;
-		result.a[parton::down        ][parton::down        ] = value;
-		result.a[parton::charm       ][parton::charm       ] = value;
-		result.a[parton::strange     ][parton::strange     ] = value;
+		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.a[parton_type::quark     ][parton_type::quark]      = value;
 
 		value = T(0.5) * cf / pi * ((T(1.0) + x * x) / omx * logmu2bsai -
 			T(2.0) * logomx / omx);
 
-		result.b[parton::anti_up     ][parton::anti_up     ] = value;
-		result.b[parton::anti_down   ][parton::anti_down   ] = value;
-		result.b[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.b[parton::anti_strange][parton::anti_strange] = value;
-		result.b[parton::up          ][parton::up          ] = value;
-		result.b[parton::down        ][parton::down        ] = value;
-		result.b[parton::charm       ][parton::charm       ] = value;
-		result.b[parton::strange     ][parton::strange     ] = value;
+		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.b[parton_type::quark     ][parton_type::quark]      = value;
 
 		T const logome = log(T(1.0) - eta);
 
 		value = T(0.5) * cf / pi * (pi * pi / T(3.0) + (eta + T(0.5) * eta *
 			eta + T(2.0) * logome) * logmu2bsai - logome * logome);
 
-		result.c[parton::anti_up     ][parton::anti_up     ] = value;
-		result.c[parton::anti_down   ][parton::anti_down   ] = value;
-		result.c[parton::anti_charm  ][parton::anti_charm  ] = value;
-		result.c[parton::anti_strange][parton::anti_strange] = value;
-		result.c[parton::up          ][parton::up          ] = value;
-		result.c[parton::down        ][parton::down        ] = value;
-		result.c[parton::charm       ][parton::charm       ] = value;
-		result.c[parton::strange     ][parton::strange     ] = value;
+		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
+		result.c[parton_type::quark     ][parton_type::quark]      = value;
 
 		// TODO: qg and gg are NYI
 	}

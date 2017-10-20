@@ -166,9 +166,19 @@ public:
 			{
 				for (auto const ap : parton_list())
 				{
-					pdf[a] += pdfb[ap] * abc.a[ap][a] * ome / xprime;
-					pdf[a] -= pdfa[ap] * abc.b[ap][a] * ome;
-					pdf[a] += pdfa[ap] * abc.c[ap][a];
+					// quark/anti-quark diagonality
+					if ((a != parton::gluon) && (ap != parton::gluon) &&
+						(a != ap))
+					{
+						continue;
+					}
+
+					auto const at = parton_type_of(a);
+					auto const apt = parton_type_of(ap);
+
+					pdf[a] += pdfb[ap] * abc.a[apt][at] * ome / xprime;
+					pdf[a] -= pdfa[ap] * abc.b[apt][at] * ome;
+					pdf[a] += pdfa[ap] * abc.c[apt][at];
 				}
 			}
 

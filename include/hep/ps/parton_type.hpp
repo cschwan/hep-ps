@@ -1,5 +1,5 @@
-#ifndef HEP_PS_ABC_TERMS_HPP
-#define HEP_PS_ABC_TERMS_HPP
+#ifndef HEP_PS_PARTON_TYPE_HPP
+#define HEP_PS_PARTON_TYPE_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -19,18 +19,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/parton_type.hpp"
+#include "hep/ps/enum.hpp"
+#include "hep/ps/parton.hpp"
+
+#include <cassert>
 
 namespace hep
 {
 
-template <typename T>
-struct abc_terms
+// TODO: rename `gluon_` to `gluon` once the `enum` is an `enum class`
+
+HEP_ENUM(parton_type,
+	anti_quark, /*!< An anti-quark. */
+	gluon_,     /*!< A gluon. */
+	quark       /*!< A quark. */
+);
+
+HEP_ENUM_ARRAY(parton_type);
+
+// TODO: make functions `constexpr` in C++14
+
+/// Returns the \ref parton_type for a \ref parton `p`.
+inline parton_type parton_type_of(parton p)
 {
-	parton_type_array<parton_type_array<T>> a;
-	parton_type_array<parton_type_array<T>> b;
-	parton_type_array<parton_type_array<T>> c;
-};
+	switch (p)
+	{
+	case anti_up:
+	case anti_down:
+	case anti_charm:
+	case anti_strange:
+		return parton_type::anti_quark;
+
+	case gluon:
+		return parton_type::gluon_;
+
+	case up:
+	case down:
+	case charm:
+	case strange:
+		return parton_type::quark;
+	}
+
+	assert( false );
+}
 
 }
 
