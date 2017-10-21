@@ -85,11 +85,6 @@ public:
 		using std::begin;
 		using std::end;
 
-		eff_pdf_neg_[0].resize(pdfs_.count());
-		eff_pdf_neg_[1].resize(pdfs_.count());
-		eff_pdf_pos_[0].resize(pdfs_.count());
-		eff_pdf_pos_[1].resize(pdfs_.count());
-
 		auto const terms = matrix_elements_.insertion_terms();
 		insertion_terms_.assign(begin(terms), end(terms));
 	}
@@ -195,15 +190,6 @@ public:
 			auto const me = corr_me.at(index);
 			auto const& term = insertion_terms_.at(index);
 
-			eff_pdf_neg_[0].clear();
-			eff_pdf_neg_[0].resize(size);
-			eff_pdf_neg_[1].clear();
-			eff_pdf_neg_[1].resize(size);
-			eff_pdf_pos_[0].clear();
-			eff_pdf_pos_[0].resize(size);
-			eff_pdf_pos_[1].clear();
-			eff_pdf_pos_[1].resize(size);
-
 			// loop over both initial state partons
 			for (auto const i : { 0u, 1u })
 			{
@@ -232,45 +218,47 @@ public:
 
 				for (std::size_t pdf = 0; pdf != size; ++pdf)
 				{
-					eff_pdf_neg_[i].at(pdf) = effective_pdf(
+					auto const pdf_neg = effective_pdf(
 						term,
 						(i == 0) ? info.x2() : info.x1(),
 						(i == 0) ? pdfsa2_.at(pdf) : pdfsa1_.at(pdf),
 						(i == 0) ? pdfsb2_.at(pdf) : pdfsb1_.at(pdf)
 					);
 
-					eff_pdf_pos_[i].at(pdf) = effective_pdf(
+					auto const pdf_pos = effective_pdf(
 						term,
 						(i == 0) ? info.x1() : info.x2(),
 						(i == 0) ? pdfsa1_.at(pdf) : pdfsa2_.at(pdf),
 						(i == 0) ? pdfsb1_.at(pdf) : pdfsb2_.at(pdf)
 					);
+
+					if (i == 0)
+					{
+						results_.at(pdf) += convolute(
+							pdf_neg,
+							pdfsa1_.at(pdf),
+							pdf_pos,
+							pdfsa2_.at(pdf),
+							me,
+							set_,
+							factor,
+							cut_result
+						);
+					}
+					else
+					{
+						results_.at(pdf) += convolute(
+							pdfsa2_.at(pdf),
+							pdf_neg,
+							pdfsa1_.at(pdf),
+							pdf_pos,
+							me,
+							set_,
+							factor,
+							cut_result
+						);
+					}
 				}
-			}
-
-			for (std::size_t pdf = 0; pdf != size; ++pdf)
-			{
-				results_.at(pdf) += convolute(
-					eff_pdf_neg_[0].at(pdf),
-					pdfsa1_.at(pdf),
-					eff_pdf_pos_[0].at(pdf),
-					pdfsa2_.at(pdf),
-					me,
-					set_,
-					factor,
-					cut_result
-				);
-
-				results_.at(pdf) += convolute(
-					pdfsa2_.at(pdf),
-					eff_pdf_neg_[1].at(pdf),
-					pdfsa1_.at(pdf),
-					eff_pdf_pos_[1].at(pdf),
-					me,
-					set_,
-					factor,
-					cut_result
-				);
 			}
 
 			if (insertion2_)
@@ -312,8 +300,6 @@ private:
 	std::vector<parton_array<T>> pdfsa2_;
 	std::vector<parton_array<T>> pdfsb1_;
 	std::vector<parton_array<T>> pdfsb2_;
-	std::vector<parton_array<T>> eff_pdf_neg_[2];
-	std::vector<parton_array<T>> eff_pdf_pos_[2];
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<insertion_term> insertion_terms_;
 };
