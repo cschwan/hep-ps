@@ -22,8 +22,6 @@
 #include "hep/ps/enum.hpp"
 #include "hep/ps/parton.hpp"
 
-#include <cassert>
-
 namespace hep
 {
 
@@ -37,10 +35,8 @@ HEP_ENUM(parton_type,
 
 HEP_ENUM_ARRAY(parton_type);
 
-// TODO: make functions `constexpr` in C++14
-
 /// Returns the \ref parton_type for a \ref parton `p`.
-inline parton_type parton_type_of(parton p)
+constexpr parton_type parton_type_of(parton p)
 {
 	switch (p)
 	{
@@ -59,8 +55,6 @@ inline parton_type parton_type_of(parton p)
 	case strange:
 		return parton_type::quark;
 	}
-
-	assert( false );
 }
 
 }

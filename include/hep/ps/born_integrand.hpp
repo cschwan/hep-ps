@@ -159,10 +159,8 @@ private:
 };
 
 template <class T, class M, class C, class R, class P, class S, class D>
-using born_integrand_t = born_integrand<T,
-	typename std::decay<M>::type, typename std::decay<C>::type,
-	typename std::decay<R>::type, typename std::decay<P>::type,
-	typename std::decay<S>::type, typename std::decay<D>::type>;
+using born_integrand_t = born_integrand<T, std::decay_t<M>, std::decay_t<C>,
+	std::decay_t<R>, std::decay_t<P>, std::decay_t<S>, std::decay_t<D>>;
 
 template <class T, class M, class C, class R, class P, class S, class D>
 inline std::unique_ptr<ps_integrand<T>> make_born_integrand(
@@ -175,17 +173,16 @@ inline std::unique_ptr<ps_integrand<T>> make_born_integrand(
 	initial_state_set set,
 	T hbarc2
 ) {
-	return std::unique_ptr<born_integrand_t<T, M, C, R, P, S, D>>(
-		new born_integrand_t<T, M, C, R, P, S, D>(
-			std::forward<M>(matrix_elements),
-			std::forward<C>(cuts),
-			std::forward<R>(recombiner),
-			std::forward<P>(pdfs),
-			std::forward<S>(scale_setter),
-			std::forward<D>(distributions),
-			set,
-			hbarc2
-	));
+	return std::make_unique<born_integrand_t<T, M, C, R, P, S, D>>(
+		std::forward<M>(matrix_elements),
+		std::forward<C>(cuts),
+		std::forward<R>(recombiner),
+		std::forward<P>(pdfs),
+		std::forward<S>(scale_setter),
+		std::forward<D>(distributions),
+		set,
+		hbarc2
+	);
 }
 
 }

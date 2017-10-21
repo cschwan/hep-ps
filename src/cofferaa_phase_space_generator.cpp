@@ -231,16 +231,15 @@ std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
 	std::vector<std::tuple<int, int, int>> const& dipoles,
 	std::size_t extra_random_numbers
 ) {
-	return std::unique_ptr<phase_space_generator<T>>(
-		new hadron_hadron_psg_adapter<cofferaa_psg<T>>(
-			min_energy,
-			cmf_energy,
-			process,
-			true,
-			constants,
-			dipoles,
-			extra_random_numbers
-	));
+	return std::make_unique<hadron_hadron_psg_adapter<cofferaa_psg<T>>>(
+		min_energy,
+		cmf_energy,
+		process,
+		true,
+		constants,
+		dipoles,
+		extra_random_numbers
+	);
 }
 
 template <typename T>
@@ -252,16 +251,15 @@ std::unique_ptr<phase_space_generator<T>> make_minimal_cofferaa_phase_space_gene
 	std::vector<std::tuple<int, int, int>> const& dipoles,
 	std::size_t extra_random_numbers
 ) {
-	return std::unique_ptr<phase_space_generator<T>>(
-		new hadron_hadron_psg_adapter<cofferaa_psg<T>>(
-			min_energy,
-			cmf_energy,
-			process,
-			false,
-			constants,
-			dipoles,
-			extra_random_numbers
-	));
+	return std::make_unique<hadron_hadron_psg_adapter<cofferaa_psg<T>>>(
+		min_energy,
+		cmf_energy,
+		process,
+		false,
+		constants,
+		dipoles,
+		extra_random_numbers
+	);
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

@@ -306,11 +306,9 @@ private:
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
-using fini_integrand_t = fini_integrand<T,
-	typename std::decay<M>::type, typename std::decay<S>::type,
-	typename std::decay<C>::type, typename std::decay<R>::type,
-	typename std::decay<P>::type, typename std::decay<U>::type,
-	typename std::decay<D>::type>;
+using fini_integrand_t = fini_integrand<T, std::decay_t<M>, std::decay_t<S>,
+	std::decay_t<C>, std::decay_t<R>, std::decay_t<P>, std::decay_t<U>,
+	std::decay_t<D>>;
 
 template <class T, class M, class S, class C, class R, class P, class U,
 	class D>
@@ -326,19 +324,18 @@ inline std::unique_ptr<ps_integrand<T>> make_fini_integrand(
 	T hbarc2,
 	bool insertion2 = false
 ) {
-	return std::unique_ptr<fini_integrand_t<T, M, S, C, R, P, U, D>>(
-		new fini_integrand_t<T, M, S, C, R, P, U, D>(
-			std::forward<M>(matrix_elements),
-			std::forward<S>(subtraction),
-			std::forward<C>(cuts),
-			std::forward<R>(recombiner),
-			std::forward<P>(pdfs),
-			std::forward<U>(scale_setter),
-			std::forward<D>(distributions),
-			set,
-			hbarc2,
-			insertion2
-	));
+	return std::make_unique<fini_integrand_t<T, M, S, C, R, P, U, D>>(
+		std::forward<M>(matrix_elements),
+		std::forward<S>(subtraction),
+		std::forward<C>(cuts),
+		std::forward<R>(recombiner),
+		std::forward<P>(pdfs),
+		std::forward<U>(scale_setter),
+		std::forward<D>(distributions),
+		set,
+		hbarc2,
+		insertion2
+	);
 }
 
 }

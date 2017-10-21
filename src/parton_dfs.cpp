@@ -45,14 +45,13 @@ parton_dfs<T>::parton_dfs(
 	std::string const& pdf_name,
 	std::size_t pdf_member
 )
-	// TODO: replace with `make_unique` in C++14
-	: pimpl(new impl(pdf_name, pdf_member))
+	: pimpl(std::make_unique<impl>(pdf_name, pdf_member))
 {
 }
 
 template <typename T>
 parton_dfs<T>::parton_dfs(std::string const& pdf_name)
-	: pimpl(new impl(pdf_name))
+	: pimpl(std::make_unique<impl>(pdf_name))
 {
 }
 

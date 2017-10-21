@@ -953,14 +953,13 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 	lusifer_constants<T> const& constants,
 	std::size_t extra_random_numbers
 ) {
-	return std::unique_ptr<phase_space_generator<T>>(
-		new hadron_hadron_psg_adapter<lusifer_psg<T>>(
-			min_energy,
-			cmf_energy,
-			processes,
-			constants,
-			extra_random_numbers
-	));
+	return std::make_unique<hadron_hadron_psg_adapter<lusifer_psg<T>>>(
+		min_energy,
+		cmf_energy,
+		processes,
+		constants,
+		extra_random_numbers
+	);
 }
 
 template <typename T>

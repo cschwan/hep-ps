@@ -191,13 +191,12 @@ std::unique_ptr<phase_space_generator<T>> make_rambo_phase_space_generator(
 	std::size_t final_state_particles,
 	std::size_t extra_random_numbers
 ) {
-	return std::unique_ptr<phase_space_generator<T>>{
-		new hadron_hadron_psg_adapter<rambo_psg<T>>{
-			min_energy,
-			cmf_energy,
-			final_state_particles,
-			extra_random_numbers
-	}};
+	return std::make_unique<hadron_hadron_psg_adapter<rambo_psg<T>>>(
+		min_energy,
+		cmf_energy,
+		final_state_particles,
+		extra_random_numbers
+	);
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

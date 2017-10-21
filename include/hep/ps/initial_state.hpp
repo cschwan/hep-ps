@@ -22,8 +22,6 @@
 #include "hep/ps/enum.hpp"
 #include "hep/ps/parton.hpp"
 
-#include <cassert>
-
 namespace hep
 {
 
@@ -51,10 +49,8 @@ HEP_ENUM_ARRAY(initial_state);
 
 HEP_ENUM_SET(initial_state);
 
-// TODO: make function `constexpr` in C++14
-
 /// Returns the second parton of the given initial_state `state`.
-inline parton state_parton_one(initial_state state)
+constexpr parton state_parton_one(initial_state state)
 {
 	switch (state)
 	{
@@ -80,14 +76,10 @@ inline parton state_parton_one(initial_state state)
 	case initial_state::q13_sg:
 		return parton::anti_strange;
 	}
-
-	assert( false );
 }
 
-// TODO: make function `constexpr` in C++14
-
 /// Returns the second parton of the given initial_state `state`.
-inline parton state_parton_two(initial_state state)
+constexpr parton state_parton_two(initial_state state)
 {
 	switch (state)
 	{
@@ -115,8 +107,6 @@ inline parton state_parton_two(initial_state state)
 	case initial_state::q13_sg:
 		return parton::gluon;
 	}
-
-	assert( false );
 }
 
 }
