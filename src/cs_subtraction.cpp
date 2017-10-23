@@ -1,27 +1,12 @@
 #include "hep/ps/cs_subtraction.hpp"
 #include "hep/ps/insertion_term_type.hpp"
+#include "hep/ps/phase_space_point.hpp"
 
 #include <gsl/gsl_sf_dilog.h>
 
 #include <cassert>
 #include <cmath>
 #include <cstddef>
-
-namespace
-{
-
-template <typename T>
-T invariant(std::vector<T> const& p, std::size_t i, std::size_t j)
-{
-	T const p0 = p.at(4 * i + 0) + p.at(4 * j + 0);
-	T const p1 = p.at(4 * i + 1) + p.at(4 * j + 1);
-	T const p2 = p.at(4 * i + 2) + p.at(4 * j + 2);
-	T const p3 = p.at(4 * i + 3) + p.at(4 * j + 3);
-
-	return p0 * p0 - p1 * p1 - p2 * p2 - p3 * p3;
-}
-
-}
 
 namespace hep
 {
@@ -71,9 +56,11 @@ dipole_invariants<T> cs_subtraction<T>::map_phase_space(
 
 	dipole_invariants<T> invariants;
 	{
-		T const sij = invariant(real_phase_space, i, j);
-		T const sik = invariant(real_phase_space, i, k);
-		T const sjk = invariant(real_phase_space, j, k);
+		phase_space_point<T> ps{real_phase_space};
+
+		T const sij = ps.m2(i, j);
+		T const sik = ps.m2(i, k);
+		T const sjk = ps.m2(j, k);
 
 		switch (dipole_info.type())
 		{
@@ -396,8 +383,10 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 
 	case insertion_term_type::initial_final:
 	{
+		phase_space_point<T> ps{phase_space};
+
 		T const omx = T(1.0) - x;
-		T const sai = invariant(phase_space, term.emitter(), term.spectator());
+		T const sai = ps.m2(term.emitter(), term.spectator());
 		T const mu2 = mu.factorization() * mu.factorization();
 		T const logmu2bsai = log(mu2 / sai);
 
@@ -425,9 +414,11 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		break;
 
 	case insertion_term_type::initial_initial:
+	{
+		phase_space_point<T> ps{phase_space};
 
 		T const omx = T(1.0) - x;
-		T const sai = invariant(phase_space, term.emitter(), term.spectator());
+		T const sai = ps.m2(term.emitter(), term.spectator());
 		T const mu2 = mu.factorization() * mu.factorization();
 		T const logmu2bsai = log(mu2 / sai);
 		T const logomx = log(omx);
@@ -459,6 +450,7 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 		result.c[parton_type::quark     ][parton_type::quark]      = value;
 
 		// TODO: qg and gg are NYI
+	}
 	}
 
 	return result;
@@ -492,7 +484,9 @@ T cs_subtraction<T>::insertion_terms2(
 
 		result -= T(7.0) * pi * pi / T(12.0);
 
-		T const sij = invariant(phase_space, term.emitter(), term.spectator());
+		phase_space_point<T> ps{phase_space};
+
+		T const sij = ps.m2(term.emitter(), term.spectator());
 		T const mu2 = mu.renormalization() * mu.renormalization();
 		T const logmubsij = log(mu2 / sij);
 

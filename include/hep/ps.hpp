@@ -54,6 +54,7 @@
 #include "hep/ps/parton_type.hpp"
 #include "hep/ps/permutation.hpp"
 #include "hep/ps/phase_space_generator.hpp"
+#include "hep/ps/phase_space_point.hpp"
 #include "hep/ps/propagator.hpp"
 #include "hep/ps/ps_integrand.hpp"
 #include "hep/ps/rambo_phase_space_generator.hpp"

@@ -1,4 +1,5 @@
 #include "hep/ps/p_type_jet_algorithm.hpp"
+#include "hep/ps/phase_space_point.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -7,62 +8,6 @@
 
 namespace
 {
-
-template <typename T>
-T rap(std::vector<T> const& p, std::size_t i)
-{
-	using std::log;
-
-	T const p0 = p[4 * i + 0];
-	T const p3 = p[4 * i + 3];
-
-	return T(0.5) * log((p0 + p3) / (p0 - p3));
-}
-
-template <typename T>
-T phi(std::vector<T> const& p, std::size_t i)
-{
-	using std::atan2;
-
-	T const p1 = p[4 * i + 1];
-	T const p2 = p[4 * i + 2];
-
-	return atan2(p2, p1);
-}
-
-template <typename T>
-T phi_diff(T phi1, T phi2)
-{
-	using std::acos;
-	using std::fabs;
-
-	T const abs_delta_phi = fabs(phi1 - phi2);
-
-	if (abs_delta_phi > acos(T(-1.0)))
-	{
-		return T(2.0) * acos(T(-1.0)) - abs_delta_phi;
-	}
-
-	return abs_delta_phi;
-}
-
-template <typename T>
-T dist2(std::vector<T> const& p, std::size_t i, std::size_t j)
-{
-	T const rap_diff = rap(p, i) - rap(p, j);
-	T const angle_diff = phi_diff(phi(p, i), phi(p, j));
-
-	return rap_diff * rap_diff + angle_diff * angle_diff;
-}
-
-template <typename T>
-T pt2(std::vector<T> const& p, std::size_t i)
-{
-	T const p1 = p.at(4 * i + 1);
-	T const p2 = p.at(4 * i + 2);
-
-	return p1 * p1 + p2 * p2;
-}
 
 constexpr std::ptrdiff_t reconstruct_distance(
 	std::size_t n,
@@ -100,10 +45,12 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 	dib_.clear();
 	dij_.clear();
 
+	phase_space_point<T> ps{phase_space};
+
 	for (std::size_t i = 0; i != n; ++i)
 	{
 		std::size_t const index = candidates_.at(i);
-		dib_.push_back(pow(pt2(phase_space, index), p_));
+		dib_.push_back(pow(ps.pt2(index), p_));
 	}
 
 	for (std::size_t i = 0; i != (n-1); ++i)
@@ -116,7 +63,7 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 			T const dib_jb = dib_.at(j);
 			T const min = fmin(dib_ib, dib_jb);
 			std::size_t const index_j = candidates_.at(j);
-			T const factor = dist2(phase_space, index_i, index_j) / radius2_;
+			T const factor = ps.dist2(index_i, index_j) / radius2_;
 
 			dij_.push_back(min * factor);
 		}

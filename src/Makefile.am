@@ -22,6 +22,7 @@ libhep_ps_la_SOURCES = \
 	p_type_jet_algorithm.cpp \
 	parton_dfs.cpp \
 	phase_space_generator.cpp \
+	phase_space_point.cpp \
 	propagator.cpp \
 	rambo_phase_space_generator.cpp \
 	silence_third_party_libs.cpp \
