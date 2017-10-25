@@ -81,7 +81,8 @@ public:
 		, pdfsa2_(pdfs_.count())
 		, pdfsb1_(pdfs_.count())
 		, pdfsb2_(pdfs_.count())
-		, results_(pdfs_.count())
+		, results_(1)
+		, pdf_results_(pdfs_.count())
 	{
 		using std::begin;
 		using std::end;
@@ -141,8 +142,8 @@ public:
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		std::size_t const size = pdfsa1_.size();
-		results_.clear();
-		results_.resize(size);
+		pdf_results_.clear();
+		pdf_results_.resize(size);
 
 		// loop over all Born, FI, IF, and II
 		for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
@@ -216,7 +217,7 @@ public:
 						(i == 0) ? pdfsb1_.at(pdf) : pdfsb2_.at(pdf)
 					);
 
-					results_.at(pdf) += convolute(
+					pdf_results_.at(pdf) += convolute(
 						(i == 0) ? pdf_neg         : pdfsa2_.at(pdf),
 						(i == 0) ? pdfsa1_.at(pdf) : pdf_neg,
 						(i == 0) ? pdf_pos         : pdfsa1_.at(pdf),
@@ -239,14 +240,23 @@ public:
 
 				for (std::size_t pdf = 0; pdf != size; ++pdf)
 				{
-					results_.at(pdf) += convolute(pdfsa1_.at(pdf),
+					pdf_results_.at(pdf) += convolute(pdfsa1_.at(pdf),
 						pdfsa2_.at(pdf), me, set_, ins, cut_result);
 				}
 			}
 		}
 
-		distributions_(phase_space, cut_result, results_, rapidity_shift,
-			event_type::born_like_n, projector);
+		results_.front() = pdf_results_.front();
+
+		distributions_(
+			phase_space,
+			cut_result,
+			results_,
+			pdf_results_,
+			rapidity_shift,
+			event_type::born_like_n,
+			projector
+		);
 
 		return results_.front().neg + results_.front().pos;
 	}
@@ -302,6 +312,7 @@ private:
 	std::vector<parton_array<T>> pdfsb1_;
 	std::vector<parton_array<T>> pdfsb2_;
 	std::vector<neg_pos_results<T>> results_;
+	std::vector<neg_pos_results<T>> pdf_results_;
 	std::vector<insertion_term> insertion_terms_;
 };
 
