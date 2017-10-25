@@ -457,6 +457,22 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 }
 
 template <typename T>
+void cs_subtraction<T>::insertion_terms(
+	insertion_term const& term,
+	std::vector<scales<T>> const& scales,
+	std::vector<T> const& phase_space,
+	T x,
+	T eta,
+	std::vector<abc_terms<T>>& results
+) const {
+	// TODO: optimize
+	for (auto const& scale : scales)
+	{
+		results.push_back(insertion_terms(term, scale, phase_space, x, eta));
+	}
+}
+
+template <typename T>
 T cs_subtraction<T>::insertion_terms2(
 	insertion_term const& term,
 	scales<T> const& mu,
@@ -505,6 +521,20 @@ T cs_subtraction<T>::insertion_terms2(
 	default:
 		// NYI
 		assert( false );
+	}
+}
+
+template <typename T>
+void cs_subtraction<T>::insertion_terms2(
+	insertion_term const& term,
+	std::vector<scales<T>> const& scales,
+	std::vector<T> const& phase_space,
+	std::vector<T>& results
+) const {
+	// TODO: optimize
+	for (auto const& scale : scales)
+	{
+		results.push_back(insertion_terms2(term, scale, phase_space));
 	}
 }
 

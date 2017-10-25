@@ -64,10 +64,26 @@ public:
 		T eta
 	) const;
 
+	void insertion_terms(
+		insertion_term const& term,
+		std::vector<scales<T>> const& scales,
+		std::vector<T> const& phase_space,
+		T x,
+		T eta,
+		std::vector<abc_terms<T>>& results
+	) const;
+
 	T insertion_terms2(
 		insertion_term const& term,
 		scales<T> const& mu,
 		std::vector<T> const& phase_space
+	) const;
+
+	void insertion_terms2(
+		insertion_term const& term,
+		std::vector<scales<T>> const& scales,
+		std::vector<T> const& phase_space,
+		std::vector<T>& results
 	) const;
 
 private:

@@ -77,11 +77,10 @@ public:
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, insertion2_(insertion2)
-		, pdfsa1_(pdfs_.count())
-		, pdfsa2_(pdfs_.count())
-		, pdfsb1_(pdfs_.count())
-		, pdfsb2_(pdfs_.count())
-		, results_(1)
+		, pdf_pdfsa1_(pdfs_.count())
+		, pdf_pdfsa2_(pdfs_.count())
+		, pdf_pdfsb1_(pdfs_.count())
+		, pdf_pdfsb2_(pdfs_.count())
 		, pdf_results_(pdfs_.count())
 	{
 		using std::begin;
@@ -89,6 +88,11 @@ public:
 
 		auto const terms = matrix_elements_.insertion_terms();
 		insertion_terms_.assign(begin(terms), end(terms));
+
+		if (!scale_setter_.dynamic())
+		{
+			set_scales(std::vector<T>());
+		}
 	}
 
 	T eval(
@@ -119,31 +123,46 @@ public:
 			return T();
 		}
 
-		auto const scales = scale_setter_(phase_space);
-
-		// only set renormalization scale if it changed
-		if (scales.renormalization() != old_renormalization_scale_)
+		if (scale_setter_.dynamic())
 		{
-			old_renormalization_scale_ = scales.renormalization();
-
-			T const alphas = pdfs_.eval_alphas(scales.renormalization());
-			matrix_elements_.parameters(scales.renormalization(), alphas);
+			set_scales(phase_space);
 		}
 
-		T const x = phase_space.back();
-		T const muf = scales.factorization();
+		pdfsa1_.clear();
+		pdfsa1_.resize(scales_.size());
+		pdfsa2_.clear();
+		pdfsa2_.resize(scales_.size());
+		pdfsb1_.clear();
+		pdfsb1_.resize(scales_.size());
+		pdfsb2_.clear();
+		pdfsb2_.resize(scales_.size());
 
-		pdfs_.eval(info.x1(), muf, pdfsa1_);
-		pdfs_.eval(info.x2(), muf, pdfsa2_);
-		pdfs_.eval(info.x1() / (info.x1() * (T(1.0) - x) + x), muf, pdfsb1_);
-		pdfs_.eval(info.x2() / (info.x2() * (T(1.0) - x) + x), muf, pdfsb2_);
+		T const x = phase_space.back();
+		T const x1p = info.x1() / (info.x1() * (T(1.0) - x) + x);
+		T const x2p = info.x2() / (info.x2() * (T(1.0) - x) + x);
+
+		pdfs_.eval(info.x1(), scales_, pdfsa1_);
+		pdfs_.eval(info.x2(), scales_, pdfsa2_);
+		pdfs_.eval(x1p, scales_, pdfsb1_);
+		pdfs_.eval(x2p, scales_, pdfsb2_);
+
+		if (pdfs_.count() > 1)
+		{
+			T const muf = scales_.front().factorization();
+
+			pdfs_.eval(info.x1(), muf, pdf_pdfsa1_);
+			pdfs_.eval(info.x2(), muf, pdf_pdfsa2_);
+			pdfs_.eval(x1p, muf, pdf_pdfsb1_);
+			pdfs_.eval(x2p, muf, pdf_pdfsb2_);
+		}
+
+		results_.clear();
+		results_.resize(scales_.size());
+		pdf_results_.clear();
+		pdf_results_.resize(pdfs_.count());
 
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
-
-		std::size_t const size = pdfsa1_.size();
-		pdf_results_.clear();
-		pdf_results_.resize(size);
 
 		// loop over all Born, FI, IF, and II
 		for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
@@ -180,48 +199,85 @@ public:
 				T const eta_neg = (i == 0) ? info.x2() : info.x1();
 				T const xprime_neg = eta_neg * (T(1.0) - x) + x;
 
-				auto const& abc_neg = subtraction_.insertion_terms(
+				subtraction_.insertion_terms(
 					term,
-					scales,
+					scales_,
 					phase_space,
 					xprime_neg,
-					eta_neg
+					eta_neg,
+					abc_neg_
 				);
 
 				T const eta_pos = (i == 0) ? info.x1() : info.x2();
 				T const xprime_pos = eta_pos * (T(1.0) - x) + x;
 
-				auto const& abc_pos = subtraction_.insertion_terms(
+				subtraction_.insertion_terms(
 					term,
-					scales,
+					scales_,
 					phase_space,
 					xprime_pos,
-					eta_pos
+					eta_pos,
+					abc_pos_
 				);
 
-				for (std::size_t pdf = 0; pdf != size; ++pdf)
+				for (std::size_t j = 0; j != scales_.size(); ++j)
 				{
 					auto const pdf_neg = effective_pdf(
-						abc_neg,
+						abc_neg_.at(j),
 						xprime_neg,
 						(i == 0) ? info.x2() : info.x1(),
-						(i == 0) ? pdfsa2_.at(pdf) : pdfsa1_.at(pdf),
-						(i == 0) ? pdfsb2_.at(pdf) : pdfsb1_.at(pdf)
+						(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
+						(i == 0) ? pdfsb2_.at(j) : pdfsb1_.at(j)
 					);
 
 					auto const pdf_pos = effective_pdf(
-						abc_pos,
+						abc_pos_.at(j),
 						xprime_pos,
 						(i == 0) ? info.x1() : info.x2(),
-						(i == 0) ? pdfsa1_.at(pdf) : pdfsa2_.at(pdf),
-						(i == 0) ? pdfsb1_.at(pdf) : pdfsb2_.at(pdf)
+						(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
+						(i == 0) ? pdfsb1_.at(j) : pdfsb2_.at(j)
+					);
+
+					results_.at(j) += convolute(
+						(i == 0) ? pdf_neg       : pdfsa2_.at(j),
+						(i == 0) ? pdfsa1_.at(j) : pdf_neg,
+						(i == 0) ? pdf_pos       : pdfsa1_.at(j),
+						(i == 0) ? pdfsa2_.at(j) : pdf_pos,
+						me,
+						set_,
+						factors_.at(j) * factor,
+						cut_result
+					);
+				}
+
+				if (pdfs_.count() == 1)
+				{
+					continue;
+				}
+
+				for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
+				{
+					auto const pdf_neg = effective_pdf(
+						abc_neg_.front(),
+						xprime_neg,
+						(i == 0) ? info.x2() : info.x1(),
+						(i == 0) ? pdf_pdfsa2_.at(pdf) : pdf_pdfsa1_.at(pdf),
+						(i == 0) ? pdf_pdfsb2_.at(pdf) : pdf_pdfsb1_.at(pdf)
+					);
+
+					auto const pdf_pos = effective_pdf(
+						abc_pos_.front(),
+						xprime_pos,
+						(i == 0) ? info.x1() : info.x2(),
+						(i == 0) ? pdf_pdfsa1_.at(pdf) : pdf_pdfsa2_.at(pdf),
+						(i == 0) ? pdf_pdfsb1_.at(pdf) : pdf_pdfsb2_.at(pdf)
 					);
 
 					pdf_results_.at(pdf) += convolute(
-						(i == 0) ? pdf_neg         : pdfsa2_.at(pdf),
-						(i == 0) ? pdfsa1_.at(pdf) : pdf_neg,
-						(i == 0) ? pdf_pos         : pdfsa1_.at(pdf),
-						(i == 0) ? pdfsa2_.at(pdf) : pdf_pos,
+						(i == 0) ? pdf_neg             : pdf_pdfsa2_.at(pdf),
+						(i == 0) ? pdf_pdfsa1_.at(pdf) : pdf_neg,
+						(i == 0) ? pdf_pos             : pdf_pdfsa1_.at(pdf),
+						(i == 0) ? pdf_pdfsa2_.at(pdf) : pdf_pos,
 						me,
 						set_,
 						factor,
@@ -232,21 +288,43 @@ public:
 
 			if (insertion2_)
 			{
-				T const ins = factor * subtraction_.insertion_terms2(
+				subtraction_.insertion_terms2(
 					term,
-					scales,
-					phase_space
+					scales_,
+					phase_space,
+					terms2_
 				);
 
-				for (std::size_t pdf = 0; pdf != size; ++pdf)
+				for (std::size_t i = 0; i != scales_.size(); ++i)
 				{
-					pdf_results_.at(pdf) += convolute(pdfsa1_.at(pdf),
-						pdfsa2_.at(pdf), me, set_, ins, cut_result);
+					results_.at(i) += convolute(
+						pdfsa1_.front(),
+						pdfsa2_.front(),
+						me,
+						set_,
+						factors_.at(i) * factor * terms2_.at(i),
+						cut_result
+					);
+				}
+
+				if (pdfs_.count() == 1)
+				{
+					continue;
+				}
+
+				for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
+				{
+					pdf_results_.at(pdf) += convolute(
+						pdf_pdfsa1_.at(pdf),
+						pdf_pdfsa2_.at(pdf),
+						me,
+						set_,
+						factor * terms2_.front(),
+						cut_result
+					);
 				}
 			}
 		}
-
-		results_.front() = pdf_results_.front();
 
 		distributions_(
 			phase_space,
@@ -294,6 +372,25 @@ protected:
 		return pdf;
 	}
 
+	void set_scales(std::vector<T> const& phase_space)
+	{
+		using std::pow;
+
+		scales_.clear();
+		factors_.clear();
+		scale_setter_(phase_space, scales_);
+		pdfs_.eval_alphas(scales_, factors_);
+
+		T const central_alphas = factors_.front();
+		matrix_elements_.alphas(central_alphas);
+
+		for (T& factor : factors_)
+		{
+			T const alphas = factor;
+			factor = pow(alphas / central_alphas, alphas_power_);
+		}
+	}
+
 private:
 	M matrix_elements_;
 	S subtraction_;
@@ -305,15 +402,24 @@ private:
 	initial_state_set set_;
 	T hbarc2_;
 
-	T old_renormalization_scale_;
 	bool insertion2_;
 	std::vector<parton_array<T>> pdfsa1_;
 	std::vector<parton_array<T>> pdfsa2_;
 	std::vector<parton_array<T>> pdfsb1_;
 	std::vector<parton_array<T>> pdfsb2_;
-	std::vector<neg_pos_results<T>> results_;
+	std::vector<parton_array<T>> pdf_pdfsa1_;
+	std::vector<parton_array<T>> pdf_pdfsa2_;
+	std::vector<parton_array<T>> pdf_pdfsb1_;
+	std::vector<parton_array<T>> pdf_pdfsb2_;
 	std::vector<neg_pos_results<T>> pdf_results_;
+	std::vector<neg_pos_results<T>> results_;
+	std::vector<scales<T>> scales_;
+	std::vector<T> factors_;
 	std::vector<insertion_term> insertion_terms_;
+	std::vector<abc_terms<T>> abc_neg_;
+	std::vector<abc_terms<T>> abc_pos_;
+	std::vector<T> terms2_;
+	T alphas_power_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U,

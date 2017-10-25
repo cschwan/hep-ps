@@ -335,22 +335,26 @@ public:
 		return T(1.0);
 	}
 
-	hep::abc_terms<T> insertion_terms(
+	void insertion_terms(
 		hep::insertion_term const&,
-		hep::scales<T> const&,
+		std::vector<hep::scales<T>> const&,
 		std::vector<T> const&,
 		T,
-		T
+		T,
+		std::vector<hep::abc_terms<T>>& results
 	) const {
-		return hep::abc_terms<T>();
+		results.clear();
+		results.resize(1);
 	}
 
-	T insertion_terms2(
+	void insertion_terms2(
 		hep::insertion_term const&,
-		hep::scales<T> const&,
-		std::vector<T> const&
+		std::vector<hep::scales<T>> const&,
+		std::vector<T> const&,
+		std::vector<T>& results
 	) const {
-		return T();
+		results.clear();
+		results.resize(1);
 	}
 
 private:
