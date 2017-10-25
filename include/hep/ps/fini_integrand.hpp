@@ -30,6 +30,7 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/ps_integrand.hpp"
+#include "hep/ps/scales.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -139,47 +140,6 @@ public:
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-		auto effective_pdf = [&](
-			insertion_term const& term,
-			T eta,
-			parton_array<T> const& pdfa,
-			parton_array<T> const& pdfb
-		) {
-			T const ome = (T(1.0) - eta);
-			T const xprime = eta + ome * x;
-			auto const& abc = subtraction_.insertion_terms(
-				term,
-				scales,
-				phase_space,
-				xprime,
-				eta
-			);
-
-			parton_array<T> pdf;
-
-			for (auto const a : parton_list())
-			{
-				for (auto const ap : parton_list())
-				{
-					// quark/anti-quark diagonality
-					if ((a != parton::gluon) && (ap != parton::gluon) &&
-						(a != ap))
-					{
-						continue;
-					}
-
-					auto const at = parton_type_of(a);
-					auto const apt = parton_type_of(ap);
-
-					pdf[a] += pdfb[ap] * abc.a[apt][at] * ome / xprime;
-					pdf[a] -= pdfa[ap] * abc.b[apt][at] * ome;
-					pdf[a] += pdfa[ap] * abc.c[apt][at];
-				}
-			}
-
-			return pdf;
-		};
-
 		std::size_t const size = pdfsa1_.size();
 		results_.clear();
 		results_.resize(size);
@@ -216,48 +176,56 @@ public:
 					break;
 				}
 
+				T const eta_neg = (i == 0) ? info.x2() : info.x1();
+				T const xprime_neg = eta_neg * (T(1.0) - x) + x;
+
+				auto const& abc_neg = subtraction_.insertion_terms(
+					term,
+					scales,
+					phase_space,
+					xprime_neg,
+					eta_neg
+				);
+
+				T const eta_pos = (i == 0) ? info.x1() : info.x2();
+				T const xprime_pos = eta_pos * (T(1.0) - x) + x;
+
+				auto const& abc_pos = subtraction_.insertion_terms(
+					term,
+					scales,
+					phase_space,
+					xprime_pos,
+					eta_pos
+				);
+
 				for (std::size_t pdf = 0; pdf != size; ++pdf)
 				{
 					auto const pdf_neg = effective_pdf(
-						term,
+						abc_neg,
+						xprime_neg,
 						(i == 0) ? info.x2() : info.x1(),
 						(i == 0) ? pdfsa2_.at(pdf) : pdfsa1_.at(pdf),
 						(i == 0) ? pdfsb2_.at(pdf) : pdfsb1_.at(pdf)
 					);
 
 					auto const pdf_pos = effective_pdf(
-						term,
+						abc_pos,
+						xprime_pos,
 						(i == 0) ? info.x1() : info.x2(),
 						(i == 0) ? pdfsa1_.at(pdf) : pdfsa2_.at(pdf),
 						(i == 0) ? pdfsb1_.at(pdf) : pdfsb2_.at(pdf)
 					);
 
-					if (i == 0)
-					{
-						results_.at(pdf) += convolute(
-							pdf_neg,
-							pdfsa1_.at(pdf),
-							pdf_pos,
-							pdfsa2_.at(pdf),
-							me,
-							set_,
-							factor,
-							cut_result
-						);
-					}
-					else
-					{
-						results_.at(pdf) += convolute(
-							pdfsa2_.at(pdf),
-							pdf_neg,
-							pdfsa1_.at(pdf),
-							pdf_pos,
-							me,
-							set_,
-							factor,
-							cut_result
-						);
-					}
+					results_.at(pdf) += convolute(
+						(i == 0) ? pdf_neg         : pdfsa2_.at(pdf),
+						(i == 0) ? pdfsa1_.at(pdf) : pdf_neg,
+						(i == 0) ? pdf_pos         : pdfsa1_.at(pdf),
+						(i == 0) ? pdfsa2_.at(pdf) : pdf_pos,
+						me,
+						set_,
+						factor,
+						cut_result
+					);
 				}
 			}
 
@@ -281,6 +249,39 @@ public:
 			event_type::born_like_n, projector);
 
 		return results_.front().neg + results_.front().pos;
+	}
+
+protected:
+	parton_array<T> effective_pdf(
+		abc_terms<T> const& abc,
+		T xprime,
+		T eta,
+		parton_array<T> const& pdfa,
+		parton_array<T> const& pdfb
+	) {
+		parton_array<T> pdf;
+
+		for (auto const a : parton_list())
+		{
+			for (auto const ap : parton_list())
+			{
+				// quark/anti-quark diagonality
+				if ((a != parton::gluon) && (ap != parton::gluon) &&
+					(a != ap))
+				{
+					continue;
+				}
+
+				auto const at = parton_type_of(a);
+				auto const apt = parton_type_of(ap);
+
+				pdf[a] += pdfb[ap] * abc.a[apt][at] * (T(1.0) - eta) / xprime;
+				pdf[a] -= pdfa[ap] * abc.b[apt][at] * (T(1.0) - eta);
+				pdf[a] += pdfa[ap] * abc.c[apt][at];
+			}
+		}
+
+		return pdf;
 	}
 
 private:
