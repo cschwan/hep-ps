@@ -110,7 +110,7 @@ public:
 		, pdfsx2_(pdfs_.count())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
-		results_.reserve(pdfs_.count());
+		pdf_results_.reserve(pdfs_.count());
 		dipole_recombination_candidates_.reserve(
 			matrix_elements_.real_recombination_candidates().size());
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
@@ -228,6 +228,9 @@ public:
 			set_scales(recombined_real_phase_space);
 		}
 
+		pdfsx1_.resize(pdfs_.count());
+		pdfsx2_.resize(pdfs_.count());
+
 		pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
 		pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
 
@@ -268,12 +271,11 @@ public:
 			auto const dipole_me = matrix_elements_.dipole_me(dipole,
 				phase_space, set);
 
-			std::size_t size = pdfsx1_.size();
-			results_.clear();
+			pdf_results_.clear();
 
-			for (std::size_t pdf = 0; pdf != size; ++pdf)
+			for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
 			{
-				results_.push_back(convolute(
+				pdf_results_.push_back(convolute(
 					pdfsx1_.at(pdf),
 					pdfsx2_.at(pdf),
 					dipole_me,
@@ -283,22 +285,21 @@ public:
 				));
 			}
 
-			distributions_(phase_space, dipole_cut_result, results_, shift,
+			distributions_(phase_space, dipole_cut_result, pdf_results_, shift,
 				event_type::born_like_n, projector);
 
-			result += results_.front();
+			result += pdf_results_.front();
 		}
 
 		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 		{
 			auto const reals = matrix_elements_.reals(real_phase_space, set);
 
-			std::size_t const size = pdfsx1_.size();
-			results_.clear();
+			pdf_results_.clear();
 
-			for (std::size_t pdf = 0; pdf != size; ++pdf)
+			for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
 			{
-				results_.push_back(convolute(
+				pdf_results_.push_back(convolute(
 					pdfsx1_.at(pdf),
 					pdfsx2_.at(pdf),
 					reals,
@@ -308,10 +309,10 @@ public:
 				));
 			}
 
-			result += results_.front();
+			result += pdf_results_.front();
 
 			distributions_(recombined_real_phase_space, real_cut_result,
-				results_, shift, event, projector);
+				pdf_results_, shift, event, projector);
 		}
 
 		return result.neg + result.pos;
@@ -356,7 +357,7 @@ private:
 
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
-	std::vector<neg_pos_results<T>> results_;
+	std::vector<neg_pos_results<T>> pdf_results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
 	std::vector<std::size_t> dipole_recombination_candidates_;
