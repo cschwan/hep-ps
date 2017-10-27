@@ -106,8 +106,8 @@ public:
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
-		, pdfsx1_(pdfs_.count())
-		, pdfsx2_(pdfs_.count())
+		, pdf_pdfsx1_(pdfs_.count())
+		, pdf_pdfsx2_(pdfs_.count())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
 		pdf_results_.reserve(pdfs_.count());
@@ -228,11 +228,26 @@ public:
 			set_scales(recombined_real_phase_space);
 		}
 
-		pdfsx1_.resize(pdfs_.count());
-		pdfsx2_.resize(pdfs_.count());
+		pdfsx1_.clear();
+		pdfsx1_.resize(scales_.size());
+		pdfsx2_.clear();
+		pdfsx2_.resize(scales_.size());
 
-		pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
-		pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
+		pdfs_.eval(info.x1(), scales_, pdfsx1_);
+		pdfs_.eval(info.x2(), scales_, pdfsx2_);
+
+		if (pdfs_.count() > 1)
+		{
+			pdf_pdfsx1_.clear();
+			pdf_pdfsx1_.resize(pdfs_.count());
+			pdf_pdfsx2_.clear();
+			pdf_pdfsx2_.resize(pdfs_.count());
+
+			T const muf = scales_.front().factorization();
+
+			pdfs_.eval(info.x1(), muf, pdf_pdfsx1_);
+			pdfs_.eval(info.x2(), muf, pdf_pdfsx2_);
+		}
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
@@ -272,22 +287,35 @@ public:
 				phase_space, set);
 
 			results_.clear();
-			pdf_results_.clear();
 
-			for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
+			for (std::size_t i = 0; i != scales_.size(); ++i)
 			{
-				pdf_results_.push_back(convolute(
-					pdfsx1_.at(pdf),
-					pdfsx2_.at(pdf),
+				results_.push_back(convolute(
+					pdfsx1_.at(i),
+					pdfsx2_.at(i),
 					dipole_me,
 					set,
-					-function * factor,
+					-function * factors_.at(i) * factor,
 					dipole_cut_result
 				));
 			}
 
-			results_.push_back(pdf_results_.front());
-			result += results_.front();
+			if (pdfs_.count() > 1)
+			{
+				pdf_results_.clear();
+
+				for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
+				{
+					pdf_results_.push_back(convolute(
+						pdf_pdfsx1_.at(pdf),
+						pdf_pdfsx2_.at(pdf),
+						dipole_me,
+						set,
+						-function * factor,
+						dipole_cut_result
+					));
+				}
+			}
 
 			distributions_(
 				phase_space,
@@ -298,6 +326,8 @@ public:
 				event_type::born_like_n,
 				projector
 			);
+
+			result += results_.front();
 		}
 
 		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
@@ -305,22 +335,35 @@ public:
 			auto const reals = matrix_elements_.reals(real_phase_space, set);
 
 			results_.clear();
-			pdf_results_.clear();
 
-			for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
+			for (std::size_t i = 0; i != scales_.size(); ++i)
 			{
-				pdf_results_.push_back(convolute(
-					pdfsx1_.at(pdf),
-					pdfsx2_.at(pdf),
+				results_.push_back(convolute(
+					pdfsx1_.at(i),
+					pdfsx2_.at(i),
 					reals,
 					set,
-					factor,
+					factors_.at(i) * factor,
 					real_cut_result
 				));
 			}
 
-			results_.push_back(pdf_results_.front());
-			result += results_.front();
+			if (pdfs_.count() > 1)
+			{
+				pdf_results_.clear();
+
+				for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
+				{
+					pdf_results_.push_back(convolute(
+						pdf_pdfsx1_.at(pdf),
+						pdf_pdfsx2_.at(pdf),
+						reals,
+						set,
+						factor,
+						real_cut_result
+					));
+				}
+			}
 
 			distributions_(
 				recombined_real_phase_space,
@@ -331,6 +374,8 @@ public:
 				event,
 				projector
 			);
+
+			result += results_.front();
 		}
 
 		return result.neg + result.pos;
@@ -375,6 +420,8 @@ private:
 
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
+	std::vector<parton_array<T>> pdf_pdfsx1_;
+	std::vector<parton_array<T>> pdf_pdfsx2_;
 	std::vector<neg_pos_results<T>> pdf_results_;
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
