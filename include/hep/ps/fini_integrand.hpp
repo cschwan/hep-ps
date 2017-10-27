@@ -146,20 +146,30 @@ public:
 		pdfs_.eval(x1p, scales_, pdfsb1_);
 		pdfs_.eval(x2p, scales_, pdfsb2_);
 
+		results_.clear();
+		results_.resize(scales_.size());
+
 		if (pdfs_.count() > 1)
 		{
+			pdf_pdfsa1_.clear();
+			pdf_pdfsa1_.resize(pdfs_.count());
+			pdf_pdfsa2_.clear();
+			pdf_pdfsa2_.resize(pdfs_.count());
+			pdf_pdfsb1_.clear();
+			pdf_pdfsb1_.resize(pdfs_.count());
+			pdf_pdfsb2_.clear();
+			pdf_pdfsb2_.resize(pdfs_.count());
+
 			T const muf = scales_.front().factorization();
 
 			pdfs_.eval(info.x1(), muf, pdf_pdfsa1_);
 			pdfs_.eval(info.x2(), muf, pdf_pdfsa2_);
 			pdfs_.eval(x1p, muf, pdf_pdfsb1_);
 			pdfs_.eval(x2p, muf, pdf_pdfsb2_);
-		}
 
-		results_.clear();
-		results_.resize(scales_.size());
-		pdf_results_.clear();
-		pdf_results_.resize(pdfs_.count());
+			pdf_results_.clear();
+			pdf_results_.resize(pdfs_.count());
+		}
 
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
