@@ -271,6 +271,7 @@ public:
 			auto const dipole_me = matrix_elements_.dipole_me(dipole,
 				phase_space, set);
 
+			results_.clear();
 			pdf_results_.clear();
 
 			for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
@@ -285,16 +286,25 @@ public:
 				));
 			}
 
-			distributions_(phase_space, dipole_cut_result, pdf_results_, shift,
-				event_type::born_like_n, projector);
+			results_.push_back(pdf_results_.front());
+			result += results_.front();
 
-			result += pdf_results_.front();
+			distributions_(
+				phase_space,
+				dipole_cut_result,
+				results_,
+				pdf_results_,
+				shift,
+				event_type::born_like_n,
+				projector
+			);
 		}
 
 		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 		{
 			auto const reals = matrix_elements_.reals(real_phase_space, set);
 
+			results_.clear();
 			pdf_results_.clear();
 
 			for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
@@ -309,10 +319,18 @@ public:
 				));
 			}
 
-			result += pdf_results_.front();
+			results_.push_back(pdf_results_.front());
+			result += results_.front();
 
-			distributions_(recombined_real_phase_space, real_cut_result,
-				pdf_results_, shift, event, projector);
+			distributions_(
+				recombined_real_phase_space,
+				real_cut_result,
+				results_,
+				pdf_results_,
+				shift,
+				event,
+				projector
+			);
 		}
 
 		return result.neg + result.pos;
@@ -358,6 +376,7 @@ private:
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
 	std::vector<neg_pos_results<T>> pdf_results_;
+	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
 	std::vector<std::size_t> dipole_recombination_candidates_;
