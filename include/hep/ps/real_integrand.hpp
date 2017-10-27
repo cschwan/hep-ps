@@ -30,6 +30,7 @@
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/ps_integrand.hpp"
+#include "hep/ps/scales.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -107,11 +108,17 @@ public:
 		, alpha_min_(alpha_min)
 		, pdfsx1_(pdfs_.count())
 		, pdfsx2_(pdfs_.count())
+		, alphas_power_(matrix_elements_.alphas_power())
 	{
 		results_.reserve(pdfs_.count());
 		dipole_recombination_candidates_.reserve(
 			matrix_elements_.real_recombination_candidates().size());
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
+
+		if (!scale_setter_.dynamic())
+		{
+			set_scales(std::vector<T>());
+		}
 	}
 
 	T eval(
@@ -216,19 +223,13 @@ public:
 			return T();
 		}
 
-		auto const scales = scale_setter_(recombined_real_phase_space);
-
-		// only set renormalization scale if it changed
-		if (scales.renormalization() != old_renormalization_scale_)
+		if (scale_setter_.dynamic())
 		{
-			old_renormalization_scale_ = scales.renormalization();
-
-			T const alphas = pdfs_.eval_alphas(scales.renormalization());
-			matrix_elements_.parameters(scales.renormalization(), alphas);
+			set_scales(recombined_real_phase_space);
 		}
 
-		pdfs_.eval(info.x1(), scales.factorization(), pdfsx1_);
-		pdfs_.eval(info.x2(), scales.factorization(), pdfsx2_);
+		pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
+		pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
@@ -316,6 +317,26 @@ public:
 		return result.neg + result.pos;
 	}
 
+protected:
+	void set_scales(std::vector<T> const& phase_space)
+	{
+		using std::pow;
+
+		scales_.clear();
+		factors_.clear();
+		scale_setter_(phase_space, scales_);
+		pdfs_.eval_alphas(scales_, factors_);
+
+		T const central_alphas = factors_.front();
+		matrix_elements_.alphas(central_alphas);
+
+		for (T& factor : factors_)
+		{
+			T const alphas = factor;
+			factor = pow(alphas / central_alphas, alphas_power_);
+		}
+	}
+
 private:
 	M matrix_elements_;
 	S subtraction_;
@@ -336,8 +357,11 @@ private:
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
 	std::vector<neg_pos_results<T>> results_;
+	std::vector<scales<T>> scales_;
+	std::vector<T> factors_;
 	std::vector<std::size_t> dipole_recombination_candidates_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
+	T alphas_power_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U,
