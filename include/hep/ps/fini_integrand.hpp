@@ -82,6 +82,7 @@ public:
 		, pdf_pdfsb1_(pdfs_.count())
 		, pdf_pdfsb2_(pdfs_.count())
 		, pdf_results_(pdfs_.count())
+		, alphas_power_(matrix_elements_.alphas_power())
 	{
 		using std::begin;
 		using std::end;
