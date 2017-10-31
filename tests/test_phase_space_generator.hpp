@@ -29,8 +29,12 @@ template <typename T>
 class test_phase_space_generator : public hep::phase_space_generator<T>
 {
 public:
-	test_phase_space_generator(std::size_t final_states)
+	test_phase_space_generator(
+		std::size_t final_states,
+		std::size_t extra_random_numbers = 0
+	)
 		: final_states_{final_states}
+		, extra_random_numbers_{extra_random_numbers}
 	{
 	}
 
@@ -72,11 +76,12 @@ public:
 
 	std::size_t map_dimensions() const override
 	{
-		return 4 * (final_states_ + 2);
+		return 4 * (final_states_ + 2) + extra_random_numbers_;
 	}
 
 private:
 	std::size_t final_states_;
+	std::size_t extra_random_numbers_;
 };
 
 #endif
