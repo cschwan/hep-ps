@@ -56,6 +56,7 @@ public:
 		dipole_invariants<T> const& invariants
 	);
 
+	// TODO: remove
 	abc_terms<T> insertion_terms(
 		insertion_term const& term,
 		scales<T> const& mu,
@@ -73,6 +74,7 @@ public:
 		std::vector<abc_terms<T>>& results
 	) const;
 
+	// TODO: remove
 	T insertion_terms2(
 		insertion_term const& term,
 		scales<T> const& mu,

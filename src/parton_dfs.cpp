@@ -65,12 +65,6 @@ template <typename T>
 parton_dfs<T>::~parton_dfs() = default;
 
 template <typename T>
-T parton_dfs<T>::eval_alphas(T renormalization_scale)
-{
-	return pimpl->pdfs.front()->alphasQ(renormalization_scale);
-}
-
-template <typename T>
 void parton_dfs<T>::eval_alphas(
 	std::vector<hep::scales<T>> const& scales,
 	std::vector<T>& alphas

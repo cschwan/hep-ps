@@ -51,9 +51,6 @@ public:
 	/// Destructor.
 	~parton_dfs();
 
-	/// Calculates the strong coupling at the given `renormalization_scale`.
-	T eval_alphas(T renormalization_scale);
-
 	/// Evaluates the strong coupling for the renormalization scales in `scales`
 	/// and writes the results into `alphas`
 	void eval_alphas(
