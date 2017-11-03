@@ -50,6 +50,7 @@
 #include "hep/ps/p_type_jet_algorithm.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/parton_df_unc.hpp"
 #include "hep/ps/parton_dfs.hpp"
 #include "hep/ps/parton_type.hpp"
 #include "hep/ps/permutation.hpp"
