@@ -75,10 +75,6 @@ public:
 	/// `pdfs` must agree with the number returned by \ref count.
 	void eval(T x, T scale, std::vector<parton_array<T>>& pdfs);
 
-	/// Evaluate the central parton distribution functions for the given \f$ x
-	/// \f$ and \f$ Q \f$.
-	parton_array<T> eval(T x, T scale);
-
 private:
 	class impl;
 	std::unique_ptr<impl> pimpl;

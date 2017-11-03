@@ -156,41 +156,6 @@ void parton_dfs<T>::eval(T x, T scale, std::vector<parton_array<T>>& pdfs)
 	}
 }
 
-template <typename T>
-parton_array<T> parton_dfs<T>::eval(T x, T scale)
-{
-	// TODO: is it possible to get these values from LHAPDF?
-	constexpr std::size_t lhapdf_ac = -4 + 6;
-	constexpr std::size_t lhapdf_as = -3 + 6;
-	constexpr std::size_t lhapdf_au = -2 + 6;
-	constexpr std::size_t lhapdf_ad = -1 + 6;
-	constexpr std::size_t lhapdf_g  =  0 + 6;
-	constexpr std::size_t lhapdf_d  =  1 + 6;
-	constexpr std::size_t lhapdf_u  =  2 + 6;
-	constexpr std::size_t lhapdf_s  =  3 + 6;
-	constexpr std::size_t lhapdf_c  =  4 + 6;
-
-	pimpl->pdfs.front()->xfxQ(
-		static_cast <double> (x),
-		static_cast <double> (scale),
-		pimpl->xfx
-	);
-
-	parton_array<T> pdfs;
-
-	pdfs[parton::anti_charm]   = T(pimpl->xfx[lhapdf_ac]) / x;
-	pdfs[parton::anti_strange] = T(pimpl->xfx[lhapdf_as]) / x;
-	pdfs[parton::anti_up]      = T(pimpl->xfx[lhapdf_au]) / x;
-	pdfs[parton::anti_down]    = T(pimpl->xfx[lhapdf_ad]) / x;
-	pdfs[parton::gluon]        = T(pimpl->xfx[lhapdf_g])  / x;
-	pdfs[parton::down]         = T(pimpl->xfx[lhapdf_d])  / x;
-	pdfs[parton::up]           = T(pimpl->xfx[lhapdf_u])  / x;
-	pdfs[parton::strange]      = T(pimpl->xfx[lhapdf_s])  / x;
-	pdfs[parton::charm]        = T(pimpl->xfx[lhapdf_c])  / x;
-
-	return pdfs;
-}
-
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template class parton_dfs<double>;
