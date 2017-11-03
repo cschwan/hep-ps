@@ -52,6 +52,7 @@ public:
 
 	std::size_t dimensions() const override
 	{
+		// we don't need random numbers in this generator
 		return 0;
 	}
 

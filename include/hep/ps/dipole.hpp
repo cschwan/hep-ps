@@ -27,9 +27,11 @@
 namespace hep
 {
 
+/// Class that represents the kinematical independent information of a dipole.
 class dipole
 {
 public:
+	/// Constructor.
 	dipole(
 		std::size_t emitter,
 		std::size_t unresolved,
@@ -49,36 +51,47 @@ public:
 	{
 	}
 
+	/// Returns the index of the particle of the real process that is the
+	/// emitter in this dipole.
 	std::size_t emitter() const
 	{
 		return emitter_;
 	}
 
+	/// Returns the index of the particle of the real process that is recombined
+	/// in the dipole.
 	std::size_t unresolved() const
 	{
 		return unresolved_;
 	}
 
+	/// Returns the index of the particle of the real process that is the
+	/// spectator of this dipole.
 	std::size_t spectator() const
 	{
 		return spectator_;
 	}
 
+	/// Returns whether the emitter particle is a fermion or a boson.
 	particle_type emitter_type() const
 	{
 		return emitter_type_;
 	}
 
+	/// Returns whether the unresolved particle is a fermion or a boson.
 	particle_type unresolved_type() const
 	{
 		return unresolved_type_;
 	}
 
+	/// Returns whether the spectator particle is a fermion or a boson.
 	particle_type spectator_type() const
 	{
 		return spectator_type_;
 	}
 
+	/// Returns whether this is an initial-initial, initial-final,
+	/// final-initial, or final-final dipole.
 	dipole_type type() const
 	{
 		return type_;
