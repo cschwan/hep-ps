@@ -47,9 +47,9 @@ public:
 	void insertion_terms(
 		hep::insertion_term const& term,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<T> const& phase_space,
-		T x,
-		T eta,
+		std::vector<T> const& /*phase_space*/,
+		T /*x*/,
+		T /*eta*/,
 		std::vector<hep::abc_terms<T>>& results
 	) const {
 		CHECK( term.type() == hep::insertion_term_type::born );
@@ -68,7 +68,7 @@ public:
 	void insertion_terms2(
 		hep::insertion_term const& term,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<T> const& phase_space,
+		std::vector<T> const& /*phase_space*/,
 		std::vector<T>& results
 	) const {
 		CHECK( term.type() == hep::insertion_term_type::born );
