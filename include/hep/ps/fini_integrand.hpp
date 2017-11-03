@@ -315,6 +315,7 @@ public:
 
 			if (insertion2_)
 			{
+				terms2_.clear();
 				subtraction_.insertion_terms2(
 					term,
 					scales_,
