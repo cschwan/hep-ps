@@ -236,6 +236,9 @@ public:
 		pdfs_.eval(info.x1(), scales_, pdfsx1_);
 		pdfs_.eval(info.x2(), scales_, pdfsx2_);
 
+		assert( pdfsx1_.size() == scales_.size() );
+		assert( pdfsx2_.size() == scales_.size() );
+
 		if (pdfs_.count() > 1)
 		{
 			pdf_pdfsx1_.clear();
@@ -247,6 +250,9 @@ public:
 
 			pdfs_.eval(info.x1(), muf, pdf_pdfsx1_);
 			pdfs_.eval(info.x2(), muf, pdf_pdfsx2_);
+
+			assert( pdf_pdfsx1_.size() == pdfs_.count() );
+			assert( pdf_pdfsx2_.size() == pdfs_.count() );
 		}
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();

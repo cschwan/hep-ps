@@ -129,7 +129,12 @@ public:
 		pdfs_.eval(info.x1(), scales_, pdfsx1_);
 		pdfs_.eval(info.x2(), scales_, pdfsx2_);
 
+		assert( pdfsx1_.size() == scales_.size() );
+		assert( pdfsx2_.size() == scales_.size() );
+
 		matrix_elements_.borns(phase_space, set_, scales_, borns_);
+
+		assert( borns_.size() == scales_.size() );
 
 		for (std::size_t i = 0; i != scales_.size(); ++i)
 		{
@@ -152,6 +157,9 @@ public:
 			// evaluate all PDFs for the central scale
 			pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
 			pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
+
+			assert( pdfsx1_.size() == pdfs_.count() );
+			assert( pdfsx2_.size() == pdfs_.count() );
 
 			for (std::size_t pdf = 0; pdf != pdfsx1_.size(); ++pdf)
 			{

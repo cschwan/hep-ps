@@ -147,6 +147,11 @@ public:
 		pdfs_.eval(x1p, scales_, pdfsb1_);
 		pdfs_.eval(x2p, scales_, pdfsb2_);
 
+		assert( pdfsa1_.size() == scales_.size() );
+		assert( pdfsa2_.size() == scales_.size() );
+		assert( pdfsb1_.size() == scales_.size() );
+		assert( pdfsb2_.size() == scales_.size() );
+
 		results_.clear();
 		results_.resize(scales_.size());
 
@@ -167,6 +172,11 @@ public:
 			pdfs_.eval(info.x2(), muf, pdf_pdfsa2_);
 			pdfs_.eval(x1p, muf, pdf_pdfsb1_);
 			pdfs_.eval(x2p, muf, pdf_pdfsb2_);
+
+			assert( pdf_pdfsa1_.size() == pdfs_.count() );
+			assert( pdf_pdfsa2_.size() == pdfs_.count() );
+			assert( pdf_pdfsb1_.size() == pdfs_.count() );
+			assert( pdf_pdfsb2_.size() == pdfs_.count() );
 
 			pdf_results_.clear();
 			pdf_results_.resize(pdfs_.count());
@@ -220,6 +230,8 @@ public:
 					abc_neg_
 				);
 
+				assert( abc_neg_.size() == scales_.size() );
+
 				T const eta_pos = (i == 0) ? info.x1() : info.x2();
 				T const xprime_pos = eta_pos * (T(1.0) - x) + x;
 
@@ -232,6 +244,8 @@ public:
 					eta_pos,
 					abc_pos_
 				);
+
+				assert( abc_neg_.size() == scales_.size() );
 
 				for (std::size_t j = 0; j != scales_.size(); ++j)
 				{
@@ -307,6 +321,8 @@ public:
 					phase_space,
 					terms2_
 				);
+
+				assert( terms2_.size() == scales_.size() );
 
 				for (std::size_t i = 0; i != scales_.size(); ++i)
 				{
