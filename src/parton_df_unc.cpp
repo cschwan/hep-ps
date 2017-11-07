@@ -48,7 +48,7 @@ template <typename T>
 parton_df_unc<T>::~parton_df_unc() = default;
 
 template <typename T>
-pdf_unc<T> parton_df_unc<T>::uncertainty(std::vector<T> const& values)
+pdf_unc<T> parton_df_unc<T>::uncertainty(std::vector<T> const& values) const
 {
 	std::vector<double> double_values;
 	double_values.reserve(values.size());
