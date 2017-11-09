@@ -43,7 +43,8 @@ HEP_ENUM(initial_state,
 	q23_cg, /*!< \f$ Q=2/3 \f$ charm/gluon initial state. */
 	q13_du, /*!< \f$ Q=1/3 \f$ down/up initial state. */
 	q13_dg, /*!< \f$ Q=1/3 \f$ anti-down/gluon initial state. */
-	q13_sg  /*!< \f$ Q=1/3 \f$ anti-strange/gluon initial state. */
+	q13_sg, /*!< \f$ Q=1/3 \f$ anti-strange/gluon initial state. */
+	q03_uu  /*!< \f$ Q=4/3 \f$ anti-up/up initial state. */
 );
 
 HEP_ENUM_ARRAY(initial_state);
@@ -79,6 +80,9 @@ constexpr parton state_parton_one(initial_state state)
 	case initial_state::q23_ss:
 	case initial_state::q13_sg:
 		return parton::anti_strange;
+
+	case initial_state::q03_uu:
+		return parton::anti_up;
 	}
 }
 
@@ -92,6 +96,7 @@ constexpr parton state_parton_two(initial_state state)
 	case initial_state::q43_cu:
 	case initial_state::q33_su:
 	case initial_state::q13_du:
+	case initial_state::q03_uu:
 		return parton::up;
 
 	case initial_state::q33_dc:
