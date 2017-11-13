@@ -41,10 +41,33 @@ HEP_ENUM(initial_state,
 	q23_ss, /*!< \f$ Q=2/3 \f$ anti-strange/anti-strange initial state. */
 	q23_ug, /*!< \f$ Q=2/3 \f$ up/gluon initial state. */
 	q23_cg, /*!< \f$ Q=2/3 \f$ charm/gluon initial state. */
-	q13_du, /*!< \f$ Q=1/3 \f$ down/up initial state. */
 	q13_dg, /*!< \f$ Q=1/3 \f$ anti-down/gluon initial state. */
 	q13_sg, /*!< \f$ Q=1/3 \f$ anti-strange/gluon initial state. */
-	q03_uu  /*!< \f$ Q=4/3 \f$ anti-up/up initial state. */
+
+	/* Q=1/3 */
+
+	uq_dq,
+	uq_sq,
+	cq_dq,
+	cq_sq,
+
+	/* Q=0 */
+
+	uq_ub,
+	cq_cb,
+	db_dq,
+	sb_sq,
+	sb_dq,
+	db_sq,
+	cq_ub,
+	uq_cb,
+
+	/* Q=-1/3 */
+
+	db_ub,
+	sb_ub,
+	db_cb,
+	sb_cb
 );
 
 HEP_ENUM_ARRAY(initial_state);
@@ -58,31 +81,45 @@ constexpr parton state_parton_one(initial_state state)
 	{
 	case initial_state::q43_uu:
 	case initial_state::q23_ug:
+	case initial_state::uq_dq:
+	case initial_state::uq_sq:
+	case initial_state::uq_ub:
+	case initial_state::uq_cb:
 		return parton::up;
 
-	case initial_state::q13_du:
+	case initial_state::sb_dq:
 		return parton::down;
 
 	case initial_state::q23_dd:
 	case initial_state::q33_du:
 	case initial_state::q33_dc:
 	case initial_state::q13_dg:
+	case initial_state::db_dq:
+	case initial_state::db_ub:
+	case initial_state::db_cb:
 		return parton::anti_down;
 
 	case initial_state::q43_cc:
 	case initial_state::q43_cu:
 	case initial_state::q23_cg:
+	case initial_state::cq_cb:
+	case initial_state::cq_ub:
+	case initial_state::cq_dq:
+	case initial_state::cq_sq:
 		return parton::charm;
+
+	case initial_state::db_sq:
+		return parton::strange;
 
 	case initial_state::q33_su:
 	case initial_state::q23_sd:
 	case initial_state::q33_sc:
 	case initial_state::q23_ss:
 	case initial_state::q13_sg:
+	case initial_state::sb_sq:
+	case initial_state::sb_ub:
+	case initial_state::sb_cb:
 		return parton::anti_strange;
-
-	case initial_state::q03_uu:
-		return parton::anti_up;
 	}
 }
 
@@ -95,18 +132,40 @@ constexpr parton state_parton_two(initial_state state)
 	case initial_state::q33_du:
 	case initial_state::q43_cu:
 	case initial_state::q33_su:
-	case initial_state::q13_du:
-	case initial_state::q03_uu:
 		return parton::up;
+
+	case initial_state::db_ub:
+	case initial_state::sb_ub:
+	case initial_state::uq_ub:
+	case initial_state::cq_ub:
+		return parton::anti_up;
+
+	case initial_state::cq_cb:
+	case initial_state::uq_cb:
+	case initial_state::db_cb:
+	case initial_state::sb_cb:
+		return parton::anti_charm;
 
 	case initial_state::q33_dc:
 	case initial_state::q43_cc:
 	case initial_state::q33_sc:
 		return parton::charm;
 
+	case initial_state::uq_dq:
+	case initial_state::cq_dq:
+	case initial_state::db_dq:
+	case initial_state::sb_dq:
+		return parton::down;
+
 	case initial_state::q23_dd:
 	case initial_state::q23_sd:
 		return parton::anti_down;
+
+	case initial_state::uq_sq:
+	case initial_state::cq_sq:
+	case initial_state::sb_sq:
+	case initial_state::db_sq:
+		return parton::strange;
 
 	case initial_state::q23_ss:
 		return parton::anti_strange;
