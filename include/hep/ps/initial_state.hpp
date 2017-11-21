@@ -87,9 +87,6 @@ constexpr parton state_parton_one(initial_state state)
 	case initial_state::uq_cb:
 		return parton::up;
 
-	case initial_state::sb_dq:
-		return parton::down;
-
 	case initial_state::q23_dd:
 	case initial_state::q33_du:
 	case initial_state::q33_dc:
@@ -97,6 +94,7 @@ constexpr parton state_parton_one(initial_state state)
 	case initial_state::db_dq:
 	case initial_state::db_ub:
 	case initial_state::db_cb:
+	case initial_state::db_sq:
 		return parton::anti_down;
 
 	case initial_state::q43_cc:
@@ -108,9 +106,6 @@ constexpr parton state_parton_one(initial_state state)
 	case initial_state::cq_sq:
 		return parton::charm;
 
-	case initial_state::db_sq:
-		return parton::strange;
-
 	case initial_state::q33_su:
 	case initial_state::q23_sd:
 	case initial_state::q33_sc:
@@ -119,6 +114,7 @@ constexpr parton state_parton_one(initial_state state)
 	case initial_state::sb_sq:
 	case initial_state::sb_ub:
 	case initial_state::sb_cb:
+	case initial_state::sb_dq:
 		return parton::anti_strange;
 	}
 }
