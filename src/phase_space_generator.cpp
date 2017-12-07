@@ -11,6 +11,7 @@ T phase_space_generator<T>::operator()(
 	std::size_t channel,
 	std::vector<T> const& random_numbers,
 	std::vector<T>& momenta,
+	std::vector<std::size_t> const&,
 	std::vector<T>& densities,
 	hep::multi_channel_map action
 ) {

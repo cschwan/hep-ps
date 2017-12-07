@@ -74,6 +74,7 @@ public:
 		std::size_t channel,
 		std::vector<T> const& random_numbers,
 		std::vector<T>& momenta,
+		std::vector<std::size_t> const& enabled_channels,
 		std::vector<T>& densities,
 		hep::multi_channel_map action
 	);
