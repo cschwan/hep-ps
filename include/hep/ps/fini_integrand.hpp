@@ -106,7 +106,7 @@ public:
 		auto const recombined = recombiner_.recombine(
 			phase_space,
 			aux_phase_space,
-			matrix_elements_.born_recombination_candidates(),
+			matrix_elements_.final_states(),
 			0
 		);
 

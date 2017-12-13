@@ -1,5 +1,7 @@
+#include "hep/ps/index_with_particle_class.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
+#include "hep/ps/particle_class.hpp"
 
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/JetDefinition.hh"
@@ -36,6 +38,15 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 	);
 
 	std::vector<std::size_t> proto_jets = { 6, 7, 8 };
+	std::vector<hep::index_with_particle_class> indices = {
+		hep::index_with_particle_class{2, hep::particle_class::other},
+		hep::index_with_particle_class{3, hep::particle_class::charged_lepton},
+		hep::index_with_particle_class{4, hep::particle_class::other},
+		hep::index_with_particle_class{5, hep::particle_class::charged_lepton},
+		hep::index_with_particle_class{6, hep::particle_class::parton},
+		hep::index_with_particle_class{7, hep::particle_class::parton},
+		hep::index_with_particle_class{8, hep::particle_class::parton}
+	};
 
 	std::vector<T> random_numbers(psg->dimensions());
 	std::vector<T> momenta(psg->map_dimensions());
@@ -66,7 +77,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 				auto const recombinations = jet_algorithm.recombine(
 					momenta,
 					recombined_momenta,
-					proto_jets,
+					indices,
 					proto_jets.size()
 				);
 

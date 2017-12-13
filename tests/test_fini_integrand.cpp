@@ -7,10 +7,12 @@
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/event_type.hpp"
 #include "hep/ps/fini_integrand.hpp"
+#include "hep/ps/index_with_particle_class.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/neg_pos_results.hpp"
+#include "hep/ps/particle_class.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/trivial_cutter.hpp"
@@ -165,9 +167,12 @@ public:
 		return { hep::insertion_term{hep::insertion_term_type::born} };
 	}
 
-	std::vector<std::size_t> born_recombination_candidates() const
+	std::vector<hep::index_with_particle_class> final_states() const
 	{
-		return { 2, 3 };
+		return {
+			hep::index_with_particle_class{2, hep::particle_class::parton},
+			hep::index_with_particle_class{3, hep::particle_class::parton}
+		};
 	}
 
 	// SCALE SETTER MEMBER FUNCTIONS

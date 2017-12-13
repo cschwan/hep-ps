@@ -23,6 +23,7 @@
 
 #include "hep/ps/convolute.hpp"
 #include "hep/ps/event_type.hpp"
+#include "hep/ps/index_with_particle_class.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/neg_pos_results.hpp"
@@ -45,13 +46,15 @@ namespace
 {
 
 inline void adjust_indices(
-	std::vector<std::size_t> const& indices,
+	std::vector<hep::index_with_particle_class> const& indices,
 	std::size_t unresolved,
-	std::vector<std::size_t>& result
+	std::vector<hep::index_with_particle_class>& result
 ) {
 	result = indices;
 
-	auto const begin = std::find(result.begin(), result.end(), unresolved);
+	auto const begin = std::find_if(result.begin(), result.end(),
+		[=](hep::index_with_particle_class p) {
+			return p.index() == unresolved; });
 	auto end = result.end();
 
 	assert( begin != end );
@@ -59,7 +62,8 @@ inline void adjust_indices(
 	auto next = std::next(begin);
 
 	// decrease all indices following the index for the unresolved by one
-	std::transform(next, end, next, [](std::size_t v) { return v - 1; });
+	std::transform(next, end, next, [=](hep::index_with_particle_class p) {
+		return hep::index_with_particle_class{p.index() - 1, p.particle()}; });
 	// rotate the unresolved index to the end of the vector
 	std::rotate(begin, next, end);
 	// remove the unresolved index
@@ -112,7 +116,7 @@ public:
 	{
 		pdf_results_.reserve(pdfs_.count());
 		dipole_recombination_candidates_.reserve(
-			matrix_elements_.real_recombination_candidates().size());
+			matrix_elements_.final_states_real().size());
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
 
 		if (!scale_setter_.dynamic())
@@ -131,7 +135,7 @@ public:
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
 			recombined_real_phase_space,
-			matrix_elements_.real_recombination_candidates(),
+			matrix_elements_.final_states_real(),
 			1
 		);
 
@@ -181,7 +185,7 @@ public:
 			}
 
 			adjust_indices(
-				matrix_elements_.real_recombination_candidates(),
+				matrix_elements_.final_states_real(),
 				dipole.unresolved(),
 				dipole_recombination_candidates_
 			);
@@ -432,7 +436,7 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
-	std::vector<std::size_t> dipole_recombination_candidates_;
+	std::vector<index_with_particle_class> dipole_recombination_candidates_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 	T alphas_power_;
 };

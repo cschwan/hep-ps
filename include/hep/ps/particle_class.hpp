@@ -1,9 +1,9 @@
-#ifndef HEP_PS_TRIVIAL_RECOMBINER_HPP
-#define HEP_PS_TRIVIAL_RECOMBINER_HPP
+#ifndef HEP_PS_PARTICLE_CLASS_HPP
+#define HEP_PS_PARTICLE_CLASS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +19,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/index_with_particle_class.hpp"
-
 #include <cstddef>
-#include <vector>
 
 namespace hep
 {
 
-/// Helper class that never recombines any phase space point. This is useful for
-/// testing.
-template <typename T>
-class trivial_recombiner
+/// Enumeration used for classifying particles. Each particle can be in one of
+/// classes denoted by the values of the enumeration.
+enum class particle_class : std::size_t
 {
-public:
-	/// Always returns zero and performs the assignment of `phase_space` to
-	/// `recombined_phase_space`.
-	std::size_t recombine(
-		std::vector<T> const& phase_space,
-		std::vector<T>& recombined_phase_space,
-		std::vector<index_with_particle_class> const& recombination_candidates,
-		std::size_t max_recombinations
-	) const;
+	/// Charged leptons.
+	charged_lepton,
+
+	/// Quarks and Gluons.
+	parton,
+
+	/// Photons.
+	photon,
+
+	/// None of the above.
+	other
 };
 
 }

@@ -6,6 +6,7 @@
 #include "hep/ps/born_integrand.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/event_type.hpp"
+#include "hep/ps/index_with_particle_class.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
@@ -129,7 +130,7 @@ public:
 		return alphas_power_;
 	}
 
-	std::vector<std::size_t> born_recombination_candidates() const
+	std::vector<hep::index_with_particle_class> final_states() const
 	{
 		return {};
 	}

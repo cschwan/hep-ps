@@ -19,6 +19,7 @@ nobase_include_HEADERS = \
 	hep/ps/find_hep_ps.hpp \
 	hep/ps/fini_integrand.hpp \
 	hep/ps/fortran_helper.hpp \
+	hep/ps/index_with_particle_class.hpp \
 	hep/ps/initial_state.hpp \
 	hep/ps/insertion_term.hpp \
 	hep/ps/insertion_term_type.hpp \
@@ -31,6 +32,7 @@ nobase_include_HEADERS = \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/non_zero_dipole.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
+	hep/ps/particle_class.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/parton.hpp \
 	hep/ps/parton_dfs.hpp \

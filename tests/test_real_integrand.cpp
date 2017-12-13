@@ -9,8 +9,10 @@
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/event_type.hpp"
+#include "hep/ps/index_with_particle_class.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
+#include "hep/ps/particle_class.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/real_integrand.hpp"
 #include "hep/ps/scales.hpp"
@@ -182,14 +184,21 @@ public:
 			hep::initial_state_set{hep::initial_state::q43_cu}} };
 	}
 
-	std::vector<std::size_t> born_recombination_candidates() const
+	std::vector<hep::index_with_particle_class> final_states() const
 	{
-		return { 2, 3 };
+		return {
+			hep::index_with_particle_class{2, hep::particle_class::parton},
+			hep::index_with_particle_class{3, hep::particle_class::parton}
+		};
 	}
 
-	std::vector<std::size_t> real_recombination_candidates() const
+	std::vector<hep::index_with_particle_class> final_states_real() const
 	{
-		return { 2, 3, 4 };
+		return {
+			hep::index_with_particle_class{2, hep::particle_class::parton},
+			hep::index_with_particle_class{3, hep::particle_class::parton},
+			hep::index_with_particle_class{4, hep::particle_class::parton}
+		};
 	}
 
 	// SCALE SETTER MEMBER FUNCTIONS

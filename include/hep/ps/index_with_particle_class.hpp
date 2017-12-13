@@ -1,9 +1,9 @@
-#ifndef HEP_PS_TRIVIAL_RECOMBINER_HPP
-#define HEP_PS_TRIVIAL_RECOMBINER_HPP
+#ifndef HEP_PS_INDEX_WITH_PARTICLE_CLASS_HPP
+#define HEP_PS_INDEX_WITH_PARTICLE_CLASS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +19,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/index_with_particle_class.hpp"
+#include "hep/ps/particle_class.hpp"
 
 #include <cstddef>
-#include <vector>
 
 namespace hep
 {
 
-/// Helper class that never recombines any phase space point. This is useful for
-/// testing.
-template <typename T>
-class trivial_recombiner
+/// Class encapsulating a particle index together with a corresponding
+/// \ref particle_class.
+class index_with_particle_class
 {
 public:
-	/// Always returns zero and performs the assignment of `phase_space` to
-	/// `recombined_phase_space`.
-	std::size_t recombine(
-		std::vector<T> const& phase_space,
-		std::vector<T>& recombined_phase_space,
-		std::vector<index_with_particle_class> const& recombination_candidates,
-		std::size_t max_recombinations
-	) const;
+	/// Constructor.
+	index_with_particle_class(
+		std::size_t index,
+		particle_class particle
+	)
+		: index_{index}
+		, particle_{particle}
+	{
+	}
+
+	/// Returns the index of the particle.
+	std::size_t index() const
+	{
+		return index_;
+	}
+
+	/// Returns the \ref particle_class of the particle with the given
+	/// \ref index.
+	particle_class particle() const
+	{
+		return particle_;
+	}
+
+private:
+	std::size_t index_;
+	particle_class particle_;
 };
 
 }
