@@ -114,9 +114,12 @@ public:
 		, pdf_pdfsx2_(pdfs_.count())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
+		std::size_t const fs = matrix_elements_.final_states_real().size();
+
+		recombined_ps_.reserve(4 * (fs + 2));
 		pdf_results_.reserve(pdfs_.count());
-		dipole_recombination_candidates_.reserve(
-			matrix_elements_.final_states_real().size());
+		dipole_recombination_candidates_.reserve(fs);
+
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
 
 		if (!scale_setter_.dynamic())
@@ -130,11 +133,9 @@ public:
 		luminosity_info<T> const& info,
 		hep::projector<T>& projector
 	) override {
-		std::vector<T> recombined_real_phase_space(real_phase_space.size());
-
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
-			recombined_real_phase_space,
+			recombined_ps_,
 			matrix_elements_.final_states_real(),
 			1
 		);
@@ -151,16 +152,15 @@ public:
 
 		T const shift = info.rapidity_shift();
 
-		using cut_result_type = decltype (cuts_.cut(recombined_real_phase_space,
-			shift, event));
+		using cut_result_type = decltype (cuts_.cut(recombined_ps_, shift,
+			event));
 
 		cut_result_type real_cut_result;
 
 		if (event == event_type::inclusive_n_plus_1 ||
 			event == event_type::born_like_n)
 		{
-			real_cut_result = cuts_.cut(recombined_real_phase_space, shift,
-				event);
+			real_cut_result = cuts_.cut(recombined_ps_, shift, event);
 		}
 
 		auto set = set_;
@@ -229,7 +229,7 @@ public:
 
 		if (scale_setter_.dynamic())
 		{
-			set_scales(recombined_real_phase_space);
+			set_scales(recombined_ps_);
 		}
 
 		pdfsx1_.clear();
@@ -376,7 +376,7 @@ public:
 			}
 
 			distributions_(
-				recombined_real_phase_space,
+				recombined_ps_,
 				real_cut_result,
 				results_,
 				pdf_results_,
@@ -428,6 +428,7 @@ private:
 	using info_type = typename decltype (cuts_.cut(std::vector<T>(), T{},
 		event_type{}))::info_t;
 
+	std::vector<T> recombined_ps_;
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
 	std::vector<parton_array<T>> pdf_pdfsx1_;

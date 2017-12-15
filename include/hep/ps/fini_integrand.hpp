@@ -90,6 +90,9 @@ public:
 		auto const terms = matrix_elements_.insertion_terms();
 		insertion_terms_.assign(begin(terms), end(terms));
 
+		std::size_t const fs = matrix_elements_.final_states().size();
+		recombined_ps_.reserve(4 * (fs + 2));
+
 		if (!scale_setter_.dynamic())
 		{
 			set_scales(std::vector<T>());
@@ -101,11 +104,9 @@ public:
 		luminosity_info<T> const& info,
 		hep::projector<T>& projector
 	) override {
-		std::vector<T> aux_phase_space(phase_space.size());
-
 		auto const recombined = recombiner_.recombine(
 			phase_space,
-			aux_phase_space,
+			recombined_ps_,
 			matrix_elements_.final_states(),
 			0
 		);
@@ -116,7 +117,7 @@ public:
 		}
 
 		T const rapidity_shift = info.rapidity_shift();
-		auto const cut_result = cuts_.cut(phase_space, rapidity_shift,
+		auto const cut_result = cuts_.cut(recombined_ps_, rapidity_shift,
 			event_type::born_like_n);
 
 		if (cut_result.neg_cutted() && cut_result.pos_cutted())
@@ -126,7 +127,7 @@ public:
 
 		if (scale_setter_.dynamic())
 		{
-			set_scales(phase_space);
+			set_scales(recombined_ps_);
 		}
 
 		pdfsa1_.clear();
@@ -357,7 +358,7 @@ public:
 		}
 
 		distributions_(
-			phase_space,
+			recombined_ps_,
 			cut_result,
 			results_,
 			pdf_results_,
@@ -433,6 +434,7 @@ private:
 	T hbarc2_;
 
 	bool insertion2_;
+	std::vector<T> recombined_ps_;
 	std::vector<parton_array<T>> pdfsa1_;
 	std::vector<parton_array<T>> pdfsa2_;
 	std::vector<parton_array<T>> pdfsb1_;
