@@ -6,8 +6,8 @@
 #include "hep/ps/abc_terms.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/event_type.hpp"
+#include "hep/ps/final_state.hpp"
 #include "hep/ps/fini_integrand.hpp"
-#include "hep/ps/index_with_particle_class.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
@@ -167,11 +167,11 @@ public:
 		return { hep::insertion_term{hep::insertion_term_type::born} };
 	}
 
-	std::vector<hep::index_with_particle_class> final_states() const
+	std::vector<hep::final_state> final_states() const
 	{
 		return {
-			hep::index_with_particle_class{2, hep::particle_class::parton},
-			hep::index_with_particle_class{3, hep::particle_class::parton}
+			hep::final_state{2, hep::particle_class::parton},
+			hep::final_state{3, hep::particle_class::parton}
 		};
 	}
 

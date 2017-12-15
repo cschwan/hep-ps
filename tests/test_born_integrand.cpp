@@ -6,7 +6,7 @@
 #include "hep/ps/born_integrand.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/index_with_particle_class.hpp"
+#include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
@@ -130,7 +130,7 @@ public:
 		return alphas_power_;
 	}
 
-	std::vector<hep::index_with_particle_class> final_states() const
+	std::vector<hep::final_state> final_states() const
 	{
 		return {};
 	}

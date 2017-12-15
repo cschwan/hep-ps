@@ -123,14 +123,14 @@ template <typename T>
 std::size_t p_type_jet_algorithm<T>::recombine(
 	std::vector<T> const& phase_space,
 	std::vector<T>& recombined_phase_space,
-	std::vector<index_with_particle_class> const& recombination_candidates,
+	std::vector<final_state> const& final_states,
 	std::size_t max_recombinations
 ) {
 	std::size_t recombinations = 0;
 
 	// we are only interested in jets, so we need to pick out the partons
 	candidates_.clear();
-	for (auto const candidate : recombination_candidates)
+	for (auto const candidate : final_states)
 	{
 		if (candidate.particle() == particle_class::parton)
 		{

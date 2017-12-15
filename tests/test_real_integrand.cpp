@@ -9,7 +9,7 @@
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/index_with_particle_class.hpp"
+#include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/particle_class.hpp"
@@ -184,20 +184,20 @@ public:
 			hep::initial_state_set{hep::initial_state::q43_cu}} };
 	}
 
-	std::vector<hep::index_with_particle_class> final_states() const
+	std::vector<hep::final_state> final_states() const
 	{
 		return {
-			hep::index_with_particle_class{2, hep::particle_class::parton},
-			hep::index_with_particle_class{3, hep::particle_class::parton}
+			hep::final_state{2, hep::particle_class::parton},
+			hep::final_state{3, hep::particle_class::parton}
 		};
 	}
 
-	std::vector<hep::index_with_particle_class> final_states_real() const
+	std::vector<hep::final_state> final_states_real() const
 	{
 		return {
-			hep::index_with_particle_class{2, hep::particle_class::parton},
-			hep::index_with_particle_class{3, hep::particle_class::parton},
-			hep::index_with_particle_class{4, hep::particle_class::parton}
+			hep::final_state{2, hep::particle_class::parton},
+			hep::final_state{3, hep::particle_class::parton},
+			hep::final_state{4, hep::particle_class::parton}
 		};
 	}
 

@@ -10,7 +10,7 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/index_with_particle_class.hpp"
+#include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
@@ -226,9 +226,9 @@ public:
 		return result;
 	}
 
-	std::vector<hep::index_with_particle_class> final_states() const
+	std::vector<hep::final_state> final_states() const
 	{
-		std::vector<hep::index_with_particle_class> result;
+		std::vector<hep::final_state> result;
 		for (std::size_t i = 0; i != final_states_; ++i)
 		{
 			result.emplace_back(i + 2, hep::particle_class::parton);
@@ -237,9 +237,9 @@ public:
 		return result;
 	}
 
-	std::vector<hep::index_with_particle_class> final_states_real() const
+	std::vector<hep::final_state> final_states_real() const
 	{
-		std::vector<hep::index_with_particle_class> result;
+		std::vector<hep::final_state> result;
 		for (std::size_t i = 0; i != final_states_ + 1; ++i)
 		{
 			result.emplace_back(i + 2, hep::particle_class::parton);

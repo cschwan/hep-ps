@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/index_with_particle_class.hpp"
+#include "hep/ps/final_state.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -50,7 +50,7 @@ public:
 	std::size_t recombine(
 		std::vector<T> const& phase_space,
 		std::vector<T>& recombined_phase_space,
-		std::vector<index_with_particle_class> const& recombination_candidates,
+		std::vector<final_state> const& final_states,
 		std::size_t max_recombinations
 	);
 

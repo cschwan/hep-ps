@@ -1,5 +1,5 @@
-#ifndef HEP_PS_INDEX_WITH_PARTICLE_CLASS_HPP
-#define HEP_PS_INDEX_WITH_PARTICLE_CLASS_HPP
+#ifndef HEP_PS_FINAL_STATE_HPP
+#define HEP_PS_FINAL_STATE_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -28,14 +28,11 @@ namespace hep
 
 /// Class encapsulating a particle index together with a corresponding
 /// \ref particle_class.
-class index_with_particle_class
+class final_state
 {
 public:
 	/// Constructor.
-	index_with_particle_class(
-		std::size_t index,
-		particle_class particle
-	)
+	final_state(std::size_t index, particle_class particle)
 		: index_{index}
 		, particle_{particle}
 	{

@@ -23,7 +23,7 @@
 
 #include "hep/ps/convolute.hpp"
 #include "hep/ps/event_type.hpp"
-#include "hep/ps/index_with_particle_class.hpp"
+#include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/neg_pos_results.hpp"
@@ -46,15 +46,14 @@ namespace
 {
 
 inline void adjust_indices(
-	std::vector<hep::index_with_particle_class> const& indices,
+	std::vector<hep::final_state> const& indices,
 	std::size_t unresolved,
-	std::vector<hep::index_with_particle_class>& result
+	std::vector<hep::final_state>& result
 ) {
 	result = indices;
 
 	auto const begin = std::find_if(result.begin(), result.end(),
-		[=](hep::index_with_particle_class p) {
-			return p.index() == unresolved; });
+		[=](hep::final_state p) { return p.index() == unresolved; });
 	auto end = result.end();
 
 	assert( begin != end );
@@ -62,8 +61,8 @@ inline void adjust_indices(
 	auto next = std::next(begin);
 
 	// decrease all indices following the index for the unresolved by one
-	std::transform(next, end, next, [=](hep::index_with_particle_class p) {
-		return hep::index_with_particle_class{p.index() - 1, p.particle()}; });
+	std::transform(next, end, next, [=](hep::final_state p) {
+		return hep::final_state{p.index() - 1, p.particle()}; });
 	// rotate the unresolved index to the end of the vector
 	std::rotate(begin, next, end);
 	// remove the unresolved index
@@ -118,7 +117,7 @@ public:
 
 		recombined_ps_.reserve(4 * (fs + 2));
 		pdf_results_.reserve(pdfs_.count());
-		dipole_recombination_candidates_.reserve(fs);
+		dipole_final_states_.reserve(fs);
 
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
 
@@ -187,13 +186,13 @@ public:
 			adjust_indices(
 				matrix_elements_.final_states_real(),
 				dipole.unresolved(),
-				dipole_recombination_candidates_
+				dipole_final_states_
 			);
 
 			auto const dipole_recombined = recombiner_.recombine(
 				phase_space,
 				phase_space,
-				dipole_recombination_candidates_,
+				dipole_final_states_,
 				0
 			);
 
@@ -437,7 +436,7 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
-	std::vector<index_with_particle_class> dipole_recombination_candidates_;
+	std::vector<final_state> dipole_final_states_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 	T alphas_power_;
 };
