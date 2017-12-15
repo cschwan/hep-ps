@@ -109,15 +109,16 @@ public:
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
+		, final_states_real_(matrix_elements_.final_states_real())
 		, pdf_pdfsx1_(pdfs_.count())
 		, pdf_pdfsx2_(pdfs_.count())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
-		std::size_t const fs = matrix_elements_.final_states_real().size();
+		std::size_t const fs = final_states_real_.size();
 
 		recombined_ps_.reserve(4 * (fs + 2));
 		pdf_results_.reserve(pdfs_.count());
-		dipole_final_states_.reserve(fs);
+		final_states_dipole_.reserve(fs);
 
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
 
@@ -135,7 +136,7 @@ public:
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
 			recombined_ps_,
-			matrix_elements_.final_states_real(),
+			final_states_real_,
 			1
 		);
 
@@ -184,15 +185,15 @@ public:
 			}
 
 			adjust_indices(
-				matrix_elements_.final_states_real(),
+				final_states_real_,
 				dipole.unresolved(),
-				dipole_final_states_
+				final_states_dipole_
 			);
 
 			auto const dipole_recombined = recombiner_.recombine(
 				phase_space,
 				phase_space,
-				dipole_final_states_,
+				final_states_dipole_,
 				0
 			);
 
@@ -428,6 +429,8 @@ private:
 		event_type{}))::info_t;
 
 	std::vector<T> recombined_ps_;
+	std::vector<final_state> final_states_real_;
+	std::vector<final_state> final_states_dipole_;
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
 	std::vector<parton_array<T>> pdf_pdfsx1_;
@@ -436,7 +439,6 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
-	std::vector<final_state> dipole_final_states_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 	T alphas_power_;
 };

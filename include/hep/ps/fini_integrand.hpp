@@ -77,6 +77,7 @@ public:
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, insertion2_(insertion2)
+		, final_states_(matrix_elements_.final_states())
 		, pdf_pdfsa1_(pdfs_.count())
 		, pdf_pdfsa2_(pdfs_.count())
 		, pdf_pdfsb1_(pdfs_.count())
@@ -90,7 +91,7 @@ public:
 		auto const terms = matrix_elements_.insertion_terms();
 		insertion_terms_.assign(begin(terms), end(terms));
 
-		std::size_t const fs = matrix_elements_.final_states().size();
+		std::size_t const fs = final_states_.size();
 		recombined_ps_.reserve(4 * (fs + 2));
 
 		if (!scale_setter_.dynamic())
@@ -107,7 +108,7 @@ public:
 		auto const recombined = recombiner_.recombine(
 			phase_space,
 			recombined_ps_,
-			matrix_elements_.final_states(),
+			final_states_,
 			0
 		);
 
@@ -435,6 +436,7 @@ private:
 
 	bool insertion2_;
 	std::vector<T> recombined_ps_;
+	std::vector<final_state> final_states_;
 	std::vector<parton_array<T>> pdfsa1_;
 	std::vector<parton_array<T>> pdfsa2_;
 	std::vector<parton_array<T>> pdfsb1_;

@@ -73,13 +73,14 @@ public:
 		, distributions_(std::forward<Distributions>(distributions))
 		, set_(set)
 		, hbarc2_(hbarc2)
+		, final_states_(matrix_elements_.final_states())
 		, pdfsx1_(pdfs_.count())
 		, pdfsx2_(pdfs_.count())
 		, pdf_results_(pdfs_.count() - 1)
 		, alphas_power_(matrix_elements_.alphas_power())
 		, dynamic_scales_{scale_setter_.dynamic()}
 	{
-		std::size_t const fs = matrix_elements_.final_states().size();
+		std::size_t const fs = final_states_.size();
 
 		recombined_ps_.reserve(4 * (fs + 2));
 		pdf_results_.reserve(pdfs_.count());
@@ -98,7 +99,7 @@ public:
 		auto const recombined = recombiner_.recombine(
 			phase_space,
 			recombined_ps_,
-			matrix_elements_.final_states(),
+			final_states_,
 			0
 		);
 
@@ -220,6 +221,7 @@ private:
 	T hbarc2_;
 
 	std::vector<T> recombined_ps_;
+	std::vector<final_state> final_states_;
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
 	std::vector<neg_pos_results<T>> pdf_results_;
