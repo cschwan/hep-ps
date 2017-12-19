@@ -19,41 +19,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/particle_class.hpp"
-
 #include <cstddef>
 
 namespace hep
 {
 
-/// Class encapsulating a particle index together with a corresponding
-/// \ref particle_class.
-class final_state
+/// Enumeration used to distinguish the final states of matrix elements.
+enum class final_state : std::size_t
 {
-public:
-	/// Constructor.
-	final_state(std::size_t index, particle_class particle)
-		: index_{index}
-		, particle_{particle}
-	{
-	}
+	/// Charged leptons.
+	charged_lepton,
 
-	/// Returns the index of the particle.
-	std::size_t index() const
-	{
-		return index_;
-	}
+	/// Quarks or Gluons.
+	quark_gluon,
 
-	/// Returns the \ref particle_class of the particle with the given
-	/// \ref index.
-	particle_class particle() const
-	{
-		return particle_;
-	}
+	/// Photons.
+	photon,
 
-private:
-	std::size_t index_;
-	particle_class particle_;
+	/// Neutrinos.
+	neutrino
 };
 
 }

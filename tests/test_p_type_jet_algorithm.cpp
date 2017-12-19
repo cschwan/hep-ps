@@ -1,7 +1,6 @@
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/particle_class.hpp"
 
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/JetDefinition.hh"
@@ -39,13 +38,13 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 
 	std::vector<std::size_t> proto_jets = { 6, 7, 8 };
 	std::vector<hep::final_state> final_states = {
-		hep::final_state{2, hep::particle_class::other},
-		hep::final_state{3, hep::particle_class::charged_lepton},
-		hep::final_state{4, hep::particle_class::other},
-		hep::final_state{5, hep::particle_class::charged_lepton},
-		hep::final_state{6, hep::particle_class::parton},
-		hep::final_state{7, hep::particle_class::parton},
-		hep::final_state{8, hep::particle_class::parton}
+		hep::final_state::neutrino,
+		hep::final_state::charged_lepton,
+		hep::final_state::neutrino,
+		hep::final_state::charged_lepton,
+		hep::final_state::quark_gluon,
+		hep::final_state::quark_gluon,
+		hep::final_state::quark_gluon
 	};
 
 	std::vector<T> random_numbers(psg->dimensions());

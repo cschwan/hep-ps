@@ -12,7 +12,6 @@
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/neg_pos_results.hpp"
-#include "hep/ps/particle_class.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/trivial_cutter.hpp"
@@ -170,8 +169,8 @@ public:
 	std::vector<hep::final_state> final_states() const
 	{
 		return {
-			hep::final_state{2, hep::particle_class::parton},
-			hep::final_state{3, hep::particle_class::parton}
+			hep::final_state::quark_gluon,
+			hep::final_state::quark_gluon
 		};
 	}
 

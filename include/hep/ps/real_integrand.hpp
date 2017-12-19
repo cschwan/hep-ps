@@ -42,35 +42,6 @@
 #include <utility>
 #include <vector>
 
-namespace
-{
-
-inline void adjust_indices(
-	std::vector<hep::final_state> const& indices,
-	std::size_t unresolved,
-	std::vector<hep::final_state>& result
-) {
-	result = indices;
-
-	auto const begin = std::find_if(result.begin(), result.end(),
-		[=](hep::final_state p) { return p.index() == unresolved; });
-	auto end = result.end();
-
-	assert( begin != end );
-
-	auto next = std::next(begin);
-
-	// decrease all indices following the index for the unresolved by one
-	std::transform(next, end, next, [=](hep::final_state p) {
-		return hep::final_state{p.index() - 1, p.particle()}; });
-	// rotate the unresolved index to the end of the vector
-	std::rotate(begin, next, end);
-	// remove the unresolved index
-	result.erase(std::prev(end));
-}
-
-}
-
 namespace hep
 {
 
@@ -110,6 +81,7 @@ public:
 		, hbarc2_(hbarc2)
 		, alpha_min_(alpha_min)
 		, final_states_real_(matrix_elements_.final_states_real())
+		, final_states_dipole_(matrix_elements_.final_states())
 		, pdf_pdfsx1_(pdfs_.count())
 		, pdf_pdfsx2_(pdfs_.count())
 		, alphas_power_(matrix_elements_.alphas_power())
@@ -118,7 +90,6 @@ public:
 
 		recombined_ps_.reserve(4 * (fs + 2));
 		pdf_results_.reserve(pdfs_.count());
-		final_states_dipole_.reserve(fs);
 
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
 
@@ -183,12 +154,6 @@ public:
 				set.subtract(dipole_with_set.set());
 				continue;
 			}
-
-			adjust_indices(
-				final_states_real_,
-				dipole.unresolved(),
-				final_states_dipole_
-			);
 
 			auto const dipole_recombined = recombiner_.recombine(
 				phase_space,

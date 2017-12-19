@@ -14,7 +14,6 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
-#include "hep/ps/particle_class.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/scales.hpp"
@@ -228,24 +227,14 @@ public:
 
 	std::vector<hep::final_state> final_states() const
 	{
-		std::vector<hep::final_state> result;
-		for (std::size_t i = 0; i != final_states_; ++i)
-		{
-			result.emplace_back(i + 2, hep::particle_class::parton);
-		}
-
-		return result;
+		return std::vector<hep::final_state>(final_states_,
+			hep::final_state::quark_gluon);
 	}
 
 	std::vector<hep::final_state> final_states_real() const
 	{
-		std::vector<hep::final_state> result;
-		for (std::size_t i = 0; i != final_states_ + 1; ++i)
-		{
-			result.emplace_back(i + 2, hep::particle_class::parton);
-		}
-
-		return result;
+		return std::vector<hep::final_state>(final_states_ + 1,
+			hep::final_state::quark_gluon);
 	}
 
 	std::array<hep::insertion_term, 3> insertion_terms() const

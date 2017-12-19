@@ -12,7 +12,6 @@
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
-#include "hep/ps/particle_class.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/real_integrand.hpp"
 #include "hep/ps/scales.hpp"
@@ -187,17 +186,17 @@ public:
 	std::vector<hep::final_state> final_states() const
 	{
 		return {
-			hep::final_state{2, hep::particle_class::parton},
-			hep::final_state{3, hep::particle_class::parton}
+			hep::final_state::quark_gluon,
+			hep::final_state::quark_gluon
 		};
 	}
 
 	std::vector<hep::final_state> final_states_real() const
 	{
 		return {
-			hep::final_state{2, hep::particle_class::parton},
-			hep::final_state{3, hep::particle_class::parton},
-			hep::final_state{4, hep::particle_class::parton}
+			hep::final_state::quark_gluon,
+			hep::final_state::quark_gluon,
+			hep::final_state::quark_gluon
 		};
 	}
 

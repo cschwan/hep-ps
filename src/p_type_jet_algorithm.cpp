@@ -130,11 +130,11 @@ std::size_t p_type_jet_algorithm<T>::recombine(
 
 	// we are only interested in jets, so we need to pick out the partons
 	candidates_.clear();
-	for (auto const candidate : final_states)
+	for (std::size_t i = 0; i != final_states.size(); ++i)
 	{
-		if (candidate.particle() == particle_class::parton)
+		if (final_states.at(i) == final_state::quark_gluon)
 		{
-			candidates_.push_back(candidate.index());
+			candidates_.push_back(i + 2);
 		}
 	}
 
