@@ -62,7 +62,6 @@ private:
 
 	std::vector<std::size_t> candidates_;
 	std::vector<T> dib_;
-	std::vector<T> dij_;
 };
 
 }

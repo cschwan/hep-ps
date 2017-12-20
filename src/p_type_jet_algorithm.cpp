@@ -5,19 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <iterator>
-
-namespace
-{
-
-constexpr std::ptrdiff_t reconstruct_distance(
-	std::size_t n,
-	std::size_t i,
-	std::size_t j
-) {
-	return ((2 * n - i - 3) * i) / 2 + j - 1;
-}
-
-}
+#include <limits>
 
 namespace hep
 {
@@ -43,7 +31,6 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 	}
 
 	dib_.clear();
-	dij_.clear();
 
 	phase_space_point<T> ps{phase_space};
 
@@ -52,6 +39,13 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 		std::size_t const index = candidates_.at(i);
 		dib_.push_back(pow(ps.pt2(index), p_));
 	}
+
+	auto const min_dib = std::min_element(dib_.begin(), dib_.end());
+	std::size_t const min_ib = std::distance(dib_.begin(), min_dib);
+
+	T min_dij = std::numeric_limits<T>::max();
+	std::size_t min_i = 0;
+	std::size_t min_j = 0;
 
 	for (std::size_t i = 0; i != (n-1); ++i)
 	{
@@ -64,39 +58,26 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 			T const min = fmin(dib_ib, dib_jb);
 			std::size_t const index_j = candidates_.at(j);
 			T const factor = ps.dist2(index_i, index_j) / radius2_;
+			T const dij = min * factor;
 
-			dij_.push_back(min * factor);
+			if (dij < min_dij)
+			{
+				min_dij = dij;
+				min_i = i;
+				min_j = j;
+			}
 		}
 	}
 
-	auto const min_dib = std::min_element(dib_.begin(), dib_.end());
-	auto const min_dij = std::min_element(dij_.begin(), dij_.end());
-
-	if (*min_dib < *min_dij)
+	if (*min_dib < min_dij)
 	{
-		std::size_t const index = std::distance(dib_.begin(), min_dib);
-		candidates_.erase(std::next(candidates_.begin(), index));
+		candidates_.erase(std::next(candidates_.begin(), min_ib));
 
 		return true;
 	}
 
-	auto const distance = std::distance(dij_.begin(), min_dij);
-
-	std::size_t i = 0;
-	std::size_t j = 1;
-
-	// TODO: find a way to remove the loop
-	while ((distance - reconstruct_distance(n, i, j)) >=
-		static_cast <std::ptrdiff_t> (n - i - 1))
-	{
-		++i;
-		++j;
-	}
-
-	j += distance - reconstruct_distance(n, i, j);
-
-	auto const index_i = candidates_.at(i);
-	auto const index_j = candidates_.at(j);
+	auto const index_i = candidates_.at(min_i);
+	auto const index_j = candidates_.at(min_j);
 
 	phase_space.at(4 * index_i + 0) += phase_space.at(4 * index_j + 0);
 	phase_space.at(4 * index_i + 1) += phase_space.at(4 * index_j + 1);
@@ -108,7 +89,7 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 		std::next(phase_space.begin(), 4 * index_j + 4)
 	);
 
-	auto begin = std::next(candidates_.begin(), j);
+	auto begin = std::next(candidates_.begin(), min_j);
 	auto next = std::next(begin);
 	auto end = candidates_.end();
 
@@ -140,9 +121,7 @@ std::size_t p_type_jet_algorithm<T>::recombine(
 
 	recombined_phase_space = phase_space;
 
-	std::size_t const n = candidates_.size();
-	dib_.reserve(n);
-	dij_.reserve((n * (n - 1)) >> 1);
+	dib_.reserve(candidates_.size());
 
 	for (;;)
 	{
