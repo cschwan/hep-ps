@@ -368,8 +368,6 @@ private:
 	T hbarc2_;
 	T alpha_min_;
 
-	T old_renormalization_scale_;
-
 	using info_type = typename decltype (cuts_.cut(std::vector<T>(), T{},
 		std::vector<recombined_state>{}))::info_t;
 

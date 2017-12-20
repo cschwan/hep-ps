@@ -30,7 +30,7 @@ void test_trivial_cutter_and_recombiner(
 	);
 
 	auto integrand = hep::make_born_integrand<T>(
-		test_matrix_elements<T>(set, count, 0, 0, 0),
+		test_matrix_elements<T>(set, count),
 		hep::trivial_cutter<T>(),
 		hep::trivial_recombiner<T>(),
 		test_pdf<T>(),

@@ -3,17 +3,8 @@
 
 #include "hep/mc/distribution_parameters.hpp"
 
-#include "hep/ps/abc_terms.hpp"
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_with_set.hpp"
-#include "hep/ps/dipole_invariants.hpp"
-#include "hep/ps/dipole_type.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/insertion_term.hpp"
-#include "hep/ps/insertion_term_type.hpp"
-#include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
@@ -72,27 +63,6 @@ public:
 		pdfs.front()[hep::parton::strange]      = T(1.0);
 	}
 
-	hep::parton_array<T> eval(T x, T scale)
-	{
-		CHECK( x >= T() );
-		CHECK( x < T(1.0) );
-		CHECK( scale > T() );
-
-		hep::parton_array<T> pdf;
-
-		pdf[hep::parton::anti_up]      = T(1.0);
-		pdf[hep::parton::anti_down]    = T(1.0);
-		pdf[hep::parton::anti_charm]   = T(1.0);
-		pdf[hep::parton::anti_strange] = T(1.0);
-		pdf[hep::parton::gluon]        = T(1.0);
-		pdf[hep::parton::up]           = T(1.0);
-		pdf[hep::parton::down]         = T(1.0);
-		pdf[hep::parton::charm]        = T(1.0);
-		pdf[hep::parton::strange]      = T(1.0);
-
-		return pdf;
-	}
-
 	T eval_alphas(T scale)
 	{
 		CHECK( scale > T() );
@@ -120,68 +90,10 @@ template <typename T>
 class test_matrix_elements
 {
 public:
-	test_matrix_elements(
-		hep::initial_state_set set,
-		std::size_t final_states,
-		std::size_t emitter,
-		std::size_t unresolved,
-		std::size_t spectator
-	)
+	test_matrix_elements(hep::initial_state_set set, std::size_t final_states)
 		: set_(set)
 		, final_states_(final_states)
-		, emitter_(emitter)
-		, unresolved_(unresolved)
-		, spectator_(spectator)
 	{
-	}
-
-	hep::initial_state_array<T> dipole_me(
-		hep::dipole const& dipole_info,
-		std::vector<T> const& dipole_phase_space,
-		hep::initial_state_set set
-	) const {
-		CHECK( dipole_phase_space.size() == 4 * (final_states_ + 2) );
-		CHECK( set_ == set );
-		CHECK( dipole_info.emitter() == emitter_ );
-		CHECK( dipole_info.unresolved() == unresolved_ );
-		CHECK( dipole_info.spectator() == spectator_ );
-
-		hep::initial_state_array<T> result;
-
-		for (auto const state : set_)
-		{
-			result[state] = T(0.5);
-		}
-
-		return result;
-	}
-
-	std::array<hep::dipole_with_set, 1> dipoles() const
-	{
-		return { hep::dipole_with_set(emitter_, unresolved_, spectator_,
-			hep::particle_type::fermion, hep::particle_type::boson,
-			hep::particle_type::fermion, hep::dipole_type::final_initial, set_)
-		};
-	}
-
-	hep::initial_state_array<T> borns(
-		std::vector<T> const& phase_space,
-		hep::initial_state_set set
-	) const {
-		CHECK( phase_space.size() == 4 * (final_states_ + 2) );
-		CHECK( set == set_ );
-
-		hep::initial_state_array<T> result;
-
-		for (auto const process : hep::initial_state_list())
-		{
-			if (set.includes(process))
-			{
-				result[process] = T(1.0);
-			}
-		}
-
-		return result;
 	}
 
 	hep::initial_state_array<T> borns(
@@ -205,72 +117,10 @@ public:
 		return result;
 	}
 
-	hep::initial_state_array<T> reals(
-		std::vector<T> const& real_phase_space,
-		hep::initial_state_set set
-	) const {
-		CHECK( real_phase_space.size() == 4 * (final_states_ + 3) );
-		CHECK( set == set_ );
-
-		hep::initial_state_array<T> result;
-
-		for (auto const process : hep::initial_state_list())
-		{
-			if (set.includes(process))
-			{
-				result[process] = T(1.0);
-			}
-		}
-
-		return result;
-	}
-
 	std::vector<hep::final_state> final_states() const
 	{
 		return std::vector<hep::final_state>(final_states_,
 			hep::final_state::quark_gluon);
-	}
-
-	std::vector<hep::final_state> final_states_real() const
-	{
-		return std::vector<hep::final_state>(final_states_ + 1,
-			hep::final_state::quark_gluon);
-	}
-
-	std::array<hep::insertion_term, 3> insertion_terms() const
-	{
-		return {
-			hep::insertion_term(
-				hep::insertion_term_type::born
-			),
-			hep::insertion_term(
-				hep::insertion_term_type::final_initial,
-				emitter_,
-				hep::particle_type::fermion,
-				spectator_
-			),
-			hep::insertion_term(
-				hep::insertion_term_type::initial_final,
-				emitter_,
-				hep::particle_type::fermion,
-				spectator_
-			)
-		};
-	}
-
-	std::array<hep::initial_state_array<T>, 3> correlated_me(
-		std::vector<T> const&,
-		hep::initial_state_set
-	) {
-		return {
-			hep::initial_state_array<T>(),
-			hep::initial_state_array<T>(),
-			hep::initial_state_array<T>()
-		};
-	}
-
-	void parameters(T, T)
-	{
 	}
 
 	void alphas(T)
@@ -285,81 +135,6 @@ public:
 private:
 	hep::initial_state_set set_;
 	std::size_t final_states_;
-	std::size_t emitter_;
-	std::size_t unresolved_;
-	std::size_t spectator_;
-};
-
-template <typename T>
-class test_subtraction
-{
-public:
-	test_subtraction(
-		std::size_t emitter,
-		std::size_t unresolved,
-		std::size_t spectator
-	)
-		: emitter_(emitter)
-		, unresolved_(unresolved)
-		, spectator_(spectator)
-	{
-	}
-
-	hep::dipole_invariants<T> map_phase_space(
-		std::vector<T> const& real_phase_space,
-		std::vector<T>& dipole_phase_space,
-		hep::dipole const& dipole_info
-	) const {
-		CHECK( (dipole_phase_space.size() + 4) == real_phase_space.size() );
-		CHECK( dipole_info.emitter() == emitter_ );
-		CHECK( dipole_info.unresolved() == unresolved_ );
-		CHECK( dipole_info.spectator() == spectator_ );
-
-		return hep::dipole_invariants<T>(1.0, 2.0, 4.0, 8.0);
-	}
-
-	T fermion_function(
-		hep::dipole const& dipole_info,
-		hep::dipole_invariants<T> const& invariants
-	) const {
-		CHECK( dipole_info.emitter() == emitter_ );
-		CHECK( dipole_info.unresolved() == unresolved_ );
-		CHECK( dipole_info.spectator() == spectator_ );
-
-		CHECK( invariants.one == T(1.0) );
-		CHECK( invariants.two == T(2.0) );
-		CHECK( invariants.sij == T(4.0) );
-		CHECK( invariants.alpha == T(8.0) );
-
-		return T(1.0);
-	}
-
-	void insertion_terms(
-		hep::insertion_term const&,
-		std::vector<hep::scales<T>> const&,
-		std::vector<T> const&,
-		T,
-		T,
-		std::vector<hep::abc_terms<T>>& results
-	) const {
-		results.clear();
-		results.resize(1);
-	}
-
-	void insertion_terms2(
-		hep::insertion_term const&,
-		std::vector<hep::scales<T>> const&,
-		std::vector<T> const&,
-		std::vector<T>& results
-	) const {
-		results.clear();
-		results.resize(1);
-	}
-
-private:
-	std::size_t emitter_;
-	std::size_t unresolved_;
-	std::size_t spectator_;
 };
 
 template <typename T>
@@ -370,11 +145,6 @@ public:
 		: scale{T(1.0)}
 		, dynamic_{dynamic}
 	{
-	}
-
-	hep::scales<T> operator()(std::vector<T> const&)
-	{
-		return { scale , scale };
 	}
 
 	void operator()(
