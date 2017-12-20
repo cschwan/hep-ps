@@ -106,21 +106,6 @@ public:
 		luminosity_info<T> const& info,
 		hep::projector<T>& projector
 	) override {
-		recombiner_.recombine(
-			real_phase_space,
-			final_states_real_,
-			recombined_ps_,
-			recombined_states_
-		);
-
-		auto const real_cut_result = cuts_.cut(
-			recombined_ps_,
-			info.rapidity_shift(),
-			recombined_states_
-		);
-
-		auto set = set_;
-
 		non_zero_dipoles_.clear();
 
 		for (auto const dipole_with_set : matrix_elements_.dipoles())
@@ -135,9 +120,8 @@ public:
 
 			if (invariants.alpha < alpha_min_)
 			{
-				// remove all initial states from the set that share this dipole
-				set.subtract(dipole_with_set.set());
-				continue;
+				// if we apply a technical cut, completely throw away the point
+				return T();
 			}
 
 			recombiner_.recombine(
@@ -167,9 +151,22 @@ public:
 			);
 		}
 
+		recombiner_.recombine(
+			real_phase_space,
+			final_states_real_,
+			recombined_ps_,
+			recombined_states_
+		);
+
+		auto const real_cut_result = cuts_.cut(
+			recombined_ps_,
+			info.rapidity_shift(),
+			recombined_states_
+		);
+
 		// if there are neither dipoles nor real matrix elements stop here
-		if (set.empty() || (non_zero_dipoles_.empty() &&
-			real_cut_result.neg_cutted() && real_cut_result.pos_cutted()))
+		if (non_zero_dipoles_.empty() && real_cut_result.neg_cutted() &&
+			real_cut_result.pos_cutted())
 		{
 			return T();
 		}
@@ -241,7 +238,7 @@ public:
 			}
 
 			auto const dipole_me = matrix_elements_.dipole_me(dipole,
-				phase_space, set);
+				phase_space, set_);
 
 			results_.clear();
 
@@ -251,7 +248,7 @@ public:
 					pdfsx1_.at(i),
 					pdfsx2_.at(i),
 					dipole_me,
-					set,
+					set_,
 					-function * factors_.at(i) * factor,
 					dipole_cut_result
 				));
@@ -267,7 +264,7 @@ public:
 						pdf_pdfsx1_.at(pdf),
 						pdf_pdfsx2_.at(pdf),
 						dipole_me,
-						set,
+						set_,
 						-function * factor,
 						dipole_cut_result
 					));
@@ -288,7 +285,7 @@ public:
 
 		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 		{
-			auto const reals = matrix_elements_.reals(real_phase_space, set);
+			auto const reals = matrix_elements_.reals(real_phase_space, set_);
 
 			results_.clear();
 
@@ -298,7 +295,7 @@ public:
 					pdfsx1_.at(i),
 					pdfsx2_.at(i),
 					reals,
-					set,
+					set_,
 					factors_.at(i) * factor,
 					real_cut_result
 				));
@@ -314,7 +311,7 @@ public:
 						pdf_pdfsx1_.at(pdf),
 						pdf_pdfsx2_.at(pdf),
 						reals,
-						set,
+						set_,
 						factor,
 						real_cut_result
 					));
