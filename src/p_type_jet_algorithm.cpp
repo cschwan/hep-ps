@@ -2,7 +2,6 @@
 #include "hep/ps/phase_space_point.hpp"
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <iterator>
 #include <limits>
@@ -18,17 +17,14 @@ p_type_jet_algorithm<T>::p_type_jet_algorithm(T p, T radius)
 }
 
 template <typename T>
-bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
-{
+void p_type_jet_algorithm<T>::find_jet(
+	std::vector<T>& phase_space,
+	std::vector<recombined_state>& recombined_states
+) {
 	using std::fmin;
 	using std::pow;
 
 	std::size_t const n = candidates_.size();
-
-	if (n == 1)
-	{
-		return true;
-	}
 
 	dib_.clear();
 
@@ -73,7 +69,7 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 	{
 		candidates_.erase(std::next(candidates_.begin(), min_ib));
 
-		return true;
+		return;
 	}
 
 	auto const index_i = candidates_.at(min_i);
@@ -89,15 +85,15 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 		std::next(phase_space.begin(), 4 * index_j + 4)
 	);
 
+	recombined_states.erase(std::next(recombined_states.begin(), index_j - 2));
+
 	auto begin = std::next(candidates_.begin(), min_j);
 	auto next = std::next(begin);
 	auto end = candidates_.end();
 
-	std::transform(next, end, next, [](std::size_t v) { return v - 1; });
+	std::transform(next, end, next, [](std::size_t p) { return p - 1; });
 	std::rotate(begin, next, end);
 	candidates_.erase(std::prev(end));
-
-	return false;
 }
 
 template <typename T>
@@ -105,17 +101,31 @@ std::size_t p_type_jet_algorithm<T>::recombine(
 	std::vector<T> const& phase_space,
 	std::vector<final_state> const& final_states,
 	std::vector<T>& recombined_phase_space,
-	std::size_t max_recombinations
+	std::vector<recombined_state>& recombined_states
 ) {
-	std::size_t recombinations = 0;
-
-	// we are only interested in jets, so we need to pick out the partons
 	candidates_.clear();
+	recombined_states.clear();
+
 	for (std::size_t i = 0; i != final_states.size(); ++i)
 	{
-		if (final_states.at(i) == final_state::quark_gluon)
+		switch (final_states.at(i))
 		{
+		case final_state::charged_lepton:
+			recombined_states.push_back(recombined_state::dressed_lepton);
+			break;
+
+		case final_state::quark_gluon:
+			recombined_states.push_back(recombined_state::jet);
 			candidates_.push_back(i + 2);
+			break;
+
+		case final_state::photon:
+			recombined_states.push_back(recombined_state::isolated_photon);
+			break;
+
+		case final_state::neutrino:
+			recombined_states.push_back(recombined_state::missing_momentum);
+			break;
 		}
 	}
 
@@ -123,27 +133,13 @@ std::size_t p_type_jet_algorithm<T>::recombine(
 
 	dib_.reserve(candidates_.size());
 
-	for (;;)
+	while (candidates_.size() > 1)
 	{
-		if (find_jet(recombined_phase_space))
-		{
-			if (candidates_.size() == 1)
-			{
-				break;
-			}
-		}
-		else
-		{
-			++recombinations;
-
-			if (recombinations > max_recombinations)
-			{
-				break;
-			}
-		}
+		find_jet(recombined_phase_space, recombined_states);
 	}
 
-	return recombinations;
+	// TODO: remove the return value as it does no longer mean anything
+	return 0;
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

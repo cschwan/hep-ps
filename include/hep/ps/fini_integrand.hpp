@@ -30,6 +30,7 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/ps_integrand.hpp"
+#include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
 #include <cassert>
@@ -93,6 +94,7 @@ public:
 
 		std::size_t const fs = final_states_.size();
 		recombined_ps_.reserve(4 * (fs + 2));
+		recombined_states_.reserve(fs);
 
 		if (!scale_setter_.dynamic())
 		{
@@ -109,7 +111,7 @@ public:
 			phase_space,
 			final_states_,
 			recombined_ps_,
-			0
+			recombined_states_
 		);
 
 		if (recombined != 0)
@@ -437,6 +439,7 @@ private:
 	bool insertion2_;
 	std::vector<T> recombined_ps_;
 	std::vector<final_state> final_states_;
+	std::vector<recombined_state> recombined_states_;
 	std::vector<parton_array<T>> pdfsa1_;
 	std::vector<parton_array<T>> pdfsa2_;
 	std::vector<parton_array<T>> pdfsb1_;

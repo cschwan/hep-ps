@@ -50,6 +50,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 	std::vector<T> random_numbers(psg->dimensions());
 	std::vector<T> momenta(psg->map_dimensions());
 	std::vector<T> recombined_momenta;
+	std::vector<hep::recombined_state> recombined_states;
 	std::mt19937 rng;
 
 	std::vector<fastjet::PseudoJet> fj_momenta;
@@ -73,11 +74,17 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 
 				psg->generate(random_numbers, momenta, channel);
 
-				auto const recombinations = jet_algorithm.recombine(
+				jet_algorithm.recombine(
 					momenta,
 					final_states,
 					recombined_momenta,
-					proto_jets.size()
+					recombined_states
+				);
+
+				auto const nj = std::count(
+					recombined_states.begin(),
+					recombined_states.end(),
+					hep::recombined_state::jet
 				);
 
 				fj_momenta.clear();
@@ -97,8 +104,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 					inclusive_jets());
 
 				// check if the number of recombined momenta agrees with FastJet
-				CHECK( (proto_jets.size() - recombinations) ==
-					fj_recombined_momenta.size() );
+				CHECK( nj == fj_recombined_momenta.size() );
 
 				ps_recombined_momenta.clear();
 

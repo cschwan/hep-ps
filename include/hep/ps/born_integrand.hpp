@@ -29,6 +29,7 @@
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/ps_integrand.hpp"
+#include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
 #include <algorithm>
@@ -83,6 +84,7 @@ public:
 		std::size_t const fs = final_states_.size();
 
 		recombined_ps_.reserve(4 * (fs + 2));
+		recombined_states_.reserve(fs);
 		pdf_results_.reserve(pdfs_.count());
 
 		if (!dynamic_scales_)
@@ -100,7 +102,7 @@ public:
 			phase_space,
 			final_states_,
 			recombined_ps_,
-			0
+			recombined_states_
 		);
 
 		if (recombined != 0)
@@ -222,6 +224,7 @@ private:
 
 	std::vector<T> recombined_ps_;
 	std::vector<final_state> final_states_;
+	std::vector<recombined_state> recombined_states_;
 	std::vector<parton_array<T>> pdfsx1_;
 	std::vector<parton_array<T>> pdfsx2_;
 	std::vector<neg_pos_results<T>> pdf_results_;

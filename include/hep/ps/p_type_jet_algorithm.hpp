@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/final_state.hpp"
+#include "hep/ps/recombined_state.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -38,24 +39,18 @@ public:
 	/// to the anti-\f$ k_\mathrm{T} \f$ algorithm.
 	p_type_jet_algorithm(T p, T radius);
 
-	/// Use the given `phase_space` and runs the E-scheme recombination
-	/// algorithm and writes the result to `recombined_phase_space`. The number
-	/// of recombinations is the return value. The phase space can have
-	/// arbitrary momenta and the ones that are subject to the recombination
-	/// must given as indices in `recombination_candidates`. The value
-	/// `max_recombinations` can be used to short-cut the recombination
-	/// algorithm. If more than `max_recombinations` are neccessary the return
-	/// value is `max_recombinations + 1` and the content of
-	/// `recombined_phase_space` is undefined.
+	/// Uses the E-scheme recombination procedure to recombine `phase_space`
+	/// into `recombined_phase_space`. Only the momenta of the final states are
+	/// used that are either a quark or a gluon.
 	std::size_t recombine(
 		std::vector<T> const& phase_space,
 		std::vector<final_state> const& final_states,
 		std::vector<T>& recombined_phase_space,
-		std::size_t max_recombinations
+		std::vector<recombined_state>& recombined_states
 	);
 
 private:
-	bool find_jet(std::vector<T>&);
+	void find_jet(std::vector<T>&, std::vector<recombined_state>&);
 
 	T p_;
 	T radius2_;

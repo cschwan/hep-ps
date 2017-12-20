@@ -1,9 +1,9 @@
-#ifndef HEP_PS_TRIVIAL_RECOMBINER_HPP
-#define HEP_PS_TRIVIAL_RECOMBINER_HPP
+#ifndef HEP_PS_RECOMBINED_STATE_HPP
+#define HEP_PS_RECOMBINED_STATE_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2017  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,29 +19,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/final_state.hpp"
-#include "hep/ps/recombined_state.hpp"
-
 #include <cstddef>
-#include <vector>
 
 namespace hep
 {
 
-/// Helper class that never recombines any phase space point. This is useful for
-/// testing.
-template <typename T>
-class trivial_recombiner
+/// Enumeration listing the possible objects in a detector.
+enum class recombined_state : std::size_t
 {
-public:
-	/// Always returns zero and performs the assignment of `phase_space` to
-	/// `recombined_phase_space`.
-	std::size_t recombine(
-		std::vector<T> const& phase_space,
-		std::vector<final_state> const& final_states,
-		std::vector<T>& recombined_phase_space,
-		std::vector<recombined_state>& recombined_states
-	) const;
+	/// Charged leptons that are possibly recombined with photons.
+	dressed_lepton,
+
+	/// Quarks or Gluons or recombinations thereof that form a jet.
+	jet,
+
+	/// An isolated photon.
+	isolated_photon,
+
+	/// The sum of all neutrino momenta.
+	missing_momentum
 };
 
 }

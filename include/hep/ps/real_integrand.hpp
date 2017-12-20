@@ -31,6 +31,7 @@
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/ps_integrand.hpp"
+#include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
 #include <algorithm>
@@ -89,6 +90,8 @@ public:
 		std::size_t const fs = final_states_real_.size();
 
 		recombined_ps_.reserve(4 * (fs + 2));
+		recombined_states_.reserve(fs);
+		recombined_dipole_states_.reserve(fs - 1);
 		pdf_results_.reserve(pdfs_.count());
 
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
@@ -108,7 +111,7 @@ public:
 			real_phase_space,
 			final_states_real_,
 			recombined_ps_,
-			1
+			recombined_states_
 		);
 
 		event_type event;
@@ -159,7 +162,7 @@ public:
 				phase_space,
 				final_states_dipole_,
 				phase_space,
-				0
+				recombined_dipole_states_
 			);
 
 			// check if it passed the recombination
@@ -394,6 +397,8 @@ private:
 		event_type{}))::info_t;
 
 	std::vector<T> recombined_ps_;
+	std::vector<recombined_state> recombined_states_;
+	std::vector<recombined_state> recombined_dipole_states_;
 	std::vector<final_state> final_states_real_;
 	std::vector<final_state> final_states_dipole_;
 	std::vector<parton_array<T>> pdfsx1_;

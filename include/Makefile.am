@@ -44,6 +44,7 @@ nobase_include_HEADERS = \
 	hep/ps/ps_integrand.hpp \
 	hep/ps/rambo_phase_space_generator.hpp \
 	hep/ps/real_integrand.hpp \
+	hep/ps/recombined_state.hpp \
 	hep/ps/renormalization_scheme.hpp \
 	hep/ps/scales.hpp \
 	hep/ps/silence_third_party_libs.hpp \
