@@ -8,12 +8,12 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/dipole_with_set.hpp"
-#include "hep/ps/event_type.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/real_integrand.hpp"
+#include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
@@ -65,12 +65,11 @@ public:
 
 	template <typename I>
 	void operator()(
-		std::vector<T> const& /*phase_space*/,
-		hep::cut_result_with_info<I> const&,
+		std::vector<T> const& phase_space,
+		T /*rapidity_shift*/,
+		hep::cut_result_with_info<I> const& /*cut_result*/,
 		std::vector<hep::neg_pos_results<T>> const& results,
 		std::vector<hep::neg_pos_results<T>> const& pdf_results,
-		T,
-		hep::event_type event_type,
 		hep::projector<T>&
 	) {
 		using std::pow;
@@ -82,14 +81,14 @@ public:
 
 		T factor;
 
-		switch (event_type)
+		switch (phase_space.size())
 		{
-		case hep::event_type::inclusive_n_plus_1:
+		case 20:
 			// real matrix element
 			factor = T(2.0);
 			break;
 
-		case hep::event_type::born_like_n:
+		case 16:
 			// dipole
 			factor = T(-1.0);
 			break;

@@ -22,7 +22,6 @@
 #include "hep/mc/projector.hpp"
 
 #include "hep/ps/convolute.hpp"
-#include "hep/ps/event_type.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
@@ -107,35 +106,18 @@ public:
 		luminosity_info<T> const& info,
 		hep::projector<T>& projector
 	) override {
-		auto const recombined = recombiner_.recombine(
+		recombiner_.recombine(
 			real_phase_space,
 			final_states_real_,
 			recombined_ps_,
 			recombined_states_
 		);
 
-		event_type event;
-
-		switch (recombined)
-		{
-		case 0: event = event_type::inclusive_n_plus_1; break;
-		case 1: event = event_type::born_like_n; break;
-		default:
-			event = event_type::other;
-		}
-
-		T const shift = info.rapidity_shift();
-
-		using cut_result_type = decltype (cuts_.cut(recombined_ps_, shift,
-			event));
-
-		cut_result_type real_cut_result;
-
-		if (event == event_type::inclusive_n_plus_1 ||
-			event == event_type::born_like_n)
-		{
-			real_cut_result = cuts_.cut(recombined_ps_, shift, event);
-		}
+		auto const real_cut_result = cuts_.cut(
+			recombined_ps_,
+			info.rapidity_shift(),
+			recombined_states_
+		);
 
 		auto set = set_;
 
@@ -158,21 +140,18 @@ public:
 				continue;
 			}
 
-			auto const dipole_recombined = recombiner_.recombine(
+			recombiner_.recombine(
 				phase_space,
 				final_states_dipole_,
 				phase_space,
 				recombined_dipole_states_
 			);
 
-			// check if it passed the recombination
-			if (dipole_recombined > 0)
-			{
-				continue;
-			}
-
-			auto const dipole_cut_result = cuts_.cut(phase_space, shift,
-				event_type::born_like_n);
+			auto const dipole_cut_result = cuts_.cut(
+				phase_space,
+				info.rapidity_shift(),
+				recombined_dipole_states_
+			);
 
 			if (dipole_cut_result.neg_cutted() &&
 				dipole_cut_result.pos_cutted())
@@ -297,11 +276,10 @@ public:
 
 			distributions_(
 				phase_space,
+				info.rapidity_shift(),
 				dipole_cut_result,
 				results_,
 				pdf_results_,
-				shift,
-				event_type::born_like_n,
 				projector
 			);
 
@@ -345,11 +323,10 @@ public:
 
 			distributions_(
 				recombined_ps_,
+				info.rapidity_shift(),
 				real_cut_result,
 				results_,
 				pdf_results_,
-				shift,
-				event,
 				projector
 			);
 
@@ -394,7 +371,7 @@ private:
 	T old_renormalization_scale_;
 
 	using info_type = typename decltype (cuts_.cut(std::vector<T>(), T{},
-		event_type{}))::info_t;
+		std::vector<recombined_state>{}))::info_t;
 
 	std::vector<T> recombined_ps_;
 	std::vector<recombined_state> recombined_states_;

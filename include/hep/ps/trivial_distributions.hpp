@@ -22,7 +22,6 @@
 #include "hep/mc/projector.hpp"
 
 #include "hep/ps/cut_result.hpp"
-#include "hep/ps/event_type.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 
 #include <vector>
@@ -43,11 +42,10 @@ public:
 	template <typename I>
 	void operator()(
 		std::vector<T> const&,
+		T,
 		cut_result_with_info<I> const&,
 		std::vector<neg_pos_results<T>> const&,
 		std::vector<neg_pos_results<T>> const&,
-		T,
-		event_type,
 		projector<T>&
 	) {
 	}

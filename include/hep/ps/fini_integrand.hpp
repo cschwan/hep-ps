@@ -23,7 +23,6 @@
 
 #include "hep/ps/abc_terms.hpp"
 #include "hep/ps/convolute.hpp"
-#include "hep/ps/event_type.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
@@ -107,21 +106,18 @@ public:
 		luminosity_info<T> const& info,
 		hep::projector<T>& projector
 	) override {
-		auto const recombined = recombiner_.recombine(
+		recombiner_.recombine(
 			phase_space,
 			final_states_,
 			recombined_ps_,
 			recombined_states_
 		);
 
-		if (recombined != 0)
-		{
-			return T();
-		}
-
-		T const rapidity_shift = info.rapidity_shift();
-		auto const cut_result = cuts_.cut(recombined_ps_, rapidity_shift,
-			event_type::born_like_n);
+		auto const cut_result = cuts_.cut(
+			recombined_ps_,
+			info.rapidity_shift(),
+			recombined_states_
+		);
 
 		if (cut_result.neg_cutted() && cut_result.pos_cutted())
 		{
@@ -362,11 +358,10 @@ public:
 
 		distributions_(
 			recombined_ps_,
+			info.rapidity_shift(),
 			cut_result,
 			results_,
 			pdf_results_,
-			rapidity_shift,
-			event_type::born_like_n,
 			projector
 		);
 

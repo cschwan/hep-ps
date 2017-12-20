@@ -5,11 +5,11 @@
 
 #include "hep/ps/born_integrand.hpp"
 #include "hep/ps/cut_result.hpp"
-#include "hep/ps/event_type.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
@@ -44,18 +44,16 @@ public:
 
 	template <typename I>
 	void operator()(
-		std::vector<T> const&,
-		hep::cut_result_with_info<I> const&,
+		std::vector<T> const& /*phase_space*/,
+		T /*rapidity_shift*/,
+		hep::cut_result_with_info<I> const& /*cut_result*/,
 		std::vector<hep::neg_pos_results<T>> const& results,
 		std::vector<hep::neg_pos_results<T>> const& pdf_results,
-		T,
-		hep::event_type event_type,
 		hep::projector<T>&
 	) {
 		using std::pow;
 
 		CHECK( results.size() == global_scales.size() );
-		CHECK( event_type == hep::event_type::born_like_n );
 
 		std::vector<T> alphas;
 		eval_alphas(global_scales, alphas);

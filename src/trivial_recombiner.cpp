@@ -4,7 +4,7 @@ namespace hep
 {
 
 template <typename T>
-std::size_t trivial_recombiner<T>::recombine(
+void trivial_recombiner<T>::recombine(
 	std::vector<T> const& phase_space,
 	std::vector<final_state> const& final_states,
 	std::vector<T>& recombined_phase_space,
@@ -34,8 +34,6 @@ std::size_t trivial_recombiner<T>::recombine(
 			break;
 		}
 	}
-
-	return 0;
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

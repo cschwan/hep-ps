@@ -97,7 +97,7 @@ void p_type_jet_algorithm<T>::find_jet(
 }
 
 template <typename T>
-std::size_t p_type_jet_algorithm<T>::recombine(
+void p_type_jet_algorithm<T>::recombine(
 	std::vector<T> const& phase_space,
 	std::vector<final_state> const& final_states,
 	std::vector<T>& recombined_phase_space,
@@ -137,9 +137,6 @@ std::size_t p_type_jet_algorithm<T>::recombine(
 	{
 		find_jet(recombined_phase_space, recombined_states);
 	}
-
-	// TODO: remove the return value as it does no longer mean anything
-	return 0;
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

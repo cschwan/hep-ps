@@ -22,7 +22,6 @@
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/recombined_state.hpp"
 
-#include <cstddef>
 #include <vector>
 
 namespace hep
@@ -34,9 +33,9 @@ template <typename T>
 class trivial_recombiner
 {
 public:
-	/// Always returns zero and performs the assignment of `phase_space` to
-	/// `recombined_phase_space`.
-	std::size_t recombine(
+	/// Copies `phase_space` to `recombined_phase_space` and converts
+	/// `final_states` to `recombined_states`.
+	void recombine(
 		std::vector<T> const& phase_space,
 		std::vector<final_state> const& final_states,
 		std::vector<T>& recombined_phase_space,

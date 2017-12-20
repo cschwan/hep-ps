@@ -42,7 +42,7 @@ public:
 	/// Uses the E-scheme recombination procedure to recombine `phase_space`
 	/// into `recombined_phase_space`. Only the momenta of the final states are
 	/// used that are either a quark or a gluon.
-	std::size_t recombine(
+	void recombine(
 		std::vector<T> const& phase_space,
 		std::vector<final_state> const& final_states,
 		std::vector<T>& recombined_phase_space,

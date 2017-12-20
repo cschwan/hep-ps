@@ -9,13 +9,13 @@
 #include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
-#include "hep/ps/event_type.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
 #include "catch.hpp"
@@ -360,83 +360,6 @@ private:
 	std::size_t emitter_;
 	std::size_t unresolved_;
 	std::size_t spectator_;
-};
-
-template <typename T>
-struct test_cuts
-{
-public:
-	test_cuts(std::size_t final_states, std::size_t inclusive)
-		: final_states_(final_states)
-		, inclusive_(inclusive)
-	{
-	}
-
-	hep::cut_result cut(
-		std::vector<T> const& phase_space,
-		T,
-		hep::event_type type
-	) const {
-		if (type == hep::event_type::inclusive_n_plus_1)
-		{
-			CHECK( phase_space.size() == 4 * (final_states_ + 3) );
-		}
-		else if (type == hep::event_type::born_like_n)
-		{
-			// FIXME: this check fails for finite insertion terms
-//			CHECK( phase_space.size() == 4 * (final_states_ + 2) );
-		}
-		else
-		{
-			FAIL( "type is neither born nor inclusive" );
-		}
-
-		if (type == hep::event_type::inclusive_n_plus_1 && !inclusive_)
-		{
-			return { true, true };
-		}
-
-		return { false, false };
-	}
-
-private:
-	std::size_t final_states_;
-	std::size_t inclusive_;
-};
-
-template <typename T>
-class test_recombiner
-{
-public:
-	test_recombiner(std::size_t final_states)
-		: final_states_(final_states)
-	{
-	}
-
-	std::size_t recombine(
-		std::vector<T> const& phase_space,
-		std::vector<T>& recombined_phase_space,
-		std::vector<std::size_t> const& recombination_candidates,
-		std::size_t
-	) const {
-		CHECK( phase_space.size() == recombined_phase_space.size() );
-		CHECK( recombination_candidates.size() ==
-			(phase_space.size() / 4 - 2) );
-
-		// TODO: improve the test
-
-		std::size_t last_index = 1;
-		for (auto const index : recombination_candidates)
-		{
-			CHECK( index > last_index );
-			last_index = index;
-		}
-
-		return 0;
-	}
-
-private:
-	std::size_t final_states_;
 };
 
 template <typename T>
