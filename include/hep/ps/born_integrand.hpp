@@ -98,8 +98,8 @@ public:
 	) override {
 		auto const recombined = recombiner_.recombine(
 			phase_space,
-			recombined_ps_,
 			final_states_,
+			recombined_ps_,
 			0
 		);
 

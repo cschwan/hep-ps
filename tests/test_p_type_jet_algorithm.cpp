@@ -75,8 +75,8 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 
 				auto const recombinations = jet_algorithm.recombine(
 					momenta,
-					recombined_momenta,
 					final_states,
+					recombined_momenta,
 					proto_jets.size()
 				);
 

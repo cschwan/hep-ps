@@ -103,8 +103,8 @@ bool p_type_jet_algorithm<T>::find_jet(std::vector<T>& phase_space)
 template <typename T>
 std::size_t p_type_jet_algorithm<T>::recombine(
 	std::vector<T> const& phase_space,
-	std::vector<T>& recombined_phase_space,
 	std::vector<final_state> const& final_states,
+	std::vector<T>& recombined_phase_space,
 	std::size_t max_recombinations
 ) {
 	std::size_t recombinations = 0;

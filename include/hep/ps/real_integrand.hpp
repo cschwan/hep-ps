@@ -106,8 +106,8 @@ public:
 	) override {
 		auto const recombined = recombiner_.recombine(
 			real_phase_space,
-			recombined_ps_,
 			final_states_real_,
+			recombined_ps_,
 			1
 		);
 
@@ -157,8 +157,8 @@ public:
 
 			auto const dipole_recombined = recombiner_.recombine(
 				phase_space,
-				phase_space,
 				final_states_dipole_,
+				phase_space,
 				0
 			);
 

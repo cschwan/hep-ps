@@ -6,8 +6,8 @@ namespace hep
 template <typename T>
 std::size_t trivial_recombiner<T>::recombine(
 	std::vector<T> const& phase_space,
-	std::vector<T>& recombined_phase_space,
 	std::vector<final_state> const&,
+	std::vector<T>& recombined_phase_space,
 	std::size_t
 ) const {
 	recombined_phase_space = phase_space;

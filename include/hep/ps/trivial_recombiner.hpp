@@ -37,8 +37,8 @@ public:
 	/// `recombined_phase_space`.
 	std::size_t recombine(
 		std::vector<T> const& phase_space,
-		std::vector<T>& recombined_phase_space,
 		std::vector<final_state> const& final_states,
+		std::vector<T>& recombined_phase_space,
 		std::size_t max_recombinations
 	) const;
 };
