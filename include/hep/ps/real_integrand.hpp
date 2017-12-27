@@ -82,8 +82,6 @@ public:
 		, alpha_min_(alpha_min)
 		, final_states_real_(matrix_elements_.final_states_real())
 		, final_states_dipole_(matrix_elements_.final_states())
-		, pdf_pdfsx1_(pdfs_.count())
-		, pdf_pdfsx2_(pdfs_.count())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
 		std::size_t const fs = final_states_real_.size();
@@ -91,13 +89,14 @@ public:
 		recombined_ps_.reserve(4 * (fs + 2));
 		recombined_states_.reserve(fs);
 		recombined_dipole_states_.reserve(fs - 1);
-		pdf_results_.reserve(pdfs_.count());
+		pdf_results_.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());
 
 		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
 
 		if (!scale_setter_.dynamic())
 		{
 			set_scales(std::vector<T>());
+			results_.reserve(scales_.size());
 		}
 	}
 
@@ -174,34 +173,16 @@ public:
 		if (scale_setter_.dynamic())
 		{
 			set_scales(recombined_ps_);
+			results_.reserve(scales_.size());
 		}
 
-		pdfsx1_.clear();
-		pdfsx1_.resize(scales_.size());
-		pdfsx2_.clear();
-		pdfsx2_.resize(scales_.size());
-
-		pdfs_.eval(info.x1(), scales_, pdfsx1_);
-		pdfs_.eval(info.x2(), scales_, pdfsx2_);
+		pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
+		pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
 
 		assert( pdfsx1_.size() == scales_.size() );
 		assert( pdfsx2_.size() == scales_.size() );
-
-		if (pdfs_.count() > 1)
-		{
-			pdf_pdfsx1_.clear();
-			pdf_pdfsx1_.resize(pdfs_.count());
-			pdf_pdfsx2_.clear();
-			pdf_pdfsx2_.resize(pdfs_.count());
-
-			T const muf = scales_.front().factorization();
-
-			pdfs_.eval(info.x1(), muf, pdf_pdfsx1_);
-			pdfs_.eval(info.x2(), muf, pdf_pdfsx2_);
-
-			assert( pdf_pdfsx1_.size() == pdfs_.count() );
-			assert( pdf_pdfsx2_.size() == pdfs_.count() );
-		}
+		assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
+		assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
@@ -241,8 +222,9 @@ public:
 				phase_space, set_);
 
 			results_.clear();
+			pdf_results_.clear();
 
-			for (std::size_t i = 0; i != scales_.size(); ++i)
+			for (std::size_t i = 0; i != pdfsx1_.size(); ++i)
 			{
 				results_.push_back(convolute(
 					pdfsx1_.at(i),
@@ -254,21 +236,16 @@ public:
 				));
 			}
 
-			if (pdfs_.count() > 1)
+			for (std::size_t i = 0; i != pdf_pdfsx1_.size(); ++i)
 			{
-				pdf_results_.clear();
-
-				for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
-				{
-					pdf_results_.push_back(convolute(
-						pdf_pdfsx1_.at(pdf),
-						pdf_pdfsx2_.at(pdf),
-						dipole_me,
-						set_,
-						-function * factor,
-						dipole_cut_result
-					));
-				}
+				pdf_results_.push_back(convolute(
+					pdf_pdfsx1_.at(i),
+					pdf_pdfsx2_.at(i),
+					dipole_me,
+					set_,
+					-function * factor,
+					dipole_cut_result
+				));
 			}
 
 			distributions_(
@@ -288,8 +265,9 @@ public:
 			auto const reals = matrix_elements_.reals(real_phase_space, set_);
 
 			results_.clear();
+			pdf_results_.clear();
 
-			for (std::size_t i = 0; i != scales_.size(); ++i)
+			for (std::size_t i = 0; i != pdfsx1_.size(); ++i)
 			{
 				results_.push_back(convolute(
 					pdfsx1_.at(i),
@@ -301,21 +279,16 @@ public:
 				));
 			}
 
-			if (pdfs_.count() > 1)
+			for (std::size_t i = 0; i != pdf_pdfsx1_.size(); ++i)
 			{
-				pdf_results_.clear();
-
-				for (std::size_t pdf = 0; pdf != pdfs_.count(); ++pdf)
-				{
-					pdf_results_.push_back(convolute(
-						pdf_pdfsx1_.at(pdf),
-						pdf_pdfsx2_.at(pdf),
-						reals,
-						set_,
-						factor,
-						real_cut_result
-					));
-				}
+				pdf_results_.push_back(convolute(
+					pdf_pdfsx1_.at(i),
+					pdf_pdfsx2_.at(i),
+					reals,
+					set_,
+					factor,
+					real_cut_result
+				));
 			}
 
 			distributions_(

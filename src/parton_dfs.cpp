@@ -2,6 +2,8 @@
 
 #include <LHAPDF/PDF.h>
 
+#include <algorithm>
+#include <iterator>
 #include <utility>
 
 namespace hep
@@ -87,72 +89,86 @@ std::size_t parton_dfs<T>::count() const
 template <typename T>
 void parton_dfs<T>::eval(
 	T x,
-	std::vector<hep::scales<T>> const& scales,
-	std::vector<parton_array<T>>& pdfs
+	std::vector<scales<T>> const& scales,
+	std::vector<parton_array<T>>& scale_pdfs,
+	std::vector<parton_array<T>>& uncertainty_pdfs
 ) {
 	// TODO: is it possible to get these values from LHAPDF?
-	constexpr std::size_t lhapdf_ac = -4 + 6;
-	constexpr std::size_t lhapdf_as = -3 + 6;
-	constexpr std::size_t lhapdf_au = -2 + 6;
-	constexpr std::size_t lhapdf_ad = -1 + 6;
-	constexpr std::size_t lhapdf_g  =  0 + 6;
-	constexpr std::size_t lhapdf_d  =  1 + 6;
-	constexpr std::size_t lhapdf_u  =  2 + 6;
-	constexpr std::size_t lhapdf_s  =  3 + 6;
-	constexpr std::size_t lhapdf_c  =  4 + 6;
+	constexpr std::size_t cx = -4 + 6;
+	constexpr std::size_t sx = -3 + 6;
+	constexpr std::size_t ux = -2 + 6;
+	constexpr std::size_t dx = -1 + 6;
+	constexpr std::size_t gl =  0 + 6;
+	constexpr std::size_t dq =  1 + 6;
+	constexpr std::size_t uq =  2 + 6;
+	constexpr std::size_t sq =  3 + 6;
+	constexpr std::size_t cq =  4 + 6;
 
-	// TODO: implement a cache?
+	scale_pdfs.clear();
+	scale_pdfs.resize(scales.size());
+
 	for (std::size_t i = 0; i != scales.size(); ++i)
+	{
+		// check if we already calculated the PDF
+		auto const end = std::next(scales.begin(), i);
+		auto const result = std::find_if(scales.begin(), end,
+			[&](hep::scales<T> const& s) {
+				return s.factorization() == scales.at(i).factorization();
+		});
+
+		if (result == end)
+		{
+			pimpl->pdfs.front()->xfxQ(
+				static_cast <double> (x),
+				static_cast <double> (scales.at(i).factorization()),
+				pimpl->xfx
+			);
+
+			scale_pdfs.at(i)[parton::anti_charm]   = T(pimpl->xfx[cx]) / x;
+			scale_pdfs.at(i)[parton::anti_strange] = T(pimpl->xfx[sx]) / x;
+			scale_pdfs.at(i)[parton::anti_up]      = T(pimpl->xfx[ux]) / x;
+			scale_pdfs.at(i)[parton::anti_down]    = T(pimpl->xfx[dx]) / x;
+			scale_pdfs.at(i)[parton::gluon]        = T(pimpl->xfx[gl]) / x;
+			scale_pdfs.at(i)[parton::down]         = T(pimpl->xfx[dq]) / x;
+			scale_pdfs.at(i)[parton::up]           = T(pimpl->xfx[uq]) / x;
+			scale_pdfs.at(i)[parton::strange]      = T(pimpl->xfx[sq]) / x;
+			scale_pdfs.at(i)[parton::charm]        = T(pimpl->xfx[cq]) / x;
+		}
+		else
+		{
+			std::size_t const index = std::distance(scales.begin(), result);
+			scale_pdfs.at(i) = scale_pdfs.at(index);
+		}
+	}
+
+	std::size_t const size = count();
+
+	if (size > 1)
+	{
+		uncertainty_pdfs.clear();
+		uncertainty_pdfs.resize(size);
+
+		// we already calculated the central PDF
+		uncertainty_pdfs.front() = scale_pdfs.front();
+	}
+
+	for (std::size_t i = 1; i != size; ++i)
 	{
 		pimpl->pdfs.front()->xfxQ(
 			static_cast <double> (x),
-			static_cast <double> (scales.at(i).factorization()),
+			static_cast <double> (scales.front().factorization()),
 			pimpl->xfx
 		);
 
-		pdfs.at(i)[parton::anti_charm]   = T(pimpl->xfx[lhapdf_ac]) / x;
-		pdfs.at(i)[parton::anti_strange] = T(pimpl->xfx[lhapdf_as]) / x;
-		pdfs.at(i)[parton::anti_up]      = T(pimpl->xfx[lhapdf_au]) / x;
-		pdfs.at(i)[parton::anti_down]    = T(pimpl->xfx[lhapdf_ad]) / x;
-		pdfs.at(i)[parton::gluon]        = T(pimpl->xfx[lhapdf_g])  / x;
-		pdfs.at(i)[parton::down]         = T(pimpl->xfx[lhapdf_d])  / x;
-		pdfs.at(i)[parton::up]           = T(pimpl->xfx[lhapdf_u])  / x;
-		pdfs.at(i)[parton::strange]      = T(pimpl->xfx[lhapdf_s])  / x;
-		pdfs.at(i)[parton::charm]        = T(pimpl->xfx[lhapdf_c])  / x;
-	}
-}
-
-template <typename T>
-void parton_dfs<T>::eval(T x, T scale, std::vector<parton_array<T>>& pdfs)
-{
-	// TODO: is it possible to get these values from LHAPDF?
-	constexpr std::size_t lhapdf_ac = -4 + 6;
-	constexpr std::size_t lhapdf_as = -3 + 6;
-	constexpr std::size_t lhapdf_au = -2 + 6;
-	constexpr std::size_t lhapdf_ad = -1 + 6;
-	constexpr std::size_t lhapdf_g  =  0 + 6;
-	constexpr std::size_t lhapdf_d  =  1 + 6;
-	constexpr std::size_t lhapdf_u  =  2 + 6;
-	constexpr std::size_t lhapdf_s  =  3 + 6;
-	constexpr std::size_t lhapdf_c  =  4 + 6;
-
-	for (std::size_t i = 0; i != pdfs.size(); ++i)
-	{
-		pimpl->pdfs.at(i)->xfxQ(
-			static_cast <double> (x),
-			static_cast <double> (scale),
-			pimpl->xfx
-		);
-
-		pdfs.at(i)[parton::anti_charm]   = T(pimpl->xfx[lhapdf_ac]) / x;
-		pdfs.at(i)[parton::anti_strange] = T(pimpl->xfx[lhapdf_as]) / x;
-		pdfs.at(i)[parton::anti_up]      = T(pimpl->xfx[lhapdf_au]) / x;
-		pdfs.at(i)[parton::anti_down]    = T(pimpl->xfx[lhapdf_ad]) / x;
-		pdfs.at(i)[parton::gluon]        = T(pimpl->xfx[lhapdf_g])  / x;
-		pdfs.at(i)[parton::down]         = T(pimpl->xfx[lhapdf_d])  / x;
-		pdfs.at(i)[parton::up]           = T(pimpl->xfx[lhapdf_u])  / x;
-		pdfs.at(i)[parton::strange]      = T(pimpl->xfx[lhapdf_s])  / x;
-		pdfs.at(i)[parton::charm]        = T(pimpl->xfx[lhapdf_c])  / x;
+		uncertainty_pdfs.at(i)[parton::anti_charm]   = T(pimpl->xfx[cx]) / x;
+		uncertainty_pdfs.at(i)[parton::anti_strange] = T(pimpl->xfx[sx]) / x;
+		uncertainty_pdfs.at(i)[parton::anti_up]      = T(pimpl->xfx[ux]) / x;
+		uncertainty_pdfs.at(i)[parton::anti_down]    = T(pimpl->xfx[dx]) / x;
+		uncertainty_pdfs.at(i)[parton::gluon]        = T(pimpl->xfx[gl]) / x;
+		uncertainty_pdfs.at(i)[parton::down]         = T(pimpl->xfx[dq]) / x;
+		uncertainty_pdfs.at(i)[parton::up]           = T(pimpl->xfx[uq]) / x;
+		uncertainty_pdfs.at(i)[parton::strange]      = T(pimpl->xfx[sq]) / x;
+		uncertainty_pdfs.at(i)[parton::charm]        = T(pimpl->xfx[cq]) / x;
 	}
 }
 

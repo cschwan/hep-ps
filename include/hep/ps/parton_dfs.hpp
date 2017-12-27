@@ -62,18 +62,16 @@ public:
 	/// object.
 	std::size_t count() const;
 
-	/// Evaluates the central PDF at \f$ x \f$ for given factorization scales in
-	/// `scales` and writes the results into `pdfs`.
+	/// Evaluates the central PDFs for all partons for the momentum fraction `x`
+	/// at the given `scales`, writes the results into `scale_pdfs`, and also
+	/// evaluates, for the central scale, the uncertainty PDFs and writes the
+	/// results into `uncertainty_pdfs`.
 	void eval(
 		T x,
-		std::vector<hep::scales<T>> const& scales,
-		std::vector<parton_array<T>>& pdfs
+		std::vector<scales<T>> const& scales,
+		std::vector<parton_array<T>>& scale_pdfs,
+		std::vector<parton_array<T>>& uncertainty_pdfs
 	);
-
-	/// Returns the values of all parton distribution functions for the given
-	/// \f$ x \f$ and \f$ Q \f$, the last value given by `scale`. The size of
-	/// `pdfs` must agree with the number returned by \ref count.
-	void eval(T x, T scale, std::vector<parton_array<T>>& pdfs);
 
 private:
 	class impl;

@@ -63,6 +63,32 @@ public:
 		pdfs.front()[hep::parton::strange]      = T(1.0);
 	}
 
+	void eval(
+		T x,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::parton_array<T>>& scale_pdfs,
+		std::vector<hep::parton_array<T>>& uncertainty_pdfs
+	) {
+		CHECK( x >= T() );
+		CHECK( x < T(1.0) );
+		CHECK( scales.size() == 1 );
+		CHECK( scales.front().factorization() > T() );
+
+		scale_pdfs.clear();
+		uncertainty_pdfs.clear();
+		scale_pdfs.resize(1);
+
+		scale_pdfs.front()[hep::parton::anti_up]      = T(1.0);
+		scale_pdfs.front()[hep::parton::anti_down]    = T(1.0);
+		scale_pdfs.front()[hep::parton::anti_charm]   = T(1.0);
+		scale_pdfs.front()[hep::parton::anti_strange] = T(1.0);
+		scale_pdfs.front()[hep::parton::gluon]        = T(1.0);
+		scale_pdfs.front()[hep::parton::up]           = T(1.0);
+		scale_pdfs.front()[hep::parton::down]         = T(1.0);
+		scale_pdfs.front()[hep::parton::charm]        = T(1.0);
+		scale_pdfs.front()[hep::parton::strange]      = T(1.0);
+	}
+
 	T eval_alphas(T scale)
 	{
 		CHECK( scale > T() );

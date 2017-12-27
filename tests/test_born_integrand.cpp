@@ -186,34 +186,32 @@ public:
 	void eval(
 		T x,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::parton_array<T>>& pdfs
+		std::vector<hep::parton_array<T>>& scale_pdfs,
+		std::vector<hep::parton_array<T>>& uncertainty_pdfs
 	) {
 		CHECK( x >= T{} );
 		CHECK( x < T(1.0) );
 		CHECK( scales.size() == global_scales.size() );
-		CHECK( pdfs.size() == scales.size() );
+
+		scale_pdfs.clear();
+		uncertainty_pdfs.clear();
+		scale_pdfs.resize(scales.size());
+		uncertainty_pdfs.resize(count());
 
 		for (std::size_t i = 0; i != scales.size(); ++i)
 		{
 			for (auto const parton : hep::parton_list())
 			{
-				pdfs.at(i)[parton] = scales.at(i).factorization();
+				scale_pdfs.at(i)[parton] = scales.at(i).factorization();
 			}
 		}
-	}
-
-	void eval(T x, T scale, std::vector<hep::parton_array<T>>& pdfs)
-	{
-		CHECK( x >= T{} );
-		CHECK( x < T(1.0) );
-		CHECK( scale > T{} );
-		CHECK( pdfs.size() == count() );
 
 		for (std::size_t i = 0; i != count(); ++i)
 		{
 			for (auto const parton : hep::parton_list())
 			{
-				pdfs.at(i)[parton] = scale * T(i+1);
+				uncertainty_pdfs.at(i)[parton] =
+					scales.front().factorization() * T(i+1);
 			}
 		}
 	}

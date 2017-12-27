@@ -74,9 +74,6 @@ public:
 		, set_(set)
 		, hbarc2_(hbarc2)
 		, final_states_(matrix_elements_.final_states())
-		, pdfsx1_(pdfs_.count())
-		, pdfsx2_(pdfs_.count())
-		, pdf_results_(pdfs_.count() - 1)
 		, alphas_power_(matrix_elements_.alphas_power())
 		, dynamic_scales_{scale_setter_.dynamic()}
 	{
@@ -84,11 +81,12 @@ public:
 
 		recombined_ps_.reserve(4 * (fs + 2));
 		recombined_states_.reserve(fs);
-		pdf_results_.reserve(pdfs_.count());
+		pdf_results_.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());
 
 		if (!dynamic_scales_)
 		{
 			set_scales(std::vector<T>());
+			results_.reserve(scales_.size());
 		}
 	}
 
@@ -118,30 +116,32 @@ public:
 		if (dynamic_scales_)
 		{
 			set_scales(recombined_ps_);
+			results_.reserve(scales_.size());
 		}
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		results_.clear();
+		pdf_results_.clear();
 		borns_.resize(scales_.size());
-		pdfsx1_.resize(scales_.size());
-		pdfsx2_.resize(scales_.size());
 
-		pdfs_.eval(info.x1(), scales_, pdfsx1_);
-		pdfs_.eval(info.x2(), scales_, pdfsx2_);
+		pdfs_.eval(info.x1(), scales_, scale_pdf_x1_, pdf_pdf_x1_);
+		pdfs_.eval(info.x2(), scales_, scale_pdf_x2_, pdf_pdf_x2_);
 
-		assert( pdfsx1_.size() == scales_.size() );
-		assert( pdfsx2_.size() == scales_.size() );
+		assert( scale_pdf_x1_.size() == scales_.size() );
+		assert( scale_pdf_x2_.size() == scales_.size() );
+		assert( (pdfs_.count() == 1) || (pdf_pdf_x1_.size() == pdfs_.count()) );
+		assert( (pdfs_.count() == 1) || (pdf_pdf_x2_.size() == pdfs_.count()) );
 
 		matrix_elements_.borns(phase_space, set_, scales_, borns_);
 
 		assert( borns_.size() == scales_.size() );
 
-		for (std::size_t i = 0; i != scales_.size(); ++i)
+		for (std::size_t i = 0; i != scale_pdf_x1_.size(); ++i)
 		{
 			results_.push_back(convolute(
-				pdfsx1_.at(i),
-				pdfsx2_.at(i),
+				scale_pdf_x1_.at(i),
+				scale_pdf_x2_.at(i),
 				borns_.at(i),
 				set_,
 				factors_.at(i) * factor,
@@ -149,30 +149,16 @@ public:
 			));
 		}
 
-		if (pdfs_.count() > 1)
+		for (std::size_t i = 0; i != pdf_pdf_x1_.size(); ++i)
 		{
-			pdf_results_.clear();
-			pdfsx1_.resize(pdfs_.count());
-			pdfsx2_.resize(pdfs_.count());
-
-			// evaluate all PDFs for the central scale
-			pdfs_.eval(info.x1(), scales_.front().factorization(), pdfsx1_);
-			pdfs_.eval(info.x2(), scales_.front().factorization(), pdfsx2_);
-
-			assert( pdfsx1_.size() == pdfs_.count() );
-			assert( pdfsx2_.size() == pdfs_.count() );
-
-			for (std::size_t pdf = 0; pdf != pdfsx1_.size(); ++pdf)
-			{
-				pdf_results_.push_back(convolute(
-					pdfsx1_.at(pdf),
-					pdfsx2_.at(pdf),
-					borns_.front(),
-					set_,
-					factor,
-					cut_result
-				));
-			}
+			pdf_results_.push_back(convolute(
+				pdf_pdf_x1_.at(i),
+				pdf_pdf_x2_.at(i),
+				borns_.front(),
+				set_,
+				factor,
+				cut_result
+			));
 		}
 
 		distributions_(
@@ -220,8 +206,10 @@ private:
 	std::vector<T> recombined_ps_;
 	std::vector<final_state> final_states_;
 	std::vector<recombined_state> recombined_states_;
-	std::vector<parton_array<T>> pdfsx1_;
-	std::vector<parton_array<T>> pdfsx2_;
+	std::vector<parton_array<T>> scale_pdf_x1_;
+	std::vector<parton_array<T>> scale_pdf_x2_;
+	std::vector<parton_array<T>> pdf_pdf_x1_;
+	std::vector<parton_array<T>> pdf_pdf_x2_;
 	std::vector<neg_pos_results<T>> pdf_results_;
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
