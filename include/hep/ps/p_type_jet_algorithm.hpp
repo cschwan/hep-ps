@@ -50,8 +50,6 @@ public:
 	);
 
 private:
-	void find_jet(std::vector<T>&, std::vector<recombined_state>&);
-
 	T p_;
 	T radius2_;
 
