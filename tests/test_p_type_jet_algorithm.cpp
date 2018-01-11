@@ -69,7 +69,7 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 			{
 				std::generate(random_numbers.begin(), random_numbers.end(), [&]() {
 					return std::generate_canonical<T,
-						std::numeric_limits<T>::max_digits10>(rng);
+						std::numeric_limits<T>::digits>(rng);
 				});
 
 				psg->generate(random_numbers, momenta, channel);
