@@ -14,6 +14,7 @@ nobase_include_HEADERS = \
 	hep/ps/dipole_type.hpp \
 	hep/ps/dipole_with_set.hpp \
 	hep/ps/enum.hpp \
+	hep/ps/ew_cs_subtraction.hpp \
 	hep/ps/factorization_scheme.hpp \
 	hep/ps/final_state.hpp \
 	hep/ps/find_hep_ps.hpp \

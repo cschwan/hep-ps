@@ -32,6 +32,7 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/dipole_with_set.hpp"
+#include "hep/ps/ew_cs_subtraction.hpp"
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/fini_integrand.hpp"
