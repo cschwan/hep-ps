@@ -90,6 +90,12 @@ public:
 	/// Calculates the rapidity of the particle with index `i`.
 	T rap_pos(std::size_t i) const;
 
+	// Calculate the pseudo-rapidity of the particle with index `i`.
+	T prap_neg(std::size_t i) const;
+
+	// Calculate the pseudo-rapidity of the particle with index `i`.
+	T prap_pos(std::size_t i) const;
+
 private:
 	T const* p_;
 	T rapidity_shift_;

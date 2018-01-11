@@ -205,6 +205,46 @@ T phase_space_point<T>::rap_pos(std::size_t i) const
 	return rapidity_shift_ + atanh(p3 / p0);
 }
 
+template <typename T>
+T phase_space_point<T>::prap_neg(std::size_t i) const
+{
+	using std::atanh;
+	using std::sinh;
+	using std::sqrt;
+
+	T const p0 = p_[4*i+0];
+	T const p1 = p_[4*i+1];
+	T const p2 = p_[4*i+2];
+	T const p3 = p_[4*i+3];
+
+	T const mt = sqrt((p0 - p3) * (p0 + p3));
+	T const pt2 = p1 * p1 + p2 * p2;
+	T const sinh_rap = sinh(rapidity_shift_ - atanh(p3 / p0));
+	T const arg = mt * sinh_rap / sqrt(pt2 + mt * mt * sinh_rap * sinh_rap);
+
+	return atanh(arg);
+}
+
+template <typename T>
+T phase_space_point<T>::prap_pos(std::size_t i) const
+{
+	using std::atanh;
+	using std::sinh;
+	using std::sqrt;
+
+	T const p0 = p_[4*i+0];
+	T const p1 = p_[4*i+1];
+	T const p2 = p_[4*i+2];
+	T const p3 = p_[4*i+3];
+
+	T const mt = sqrt((p0 - p3) * (p0 + p3));
+	T const pt2 = p1 * p1 + p2 * p2;
+	T const sinh_rap = sinh(rapidity_shift_ + atanh(p3 / p0));
+	T const arg = mt * sinh_rap / sqrt(pt2 + mt * mt * sinh_rap * sinh_rap);
+
+	return atanh(arg);
+}
+
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template class phase_space_point<double>;
