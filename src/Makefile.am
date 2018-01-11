@@ -20,6 +20,7 @@ libhep_ps_la_SOURCES = \
 	lusifer_interfaces.hpp \
 	lusifer_phase_space_generator.cpp \
 	p_type_jet_algorithm.cpp \
+	p_type_photon_parton_recombiner.cpp \
 	parton_dfs.cpp \
 	parton_df_unc.cpp \
 	phase_space_generator.cpp \

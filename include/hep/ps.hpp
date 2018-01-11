@@ -48,6 +48,7 @@
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
+#include "hep/ps/p_type_photon_parton_recombiner.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/parton_df_unc.hpp"

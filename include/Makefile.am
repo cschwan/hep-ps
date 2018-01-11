@@ -31,6 +31,7 @@ nobase_include_HEADERS = \
 	hep/ps/neg_pos_results.hpp \
 	hep/ps/non_zero_dipole.hpp \
 	hep/ps/p_type_jet_algorithm.hpp \
+	hep/ps/p_type_photon_parton_recombiner.hpp \
 	hep/ps/particle_type.hpp \
 	hep/ps/parton.hpp \
 	hep/ps/parton_dfs.hpp \
