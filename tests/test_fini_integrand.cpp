@@ -53,6 +53,8 @@ public:
 		T /*eta*/,
 		std::vector<hep::abc_terms<T>>& results
 	) const {
+		results.clear();
+
 		CHECK( term.type() == hep::insertion_term_type::born );
 
 		for (auto const& scale : scales)
@@ -72,6 +74,8 @@ public:
 		std::vector<T> const& /*phase_space*/,
 		std::vector<T>& results
 	) const {
+		results.clear();
+
 		CHECK( term.type() == hep::insertion_term_type::born );
 
 		for (auto const& scale : scales)

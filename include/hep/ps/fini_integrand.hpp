@@ -188,7 +188,6 @@ public:
 				T const eta_neg = (i == 0) ? info.x2() : info.x1();
 				T const xprime_neg = eta_neg * (T(1.0) - x) + x;
 
-				abc_neg_.clear();
 				subtraction_.insertion_terms(
 					term,
 					scales_,
@@ -203,7 +202,6 @@ public:
 				T const eta_pos = (i == 0) ? info.x1() : info.x2();
 				T const xprime_pos = eta_pos * (T(1.0) - x) + x;
 
-				abc_pos_.clear();
 				subtraction_.insertion_terms(
 					term,
 					scales_,
@@ -278,7 +276,6 @@ public:
 
 			if (insertion2_)
 			{
-				terms2_.clear();
 				subtraction_.insertion_terms2(
 					term,
 					scales_,

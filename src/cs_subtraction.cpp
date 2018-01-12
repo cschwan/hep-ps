@@ -299,23 +299,28 @@ T cs_subtraction<T>::fermion_function(
 }
 
 template <typename T>
-abc_terms<T> cs_subtraction<T>::insertion_terms(
+void cs_subtraction<T>::insertion_terms(
 	insertion_term const& term,
-	scales<T> const& mu,
+	std::vector<scales<T>> const& scales,
 	std::vector<T> const& phase_space,
 	T x,
-	T eta
+	T eta,
+	std::vector<abc_terms<T>>& results
 ) const {
 	using std::acos;
 	using std::log;
 
+	constexpr auto gl = parton_type::gluon_;
+	constexpr auto qq = parton_type::quark;
+	constexpr auto aq = parton_type::anti_quark;
+
 	// TODO: DIS scheme is NYI
 	assert( fscheme_ == factorization_scheme::msbar );
 
-	abc_terms<T> result;
-
 	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
 	T const pi = acos(T(-1.0));
+
+	results.clear();
 
 	switch (term.type())
 	{
@@ -323,33 +328,31 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 	{
 		T const omx = T(1.0) - x;
 		T const logomxbx = log(omx / x);
-
-		T value = T(0.5) * tf_ / pi * ((x * x + omx * omx) * logomxbx +
-			T(2.0) * x * omx);
-
-		result.a[parton_type::gluon_    ][parton_type::anti_quark] = value;
-		result.a[parton_type::gluon_    ][parton_type::quark]      = value;
-
-		value = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) * logomxbx + omx);
-
-		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.a[parton_type::quark     ][parton_type::quark]      = value;
-
-		value = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
-
-		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.b[parton_type::quark     ][parton_type::quark]      = value;
-
 		T const dilogome = gsl_sf_dilog(T(1.0) - eta);
-		T const logome   = log(T(1.0) - eta);
+		T const logome = log(T(1.0) - eta);
 
-		value = T(0.5) * cf / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
-			T(2.0) * dilogome + logome * logome);
+		T const value1 = T(0.5) * tf_ / pi * ((x * x + omx * omx) * logomxbx +
+			T(2.0) * x * omx);
+		T const value2 = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) *
+			logomxbx + omx);
+		T const value3 = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
+		T const value4 = T(0.5) * cf / pi * (T(2.0) / T(3.0) * pi * pi -
+			T(5.0) + T(2.0) * dilogome + logome * logome);
 
-		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.c[parton_type::quark     ][parton_type::quark]      = value;
+		abc_terms<T> result;
+
+		result.a[gl][aq] = value1;
+		result.a[gl][qq] = value1;
+		result.a[aq][aq] = value2;
+		result.a[qq][qq] = value2;
+		result.b[aq][aq] = value3;
+		result.b[qq][qq] = value3;
+		result.c[aq][aq] = value4;
+		result.c[qq][qq] = value4;
 
 		// TODO: qg and gg are NYI
+
+		results.assign(scales.size(), result);
 	}
 
 		break;
@@ -361,22 +364,21 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 			? T(1.5) * cf
 			: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * nf_;
 
-		T value = T(0.5) * gamma / pi / (T(1.0) - x);
+		T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
+		T const value2 = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
 
-		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.a[parton_type::quark     ][parton_type::quark]      = value;
+		abc_terms<T> result;
 
-		value = T(0.5) * gamma / pi / (T(1.0) - x);
-
-		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.b[parton_type::quark     ][parton_type::quark]      = value;
-
-		value = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
-
-		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.c[parton_type::quark     ][parton_type::quark]      = value;
+		result.a[aq][aq] = value1;
+		result.a[qq][qq] = value1;
+		result.b[aq][aq] = value1;
+		result.b[qq][qq] = value1;
+		result.c[aq][aq] = value2;
+		result.c[qq][qq] = value2;
 
 		// TODO: qg and gg are NYI
+
+		results.assign(scales.size(), result);
 	}
 
 		break;
@@ -387,28 +389,32 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 
 		T const omx = T(1.0) - x;
 		T const sai = ps.m2(term.emitter(), term.spectator());
-		T const mu2 = mu.factorization() * mu.factorization();
-		T const logmu2bsai = log(mu2 / sai);
 
-		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * logmu2bsai;
+		T const value1 = T(0.5) * tf_ / pi * (x * x + omx * omx);
+		T const value2 = T(0.5) * cf / pi * (T(1.0) + x * x) / omx;
+		T const value3 = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) +
+			T(2.0) * log(T(1.0) - eta));
 
-		result.a[parton_type::gluon_    ][parton_type::anti_quark] = value;
-		result.a[parton_type::gluon_    ][parton_type::quark]      = value;
+		for (auto const mu : scales)
+		{
+			T const mu2 = mu.factorization() * mu.factorization();
+			T const logmu2bsai = log(mu2 / sai);
 
-		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * logmu2bsai;
+			abc_terms<T> result;
 
-		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.a[parton_type::quark     ][parton_type::quark]      = value;
-		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.b[parton_type::quark     ][parton_type::quark]      = value;
+			result.a[gl][aq] = value1 * logmu2bsai;
+			result.a[gl][qq] = value1 * logmu2bsai;
+			result.a[aq][aq] = value2 * logmu2bsai;
+			result.a[qq][qq] = value2 * logmu2bsai;
+			result.b[aq][aq] = value2 * logmu2bsai;
+			result.b[qq][qq] = value2 * logmu2bsai;
+			result.c[aq][aq] = value3 * logmu2bsai;
+			result.c[qq][qq] = value3 * logmu2bsai;
 
-		value = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) + T(2.0) *
-			log(T(1.0) - eta)) * logmu2bsai;
+			// TODO: qg and gg are NYI
 
-		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.c[parton_type::quark     ][parton_type::quark]      = value;
-
-		// TODO: qg and gg are NYI
+			results.push_back(result);
+		}
 	}
 
 		break;
@@ -419,107 +425,42 @@ abc_terms<T> cs_subtraction<T>::insertion_terms(
 
 		T const omx = T(1.0) - x;
 		T const sai = ps.m2(term.emitter(), term.spectator());
-		T const mu2 = mu.factorization() * mu.factorization();
-		T const logmu2bsai = log(mu2 / sai);
 		T const logomx = log(omx);
-
-		T value = T(0.5) * tf_ / pi * (x * x + omx * omx) * (logmu2bsai -
-			logomx);
-
-		result.a[parton_type::gluon_    ][parton_type::anti_quark] = value;
-		result.a[parton_type::gluon_    ][parton_type::quark]      = value;
-
-		value = T(0.5) * cf / pi * (T(1.0) + x * x) / omx * (logmu2bsai -
-			logomx);
-
-		result.a[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.a[parton_type::quark     ][parton_type::quark]      = value;
-
-		value = T(0.5) * cf / pi * ((T(1.0) + x * x) / omx * logmu2bsai -
-			T(2.0) * logomx / omx);
-
-		result.b[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.b[parton_type::quark     ][parton_type::quark]      = value;
-
 		T const logome = log(T(1.0) - eta);
 
-		value = T(0.5) * cf / pi * (pi * pi / T(3.0) + (eta + T(0.5) * eta *
-			eta + T(2.0) * logome) * logmu2bsai - logome * logome);
+		T const value1 = T(0.5) * tf_ / pi * (x * x + omx * omx);
+		T const value2 = T(0.5) * cf / pi * (T(1.0) + x * x) / omx;
 
-		result.c[parton_type::anti_quark][parton_type::anti_quark] = value;
-		result.c[parton_type::quark     ][parton_type::quark]      = value;
+		for (auto const& mu : scales)
+		{
+			T const mu2 = mu.factorization() * mu.factorization();
+			T const logmu2bsai = log(mu2 / sai);
 
-		// TODO: qg and gg are NYI
+			T const value3 = T(0.5) * cf / pi * ((T(1.0) + x * x) / omx *
+				logmu2bsai - T(2.0) * logomx / omx);
+			T const value4 = T(0.5) * cf / pi * (pi * pi / T(3.0) + (eta +
+				T(0.5) * eta * eta + T(2.0) * logome) * logmu2bsai -
+				logome * logome);
+
+			abc_terms<T> result;
+
+			result.a[gl][aq] = value1 * (logmu2bsai - logomx);
+			result.a[gl][qq] = value1 * (logmu2bsai - logomx);
+			result.a[aq][aq] = value2 * (logmu2bsai - logomx);
+			result.a[qq][qq] = value2 * (logmu2bsai - logomx);
+			result.b[aq][aq] = value3;
+			result.b[qq][qq] = value3;
+			result.c[aq][aq] = value4;
+			result.c[qq][qq] = value4;
+
+			// TODO: qg and gg are NYI
+
+			results.push_back(result);
+		}
 	}
-	}
-
-	return result;
-}
-
-template <typename T>
-void cs_subtraction<T>::insertion_terms(
-	insertion_term const& term,
-	std::vector<scales<T>> const& scales,
-	std::vector<T> const& phase_space,
-	T x,
-	T eta,
-	std::vector<abc_terms<T>>& results
-) const {
-	// TODO: optimize
-	for (auto const& scale : scales)
-	{
-		results.push_back(insertion_terms(term, scale, phase_space, x, eta));
-	}
-}
-
-template <typename T>
-T cs_subtraction<T>::insertion_terms2(
-	insertion_term const& term,
-	scales<T> const& mu,
-	std::vector<T> const& phase_space
-) const {
-	using std::acos;
-
-	if (term.type() == insertion_term_type::born)
-	{
-		return T();
-	}
-
-	// TODO: other schemes are NYI
-	assert( rscheme_ == renormalization_scheme::msbar );
-
-	switch (term.emitter_type())
-	{
-	case particle_type::fermion:
-	{
-		T result{};
-
-		result += T(5.0);
-
-		T const pi = acos(T(-1.0));
-
-		result -= T(7.0) * pi * pi / T(12.0);
-
-		phase_space_point<T> ps{phase_space};
-
-		T const sij = ps.m2(term.emitter(), term.spectator());
-		T const mu2 = mu.renormalization() * mu.renormalization();
-		T const logmubsij = log(mu2 / sij);
-
-		result += T(3.0) / T(2.0) * logmubsij;
-		result += T(0.5) * logmubsij * logmubsij;
-
-		T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
-
-		result *= T(-0.5) * cf / pi;
-
-		return result;
-	}
-
-		break;
 
 	default:
-		// NYI
+		// implementation error
 		assert( false );
 	}
 }
@@ -531,10 +472,54 @@ void cs_subtraction<T>::insertion_terms2(
 	std::vector<T> const& phase_space,
 	std::vector<T>& results
 ) const {
-	// TODO: optimize
-	for (auto const& scale : scales)
+	using std::acos;
+
+	if (term.type() == insertion_term_type::born)
 	{
-		results.push_back(insertion_terms2(term, scale, phase_space));
+		results.assign(scales.size(), T());
+		return;
+	}
+
+	// TODO: other schemes are NYI
+	assert( rscheme_ == renormalization_scheme::msbar );
+
+	results.clear();
+
+	switch (term.emitter_type())
+	{
+	case particle_type::fermion:
+	{
+		phase_space_point<T> ps{phase_space};
+
+		// multiplication by this factor simplifies the terms outside the log
+		T const expmeulgam = T(5.61459483566885169824143214791e-1l);
+
+		T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+		T const pi = acos(T(-1.0));
+		T const sij = ps.m2(term.emitter(), term.spectator());
+		T const factor = T(4.0) * pi * expmeulgam / sij;
+
+		for (auto const mu : scales)
+		{
+			// TODO: set this to the infrared scale
+			T const mu2 = mu.renormalization() * mu.renormalization();
+			T const logmubsij = log(factor * mu2);
+
+			T result = T(5.0);
+			result -= T(7.0) * pi * pi / T(12.0);
+			result += T(3.0) / T(2.0) * logmubsij;
+			result += T(0.5) * logmubsij * logmubsij;
+			result *= T(-0.5) * cf / pi;
+
+			results.push_back(result);
+		}
+	}
+
+		break;
+
+	default:
+		// NYI
+		assert( false );
 	}
 }
 
