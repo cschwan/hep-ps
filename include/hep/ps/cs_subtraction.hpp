@@ -41,8 +41,7 @@ public:
 		T n,
 		T tf,
 		T nf,
-		factorization_scheme fscheme,
-		renormalization_scheme rscheme
+		factorization_scheme fscheme
 	);
 
 	dipole_invariants<T> map_phase_space(
@@ -73,11 +72,10 @@ public:
 	) const;
 
 private:
-	T n_;
+	T nc_;
 	T tf_;
 	T nf_;
 	factorization_scheme fscheme_;
-	renormalization_scheme rscheme_;
 };
 
 }

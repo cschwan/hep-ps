@@ -13,17 +13,15 @@ namespace hep
 
 template <typename T>
 cs_subtraction<T>::cs_subtraction(
-	T n,
+	T nc,
 	T tf,
 	T nf,
-	factorization_scheme fscheme,
-	renormalization_scheme rscheme
+	factorization_scheme fscheme
 )
-	: n_(n)
-	, tf_(tf)
-	, nf_(nf)
-	, fscheme_(fscheme)
-	, rscheme_(rscheme)
+	: nc_{nc}
+	, tf_{tf}
+	, nf_{nf}
+	, fscheme_{fscheme}
 {
 }
 
@@ -221,7 +219,7 @@ T cs_subtraction<T>::fermion_function(
 	dipole const& dipole_info,
 	dipole_invariants<T> const& invariants
 ) {
-	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+	T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 	T factor = T(8.0) * std::acos(T(-1.0)) * cf;
 
 	T dipole;
@@ -317,7 +315,7 @@ void cs_subtraction<T>::insertion_terms(
 	// TODO: DIS scheme is NYI
 	assert( fscheme_ == factorization_scheme::msbar );
 
-	T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+	T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 	T const pi = acos(T(-1.0));
 
 	results.clear();
@@ -359,7 +357,7 @@ void cs_subtraction<T>::insertion_terms(
 
 	case insertion_term_type::final_initial:
 	{
-		T const ca = n_;
+		T const ca = nc_;
 		T const gamma = (term.emitter_type() == particle_type::fermion)
 			? T(1.5) * cf
 			: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * nf_;
@@ -480,9 +478,6 @@ void cs_subtraction<T>::insertion_terms2(
 		return;
 	}
 
-	// TODO: other schemes are NYI
-	assert( rscheme_ == renormalization_scheme::msbar );
-
 	results.clear();
 
 	switch (term.emitter_type())
@@ -494,7 +489,7 @@ void cs_subtraction<T>::insertion_terms2(
 		// multiplication by this factor simplifies the terms outside the log
 		T const expmeulgam = T(5.61459483566885169824143214791e-1l);
 
-		T const cf = tf_ * (n_ * n_ - T(1.0)) / n_;
+		T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 		T const pi = acos(T(-1.0));
 		T const sij = ps.m2(term.emitter(), term.spectator());
 		T const factor = T(4.0) * pi * expmeulgam / sij;

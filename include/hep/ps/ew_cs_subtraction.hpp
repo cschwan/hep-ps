@@ -28,11 +28,7 @@ template <typename T>
 class ew_cs_subtraction : public cs_subtraction<T>
 {
 public:
-	ew_cs_subtraction(
-		T nf,
-		factorization_scheme fscheme,
-		renormalization_scheme rscheme
-	);
+	ew_cs_subtraction(T nf, factorization_scheme fscheme);
 };
 
 }
