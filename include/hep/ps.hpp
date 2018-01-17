@@ -63,6 +63,7 @@
 #include "hep/ps/rambo_phase_space_generator.hpp"
 #include "hep/ps/real_integrand.hpp"
 #include "hep/ps/recombined_state.hpp"
+#include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/renormalization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/silence_third_party_libs.hpp"

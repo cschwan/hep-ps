@@ -16,12 +16,14 @@ cs_subtraction<T>::cs_subtraction(
 	T nc,
 	T tf,
 	T nf,
-	factorization_scheme fscheme
+	factorization_scheme fscheme,
+	regularization_scheme rscheme
 )
 	: nc_{nc}
 	, tf_{tf}
 	, nf_{nf}
 	, fscheme_{fscheme}
+	, rscheme_{rscheme}
 {
 }
 
@@ -478,6 +480,12 @@ void cs_subtraction<T>::insertion_terms2(
 		return;
 	}
 
+	if (rscheme_ != regularization_scheme::dim_reg_blha)
+	{
+		// TODO: other regularization schemes are NYI
+		assert( false );
+	}
+
 	results.clear();
 
 	switch (term.emitter_type())
@@ -496,8 +504,7 @@ void cs_subtraction<T>::insertion_terms2(
 
 		for (auto const mu : scales)
 		{
-			// TODO: set this to the infrared scale
-			T const mu2 = mu.renormalization() * mu.renormalization();
+			T const mu2 = mu.regularization() * mu.regularization();
 			T const logmubsij = log(factor * mu2);
 
 			T result = T(5.0);

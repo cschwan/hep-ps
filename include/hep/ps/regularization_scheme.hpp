@@ -1,5 +1,5 @@
-#ifndef HEP_PS_EW_CS_SUBTRACTION_HPP
-#define HEP_PS_EW_CS_SUBTRACTION_HPP
+#ifndef HEP_PS_REGULARIZATION_SCHEME_HPP
+#define HEP_PS_REGULARIZATION_SCHEME_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -19,21 +19,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/cs_subtraction.hpp"
-#include "hep/ps/regularization_scheme.hpp"
-
 namespace hep
 {
 
-template <typename T>
-class ew_cs_subtraction : public cs_subtraction<T>
+/// Enumeration that denotes the regularization scheme and specifies how the
+/// finite parts of the calculation are distributed across the virtual and
+/// integrated subtraction terms.
+enum class regularization_scheme
 {
-public:
-	ew_cs_subtraction(
-		T nf,
-		factorization_scheme fscheme,
-		regularization_scheme rscheme
-	);
+	/// Dimensional regularization using the Binoth Les Houches Accord (BLHA)
+	/// convention.
+	dim_reg_blha
 };
 
 }

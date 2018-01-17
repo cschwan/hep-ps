@@ -187,9 +187,10 @@ public:
 			for (auto& scale : global_scales)
 			{
 				T const muf = T(2.0) * scale.factorization();
+				T const mu = scale.regularization();
 				T const mur = T(2.0) * scale.renormalization();
 
-				scale = hep::scales<T>{muf, mur};
+				scale = hep::scales<T>{muf, mu, mur};
 			}
 		}
 
@@ -277,13 +278,13 @@ void test_fini_integrand(
 
 	// reset scales
 	global_scales = {
-		hep::scales<T>{         T(10.0),          T(10.0)},
-		hep::scales<T>{T(0.5) * T(10.0),          T(10.0)},
-		hep::scales<T>{         T(10.0), T(0.5) * T(10.0)},
-		hep::scales<T>{T(2.0) * T(10.0),          T(10.0)},
-		hep::scales<T>{         T(10.0), T(2.0) * T(10.0)},
-		hep::scales<T>{T(0.5) * T(10.0), T(0.5) * T(10.0)},
-		hep::scales<T>{T(2.0) * T(10.0), T(2.0) * T(10.0)}
+		hep::scales<T>{         T(10.0), T(10.0),          T(10.0)},
+		hep::scales<T>{T(0.5) * T(10.0), T(10.0),          T(10.0)},
+		hep::scales<T>{         T(10.0), T(10.0), T(0.5) * T(10.0)},
+		hep::scales<T>{T(2.0) * T(10.0), T(10.0),          T(10.0)},
+		hep::scales<T>{         T(10.0), T(10.0), T(2.0) * T(10.0)},
+		hep::scales<T>{T(0.5) * T(10.0), T(10.0), T(0.5) * T(10.0)},
+		hep::scales<T>{T(2.0) * T(10.0), T(10.0), T(2.0) * T(10.0)}
 	};
 
 	// number of final states is not really interesting here

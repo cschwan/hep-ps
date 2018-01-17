@@ -177,7 +177,7 @@ public:
 		std::vector<T> const&,
 		std::vector<hep::scales<T>>& scales
 	) {
-		scales.emplace_back(scale, scale);
+		scales.emplace_back(scale, scale, scale);
 	}
 
 	bool dynamic() const
