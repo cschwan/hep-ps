@@ -480,9 +480,19 @@ void cs_subtraction<T>::insertion_terms2(
 		return;
 	}
 
-	if (rscheme_ != regularization_scheme::dim_reg_blha)
+	T const pi = acos(T(-1.0));
+	T scheme_dep_constant;
+
+	switch (rscheme_)
 	{
-		// TODO: other regularization schemes are NYI
+	case regularization_scheme::dim_reg_blha:
+		scheme_dep_constant = T{};
+		break;
+
+	case regularization_scheme::dim_reg_coli:
+		scheme_dep_constant = -pi * pi / T(6.0);
+
+	default:
 		assert( false );
 	}
 
@@ -498,7 +508,6 @@ void cs_subtraction<T>::insertion_terms2(
 		T const expmeulgam = T(5.61459483566885169824143214791e-1l);
 
 		T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
-		T const pi = acos(T(-1.0));
 		T const sij = ps.m2(term.emitter(), term.spectator());
 		T const factor = T(4.0) * pi * expmeulgam / sij;
 
@@ -511,6 +520,7 @@ void cs_subtraction<T>::insertion_terms2(
 			result -= T(7.0) * pi * pi / T(12.0);
 			result += T(3.0) / T(2.0) * logmubsij;
 			result += T(0.5) * logmubsij * logmubsij;
+			result += scheme_dep_constant;
 			result *= T(-0.5) * cf / pi;
 
 			results.push_back(result);

@@ -29,7 +29,10 @@ enum class regularization_scheme
 {
 	/// Dimensional regularization using the Binoth Les Houches Accord (BLHA)
 	/// convention.
-	dim_reg_blha
+	dim_reg_blha,
+
+	/// Dimensional regularization using the COLI convention.
+	dim_reg_coli
 };
 
 }
