@@ -172,6 +172,11 @@ void parton_dfs<T>::eval(
 	}
 }
 
+template <typename T>
+void parton_dfs<T>::register_partons(parton_set set)
+{
+}
+
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template class parton_dfs<double>;

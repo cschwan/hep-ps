@@ -217,6 +217,10 @@ public:
 		}
 	}
 
+	void register_partons(hep::parton_set)
+	{
+	}
+
 private:
 	std::size_t alphas_power_;
 	T alphas_;

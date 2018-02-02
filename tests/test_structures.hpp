@@ -110,6 +110,10 @@ public:
 	{
 		return 1;
 	}
+
+	void register_partons(hep::parton_set)
+	{
+	}
 };
 
 template <typename T>

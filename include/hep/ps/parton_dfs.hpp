@@ -73,6 +73,10 @@ public:
 		std::vector<parton_array<T>>& uncertainty_pdfs
 	);
 
+	/// Registers all the partons contained in `set`. For performance reasons
+	/// the values for the PDFs of unregistered partons may be zero.
+	void register_partons(parton_set set);
+
 private:
 	class impl;
 	std::unique_ptr<impl> pimpl;

@@ -88,6 +88,8 @@ public:
 			set_scales(std::vector<T>());
 			results_.reserve(scales_.size());
 		}
+
+		pdfs_.register_partons(partons_in_initial_state_set(set));
 	}
 
 	T eval(
