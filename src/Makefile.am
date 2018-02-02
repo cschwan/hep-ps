@@ -14,6 +14,7 @@ libhep_ps_la_SOURCES = \
 	fortran_helper.cpp \
 	generator.f \
 	hadron_hadron_psg_adapter.hpp \
+	initial_state.cpp \
 	inv_idx.cpp \
 	lusifer_constants.cpp \
 	lusifer_diagram_generator.cpp \

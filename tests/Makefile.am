@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	test_fini_integrand \
 	test_fortran_helper \
 	test_headers \
+	test_initial_state \
 	test_lusifer_diagram_generator \
 	test_lusifer_phase_space_generator \
 	test_lusifer_phase_space_generator2 \

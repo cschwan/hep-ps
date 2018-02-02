@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -173,6 +173,9 @@ constexpr parton state_parton_two(initial_state state)
 		return parton::gluon;
 	}
 }
+
+/// Returns a \ref parton_set with all partons that are in `set`.
+parton_set partons_in_initial_state_set(initial_state_set set);
 
 }
 
