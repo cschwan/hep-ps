@@ -30,7 +30,8 @@ namespace hep
 HEP_ENUM(parton_type,
 	anti_quark, /*!< An anti-quark. */
 	gluon_,     /*!< A gluon. */
-	quark       /*!< A quark. */
+	quark,      /*!< A quark. */
+	photon_     /*!< A photon. */
 );
 
 HEP_ENUM_ARRAY(parton_type);
@@ -54,6 +55,9 @@ constexpr parton_type parton_type_of(parton p)
 	case charm:
 	case strange:
 		return parton_type::quark;
+
+	case photon:
+		return parton_type::photon_;
 	}
 }
 

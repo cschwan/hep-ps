@@ -33,7 +33,8 @@ HEP_ENUM(parton,
 	up,           /*!< An up quark. */
 	down,         /*!< A down quark. */
 	charm,        /*!< A charm quark. */
-	strange       /*!< A strange quark. */
+	strange,      /*!< A strange quark. */
+	photon        /*!< A photon. */
 );
 
 HEP_ENUM_ARRAY(parton);

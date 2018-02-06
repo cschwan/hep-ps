@@ -20,6 +20,7 @@ int parton_to_pdg_id(parton p)
 	case parton::strange:      return  3;
 	case parton::charm:        return  4;
 	case parton::gluon:        return 21;
+	case parton::photon:       return 22;
 
 	default:
 		// implementation error

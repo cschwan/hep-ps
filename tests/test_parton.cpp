@@ -14,4 +14,5 @@ TEST_CASE("test parton_to_pdg_id()", "[parton]")
 	CHECK( hep::parton_to_pdg_id(hep::parton::strange)      ==  3 );
 	CHECK( hep::parton_to_pdg_id(hep::parton::charm)        ==  4 );
 	CHECK( hep::parton_to_pdg_id(hep::parton::gluon)        == 21 );
+	CHECK( hep::parton_to_pdg_id(hep::parton::photon)       == 22 );
 }
