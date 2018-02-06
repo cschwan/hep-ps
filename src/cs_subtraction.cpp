@@ -430,17 +430,16 @@ void cs_subtraction<T>::insertion_terms(
 
 		T const value1 = T(0.5) * tf_ / pi * (x * x + omx * omx);
 		T const value2 = T(0.5) * cf / pi * (T(1.0) + x * x) / omx;
+		T const value3 = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) +
+			T(2.0) * logome);
+		T const value4 = T(0.5) * cf / pi * T(2.0) * logomx / omx;
+		T const value5 = T(0.5) * cf / pi * (pi*pi / T(3.0) - logome * logome);
+
 
 		for (auto const& mu : scales)
 		{
 			T const mu2 = mu.factorization() * mu.factorization();
 			T const logmu2bsai = log(mu2 / sai);
-
-			T const value3 = T(0.5) * cf / pi * ((T(1.0) + x * x) / omx *
-				logmu2bsai - T(2.0) * logomx / omx);
-			T const value4 = T(0.5) * cf / pi * (pi * pi / T(3.0) + (eta +
-				T(0.5) * eta * eta + T(2.0) * logome) * logmu2bsai -
-				logome * logome);
 
 			abc_terms<T> result;
 
@@ -448,10 +447,10 @@ void cs_subtraction<T>::insertion_terms(
 			result.a[gl][qq] = value1 * (logmu2bsai - logomx);
 			result.a[aq][aq] = value2 * (logmu2bsai - logomx);
 			result.a[qq][qq] = value2 * (logmu2bsai - logomx);
-			result.b[aq][aq] = value3;
-			result.b[qq][qq] = value3;
-			result.c[aq][aq] = value4;
-			result.c[qq][qq] = value4;
+			result.b[aq][aq] = value2 * logmu2bsai - value4;
+			result.b[qq][qq] = value2 * logmu2bsai - value4;
+			result.c[aq][aq] = value3 * logmu2bsai + value5;
+			result.c[qq][qq] = value3 * logmu2bsai + value5;
 
 			// TODO: qg and gg are NYI
 
