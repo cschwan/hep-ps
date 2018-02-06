@@ -457,6 +457,8 @@ void cs_subtraction<T>::insertion_terms(
 
 			results.push_back(result);
 		}
+
+		break;
 	}
 
 	default:
@@ -491,6 +493,7 @@ void cs_subtraction<T>::insertion_terms2(
 
 	case regularization_scheme::dim_reg_coli:
 		scheme_dep_constant = -pi * pi / T(6.0);
+		break;
 
 	default:
 		assert( false );
