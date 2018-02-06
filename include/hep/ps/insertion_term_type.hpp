@@ -39,7 +39,11 @@ enum class insertion_term_type
 
 	/// Marks a final-initial (FI) finite insertion term, i.e. a term with a
 	/// final state emitter and an initial state spectator.
-	final_initial
+	final_initial,
+
+	/// Marks a final-final (FF) finite insertion term, i.e. a term with a
+	/// final state emitter and an initial state spectator.
+	final_final
 };
 
 }

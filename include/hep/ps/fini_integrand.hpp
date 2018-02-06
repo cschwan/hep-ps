@@ -155,7 +155,7 @@ public:
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-		// loop over all Born, FI, IF, and II
+		// loop over all Born, FI, IF, II, and FF
 		for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
 		{
 			auto const me = corr_me.at(index);
@@ -182,6 +182,9 @@ public:
 					}
 
 					break;
+
+				case insertion_term_type::final_final:
+					continue;
 
 				default:
 					break;
