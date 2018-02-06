@@ -507,17 +507,13 @@ void cs_subtraction<T>::insertion_terms2(
 	{
 		phase_space_point<T> ps{phase_space};
 
-		// multiplication by this factor simplifies the terms outside the log
-		T const expmeulgam = T(5.61459483566885169824143214791e-1l);
-
 		T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 		T const sij = ps.m2(term.emitter(), term.spectator());
-		T const factor = T(4.0) * pi * expmeulgam / sij;
 
 		for (auto const mu : scales)
 		{
 			T const mu2 = mu.regularization() * mu.regularization();
-			T const logmubsij = log(factor * mu2);
+			T const logmubsij = log(mu2 / sij);
 
 			T result = T(5.0);
 			result -= T(7.0) * pi * pi / T(12.0);
