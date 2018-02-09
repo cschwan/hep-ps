@@ -1,0 +1,4 @@
+[wrap-git]
+directory=hep-mc
+url=https://github.com/cschwan/hep-mc.git
+revision=head

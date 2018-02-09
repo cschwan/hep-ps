@@ -1,0 +1,2 @@
+option('additional-tests', type : 'boolean', value : false, description : 'enable additional unit tests requiring more external dependencies')
+option('doxygen', type : 'boolean', value : false, description : 'use Doxygen to generate source documentation')
