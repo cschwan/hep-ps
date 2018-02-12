@@ -39,6 +39,7 @@
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
+#include "hep/ps/insertion_term_mode.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/inv_idx.hpp"
 #include "hep/ps/kaellen.hpp"

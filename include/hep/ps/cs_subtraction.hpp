@@ -24,6 +24,7 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/insertion_term.hpp"
+#include "hep/ps/insertion_term_mode.hpp"
 #include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 
@@ -42,7 +43,8 @@ public:
 		T tf,
 		T nf,
 		factorization_scheme fscheme,
-		regularization_scheme rscheme
+		regularization_scheme rscheme,
+		insertion_term_mode mode
 	);
 
 	dipole_invariants<T> map_phase_space(
@@ -78,6 +80,7 @@ private:
 	T nf_;
 	factorization_scheme fscheme_;
 	regularization_scheme rscheme_;
+	insertion_term_mode mode_;
 };
 
 }

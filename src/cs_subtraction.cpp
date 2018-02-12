@@ -17,13 +17,15 @@ cs_subtraction<T>::cs_subtraction(
 	T tf,
 	T nf,
 	factorization_scheme fscheme,
-	regularization_scheme rscheme
+	regularization_scheme rscheme,
+	insertion_term_mode mode
 )
 	: nc_{nc}
 	, tf_{tf}
 	, nf_{nf}
 	, fscheme_{fscheme}
 	, rscheme_{rscheme}
+	, mode_{mode}
 {
 }
 
@@ -310,7 +312,21 @@ void cs_subtraction<T>::insertion_terms(
 	using std::acos;
 	using std::log;
 
-	constexpr auto gl = parton_type::gluon_;
+	auto bo = parton_type::gluon_;
+
+	switch (mode_)
+	{
+	case insertion_term_mode::ew:
+	case insertion_term_mode::ew_no_photons:
+	case insertion_term_mode::ew_only_photons:
+		bo = parton_type::photon_;
+
+		break;
+
+	default:
+		break;
+	}
+
 	constexpr auto qq = parton_type::quark;
 	constexpr auto aq = parton_type::anti_quark;
 
@@ -331,8 +347,6 @@ void cs_subtraction<T>::insertion_terms(
 		T const dilogome = gsl_sf_dilog(T(1.0) - eta);
 		T const logome = log(T(1.0) - eta);
 
-		T const value1 = T(0.5) * tf_ / pi * ((x * x + omx * omx) * logomxbx +
-			T(2.0) * x * omx);
 		T const value2 = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) *
 			logomxbx + omx);
 		T const value3 = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
@@ -341,14 +355,24 @@ void cs_subtraction<T>::insertion_terms(
 
 		abc_terms<T> result;
 
-		result.a[gl][aq] = value1;
-		result.a[gl][qq] = value1;
-		result.a[aq][aq] = value2;
-		result.a[qq][qq] = value2;
-		result.b[aq][aq] = value3;
-		result.b[qq][qq] = value3;
-		result.c[aq][aq] = value4;
-		result.c[qq][qq] = value4;
+		if (mode_ != insertion_term_mode::ew_no_photons)
+		{
+			T const value1 = T(0.5) * tf_ / pi * ((x * x + omx * omx) *
+				logomxbx + T(2.0) * x * omx);
+
+			result.a[bo][aq] = value1;
+			result.a[bo][qq] = value1;
+		}
+
+		if (mode_ != insertion_term_mode::ew_only_photons)
+		{
+			result.a[aq][aq] = value2;
+			result.a[qq][qq] = value2;
+			result.b[aq][aq] = value3;
+			result.b[qq][qq] = value3;
+			result.c[aq][aq] = value4;
+			result.c[qq][qq] = value4;
+		}
 
 		// TODO: qg and gg are NYI
 
@@ -369,12 +393,15 @@ void cs_subtraction<T>::insertion_terms(
 
 		abc_terms<T> result;
 
-		result.a[aq][aq] = value1;
-		result.a[qq][qq] = value1;
-		result.b[aq][aq] = value1;
-		result.b[qq][qq] = value1;
-		result.c[aq][aq] = value2;
-		result.c[qq][qq] = value2;
+		if (mode_ != insertion_term_mode::ew_only_photons)
+		{
+			result.a[aq][aq] = value1;
+			result.a[qq][qq] = value1;
+			result.b[aq][aq] = value1;
+			result.b[qq][qq] = value1;
+			result.c[aq][aq] = value2;
+			result.c[qq][qq] = value2;
+		}
 
 		// TODO: qg and gg are NYI
 
@@ -402,14 +429,21 @@ void cs_subtraction<T>::insertion_terms(
 
 			abc_terms<T> result;
 
-			result.a[gl][aq] = value1 * logmu2bsai;
-			result.a[gl][qq] = value1 * logmu2bsai;
-			result.a[aq][aq] = value2 * logmu2bsai;
-			result.a[qq][qq] = value2 * logmu2bsai;
-			result.b[aq][aq] = value2 * logmu2bsai;
-			result.b[qq][qq] = value2 * logmu2bsai;
-			result.c[aq][aq] = value3 * logmu2bsai;
-			result.c[qq][qq] = value3 * logmu2bsai;
+			if (mode_ != insertion_term_mode::ew_no_photons)
+			{
+				result.a[bo][aq] = value1 * logmu2bsai;
+				result.a[bo][qq] = value1 * logmu2bsai;
+			}
+
+			if (mode_ != insertion_term_mode::ew_only_photons)
+			{
+				result.a[aq][aq] = value2 * logmu2bsai;
+				result.a[qq][qq] = value2 * logmu2bsai;
+				result.b[aq][aq] = value2 * logmu2bsai;
+				result.b[qq][qq] = value2 * logmu2bsai;
+				result.c[aq][aq] = value3 * logmu2bsai;
+				result.c[qq][qq] = value3 * logmu2bsai;
+			}
 
 			// TODO: qg and gg are NYI
 
@@ -435,7 +469,6 @@ void cs_subtraction<T>::insertion_terms(
 		T const value4 = T(0.5) * cf / pi * T(2.0) * logomx / omx;
 		T const value5 = T(0.5) * cf / pi * (pi*pi / T(3.0) - logome * logome);
 
-
 		for (auto const& mu : scales)
 		{
 			T const mu2 = mu.factorization() * mu.factorization();
@@ -443,14 +476,21 @@ void cs_subtraction<T>::insertion_terms(
 
 			abc_terms<T> result;
 
-			result.a[gl][aq] = value1 * (logmu2bsai - logomx);
-			result.a[gl][qq] = value1 * (logmu2bsai - logomx);
-			result.a[aq][aq] = value2 * (logmu2bsai - logomx);
-			result.a[qq][qq] = value2 * (logmu2bsai - logomx);
-			result.b[aq][aq] = value2 * logmu2bsai - value4;
-			result.b[qq][qq] = value2 * logmu2bsai - value4;
-			result.c[aq][aq] = value3 * logmu2bsai + value5;
-			result.c[qq][qq] = value3 * logmu2bsai + value5;
+			if (mode_ != insertion_term_mode::ew_no_photons)
+			{
+				result.a[bo][aq] = value1 * (logmu2bsai - logomx);
+				result.a[bo][qq] = value1 * (logmu2bsai - logomx);
+			}
+
+			if (mode_ != insertion_term_mode::ew_only_photons)
+			{
+				result.a[aq][aq] = value2 * (logmu2bsai - logomx);
+				result.a[qq][qq] = value2 * (logmu2bsai - logomx);
+				result.b[aq][aq] = value2 * logmu2bsai - value4;
+				result.b[qq][qq] = value2 * logmu2bsai - value4;
+				result.c[aq][aq] = value3 * logmu2bsai + value5;
+				result.c[qq][qq] = value3 * logmu2bsai + value5;
+			}
 
 			// TODO: qg and gg are NYI
 
@@ -481,17 +521,16 @@ void cs_subtraction<T>::insertion_terms2(
 		return;
 	}
 
-	T const pi = acos(T(-1.0));
-	T scheme_dep_constant;
+	T scheme_dep_factor;
 
 	switch (rscheme_)
 	{
 	case regularization_scheme::dim_reg_blha:
-		scheme_dep_constant = T{};
+		scheme_dep_factor = T(-7.0) / T(12.0);
 		break;
 
 	case regularization_scheme::dim_reg_coli:
-		scheme_dep_constant = -pi * pi / T(6.0);
+		scheme_dep_factor = T(-5.0) / T(12.0);
 		break;
 
 	default:
@@ -506,6 +545,7 @@ void cs_subtraction<T>::insertion_terms2(
 	{
 		phase_space_point<T> ps{phase_space};
 
+		T const pi = acos(T(-1.0));
 		T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 		T const sij = ps.m2(term.emitter(), term.spectator());
 
@@ -515,10 +555,9 @@ void cs_subtraction<T>::insertion_terms2(
 			T const logmubsij = log(mu2 / sij);
 
 			T result = T(5.0);
-			result -= T(7.0) * pi * pi / T(12.0);
-			result += T(3.0) / T(2.0) * logmubsij;
+			result += scheme_dep_factor * pi * pi;
+			result += T(1.5) * logmubsij;
 			result += T(0.5) * logmubsij * logmubsij;
-			result += scheme_dep_constant;
 			result *= T(-0.5) * cf / pi;
 
 			results.push_back(result);
