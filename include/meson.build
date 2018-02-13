@@ -1,3 +1,5 @@
+incdir = include_directories('.')
+
 install_headers(
 	'hep/ps/abc_terms.hpp',
 	'hep/ps/boost.hpp',

@@ -1,6 +1,8 @@
 conf = configuration_data()
+# get rid of this and use Fortran's C interfaces instead
 conf.set('F77_FUNC_(name,NAME)', 'name ## _')
 configure_file(output : 'config.hpp', configuration : conf)
+add_project_arguments('-DHAVE_CONFIG_H', language : 'cpp')
 
 sources = [
 	'boost.cpp',
@@ -40,6 +42,8 @@ sources = [
 gsl = dependency('gsl')
 lhapdf = dependency('lhapdf', version : '>=6')
 
+# remove this line once the following bug is fixed:
+# https://github.com/mesonbuild/meson/issues/2685
 fortran = meson.get_compiler('cpp').find_library('gfortran')
 
 libhep_ps = library(

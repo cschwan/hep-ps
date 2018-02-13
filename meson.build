@@ -8,11 +8,6 @@ project(
 	meson_version : '>=0.42'
 )
 
-add_project_arguments('-DHAVE_CONFIG_H', language : 'cpp')
-
-#mpidep = dependency('mpi', language : 'cpp', required : true)
-incdir = include_directories('include')
-
 hep_mc = dependency('hep-mc', fallback : ['hep-mc', 'hep_mc_dep'])
 
 if get_option('doxygen')
@@ -22,3 +17,9 @@ endif
 subdir('include')
 subdir('src')
 subdir('tests')
+
+hep_ps_dep = declare_dependency(
+	dependencies : hep_mc,
+	include_directories : incdir,
+	link_with : libhep_ps
+)
