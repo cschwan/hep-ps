@@ -50,5 +50,6 @@ libhep_ps = library(
 	'hep-ps',
 	sources,
 	dependencies : [ hep_mc, fortran, gsl, lhapdf ],
-	include_directories : incdir
+	include_directories : incdir,
+	install : true
 )

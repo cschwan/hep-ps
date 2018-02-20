@@ -1,6 +1,6 @@
 incdir = include_directories('.')
 
-install_headers(
+headers1 = [
 	'hep/ps/abc_terms.hpp',
 	'hep/ps/boost.hpp',
 	'hep/ps/born_integrand.hpp',
@@ -23,6 +23,7 @@ install_headers(
 	'hep/ps/fortran_helper.hpp',
 	'hep/ps/initial_state.hpp',
 	'hep/ps/insertion_term.hpp',
+	'hep/ps/insertion_term_mode.hpp',
 	'hep/ps/insertion_term_type.hpp',
 	'hep/ps/inv_idx.hpp',
 	'hep/ps/kaellen.hpp',
@@ -55,10 +56,13 @@ install_headers(
 	'hep/ps/trivial_distributions.hpp',
 	'hep/ps/trivial_recombiner.hpp',
 	'hep/ps/vertex.hpp',
-	subdir : 'hep/mc'
-)
+]
 
-install_headers(
-	'hep/ps.hpp',
-	subdir : 'hep'
-)
+headers2 = [
+	'hep/ps.hpp'
+]
+
+headers = files(headers1, headers2)
+
+install_headers(headers1, subdir : 'hep/ps')
+install_headers(headers2, subdir : 'hep')
