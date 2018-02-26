@@ -48,6 +48,15 @@ test_headers = executable(
 	link_with : [ libcatch, libhep_ps ]
 )
 
+test_list_phase_space_generator = executable(
+	'test_list_phase_space_generator',
+	'test_list_phase_space_generator.cpp',
+	include_directories : incdir,
+	cpp_args : '-DHEP_TYPE_T=double',
+	dependencies : hep_mc,
+	link_with : [ libcatch, libhep_ps ]
+)
+
 test_lusifer_diagram_generator = executable(
 	'test_lusifer_diagram_generator',
 	'test_lusifer_diagram_generator.cpp',
@@ -140,6 +149,7 @@ test('test_cofferaa_phase_space_generator', test_cofferaa_phase_space_generator)
 test('test_fini_integrand', test_fini_integrand)
 test('test_fortran_helper', test_fortran_helper)
 test('test_headers', test_headers)
+test('test_list_phase_space_generator', test_list_phase_space_generator)
 test('test_lusifer_diagram_generator', test_lusifer_diagram_generator)
 test('test_lusifer_phase_space_generator', test_lusifer_phase_space_generator)
 test('test_lusifer_phase_space_generator2', test_lusifer_phase_space_generator2)

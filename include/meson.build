@@ -27,6 +27,7 @@ headers1 = [
 	'hep/ps/insertion_term_type.hpp',
 	'hep/ps/inv_idx.hpp',
 	'hep/ps/kaellen.hpp',
+	'hep/ps/list_phase_space_generator.hpp',
 	'hep/ps/luminosity_info.hpp',
 	'hep/ps/lusifer_constants.hpp',
 	'hep/ps/lusifer_diagram_generator.hpp',

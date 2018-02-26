@@ -43,6 +43,7 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/inv_idx.hpp"
 #include "hep/ps/kaellen.hpp"
+#include "hep/ps/list_phase_space_generator.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/lusifer_constants.hpp"
 #include "hep/ps/lusifer_diagram_generator.hpp"
