@@ -52,6 +52,7 @@ headers1 = [
 	'hep/ps/recombined_state.hpp',
 	'hep/ps/regularization_scheme.hpp',
 	'hep/ps/renormalization_scheme.hpp',
+	'hep/ps/scale_variation.hpp',
 	'hep/ps/scales.hpp',
 	'hep/ps/silence_third_party_libs.hpp',
 	'hep/ps/trivial_cutter.hpp',
