@@ -34,6 +34,7 @@ sources = [
 	'phase_space_point.cpp',
 	'propagator.cpp',
 	'rambo_phase_space_generator.cpp',
+	'static_scale_function.cpp',
 	'silence_third_party_libs.cpp',
 	'trivial_cutter.cpp',
 	'trivial_recombiner.cpp',

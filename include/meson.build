@@ -55,6 +55,7 @@ headers1 = [
 	'hep/ps/scale_variation.hpp',
 	'hep/ps/scales.hpp',
 	'hep/ps/silence_third_party_libs.hpp',
+	'hep/ps/static_scale_function.hpp',
 	'hep/ps/trivial_cutter.hpp',
 	'hep/ps/trivial_distributions.hpp',
 	'hep/ps/trivial_recombiner.hpp',

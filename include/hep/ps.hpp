@@ -71,6 +71,7 @@
 #include "hep/ps/scale_variation.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/silence_third_party_libs.hpp"
+#include "hep/ps/static_scale_function.hpp"
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
