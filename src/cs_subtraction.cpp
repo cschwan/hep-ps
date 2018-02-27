@@ -526,11 +526,11 @@ void cs_subtraction<T>::insertion_terms2(
 	switch (rscheme_)
 	{
 	case regularization_scheme::dim_reg_blha:
-		scheme_dep_factor = T(-7.0) / T(12.0);
+		scheme_dep_factor = T(-1.0) / T(2.0);
 		break;
 
 	case regularization_scheme::dim_reg_coli:
-		scheme_dep_factor = T(-5.0) / T(12.0);
+		scheme_dep_factor = T(-2.0) / T(3.0);
 		break;
 
 	default:
