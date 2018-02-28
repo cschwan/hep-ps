@@ -20,6 +20,7 @@ headers1 = [
 	'hep/ps/final_state.hpp',
 	'hep/ps/find_hep_ps.hpp',
 	'hep/ps/fini_integrand.hpp',
+	'hep/ps/finite_parts.hpp',
 	'hep/ps/fortran_helper.hpp',
 	'hep/ps/initial_state.hpp',
 	'hep/ps/insertion_term.hpp',

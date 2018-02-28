@@ -7,6 +7,7 @@
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/fini_integrand.hpp"
+#include "hep/ps/finite_parts.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
@@ -305,7 +306,8 @@ void test_fini_integrand(
 		fini,
 		fini,
 		set,
-		T(1.0)
+		T(1.0),
+		hep::finite_parts::insertion_term
 	);
 
 	hep::multi_channel(

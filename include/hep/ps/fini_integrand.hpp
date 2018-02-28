@@ -23,6 +23,7 @@
 
 #include "hep/ps/abc_terms.hpp"
 #include "hep/ps/convolute.hpp"
+#include "hep/ps/finite_parts.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
@@ -65,7 +66,7 @@ public:
 		Distributions&& distributions,
 		initial_state_set set,
 		T hbarc2,
-		bool insertion2
+		finite_parts parts
 	)
 		: matrix_elements_(std::forward<MatrixElements>(matrix_elements))
 		, subtraction_(std::forward<Subtraction>(subtraction))
@@ -76,7 +77,7 @@ public:
 		, distributions_(std::forward<Distributions>(distributions))
 		, set_(set)
 		, hbarc2_(hbarc2)
-		, insertion2_(insertion2)
+		, parts_{parts}
 		, final_states_(matrix_elements_.final_states())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
@@ -161,6 +162,8 @@ public:
 			auto const me = corr_me.at(index);
 			auto const& term = insertion_terms_.at(index);
 
+			if (parts_ != finite_parts::insertion_term2)
+			{
 			// loop over both initial state partons
 			for (auto const i : { 0u, 1u })
 			{
@@ -278,8 +281,9 @@ public:
 					);
 				}
 			}
+			}
 
-			if (insertion2_)
+			if (parts_ != finite_parts::insertion_term)
 			{
 				subtraction_.insertion_terms2(
 					term,
@@ -390,8 +394,8 @@ private:
 	D distributions_;
 	initial_state_set set_;
 	T hbarc2_;
+	finite_parts parts_;
 
-	bool insertion2_;
 	std::vector<T> recombined_ps_;
 	std::vector<final_state> final_states_;
 	std::vector<recombined_state> recombined_states_;
@@ -432,7 +436,7 @@ inline std::unique_ptr<ps_integrand<T>> make_fini_integrand(
 	D&& distributions,
 	initial_state_set set,
 	T hbarc2,
-	bool insertion2 = false
+	finite_parts parts
 ) {
 	return std::make_unique<fini_integrand_t<T, M, S, C, R, P, U, D>>(
 		std::forward<M>(matrix_elements),
@@ -444,7 +448,7 @@ inline std::unique_ptr<ps_integrand<T>> make_fini_integrand(
 		std::forward<D>(distributions),
 		set,
 		hbarc2,
-		insertion2
+		parts
 	);
 }
 

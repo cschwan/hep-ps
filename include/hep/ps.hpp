@@ -36,6 +36,7 @@
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/fini_integrand.hpp"
+#include "hep/ps/finite_parts.hpp"
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
