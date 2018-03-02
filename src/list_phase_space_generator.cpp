@@ -10,7 +10,7 @@ template <typename T>
 class list_psg : public hep::phase_space_generator<T>
 {
 public:
-	list_psg(std::vector<std::vector<T>> const& list);
+	list_psg(std::vector<hep::list_phase_space_point<T>> const& list);
 
 	std::size_t channels() const override;
 
@@ -30,11 +30,11 @@ public:
 
 private:
 	std::size_t index_;
-	std::vector<std::vector<T>> list_;
+	std::vector<hep::list_phase_space_point<T>> list_;
 };
 
 template <typename T>
-list_psg<T>::list_psg(std::vector<std::vector<T>> const& list)
+list_psg<T>::list_psg(std::vector<hep::list_phase_space_point<T>> const& list)
 	: index_{0}
 	, list_(list)
 {
@@ -68,20 +68,29 @@ void list_psg<T>::generate(
 ) {
 	assert( channel == 0 );
 
-	momenta.assign(list_.at(index_).begin(), list_.at(index_).end());
+	auto const& phase_space = list_.at(index_).phase_space();
+
+	momenta.assign(phase_space.begin(), phase_space.end());
 	index_ = (index_ + 1) % list_.size();
 }
 
 template <typename T>
 hep::luminosity_info<T> list_psg<T>::info() const
 {
-	return hep::luminosity_info<T>{};
+	if (index_ != 0)
+	{
+		return list_.at(index_ - 1).info();
+	}
+	else
+	{
+		return list_.back().info();
+	}
 }
 
 template <typename T>
 std::size_t list_psg<T>::map_dimensions() const
 {
-	return list_.front().size();
+	return list_.front().phase_space().size();
 }
 
 template class list_psg<double>;
@@ -92,15 +101,41 @@ namespace hep
 {
 
 template <typename T>
+list_phase_space_point<T>::list_phase_space_point(
+	luminosity_info<T> const& info,
+	std::vector<T> const& phase_space
+)
+	: info_{info}
+	, phase_space_(phase_space)
+{
+}
+
+template <typename T>
+luminosity_info<T> const& list_phase_space_point<T>::info() const
+{
+	return info_;
+}
+
+template <typename T>
+std::vector<T> const& list_phase_space_point<T>::phase_space() const
+{
+	return phase_space_;
+}
+
+template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(
-	std::vector<std::vector<T>> const& list_of_phase_space_points
+	std::vector<list_phase_space_point<T>> const& list_of_phase_space_points
 ) {
 	return std::make_unique<list_psg<T>>(list_of_phase_space_points);
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
+template class list_phase_space_point<double>;
+
 template std::unique_ptr<phase_space_generator<double>>
-make_list_phase_space_generator(std::vector<std::vector<double>> const&);
+make_list_phase_space_generator(
+	std::vector<list_phase_space_point<double>> const&
+);
 
 }

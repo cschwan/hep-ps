@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/phase_space_generator.hpp"
 
 #include <memory>
@@ -27,12 +28,35 @@
 namespace hep
 {
 
+/// Class capturing a phase space point together with the luminosity
+/// information.
+template <typename T>
+class list_phase_space_point
+{
+public:
+	/// Constructor.
+	list_phase_space_point(
+		luminosity_info<T> const& info,
+		std::vector<T> const& phase_space
+	);
+
+	/// Returns the luminosity information.
+	luminosity_info<T> const& info() const;
+
+	/// Returns the phase space point.
+	std::vector<T> const& phase_space() const;
+
+private:
+	luminosity_info<T> info_;
+	std::vector<T> phase_space_;
+};
+
 /// Creates a phase space generator which generates the points given in the
 /// list, in the same ordering. If the list is exhausted, the generator starts
 /// with the first point again. Each point has a weight of one.
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(
-	std::vector<std::vector<T>> const& list_of_phase_space_points
+	std::vector<list_phase_space_point<T>> const& list_of_phase_space_points
 );
 
 }
