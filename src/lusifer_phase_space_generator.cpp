@@ -801,14 +801,14 @@ void lusifer_psg<T>::generate(
 
 		// TODO: replace particle_infos calls with model
 
-		s[invariant.in] = map(
+		s[invariant.in] = fabs(map(
 			particle_infos.at(invariant.idhep).power,
 			particle_infos.at(invariant.idhep).mass,
 			particle_infos.at(invariant.idhep).width,
 			*r++,
 			smin,
 			smax
-		);
+		));
 	}
 
 	for (auto const& process : channels_[channel].processes)
@@ -819,15 +819,14 @@ void lusifer_psg<T>::generate(
 		T const t1 = this->s[process.in1];
 		T const t2 = this->s[process.in2];
 
-		T const lambdas = sqrt(hep::kaellen(s, s1, s2));
-		T const lambdat = sqrt(hep::kaellen(s, t1, t2));
+		T const lambdas = sqrt(fabs(hep::kaellen(s, s1, s2)));
+		T const lambdat = sqrt(fabs(hep::kaellen(s, t1, t2)));
 
 		T const tmp = (s + s1 - s2) * (s + t1 - t2);
 		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
 		T       tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
 
-		// TODO: make this parameter available from outside
-		if (fabs(tmax) < T(1e-7))
+		if (tmax > T())
 		{
 			tmax = T();
 		}
@@ -901,7 +900,7 @@ void lusifer_psg<T>::generate(
 		T const sqrts = sqrt(s);
 
 		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
-			T(0.5) * sqrt(hep::kaellen(s, s1, s2)) / sqrts };
+			T(0.5) * sqrt(fabs(hep::kaellen(s, s1, s2))) / sqrts };
 
 		T const phi = T(2.0) * acos(T(-1.0)) * *r++;
 		T const cos_theta = T(2.0) * *r++ - T(1.0);
