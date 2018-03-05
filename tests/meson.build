@@ -124,6 +124,14 @@ test_permutation = executable(
 	link_with : [ libcatch, libhep_ps ]
 )
 
+test_phase_space_point = executable(
+	'test_phase_space_point',
+	'test_phase_space_point.cpp',
+	include_directories : incdir,
+	cpp_args : '-DHEP_TYPE_T=double',
+	link_with : [ libcatch, libhep_ps ]
+)
+
 test_phase_space_quality = executable(
 	'test_phase_space_quality',
 	'test_phase_space_quality.cpp',
@@ -174,6 +182,7 @@ test('test_lusifer_phase_space_generator2', test_lusifer_phase_space_generator2)
 test('test_lusifer_phase_space_generator3', test_lusifer_phase_space_generator3)
 test('test_parton', test_parton)
 test('test_permutation', test_permutation)
+test('test_phase_space_point', test_phase_space_point)
 test('test_phase_space_quality', test_phase_space_quality, timeout : 120)
 test('test_rambo_phase_space_generator', test_rambo_phase_space_generator)
 test('test_real_integrand', test_real_integrand)
