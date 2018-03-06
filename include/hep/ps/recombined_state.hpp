@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ enum class recombined_state : std::size_t
 	/// An isolated photon.
 	isolated_photon,
 
-	/// The sum of all neutrino momenta.
+	/// Momenta of particle that are not detectable.
 	missing_momentum
 };
 

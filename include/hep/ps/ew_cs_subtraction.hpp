@@ -27,10 +27,13 @@
 namespace hep
 {
 
+/// Uses the Catani-Seymour subtraction to cancel the infrared divergences from
+/// electroweak (EW) amplitudes.
 template <typename T>
 class ew_cs_subtraction : public cs_subtraction<T>
 {
 public:
+	/// Constructor.
 	ew_cs_subtraction(
 		T nf,
 		factorization_scheme fscheme,

@@ -22,7 +22,8 @@
 namespace hep
 {
 
-/// Class that captures the factorization and renormalization scales.
+/// Class that captures all important scales that matrix elements and other
+/// parts of perturbative calculations depend on.
 template <typename T>
 class scales
 {
