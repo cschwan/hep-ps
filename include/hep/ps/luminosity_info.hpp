@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,18 +27,17 @@ class luminosity_info
 {
 public:
 	luminosity_info(T energy_squared = T())
-		: x1_(T(1.0))
-		, x2_(T(1.0))
-		, energy_squared_(energy_squared)
-		, rapidity_shift_(T())
+		: x1_{T(1.0)}
+		, x2_{T(1.0)}
+		, energy_squared_{energy_squared}
 	{
 	}
 
 	luminosity_info(T x1, T x2, T energy_squared, T rapidity_shift)
-		: x1_(x1)
-		, x2_(x2)
-		, energy_squared_(energy_squared)
-		, rapidity_shift_(rapidity_shift)
+		: x1_{x1}
+		, x2_{x2}
+		, energy_squared_{energy_squared}
+		, rapidity_shift_{rapidity_shift}
 	{
 	}
 

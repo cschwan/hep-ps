@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/cs_subtraction.hpp"
+#include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/insertion_term_mode.hpp"
 #include "hep/ps/regularization_scheme.hpp"
 

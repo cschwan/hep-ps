@@ -189,6 +189,7 @@ test('test_real_integrand', test_real_integrand)
 test('test_trivial_cutter_and_recombiner', test_trivial_cutter_and_recombiner)
 
 if get_option('additional-tests')
+	# TODO: this doesn't work, fix it
 	fastjet = dependency('fastjet')
 
 	test_p_type_jet_algorithm = executable(

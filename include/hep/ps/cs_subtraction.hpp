@@ -39,7 +39,7 @@ class cs_subtraction
 {
 public:
 	cs_subtraction(
-		T n,
+		T nc,
 		T tf,
 		T nf,
 		factorization_scheme fscheme,

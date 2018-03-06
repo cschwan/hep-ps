@@ -1,5 +1,6 @@
 #include "hep/ps/cs_subtraction.hpp"
 #include "hep/ps/insertion_term_type.hpp"
+#include "hep/ps/parton_type.hpp"
 #include "hep/ps/phase_space_point.hpp"
 
 #include <gsl/gsl_sf_dilog.h>
@@ -422,7 +423,7 @@ void cs_subtraction<T>::insertion_terms(
 		T const value3 = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) +
 			T(2.0) * log(T(1.0) - eta));
 
-		for (auto const mu : scales)
+		for (auto const& mu : scales)
 		{
 			T const mu2 = mu.factorization() * mu.factorization();
 			T const logmu2bsai = log(mu2 / sai);
@@ -549,7 +550,7 @@ void cs_subtraction<T>::insertion_terms2(
 		T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 		T const sij = ps.m2(term.emitter(), term.spectator());
 
-		for (auto const mu : scales)
+		for (auto const& mu : scales)
 		{
 			T const mu2 = mu.regularization() * mu.regularization();
 			T const logmubsij = log(mu2 / sij);
