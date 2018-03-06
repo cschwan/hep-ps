@@ -347,8 +347,8 @@ protected:
 			for (auto const ap : parton_list())
 			{
 				// quark/anti-quark diagonality
-				if ((a != parton::gluon) && (ap != parton::gluon) &&
-					(a != ap))
+				if ((a != ap) && ((a != parton::gluon) && (ap != parton::gluon)
+					&& (a != parton::photon) && (ap != parton::photon)))
 				{
 					continue;
 				}
