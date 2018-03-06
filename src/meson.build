@@ -1,8 +1,20 @@
+add_project_arguments('-DHAVE_CONFIG_H', language : 'cpp')
+
 conf = configuration_data()
 # get rid of this and use Fortran's C interfaces instead
 conf.set('F77_FUNC_(name,NAME)', 'name ## _')
+
+if get_option('openloops')
+	conf.set('HAVE_OPENLOOPS', '1')
+endif
+
 configure_file(output : 'config.hpp', configuration : conf)
-add_project_arguments('-DHAVE_CONFIG_H', language : 'cpp')
+
+deps = []
+
+if get_option('openloops')
+	deps += [ meson.get_compiler('cpp').find_library('openloops') ]
+endif
 
 sources = [
 	'boost.cpp',
@@ -25,6 +37,7 @@ sources = [
 	'lusifer_extra.f',
 	'lusifer_interfaces.hpp',
 	'lusifer_phase_space_generator.cpp',
+	'ol_interface.cpp',
 	'p_type_jet_algorithm.cpp',
 	'p_type_photon_parton_recombiner.cpp',
 	'parton.cpp',
@@ -41,17 +54,17 @@ sources = [
 	'vertex.cpp'
 ]
 
-gsl = dependency('gsl')
-lhapdf = dependency('lhapdf', version : '>=6')
+deps += dependency('gsl')
+deps += dependency('lhapdf', version : '>=6')
 
 # remove this line once the following bug is fixed:
 # https://github.com/mesonbuild/meson/issues/2685
-fortran = meson.get_compiler('cpp').find_library('gfortran')
+deps += meson.get_compiler('cpp').find_library('gfortran')
 
 libhep_ps = library(
 	'hep-ps',
 	sources,
-	dependencies : [ hep_mc, fortran, gsl, lhapdf ],
+	dependencies : deps,
 	include_directories : incdir,
 	install : true
 )

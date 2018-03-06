@@ -35,6 +35,7 @@ headers1 = [
 	'hep/ps/lusifer_phase_space_generator.hpp',
 	'hep/ps/neg_pos_results.hpp',
 	'hep/ps/non_zero_dipole.hpp',
+	'hep/ps/ol_interface.hpp',
 	'hep/ps/p_type_jet_algorithm.hpp',
 	'hep/ps/p_type_photon_parton_recombiner.hpp',
 	'hep/ps/particle_type.hpp',
