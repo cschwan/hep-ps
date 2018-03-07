@@ -164,123 +164,123 @@ public:
 
 			if (parts_ != finite_parts::insertion_term2)
 			{
-			// loop over both initial state partons
-			for (auto const i : { 0u, 1u })
-			{
-				switch (term.type())
+				// loop over both initial state partons
+				for (auto const i : { 0u, 1u })
 				{
-				case insertion_term_type::final_initial:
-					if (term.spectator() != i)
+					switch (term.type())
 					{
+					case insertion_term_type::final_initial:
+						if (term.spectator() != i)
+						{
+							continue;
+						}
+
+						break;
+
+					case insertion_term_type::initial_final:
+					case insertion_term_type::initial_initial:
+						if (term.emitter() != i)
+						{
+							continue;
+						}
+
+						break;
+
+					case insertion_term_type::final_final:
 						continue;
+
+					default:
+						break;
 					}
 
-					break;
+					T const eta_neg = (i == 0) ? info.x2() : info.x1();
+					T const xprime_neg = eta_neg * (T(1.0) - x) + x;
 
-				case insertion_term_type::initial_final:
-				case insertion_term_type::initial_initial:
-					if (term.emitter() != i)
+					subtraction_.insertion_terms(
+						term,
+						scales_,
+						phase_space,
+						xprime_neg,
+						eta_neg,
+						abc_neg_
+					);
+
+					assert( abc_neg_.size() == scales_.size() );
+
+					T const eta_pos = (i == 0) ? info.x1() : info.x2();
+					T const xprime_pos = eta_pos * (T(1.0) - x) + x;
+
+					subtraction_.insertion_terms(
+						term,
+						scales_,
+						phase_space,
+						xprime_pos,
+						eta_pos,
+						abc_pos_
+					);
+
+					assert( abc_neg_.size() == scales_.size() );
+
+					for (std::size_t j = 0; j != scales_.size(); ++j)
 					{
-						continue;
+						auto const pdf_neg = effective_pdf(
+							abc_neg_.at(j),
+							xprime_neg,
+							(i == 0) ? info.x2() : info.x1(),
+							(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
+							(i == 0) ? pdfsb2_.at(j) : pdfsb1_.at(j)
+						);
+
+						auto const pdf_pos = effective_pdf(
+							abc_pos_.at(j),
+							xprime_pos,
+							(i == 0) ? info.x1() : info.x2(),
+							(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
+							(i == 0) ? pdfsb1_.at(j) : pdfsb2_.at(j)
+						);
+
+						results_.at(j) += convolute(
+							(i == 0) ? pdf_neg       : pdfsa2_.at(j),
+							(i == 0) ? pdfsa1_.at(j) : pdf_neg,
+							(i == 0) ? pdf_pos       : pdfsa1_.at(j),
+							(i == 0) ? pdfsa2_.at(j) : pdf_pos,
+							me,
+							set_,
+							factors_.at(j) * factor,
+							cut_result
+						);
 					}
 
-					break;
+					for (std::size_t j = 0; j != pdf_pdfsa1_.size(); ++j)
+					{
+						auto const pdf_neg = effective_pdf(
+							abc_neg_.front(),
+							xprime_neg,
+							(i == 0) ? info.x2() : info.x1(),
+							(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pdfsa1_.at(j),
+							(i == 0) ? pdf_pdfsb2_.at(j) : pdf_pdfsb1_.at(j)
+						);
 
-				case insertion_term_type::final_final:
-					continue;
+						auto const pdf_pos = effective_pdf(
+							abc_pos_.front(),
+							xprime_pos,
+							(i == 0) ? info.x1() : info.x2(),
+							(i == 0) ? pdf_pdfsa1_.at(j) : pdf_pdfsa2_.at(j),
+							(i == 0) ? pdf_pdfsb1_.at(j) : pdf_pdfsb2_.at(j)
+						);
 
-				default:
-					break;
+						pdf_results_.at(j) += convolute(
+							(i == 0) ? pdf_neg             : pdf_pdfsa2_.at(j),
+							(i == 0) ? pdf_pdfsa1_.at(j) : pdf_neg,
+							(i == 0) ? pdf_pos             : pdf_pdfsa1_.at(j),
+							(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pos,
+							me,
+							set_,
+							factor,
+							cut_result
+						);
+					}
 				}
-
-				T const eta_neg = (i == 0) ? info.x2() : info.x1();
-				T const xprime_neg = eta_neg * (T(1.0) - x) + x;
-
-				subtraction_.insertion_terms(
-					term,
-					scales_,
-					phase_space,
-					xprime_neg,
-					eta_neg,
-					abc_neg_
-				);
-
-				assert( abc_neg_.size() == scales_.size() );
-
-				T const eta_pos = (i == 0) ? info.x1() : info.x2();
-				T const xprime_pos = eta_pos * (T(1.0) - x) + x;
-
-				subtraction_.insertion_terms(
-					term,
-					scales_,
-					phase_space,
-					xprime_pos,
-					eta_pos,
-					abc_pos_
-				);
-
-				assert( abc_neg_.size() == scales_.size() );
-
-				for (std::size_t j = 0; j != scales_.size(); ++j)
-				{
-					auto const pdf_neg = effective_pdf(
-						abc_neg_.at(j),
-						xprime_neg,
-						(i == 0) ? info.x2() : info.x1(),
-						(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
-						(i == 0) ? pdfsb2_.at(j) : pdfsb1_.at(j)
-					);
-
-					auto const pdf_pos = effective_pdf(
-						abc_pos_.at(j),
-						xprime_pos,
-						(i == 0) ? info.x1() : info.x2(),
-						(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
-						(i == 0) ? pdfsb1_.at(j) : pdfsb2_.at(j)
-					);
-
-					results_.at(j) += convolute(
-						(i == 0) ? pdf_neg       : pdfsa2_.at(j),
-						(i == 0) ? pdfsa1_.at(j) : pdf_neg,
-						(i == 0) ? pdf_pos       : pdfsa1_.at(j),
-						(i == 0) ? pdfsa2_.at(j) : pdf_pos,
-						me,
-						set_,
-						factors_.at(j) * factor,
-						cut_result
-					);
-				}
-
-				for (std::size_t j = 0; j != pdf_pdfsa1_.size(); ++j)
-				{
-					auto const pdf_neg = effective_pdf(
-						abc_neg_.front(),
-						xprime_neg,
-						(i == 0) ? info.x2() : info.x1(),
-						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pdfsa1_.at(j),
-						(i == 0) ? pdf_pdfsb2_.at(j) : pdf_pdfsb1_.at(j)
-					);
-
-					auto const pdf_pos = effective_pdf(
-						abc_pos_.front(),
-						xprime_pos,
-						(i == 0) ? info.x1() : info.x2(),
-						(i == 0) ? pdf_pdfsa1_.at(j) : pdf_pdfsa2_.at(j),
-						(i == 0) ? pdf_pdfsb1_.at(j) : pdf_pdfsb2_.at(j)
-					);
-
-					pdf_results_.at(j) += convolute(
-						(i == 0) ? pdf_neg             : pdf_pdfsa2_.at(j),
-						(i == 0) ? pdf_pdfsa1_.at(j) : pdf_neg,
-						(i == 0) ? pdf_pos             : pdf_pdfsa1_.at(j),
-						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pos,
-						me,
-						set_,
-						factor,
-						cut_result
-					);
-				}
-			}
 			}
 
 			if (parts_ != finite_parts::insertion_term)
