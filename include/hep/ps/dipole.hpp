@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,8 +38,7 @@ public:
 		std::size_t spectator,
 		particle_type emitter_type,
 		particle_type unresolved_type,
-		particle_type spectator_type,
-		dipole_type type
+		particle_type spectator_type
 	)
 		: emitter_(emitter)
 		, unresolved_(unresolved)
@@ -47,8 +46,27 @@ public:
 		, emitter_type_(emitter_type)
 		, unresolved_type_(unresolved_type)
 		, spectator_type_(spectator_type)
-		, type_(type)
 	{
+		int type = (emitter < 2) | ((spectator < 2) << 1);
+
+		switch (type)
+		{
+		case 0:
+			type_ = dipole_type::final_final;
+			break;
+
+		case 1:
+			type_ = dipole_type::initial_final;
+			break;
+
+		case 2:
+			type_ = dipole_type::final_initial;
+			break;
+
+		case 3:
+			type_ = dipole_type::initial_initial;
+			break;
+		}
 	}
 
 	/// Returns the index of the particle of the real process that is the

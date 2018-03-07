@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,27 +35,43 @@ class insertion_term
 public:
 	/// Constructor for insertion terms not of the type `born`.
 	insertion_term(
-		insertion_term_type type,
 		std::size_t emitter,
 		particle_type emitter_type,
 		std::size_t spectator
 	)
-		: type_(type)
-		, emitter_(emitter)
+		: emitter_(emitter)
 		, emitter_type_(emitter_type)
 		, spectator_(spectator)
 	{
-		assert( type != insertion_term_type::born );
+		int type = (emitter < 2) | ((spectator < 2) << 1);
+
+		switch (type)
+		{
+		case 0:
+			type_ = insertion_term_type::final_final;
+			break;
+
+		case 1:
+			type_ = insertion_term_type::initial_final;
+			break;
+
+		case 2:
+			type_ = insertion_term_type::final_initial;
+			break;
+
+		case 3:
+			type_ = insertion_term_type::initial_initial;
+			break;
+		}
 	}
 
 	/// Constructor for `born` insertion terms.
-	insertion_term(insertion_term_type type)
-		: type_(type)
+	insertion_term()
+		: type_(insertion_term_type::born)
 		, emitter_(0)
 		, emitter_type_(particle_type::boson)
 		, spectator_(0)
 	{
-		assert( type == insertion_term_type::born );
 	}
 
 	/// Returns the index of the emitter particle.

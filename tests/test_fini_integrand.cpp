@@ -165,7 +165,7 @@ public:
 
 	std::array<hep::insertion_term, 1> insertion_terms() const
 	{
-		return { hep::insertion_term{hep::insertion_term_type::born} };
+		return { hep::insertion_term{} };
 	}
 
 	std::vector<hep::final_state> final_states() const

@@ -178,7 +178,6 @@ public:
 	{
 		return { hep::dipole_with_set{ 2, 4, 3, hep::particle_type::fermion,
 			hep::particle_type::boson, hep::particle_type::fermion,
-			hep::dipole_type::final_final,
 			hep::initial_state_set{hep::initial_state::q43_cu}} };
 	}
 

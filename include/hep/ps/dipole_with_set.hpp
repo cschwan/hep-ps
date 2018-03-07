@@ -41,11 +41,10 @@ public:
 		particle_type emitter_type,
 		particle_type unresolved_type,
 		particle_type spectator_type,
-		dipole_type type,
 		initial_state_set set
 	)
 		: dipole_(emitter, unresolved, spectator, emitter_type, unresolved_type,
-			spectator_type, type)
+			spectator_type)
 		, set_(set)
 	{
 	}
