@@ -26,12 +26,11 @@ namespace hep
 /// OpenLoops in this library wasn't activated, some of the methods frow an
 /// exception. Currently this interface is only a thin wrapper which
 /// automatically calls `ol_start` and `ol_finish`.
-template <typename T>
 class ol_interface
 {
 public:
 	/// Returns the singleton instance.
-	static ol_interface<T>& instance();
+	static ol_interface& instance();
 
 	/// Returns `true` if this library was compiled against OpenLoops. Otherwise
 	/// this function returns `false` and the member functions of this class

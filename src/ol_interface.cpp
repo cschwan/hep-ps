@@ -31,15 +31,13 @@ void ol_evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct);
 namespace hep
 {
 
-template <typename T>
-ol_interface<T>& ol_interface<T>::instance()
+ol_interface& ol_interface::instance()
 {
 	static ol_interface object;
 	return object;
 }
 
-template <typename T>
-bool ol_interface<T>::enabled()
+bool ol_interface::enabled()
 {
 #ifdef HAVE_OPENLOOPS
 	return true;
@@ -48,72 +46,63 @@ bool ol_interface<T>::enabled()
 #endif
 }
 
-template <typename T>
-ol_interface<T>::ol_interface()
+ol_interface::ol_interface()
 {
 #ifdef HAVE_OPENLOOPS
 	ol_start();
 #endif
 }
 
-template <typename T>
-ol_interface<T>::~ol_interface()
+ol_interface::~ol_interface()
 {
 #ifdef HAVE_OPENLOOPS
 	ol_finish();
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::setparameter_int(char const* param, int val)
+void ol_interface::setparameter_int(char const* param, int val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_setparameter_int(param, val);
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::setparameter_double(char const* param, double val)
+void ol_interface::setparameter_double(char const* param, double val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_setparameter_double(param, val);
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::setparameter_string(char const* param, char* val)
+void ol_interface::setparameter_string(char const* param, char* val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_setparameter_string(param, val);
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::getparameter_int(char const* param, int* val)
+void ol_interface::getparameter_int(char const* param, int* val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_getparameter_int(param, val);
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::getparameter_double(char const* param, double* val)
+void ol_interface::getparameter_double(char const* param, double* val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_getparameter_double(param, val);
 #endif
 }
 
-template <typename T>
-int ol_interface<T>::register_process(char const* process, int amptype)
+int ol_interface::register_process(char const* process, int amptype)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_register_process(process, amptype);
 #endif
 }
 
-template <typename T>
-int ol_interface<T>::n_external(int id)
+int ol_interface::n_external(int id)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_n_external(id);
@@ -122,8 +111,7 @@ int ol_interface<T>::n_external(int id)
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::evaluate_tree(int id, double* pp, double* m2tree)
+void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_tree(id, pp, m2tree);
@@ -132,9 +120,13 @@ void ol_interface<T>::evaluate_tree(int id, double* pp, double* m2tree)
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::evaluate_cc(int id, double* pp, double* m2tree, double* m2cc, double* m2ew)
-{
+void ol_interface::evaluate_cc(
+	int id,
+	double* pp,
+	double* m2tree,
+	double* m2cc,
+	double* m2ew
+) {
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
 #else
@@ -142,9 +134,13 @@ void ol_interface<T>::evaluate_cc(int id, double* pp, double* m2tree, double* m2
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::evaluate_sc(int id, double* pp, int emitter, double* polvect, double* m2sc)
-{
+void ol_interface::evaluate_sc(
+	int id,
+	double* pp,
+	int emitter,
+	double* polvect,
+	double* m2sc
+) {
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
 #else
@@ -152,8 +148,7 @@ void ol_interface<T>::evaluate_sc(int id, double* pp, int emitter, double* polve
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::evaluate_loop(
+void ol_interface::evaluate_loop(
 	int id,
 	double* pp,
 	double* m2tree,
@@ -167,9 +162,12 @@ void ol_interface<T>::evaluate_loop(
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::evaluate_loop2(int id, double* pp, double* m2loop2, double* acc)
-{
+void ol_interface::evaluate_loop2(
+	int id,
+	double* pp,
+	double* m2loop2,
+	double* acc
+) {
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_loop2(id, pp, m2loop2, acc);
 #else
@@ -177,18 +175,17 @@ void ol_interface<T>::evaluate_loop2(int id, double* pp, double* m2loop2, double
 #endif
 }
 
-template <typename T>
-void ol_interface<T>::evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct)
-{
+void ol_interface::evaluate_ct(
+	int id,
+	double* pp,
+	double* m2_tree,
+	double* m2_ct
+) {
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_ct(id, pp, m2_tree, m2_ct);
 #else
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
-
-// -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
-
-template class ol_interface<double>;
 
 }
