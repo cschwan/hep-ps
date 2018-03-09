@@ -227,7 +227,7 @@ T cs_subtraction<T>::fermion_function(
 	using std::acos;
 
 	T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
-	T factor = T(8.0) * acos(T(-1.0)) * cf;
+	T factor = T(8.0) * acos(T(-1.0));
 
 	T dipole;
 	T propagator;
@@ -264,7 +264,7 @@ T cs_subtraction<T>::fermion_function(
 
 		if (dipole_info.unresolved_type() == particle_type::fermion)
 		{
-			factor = T(8.0) * acos(T(-1.0)) * tf_;
+			factor *= tf_ / cf;
 			dipole = T(1.0) - T(2.0) * x * (T(1.0) - x);
 		}
 		else
@@ -283,7 +283,7 @@ T cs_subtraction<T>::fermion_function(
 
 		if (dipole_info.unresolved_type() == particle_type::fermion)
 		{
-			factor = T(8.0) * acos(T(-1.0)) * tf_;
+			factor *= tf_ / cf;
 			dipole = T(1.0) - T(2.0) * x * (T(1.0) - x);
 		}
 		else
@@ -350,17 +350,17 @@ void cs_subtraction<T>::insertion_terms(
 		T const dilogome = gsl_sf_dilog(T(1.0) - eta);
 		T const logome = log(T(1.0) - eta);
 
-		T const value2 = T(0.5) * cf / pi * (((T(1.0) + x * x) / omx) *
-			logomxbx + omx);
-		T const value3 = T(0.5) * cf / pi * (T(2.0) / omx) * logomxbx;
-		T const value4 = T(0.5) * cf / pi * (T(2.0) / T(3.0) * pi * pi -
-			T(5.0) + T(2.0) * dilogome + logome * logome);
+		T const value2 = T(0.5) / pi * (((T(1.0) + x * x) / omx) * logomxbx +
+			omx);
+		T const value3 = T(0.5) / pi * (T(2.0) / omx) * logomxbx;
+		T const value4 = T(0.5) / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
+			T(2.0) * dilogome + logome * logome);
 
 		abc_terms<T> result;
 
 		if (mode_ != insertion_term_mode::ew_no_photons)
 		{
-			T const value1 = T(0.5) * tf_ / pi * ((x * x + omx * omx) *
+			T const value1 = T(0.5) * tf_ / cf / pi * ((x * x + omx * omx) *
 				logomxbx + T(2.0) * x * omx);
 
 			result.a[bo][aq] = value1;
@@ -388,7 +388,8 @@ void cs_subtraction<T>::insertion_terms(
 	{
 		T const ca = nc_;
 		T const gamma = (term.emitter_type() == particle_type::fermion)
-			? T(1.5) * cf
+			? T(1.5)
+			// FIXME: the following branch has probably the wrong color factors
 			: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * nf_;
 
 		T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
@@ -420,9 +421,9 @@ void cs_subtraction<T>::insertion_terms(
 		T const omx = T(1.0) - x;
 		T const sai = ps.m2(term.emitter(), term.spectator());
 
-		T const value1 = T(0.5) * tf_ / pi * (x * x + omx * omx);
-		T const value2 = T(0.5) * cf / pi * (T(1.0) + x * x) / omx;
-		T const value3 = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) +
+		T const value1 = T(0.5) * tf_ / cf / pi * (x * x + omx * omx);
+		T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
+		T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) +
 			T(2.0) * log(T(1.0) - eta));
 
 		for (auto const& mu : scales)
@@ -465,12 +466,12 @@ void cs_subtraction<T>::insertion_terms(
 		T const logomx = log(omx);
 		T const logome = log(T(1.0) - eta);
 
-		T const value1 = T(0.5) * tf_ / pi * (x * x + omx * omx);
-		T const value2 = T(0.5) * cf / pi * (T(1.0) + x * x) / omx;
-		T const value3 = T(0.5) * cf / pi * (T(0.5) * eta * (T(2.0) + eta) +
+		T const value1 = T(0.5) * tf_ / cf / pi * (x * x + omx * omx);
+		T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
+		T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) +
 			T(2.0) * logome);
-		T const value4 = T(0.5) * cf / pi * T(2.0) * logomx / omx;
-		T const value5 = T(0.5) * cf / pi * (pi*pi / T(3.0) - logome * logome);
+		T const value4 = T(0.5) / pi * T(2.0) * logomx / omx;
+		T const value5 = T(0.5) / pi * (pi*pi / T(3.0) - logome * logome);
 
 		for (auto const& mu : scales)
 		{
@@ -549,7 +550,6 @@ void cs_subtraction<T>::insertion_terms2(
 		phase_space_point<T> ps{phase_space};
 
 		T const pi = acos(T(-1.0));
-		T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 		T const sij = ps.m2(term.emitter(), term.spectator());
 
 		for (auto const& mu : scales)
@@ -561,7 +561,7 @@ void cs_subtraction<T>::insertion_terms2(
 			result += scheme_dep_factor * pi * pi;
 			result += T(1.5) * logmubsij;
 			result += T(0.5) * logmubsij * logmubsij;
-			result *= T(-0.5) * cf / pi;
+			result *= T(-0.5) / pi;
 
 			results.push_back(result);
 		}
