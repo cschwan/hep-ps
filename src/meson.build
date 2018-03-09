@@ -24,7 +24,6 @@ sources = [
 	'cofferaa_phase_space_generator.cpp',
 	'cs_subtraction.cpp',
 	'diagram.cpp',
-	'ew_cs_subtraction.cpp',
 	'find_hep_ps.cpp',
 	'fortran_helper.cpp',
 	'generator.f',

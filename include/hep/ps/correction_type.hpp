@@ -1,9 +1,9 @@
-#ifndef HEP_PS_EW_CS_SUBTRACTION_HPP
-#define HEP_PS_EW_CS_SUBTRACTION_HPP
+#ifndef HEP_PS_CORRECTION_TYPE_HPP
+#define HEP_PS_CORRECTION_TYPE_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017-2018  Christopher Schwan
+ * Copyright (C) 2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +19,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/cs_subtraction.hpp"
-#include "hep/ps/factorization_scheme.hpp"
-#include "hep/ps/insertion_term_mode.hpp"
-#include "hep/ps/regularization_scheme.hpp"
-
 namespace hep
 {
 
-/// Uses the Catani-Seymour subtraction to cancel the infrared divergences from
-/// electroweak (EW) amplitudes.
-template <typename T>
-class ew_cs_subtraction : public cs_subtraction<T>
+/// Enumeration used to select the type for certain corrections.
+enum class correction_type
 {
-public:
-	/// Constructor.
-	ew_cs_subtraction(
-		T nf,
-		factorization_scheme fscheme,
-		regularization_scheme rscheme,
-		insertion_term_mode mode
-	);
+	/// Denotes terms belonging to electroweak corrections.
+	ew,
+
+	/// Denotes terms belonging to strong corrections.
+	qcd
 };
 
 }

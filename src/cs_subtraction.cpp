@@ -19,15 +19,23 @@ cs_subtraction<T>::cs_subtraction(
 	T nf,
 	factorization_scheme fscheme,
 	regularization_scheme rscheme,
-	insertion_term_mode mode
+	correction_type type
 )
 	: nc_{nc}
 	, tf_{tf}
 	, nf_{nf}
 	, fscheme_{fscheme}
 	, rscheme_{rscheme}
-	, mode_{mode}
+	, type_{type}
 {
+	if (type_ == correction_type::ew)
+	{
+		using std::sqrt;
+
+		// this value of Nc sets Cf to one
+		nc_ = T(0.5) * (T(1.0) + sqrt(T(5.0)));
+		tf_ = T(1.0);
+	}
 }
 
 template <typename T>
@@ -315,20 +323,9 @@ void cs_subtraction<T>::insertion_terms(
 	using std::acos;
 	using std::log;
 
-	auto bo = parton_type::gluon_;
-
-	switch (mode_)
-	{
-	case insertion_term_mode::ew:
-	case insertion_term_mode::ew_no_photons:
-	case insertion_term_mode::ew_only_photons:
-		bo = parton_type::photon_;
-
-		break;
-
-	default:
-		break;
-	}
+	parton_type const bo = (type_ == correction_type::ew)
+		? parton_type::photon_
+		: parton_type::gluon_;
 
 	constexpr auto qq = parton_type::quark;
 	constexpr auto aq = parton_type::anti_quark;
@@ -350,6 +347,8 @@ void cs_subtraction<T>::insertion_terms(
 		T const dilogome = gsl_sf_dilog(T(1.0) - eta);
 		T const logome = log(T(1.0) - eta);
 
+		T const value1 = T(0.5) * tf_ / cf / pi * ((x * x + omx * omx) *
+			logomxbx + T(2.0) * x * omx);
 		T const value2 = T(0.5) / pi * (((T(1.0) + x * x) / omx) * logomxbx +
 			omx);
 		T const value3 = T(0.5) / pi * (T(2.0) / omx) * logomxbx;
@@ -358,24 +357,15 @@ void cs_subtraction<T>::insertion_terms(
 
 		abc_terms<T> result;
 
-		if (mode_ != insertion_term_mode::ew_no_photons)
-		{
-			T const value1 = T(0.5) * tf_ / cf / pi * ((x * x + omx * omx) *
-				logomxbx + T(2.0) * x * omx);
+		result.a[bo][aq] = value1;
+		result.a[bo][qq] = value1;
 
-			result.a[bo][aq] = value1;
-			result.a[bo][qq] = value1;
-		}
-
-		if (mode_ != insertion_term_mode::ew_only_photons)
-		{
-			result.a[aq][aq] = value2;
-			result.a[qq][qq] = value2;
-			result.b[aq][aq] = value3;
-			result.b[qq][qq] = value3;
-			result.c[aq][aq] = value4;
-			result.c[qq][qq] = value4;
-		}
+		result.a[aq][aq] = value2;
+		result.a[qq][qq] = value2;
+		result.b[aq][aq] = value3;
+		result.b[qq][qq] = value3;
+		result.c[aq][aq] = value4;
+		result.c[qq][qq] = value4;
 
 		// TODO: qg and gg are NYI
 
@@ -397,15 +387,12 @@ void cs_subtraction<T>::insertion_terms(
 
 		abc_terms<T> result;
 
-		if (mode_ != insertion_term_mode::ew_only_photons)
-		{
-			result.a[aq][aq] = value1;
-			result.a[qq][qq] = value1;
-			result.b[aq][aq] = value1;
-			result.b[qq][qq] = value1;
-			result.c[aq][aq] = value2;
-			result.c[qq][qq] = value2;
-		}
+		result.a[aq][aq] = value1;
+		result.a[qq][qq] = value1;
+		result.b[aq][aq] = value1;
+		result.b[qq][qq] = value1;
+		result.c[aq][aq] = value2;
+		result.c[qq][qq] = value2;
 
 		// TODO: qg and gg are NYI
 
@@ -433,21 +420,15 @@ void cs_subtraction<T>::insertion_terms(
 
 			abc_terms<T> result;
 
-			if (mode_ != insertion_term_mode::ew_no_photons)
-			{
-				result.a[bo][aq] = value1 * logmu2bsai;
-				result.a[bo][qq] = value1 * logmu2bsai;
-			}
+			result.a[bo][aq] = value1 * logmu2bsai;
+			result.a[bo][qq] = value1 * logmu2bsai;
 
-			if (mode_ != insertion_term_mode::ew_only_photons)
-			{
-				result.a[aq][aq] = value2 * logmu2bsai;
-				result.a[qq][qq] = value2 * logmu2bsai;
-				result.b[aq][aq] = value2 * logmu2bsai;
-				result.b[qq][qq] = value2 * logmu2bsai;
-				result.c[aq][aq] = value3 * logmu2bsai;
-				result.c[qq][qq] = value3 * logmu2bsai;
-			}
+			result.a[aq][aq] = value2 * logmu2bsai;
+			result.a[qq][qq] = value2 * logmu2bsai;
+			result.b[aq][aq] = value2 * logmu2bsai;
+			result.b[qq][qq] = value2 * logmu2bsai;
+			result.c[aq][aq] = value3 * logmu2bsai;
+			result.c[qq][qq] = value3 * logmu2bsai;
 
 			// TODO: qg and gg are NYI
 
@@ -480,21 +461,15 @@ void cs_subtraction<T>::insertion_terms(
 
 			abc_terms<T> result;
 
-			if (mode_ != insertion_term_mode::ew_no_photons)
-			{
-				result.a[bo][aq] = value1 * (logmu2bsai - logomx);
-				result.a[bo][qq] = value1 * (logmu2bsai - logomx);
-			}
+			result.a[bo][aq] = value1 * (logmu2bsai - logomx);
+			result.a[bo][qq] = value1 * (logmu2bsai - logomx);
 
-			if (mode_ != insertion_term_mode::ew_only_photons)
-			{
-				result.a[aq][aq] = value2 * (logmu2bsai - logomx);
-				result.a[qq][qq] = value2 * (logmu2bsai - logomx);
-				result.b[aq][aq] = value2 * logmu2bsai - value4;
-				result.b[qq][qq] = value2 * logmu2bsai - value4;
-				result.c[aq][aq] = value3 * logmu2bsai + value5;
-				result.c[qq][qq] = value3 * logmu2bsai + value5;
-			}
+			result.a[aq][aq] = value2 * (logmu2bsai - logomx);
+			result.a[qq][qq] = value2 * (logmu2bsai - logomx);
+			result.b[aq][aq] = value2 * logmu2bsai - value4;
+			result.b[qq][qq] = value2 * logmu2bsai - value4;
+			result.c[aq][aq] = value3 * logmu2bsai + value5;
+			result.c[qq][qq] = value3 * logmu2bsai + value5;
 
 			// TODO: qg and gg are NYI
 
