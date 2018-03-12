@@ -24,6 +24,7 @@ void ol_evaluate_sc(int id, double* pp, int emitter, double* polvect, double* m2
 void ol_evaluate_loop(int id, double* pp, double* m2tree, double* m2loop, double* acc);
 void ol_evaluate_loop2(int id, double* pp, double* m2loop2, double* acc);
 void ol_evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct);
+void ol_evaluate_full(int id, double* pp, double* m2tree, double* m2loop, double* m2ir, double* m2loop2, double* m2iop, double* acc);
 
 }
 #endif
@@ -183,6 +184,23 @@ void ol_interface::evaluate_ct(
 ) {
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_ct(id, pp, m2_tree, m2_ct);
+#else
+	throw std::runtime_error("OpenLoops support not enabled");
+#endif
+}
+
+void ol_interface::evaluate_full(
+	int id,
+	double* pp,
+	double* m2tree,
+	double* m2loop,
+	double* m2ir1,
+	double* m2loop2,
+	double* m2ir2,
+	double* acc
+) {
+#ifdef HAVE_OPENLOOPS
+	ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
 #else
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif

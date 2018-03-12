@@ -97,6 +97,18 @@ public:
 	/// Evaluate counterterms.
 	void evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct);
 
+	/// Evaluate everything.
+	void evaluate_full(
+		int id,
+		double* pp,
+		double* m2tree,
+		double* m2loop,
+		double* m2ir1,
+		double* m2loop2,
+		double* m2ir2,
+		double* acc
+	);
+
 private:
 	ol_interface();
 };
