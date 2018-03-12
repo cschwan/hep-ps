@@ -220,8 +220,7 @@ public:
 				assert( false );
 			}
 
-			auto const dipole_me = matrix_elements_.dipole_me(dipole,
-				phase_space, set_);
+			matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
 
 			results_.clear();
 			pdf_results_.clear();
@@ -231,7 +230,7 @@ public:
 				results_.push_back(convolute(
 					pdfsx1_.at(i),
 					pdfsx2_.at(i),
-					dipole_me,
+					me_.at(i),
 					set_,
 					-function * factors_.at(i) * factor,
 					dipole_cut_result
@@ -243,7 +242,7 @@ public:
 				pdf_results_.push_back(convolute(
 					pdf_pdfsx1_.at(i),
 					pdf_pdfsx2_.at(i),
-					dipole_me,
+					me_.front(),
 					set_,
 					-function * factor,
 					dipole_cut_result
@@ -264,7 +263,7 @@ public:
 
 		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 		{
-			auto const reals = matrix_elements_.reals(real_phase_space, set_);
+			matrix_elements_.reals(real_phase_space, set_, scales_, me_);
 
 			results_.clear();
 			pdf_results_.clear();
@@ -274,7 +273,7 @@ public:
 				results_.push_back(convolute(
 					pdfsx1_.at(i),
 					pdfsx2_.at(i),
-					reals,
+					me_.at(i),
 					set_,
 					factors_.at(i) * factor,
 					real_cut_result
@@ -286,7 +285,7 @@ public:
 				pdf_results_.push_back(convolute(
 					pdf_pdfsx1_.at(i),
 					pdf_pdfsx2_.at(i),
-					reals,
+					me_.front(),
 					set_,
 					factor,
 					real_cut_result
@@ -356,6 +355,7 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
+	std::vector<initial_state_array<T>> me_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 	T alphas_power_;
 };

@@ -130,9 +130,11 @@ public:
 
 	// MATRIX ELEMENT MEMBER FUNCTIONS
 
-	hep::initial_state_array<T> reals(
+	void reals(
 		std::vector<T> const&,
-		hep::initial_state_set set
+		hep::initial_state_set set,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::initial_state_array<T>>& results
 	) const {
 		using std::pow;
 
@@ -143,13 +145,15 @@ public:
 			result[state] = pow(alphas_, T(alphas_power_)) * T(2.0);
 		}
 
-		return result;
+		results.assign(scales.size(), result);
 	}
 
-	hep::initial_state_array<T> dipole_me(
+	void dipole_me(
 		hep::dipole const& /*dipole*/,
 		std::vector<T> const& /*phase_space*/,
-		hep::initial_state_set set
+		hep::initial_state_set set,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::initial_state_array<T>>& results
 	) {
 		hep::initial_state_array<T> result;
 
@@ -158,7 +162,7 @@ public:
 			result[state] = pow(alphas_, T(alphas_power_)) * T(1.0);
 		}
 
-		return result;
+		results.assign(scales.size(), result);
 	}
 
 	void alphas(T alphas)
