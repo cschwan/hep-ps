@@ -297,8 +297,8 @@ public:
 				for (std::size_t i = 0; i != pdfsa1_.size(); ++i)
 				{
 					results_.at(i) += convolute(
-						pdfsa1_.front(),
-						pdfsa2_.front(),
+						pdfsa1_.at(i),
+						pdfsa2_.at(i),
 						me,
 						set_,
 						factors_.at(i) * factor * terms2_.at(i),
