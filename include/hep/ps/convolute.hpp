@@ -24,6 +24,8 @@
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
 
+#include <cassert>
+
 namespace hep
 {
 
@@ -91,6 +93,59 @@ inline neg_pos_results<T> convolute(
 	}
 
 	return { factor * neg , factor * pos };
+}
+
+template <typename T, typename I>
+inline void convolute_mes_with_pdfs(
+	std::vector<neg_pos_results<T>>& scale_results,
+	std::vector<neg_pos_results<T>>& pdf_results,
+	std::vector<parton_array<T>> const& scale_uncertainty_pdfs_one,
+	std::vector<parton_array<T>> const& scale_uncertainty_pdfs_two,
+	std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_one,
+	std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_two,
+	std::vector<initial_state_array<T>> const& matrix_elements,
+	initial_state_set set,
+	std::vector<T> const& alphas_factors,
+	T global_factor,
+	cut_result_with_info<I> const& cut
+) {
+	std::size_t const scales = scale_uncertainty_pdfs_one.size();
+	std::size_t const pdfs = pdf_uncertainty_pdfs_one.size();
+
+	assert( scale_uncertainty_pdfs_one.size() == scales );
+	assert( scale_uncertainty_pdfs_two.size() == scales );
+	assert( matrix_elements.size() == scales );
+	assert( alphas_factors.size() == scales );
+	assert( pdf_uncertainty_pdfs_one.size() == pdfs );
+	assert( pdf_uncertainty_pdfs_two.size() == pdfs );
+
+	scale_results.clear();
+
+	for (std::size_t i = 0; i != scales; ++i)
+	{
+		scale_results.push_back(convolute(
+			scale_uncertainty_pdfs_one.at(i),
+			scale_uncertainty_pdfs_two.at(i),
+			matrix_elements.at(i),
+			set,
+			alphas_factors.at(i) * global_factor,
+			cut
+		));
+	}
+
+	pdf_results.clear();
+
+	for (std::size_t i = 0; i != pdfs; ++i)
+	{
+		pdf_results.push_back(convolute(
+			pdf_uncertainty_pdfs_one.at(i),
+			pdf_uncertainty_pdfs_two.at(i),
+			matrix_elements.front(),
+			set,
+			global_factor,
+			cut
+		));
+	}
 }
 
 }

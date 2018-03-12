@@ -123,8 +123,6 @@ public:
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-		results_.clear();
-		pdf_results_.clear();
 		borns_.resize(scales_.size());
 
 		pdfs_.eval(info.x1(), scales_, scale_pdf_x1_, pdf_pdf_x1_);
@@ -139,29 +137,19 @@ public:
 
 		assert( borns_.size() == scales_.size() );
 
-		for (std::size_t i = 0; i != scale_pdf_x1_.size(); ++i)
-		{
-			results_.push_back(convolute(
-				scale_pdf_x1_.at(i),
-				scale_pdf_x2_.at(i),
-				borns_.at(i),
-				set_,
-				factors_.at(i) * factor,
-				cut_result
-			));
-		}
-
-		for (std::size_t i = 0; i != pdf_pdf_x1_.size(); ++i)
-		{
-			pdf_results_.push_back(convolute(
-				pdf_pdf_x1_.at(i),
-				pdf_pdf_x2_.at(i),
-				borns_.front(),
-				set_,
-				factor,
-				cut_result
-			));
-		}
+		convolute_mes_with_pdfs(
+			results_,
+			pdf_results_,
+			scale_pdf_x1_,
+			scale_pdf_x2_,
+			pdf_pdf_x1_,
+			pdf_pdf_x2_,
+			borns_,
+			set_,
+			factors_,
+			factor,
+			cut_result
+		);
 
 		distributions_(
 			recombined_ps_,

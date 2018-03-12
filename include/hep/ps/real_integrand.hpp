@@ -222,32 +222,19 @@ public:
 
 			matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
 
-			results_.clear();
-			pdf_results_.clear();
-
-			for (std::size_t i = 0; i != pdfsx1_.size(); ++i)
-			{
-				results_.push_back(convolute(
-					pdfsx1_.at(i),
-					pdfsx2_.at(i),
-					me_.at(i),
-					set_,
-					-function * factors_.at(i) * factor,
-					dipole_cut_result
-				));
-			}
-
-			for (std::size_t i = 0; i != pdf_pdfsx1_.size(); ++i)
-			{
-				pdf_results_.push_back(convolute(
-					pdf_pdfsx1_.at(i),
-					pdf_pdfsx2_.at(i),
-					me_.front(),
-					set_,
-					-function * factor,
-					dipole_cut_result
-				));
-			}
+			convolute_mes_with_pdfs(
+				results_,
+				pdf_results_,
+				pdfsx1_,
+				pdfsx2_,
+				pdf_pdfsx1_,
+				pdf_pdfsx2_,
+				me_,
+				set_,
+				factors_,
+				-function * factor,
+				dipole_cut_result
+			);
 
 			distributions_(
 				phase_space,
@@ -265,32 +252,19 @@ public:
 		{
 			matrix_elements_.reals(real_phase_space, set_, scales_, me_);
 
-			results_.clear();
-			pdf_results_.clear();
-
-			for (std::size_t i = 0; i != pdfsx1_.size(); ++i)
-			{
-				results_.push_back(convolute(
-					pdfsx1_.at(i),
-					pdfsx2_.at(i),
-					me_.at(i),
-					set_,
-					factors_.at(i) * factor,
-					real_cut_result
-				));
-			}
-
-			for (std::size_t i = 0; i != pdf_pdfsx1_.size(); ++i)
-			{
-				pdf_results_.push_back(convolute(
-					pdf_pdfsx1_.at(i),
-					pdf_pdfsx2_.at(i),
-					me_.front(),
-					set_,
-					factor,
-					real_cut_result
-				));
-			}
+			convolute_mes_with_pdfs(
+				results_,
+				pdf_results_,
+				pdfsx1_,
+				pdfsx2_,
+				pdf_pdfsx1_,
+				pdf_pdfsx2_,
+				me_,
+				set_,
+				factors_,
+				factor,
+				real_cut_result
+			);
 
 			distributions_(
 				recombined_ps_,
