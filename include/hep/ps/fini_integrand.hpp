@@ -168,7 +168,8 @@ public:
 			auto const me = corr_me.at(index);
 			auto const& term = insertion_terms_.at(index);
 
-			if (parts_ != finite_parts::insertion_term2)
+			if ((parts_ != finite_parts::insertion_term2) &&
+				(term.type() != insertion_term_type::final_final))
 			{
 				// loop over both initial state partons
 				for (auto const i : { 0u, 1u })
@@ -191,9 +192,6 @@ public:
 						}
 
 						break;
-
-					case insertion_term_type::final_final:
-						continue;
 
 					default:
 						break;
@@ -283,7 +281,8 @@ public:
 				}
 			}
 
-			if (parts_ != finite_parts::insertion_term)
+			if ((parts_ != finite_parts::insertion_term) &&
+				(term.type() != insertion_term_type::born))
 			{
 				subtraction_.insertion_terms2(
 					term,

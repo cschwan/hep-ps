@@ -496,8 +496,8 @@ void cs_subtraction<T>::insertion_terms2(
 
 	if (term.type() == insertion_term_type::born)
 	{
-		results.assign(scales.size(), T());
-		return;
+		// should not be called with this function
+		assert( false );
 	}
 
 	T scheme_dep_factor;
