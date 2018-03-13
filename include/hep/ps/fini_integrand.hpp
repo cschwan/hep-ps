@@ -156,6 +156,12 @@ public:
 		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
+		T const eta[] = { info.x1(), info.x2() };
+		T const xprime[] = {
+			eta[0] * (T(1.0) - x) + x,
+			eta[1] * (T(1.0) - x) + x
+		};
+
 		// loop over all Born, FI, IF, II, and FF
 		for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
 		{
@@ -193,29 +199,23 @@ public:
 						break;
 					}
 
-					T const eta_neg = (i == 0) ? info.x2() : info.x1();
-					T const xprime_neg = eta_neg * (T(1.0) - x) + x;
-
 					subtraction_.insertion_terms(
 						term,
 						scales_,
 						phase_space,
-						xprime_neg,
-						eta_neg,
+						xprime[1 - i],
+						eta[1 - i],
 						abc_neg_
 					);
 
 					assert( abc_neg_.size() == scales_.size() );
 
-					T const eta_pos = (i == 0) ? info.x1() : info.x2();
-					T const xprime_pos = eta_pos * (T(1.0) - x) + x;
-
 					subtraction_.insertion_terms(
 						term,
 						scales_,
 						phase_space,
-						xprime_pos,
-						eta_pos,
+						xprime[i],
+						eta[i],
 						abc_pos_
 					);
 
@@ -225,7 +225,7 @@ public:
 					{
 						auto const pdf_neg = effective_pdf(
 							abc_neg_.at(j),
-							xprime_neg,
+							xprime[1 - i],
 							(i == 0) ? info.x2() : info.x1(),
 							(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
 							(i == 0) ? pdfsb2_.at(j) : pdfsb1_.at(j)
@@ -233,7 +233,7 @@ public:
 
 						auto const pdf_pos = effective_pdf(
 							abc_pos_.at(j),
-							xprime_pos,
+							xprime[i],
 							(i == 0) ? info.x1() : info.x2(),
 							(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
 							(i == 0) ? pdfsb1_.at(j) : pdfsb2_.at(j)
@@ -255,7 +255,7 @@ public:
 					{
 						auto const pdf_neg = effective_pdf(
 							abc_neg_.front(),
-							xprime_neg,
+							xprime[1 - i],
 							(i == 0) ? info.x2() : info.x1(),
 							(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pdfsa1_.at(j),
 							(i == 0) ? pdf_pdfsb2_.at(j) : pdf_pdfsb1_.at(j)
@@ -263,7 +263,7 @@ public:
 
 						auto const pdf_pos = effective_pdf(
 							abc_pos_.front(),
-							xprime_pos,
+							xprime[i],
 							(i == 0) ? info.x1() : info.x2(),
 							(i == 0) ? pdf_pdfsa1_.at(j) : pdf_pdfsa2_.at(j),
 							(i == 0) ? pdf_pdfsb1_.at(j) : pdf_pdfsb2_.at(j)
