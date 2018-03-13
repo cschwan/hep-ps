@@ -171,113 +171,88 @@ public:
 			if ((parts_ != finite_parts::insertion_term2) &&
 				(term.type() != insertion_term_type::final_final))
 			{
-				// loop over both initial state partons
-				for (auto const i : { 0u, 1u })
+				std::size_t const i = term.initial_particle();
+
+				subtraction_.insertion_terms(
+					term,
+					scales_,
+					phase_space,
+					xprime[1 - i],
+					eta[1 - i],
+					abc_neg_
+				);
+
+				assert( abc_neg_.size() == scales_.size() );
+
+				subtraction_.insertion_terms(
+					term,
+					scales_,
+					phase_space,
+					xprime[i],
+					eta[i],
+					abc_pos_
+				);
+
+				assert( abc_neg_.size() == scales_.size() );
+
+				for (std::size_t j = 0; j != scales_.size(); ++j)
 				{
-					switch (term.type())
-					{
-					case insertion_term_type::final_initial:
-						if (term.spectator() != i)
-						{
-							continue;
-						}
-
-						break;
-
-					case insertion_term_type::initial_final:
-					case insertion_term_type::initial_initial:
-						if (term.emitter() != i)
-						{
-							continue;
-						}
-
-						break;
-
-					default:
-						break;
-					}
-
-					subtraction_.insertion_terms(
-						term,
-						scales_,
-						phase_space,
+					auto const pdf_neg = effective_pdf(
+						abc_neg_.at(j),
 						xprime[1 - i],
-						eta[1 - i],
-						abc_neg_
+						(i == 0) ? info.x2() : info.x1(),
+						(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
+						(i == 0) ? pdfsb2_.at(j) : pdfsb1_.at(j)
 					);
 
-					assert( abc_neg_.size() == scales_.size() );
-
-					subtraction_.insertion_terms(
-						term,
-						scales_,
-						phase_space,
+					auto const pdf_pos = effective_pdf(
+						abc_pos_.at(j),
 						xprime[i],
-						eta[i],
-						abc_pos_
+						(i == 0) ? info.x1() : info.x2(),
+						(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
+						(i == 0) ? pdfsb1_.at(j) : pdfsb2_.at(j)
 					);
 
-					assert( abc_neg_.size() == scales_.size() );
+					results_.at(j) += convolute(
+						(i == 0) ? pdf_neg       : pdfsa2_.at(j),
+						(i == 0) ? pdfsa1_.at(j) : pdf_neg,
+						(i == 0) ? pdf_pos       : pdfsa1_.at(j),
+						(i == 0) ? pdfsa2_.at(j) : pdf_pos,
+						me,
+						set_,
+						factors_.at(j) * factor,
+						cut_result
+					);
+				}
 
-					for (std::size_t j = 0; j != scales_.size(); ++j)
-					{
-						auto const pdf_neg = effective_pdf(
-							abc_neg_.at(j),
-							xprime[1 - i],
-							(i == 0) ? info.x2() : info.x1(),
-							(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
-							(i == 0) ? pdfsb2_.at(j) : pdfsb1_.at(j)
-						);
+				for (std::size_t j = 0; j != pdf_pdfsa1_.size(); ++j)
+				{
+					auto const pdf_neg = effective_pdf(
+						abc_neg_.front(),
+						xprime[1 - i],
+						(i == 0) ? info.x2() : info.x1(),
+						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pdfsa1_.at(j),
+						(i == 0) ? pdf_pdfsb2_.at(j) : pdf_pdfsb1_.at(j)
+					);
 
-						auto const pdf_pos = effective_pdf(
-							abc_pos_.at(j),
-							xprime[i],
-							(i == 0) ? info.x1() : info.x2(),
-							(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
-							(i == 0) ? pdfsb1_.at(j) : pdfsb2_.at(j)
-						);
+					auto const pdf_pos = effective_pdf(
+						abc_pos_.front(),
+						xprime[i],
+						(i == 0) ? info.x1() : info.x2(),
+						(i == 0) ? pdf_pdfsa1_.at(j) : pdf_pdfsa2_.at(j),
+						(i == 0) ? pdf_pdfsb1_.at(j) : pdf_pdfsb2_.at(j)
+					);
 
-						results_.at(j) += convolute(
-							(i == 0) ? pdf_neg       : pdfsa2_.at(j),
-							(i == 0) ? pdfsa1_.at(j) : pdf_neg,
-							(i == 0) ? pdf_pos       : pdfsa1_.at(j),
-							(i == 0) ? pdfsa2_.at(j) : pdf_pos,
-							me,
-							set_,
-							factors_.at(j) * factor,
-							cut_result
-						);
-					}
-
-					for (std::size_t j = 0; j != pdf_pdfsa1_.size(); ++j)
-					{
-						auto const pdf_neg = effective_pdf(
-							abc_neg_.front(),
-							xprime[1 - i],
-							(i == 0) ? info.x2() : info.x1(),
-							(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pdfsa1_.at(j),
-							(i == 0) ? pdf_pdfsb2_.at(j) : pdf_pdfsb1_.at(j)
-						);
-
-						auto const pdf_pos = effective_pdf(
-							abc_pos_.front(),
-							xprime[i],
-							(i == 0) ? info.x1() : info.x2(),
-							(i == 0) ? pdf_pdfsa1_.at(j) : pdf_pdfsa2_.at(j),
-							(i == 0) ? pdf_pdfsb1_.at(j) : pdf_pdfsb2_.at(j)
-						);
-
-						pdf_results_.at(j) += convolute(
-							(i == 0) ? pdf_neg             : pdf_pdfsa2_.at(j),
-							(i == 0) ? pdf_pdfsa1_.at(j) : pdf_neg,
-							(i == 0) ? pdf_pos             : pdf_pdfsa1_.at(j),
-							(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pos,
-							me,
-							set_,
-							factor,
-							cut_result
-						);
-					}
+					pdf_results_.at(j) += convolute(
+						(i == 0) ? pdf_neg             : pdf_pdfsa2_.at(j),
+						(i == 0) ? pdf_pdfsa1_.at(j) : pdf_neg,
+						(i == 0) ? pdf_pos             : pdf_pdfsa1_.at(j),
+						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pos,
+						me,
+						set_,
+						factor,
+						cut_result
+					);
 				}
 			}
 

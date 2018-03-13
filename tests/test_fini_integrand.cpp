@@ -75,15 +75,7 @@ public:
 		std::vector<T> const& /*phase_space*/,
 		std::vector<T>& results
 	) const {
-		results.clear();
-
-		CHECK( term.type() == hep::insertion_term_type::born );
-
-		for (auto const& scale : scales)
-		{
-			// TODO: test this call
-			results.emplace_back();
-		}
+		// TODO: test this call
 	}
 
 	// DISTRIBUTION MEMBER FUNCTIONS
@@ -137,7 +129,7 @@ public:
 
 	// MATRIX ELEMENT MEMBER FUNCTIONS
 
-	std::array<hep::initial_state_array<T>, 1> correlated_me(
+	std::array<hep::initial_state_array<T>, 2> correlated_me(
 		std::vector<T> const& /*phase_space*/,
 		hep::initial_state_set set
 	) {
@@ -148,7 +140,7 @@ public:
 			result[state] = pow(alphas_, T(alphas_power_)) * T(1.0);
 		}
 
-		return { result };
+		return { result, result };
 	}
 
 	void alphas(T alphas)
@@ -164,9 +156,9 @@ public:
 		return alphas_power_;
 	}
 
-	std::array<hep::insertion_term, 1> insertion_terms() const
+	std::array<hep::insertion_term, 2> insertion_terms() const
 	{
-		return { hep::insertion_term{} };
+		return { hep::insertion_term{0}, hep::insertion_term{1} };
 	}
 
 	std::vector<hep::final_state> final_states() const

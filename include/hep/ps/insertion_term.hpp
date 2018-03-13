@@ -66,11 +66,11 @@ public:
 	}
 
 	/// Constructor for `born` insertion terms.
-	insertion_term()
+	insertion_term(std::size_t initial)
 		: type_(insertion_term_type::born)
-		, emitter_(0)
-		, emitter_type_(particle_type::boson)
-		, spectator_(0)
+		, emitter_{initial}
+		, emitter_type_{particle_type::boson}
+		, spectator_{0}
 	{
 	}
 
@@ -102,6 +102,29 @@ public:
 	insertion_term_type type() const
 	{
 		return type_;
+	}
+
+	/// Returns the index of the initial particle.
+	std::size_t initial_particle() const
+	{
+		switch (type_)
+		{
+		case insertion_term_type::born:
+			return emitter_;
+
+		case insertion_term_type::initial_final:
+		case insertion_term_type::initial_initial:
+			return emitter();
+
+		case insertion_term_type::final_initial:
+			return spectator();
+
+		case insertion_term_type::final_final:
+			assert( false );
+
+		default:
+			assert( false );
+		}
 	}
 
 private:
