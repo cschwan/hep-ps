@@ -170,9 +170,10 @@ T jacobian(T power, T mass, T width, T x, T xmin, T xmax)
 		T const mg = mass * width;
 		T const min = atan((xmin - m2) / mg);
 		T const max = atan((xmax - m2) / mg);
+		T const max_min = max - min;
 		T const xprime = x - m2;
 
-		return mg / ((max - min) * (xprime * xprime + mg * mg));
+		return mg / (max_min * (xprime * xprime + mg * mg));
 	}
 
 	if (power == T())
@@ -191,8 +192,8 @@ T jacobian(T power, T mass, T width, T x, T xmin, T xmax)
 
 	T const omp = T(1.0) - power;
 
-	return omp / ((pow(xmax - m2, omp) - pow(xmin - m2, omp)) *
-		pow(x - m2, power));
+	return omp / ((pow(fabs(xmax - m2), omp) - pow(fabs(xmin - m2), omp)) *
+		pow(fabs(x - m2), power));
 }
 
 template <typename T>
@@ -643,8 +644,8 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
 		T const t1 = this->s[process.in1];
 		T const t2 = this->s[process.in2];
 
-		T const lambdas = sqrt(hep::kaellen(s, s1, s2));
-		T const lambdat = sqrt(hep::kaellen(s, t1, t2));
+		T const lambdas = sqrt(fabs(hep::kaellen(s, s1, s2)));
+		T const lambdat = sqrt(fabs(hep::kaellen(s, t1, t2)));
 
 		T const tmp = (s + s1 - s2) * (s + t1 - t2);
 		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
@@ -677,7 +678,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
 		T const s2 = this->s[decay.out2];
 
 		T const jacobian = T(2.0) * s / (acos(T(-1.0)) *
-			sqrt(hep::kaellen(s, s1, s2)));
+			sqrt(fabs(hep::kaellen(s, s1, s2))));
 
 		decay_jacobians.push_back(jacobian);
 	}
