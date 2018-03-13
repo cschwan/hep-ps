@@ -168,9 +168,16 @@ T jacobian(T power, T mass, T width, T x, T xmin, T xmax)
 	if (width > T())
 	{
 		T const mg = mass * width;
-		T const min = atan((xmin - m2) / mg);
-		T const max = atan((xmax - m2) / mg);
-		T const max_min = max - min;
+		T const min = (xmin - m2) / mg;
+		T const max = (xmax - m2) / mg;
+
+		// formula for the difference of two arctans
+		T max_min = atan((xmax - xmin) / mg / (T(1.0) + max * min));
+		if (min * max < T(-1.0))
+		{
+			max_min += (max > T()) ? acos(T(-1.0)) : -acos(T(-1.0));
+		}
+
 		T const xprime = x - m2;
 
 		return mg / (max_min * (xprime * xprime + mg * mg));
