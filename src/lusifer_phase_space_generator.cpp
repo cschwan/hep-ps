@@ -250,12 +250,13 @@ template <typename T>
 void rotate(std::array<T, 4>& p, T phi, T cos_theta)
 {
 	using std::cos;
+	using std::fabs;
 	using std::sin;
 	using std::sqrt;
 
 	T const sin_phi = sin(phi);
 	T const cos_phi = cos(phi);
-	T const sin_theta = sqrt((T(1.0) - cos_theta) * (T(1.0) + cos_theta));
+	T const sin_theta = sqrt(fabs((T(1.0) - cos_theta) * (T(1.0) + cos_theta)));
 
 	T const px = p[1];
 	T const py = p[2];
