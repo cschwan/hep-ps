@@ -188,9 +188,6 @@ T jacobian(T power, T mass, T width, T x, T xmin, T xmax)
 		return T(1.0) / (xmax - xmin);
 	}
 
-	// TODO: make this parameter accessible from outside
-	m2 -= T(1e-6);
-
 	if (power == T(1.0))
 	{
 		// TODO: WARNING this branch is untested!
@@ -230,9 +227,6 @@ T map(T power, T mass, T width, T x, T xmin, T xmax)
 	{
 		return x * xmax + (T(1.0) - x) * xmin;
 	}
-
-	// TODO: make this parameter accessible from outside
-	m2 -= T(1e-6);
 
 	if (power == T(1.0))
 	{
