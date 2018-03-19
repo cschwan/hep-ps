@@ -30,6 +30,7 @@ sources = [
 	'hadron_hadron_psg_adapter.hpp',
 	'initial_state.cpp',
 	'inv_idx.cpp',
+	'kaellen.cpp',
 	'list_phase_space_generator.cpp',
 	'lusifer_constants.cpp',
 	'lusifer_diagram_generator.cpp',

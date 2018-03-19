@@ -19,18 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <type_traits>
-
 namespace hep
 {
 
 /// Calculates the Källén function, also known as triangle function, that
 /// arises in three-point one-loop functions or particle decays.
-template <typename T1, typename T2, typename T3>
-inline typename std::common_type<T1, T2, T3>::type kaellen(T1 x, T2 y, T3 z)
-{
-	return (x - y - z) * (x - y - z) - T1(4.0) * y * z;
-}
+template <typename T>
+T kaellen(T x, T y, T z);
 
 }
 
