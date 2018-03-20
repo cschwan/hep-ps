@@ -60,6 +60,7 @@
 #include "hep/ps/parton_df_unc.hpp"
 #include "hep/ps/parton_dfs.hpp"
 #include "hep/ps/parton_type.hpp"
+#include "hep/ps/pdg_functions.hpp"
 #include "hep/ps/permutation.hpp"
 #include "hep/ps/phase_space_generator.hpp"
 #include "hep/ps/phase_space_point.hpp"

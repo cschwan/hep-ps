@@ -43,6 +43,7 @@ sources = [
 	'parton.cpp',
 	'parton_dfs.cpp',
 	'parton_df_unc.cpp',
+	'pdg_functions.cpp',
 	'phase_space_generator.cpp',
 	'phase_space_point.cpp',
 	'propagator.cpp',

@@ -44,6 +44,7 @@ headers1 = [
 	'hep/ps/parton_dfs.hpp',
 	'hep/ps/parton_df_unc.hpp',
 	'hep/ps/parton_type.hpp',
+	'hep/ps/pdg_functions.hpp',
 	'hep/ps/permutation.hpp',
 	'hep/ps/phase_space_generator.hpp',
 	'hep/ps/phase_space_point.hpp',
