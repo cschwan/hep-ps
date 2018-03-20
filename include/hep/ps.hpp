@@ -27,6 +27,7 @@
 #include "hep/ps/convolute.hpp"
 #include "hep/ps/correction_type.hpp"
 #include "hep/ps/cs_subtraction.hpp"
+#include "hep/ps/coupling_order.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/diagram.hpp"
 #include "hep/ps/dipole.hpp"

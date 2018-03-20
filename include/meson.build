@@ -9,6 +9,7 @@ headers1 = [
 	'hep/ps/convolute.hpp',
 	'hep/ps/correction_type.hpp',
 	'hep/ps/cs_subtraction.hpp',
+	'hep/ps/coupling_order.hpp',
 	'hep/ps/cut_result.hpp',
 	'hep/ps/diagram.hpp',
 	'hep/ps/dipole.hpp',
