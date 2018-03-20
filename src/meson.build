@@ -10,7 +10,7 @@ endif
 
 configure_file(output : 'config.hpp', configuration : conf)
 
-deps = []
+deps = [ hep_mc ]
 
 if get_option('openloops')
 	deps += [ meson.get_compiler('cpp').find_library('openloops') ]

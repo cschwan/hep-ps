@@ -129,6 +129,7 @@ test_phase_space_point = executable(
 	'test_phase_space_point.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
+	dependencies : hep_mc,
 	link_with : [ libcatch, libhep_ps ]
 )
 
