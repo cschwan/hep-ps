@@ -280,6 +280,46 @@ void decay_momenta(
 }
 
 template <typename T>
+struct tinv
+{
+	T tmin;
+	T tmax;
+	T lambdas;
+	T lambdat;
+};
+
+template <typename T>
+tinv<T> calc_tinv(T s, T s1, T s2, T t1, T t2)
+{
+	using std::fabs;
+	using std::sqrt;
+
+	T const lambdas = sqrt(fabs(hep::kaellen(s, s1, s2)));
+	T const lambdat = sqrt(fabs(hep::kaellen(s, t1, t2)));
+
+	T const tmp = (s + s1 - s2) * (s + t1 - t2);
+	T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
+	T       tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
+
+	// if the value is obviously wrong, we try another approach
+	if (tmax > T{})
+	{
+		T const x = s - t1 - t2;
+		T const y = s - s1 - s2;
+		T const eps2 = t1 * t2 / (x * x);
+		T const epsp2 = s1 * s2 / (y * y);
+
+		// the following expansion is valid for large s (for small eps and epsp)
+		tmax = ((t2 * s1 + t1 * s2) - (x * y * (eps2 + epsp2 + (eps2 - epsp2) *
+			(eps2 - epsp2)))) / s;
+	}
+
+	assert( tmax > tmin );
+
+	return { tmin, tmax, lambdas, lambdat };
+}
+
+template <typename T>
 class lusifer_psg
 {
 public:
@@ -646,28 +686,16 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
 		T const t1 = this->s[process.in1];
 		T const t2 = this->s[process.in2];
 
-		T const lambdas = sqrt(fabs(hep::kaellen(s, s1, s2)));
-		T const lambdat = sqrt(fabs(hep::kaellen(s, t1, t2)));
-
-		T const tmp = (s + s1 - s2) * (s + t1 - t2);
-		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
-		T       tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
-
-		// TODO: make this parameter available from outside
-		if (fabs(tmax) < T(1e-7))
-		{
-			tmax = T();
-		}
-
-		T const factor = T(2.0) * lambdat / acos(T(-1.0));
+		auto const& tinv = calc_tinv(s, s1, s2, t1, t2);
+		T const factor = T(2.0) * tinv.lambdat / acos(T(-1.0));
 
 		process_jacobians.push_back(factor * jacobian(
 			 particle_infos.at(process.idhep).power,
 			-particle_infos.at(process.idhep).mass,
 			 particle_infos.at(process.idhep).width,
 			-t,
-			-tmax,
-			-tmin
+			-tinv.tmax,
+			-tinv.tmin
 		));
 	}
 
@@ -822,35 +850,25 @@ void lusifer_psg<T>::generate(
 		T const t1 = this->s[process.in1];
 		T const t2 = this->s[process.in2];
 
-		T const lambdas = sqrt(fabs(hep::kaellen(s, s1, s2)));
-		T const lambdat = sqrt(fabs(hep::kaellen(s, t1, t2)));
-
-		T const tmp = (s + s1 - s2) * (s + t1 - t2);
-		T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
-		T       tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
-
-		if (tmax > T())
-		{
-			tmax = T();
-		}
-
+		auto const& tinv = calc_tinv(s, s1, s2, t1, t2);
 		T phi = T(2.0) * acos(T(-1.0)) * *r++;
 		T const h = map(
 			 particle_infos.at(process.idhep).power,
 			-particle_infos.at(process.idhep).mass,
 			 particle_infos.at(process.idhep).width,
 			*r++,
-			-tmax,
-			-tmin
+			-tinv.tmax,
+			-tinv.tmin
 		);
-		T cos_theta = (tmp - T(2.0) * s * (t1 + s1 + h)) / (lambdas * lambdat);
+		T cos_theta = ((s + s1 - s2) * (s + t1 - t2) - T(2.0) * s *
+			(t1 + s1 + h)) / (tinv.lambdas * tinv.lambdat);
 
 		auto& p1 = p[process.out1];
 
 		T const sqrts = sqrt(s);
 
 		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
-			T(0.5) * lambdas / sqrts };
+			T(0.5) * tinv.lambdas / sqrts };
 
 		auto const& q1 = p[process.in1];
 		phi = copysign(phi, q1[3]);
