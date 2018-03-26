@@ -842,6 +842,8 @@ void lusifer_psg<T>::generate(
 	using std::atan2;
 	using std::copysign;
 	using std::fabs;
+	using std::fmax;
+	using std::fmin;
 	using std::sqrt;
 
 	for (auto& momentum : p)
@@ -942,8 +944,12 @@ void lusifer_psg<T>::generate(
 			-tinv.tmax,
 			-tinv.tmin
 		);
+
 		T cos_theta = ((s + s1 - s2) * (s + t1 - t2) - T(2.0) * s *
 			(t1 + s1 - t)) / (tinv.lambdas * tinv.lambdat);
+
+		// make sure the cosine is within the proper bounds
+		cos_theta = fmax(T(-1.0), fmin(cos_theta, T(1.0)));
 
 		auto& p1 = p[process.out1];
 
