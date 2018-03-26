@@ -1,4 +1,5 @@
 #include "hep/ps/parton_dfs.hpp"
+#include "hep/ps/suppress_banners.hpp"
 
 #include <LHAPDF/PDF.h>
 
@@ -24,12 +25,22 @@ public:
 template <typename T>
 parton_dfs<T>::impl::impl(std::string const& pdf_name, std::size_t pdf_member)
 {
+	if (suppress_banners())
+	{
+		LHAPDF::setVerbosity(0);
+	}
+
 	pdfs.emplace_back(LHAPDF::mkPDF(pdf_name, pdf_member));
 }
 
 template <typename T>
 parton_dfs<T>::impl::impl(std::string const& pdf_name)
 {
+	if (suppress_banners())
+	{
+		LHAPDF::setVerbosity(0);
+	}
+
 	for (auto pdf : LHAPDF::mkPDFs(pdf_name))
 	{
 		pdfs.emplace_back(pdf);

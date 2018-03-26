@@ -1,4 +1,5 @@
 #include "hep/ps/ol_interface.hpp"
+#include "hep/ps/suppress_banners.hpp"
 
 #include "config.hpp"
 
@@ -50,6 +51,11 @@ bool ol_interface::enabled()
 ol_interface::ol_interface()
 {
 #ifdef HAVE_OPENLOOPS
+	if (suppress_banners())
+	{
+		ol_setparameter_int("nosplash", 1);
+	}
+
 	ol_start();
 #endif
 }

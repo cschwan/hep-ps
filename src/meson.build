@@ -50,7 +50,7 @@ sources = [
 	'propagator.cpp',
 	'rambo_phase_space_generator.cpp',
 	'static_scale_function.cpp',
-	'silence_third_party_libs.cpp',
+	'suppress_banners.cpp',
 	'trivial_cutter.cpp',
 	'trivial_recombiner.cpp',
 	'vertex.cpp'

@@ -1,9 +1,9 @@
-#ifndef HEP_PS_SILENCE_THIRD_PARTY_LIBS_HPP
-#define HEP_PS_SILENCE_THIRD_PARTY_LIBS_HPP
+#ifndef HEP_PS_SUPRESS_BANNERS_HPP
+#define HEP_PS_SUPRESS_BANNERS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,13 @@
 namespace hep
 {
 
-/// Prevents third-party libraries, e.g. libraries used for pdf evaluation, from
-/// printing their banners. This is useful if multiple processes are started and
-/// only one of them should print banners.
-void silence_third_party_libs();
+/// Prevents all third-party libraries used by `hep-ps` from printing their
+/// banners. This is useful if many processes are started and only one of them
+/// should print banners.
+void suppress_banners(bool suppress);
+
+/// Returns `true` if third-party libraries should be silenced.
+bool& suppress_banners();
 
 }
 
