@@ -105,7 +105,9 @@ void ol_interface::getparameter_double(char const* param, double* val)
 int ol_interface::register_process(char const* process, int amptype)
 {
 #ifdef HAVE_OPENLOOPS
-	ol_register_process(process, amptype);
+	return ol_register_process(process, amptype);
+#else
+	return -1;
 #endif
 }
 
