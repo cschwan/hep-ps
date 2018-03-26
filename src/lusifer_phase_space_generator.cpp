@@ -320,27 +320,81 @@ tinv<T> calc_tinv(T s, T s1, T s2, T t1, T t2)
 	using std::fabs;
 	using std::sqrt;
 
+	T const threshold = T(1e-5);
+
+	std::size_t const non_zero_invariants =
+		((s1 == T{}) ? 0 : 1) | ((s2 == T{}) ? 0 : 2) |
+		((t1 == T{}) ? 0 : 4) | ((t2 == T{}) ? 0 : 8);
+
 	T const lambdas = hep::sqrt_kaellen(s, s1, s2);
 	T const lambdat = hep::sqrt_kaellen(s, t1, t2);
 
-	T const tmp = (s + s1 - s2) * (s + t1 - t2);
-	T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
-	T       tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
+	T tmin = T{};
+	T tmax = T{};
 
-	// if the value is obviously wrong, we try another approach
-	if (tmax > T{})
+	T const x = s - s1 - s2;
+	T const y = s - t1 - t2;
+	T const e1 = s1 * s2 / (x * x);
+	T const e2 = t1 * t2 / (y * y);
+
+	switch (non_zero_invariants)
 	{
-		T const x = s - t1 - t2;
-		T const y = s - s1 - s2;
-		T const eps2 = t1 * t2 / (x * x);
-		T const epsp2 = s1 * s2 / (y * y);
+	case 1: // s2 = t1 = t2 = 0
+	case 2: // s1 = t1 = t2 = 0
+		tmin = -lambdas;
+		// tmax is zero
+		break;
 
-		// the following expansion is valid for large s (for small eps and epsp)
-		tmax = ((t2 * s1 + t1 * s2) - (x * y * (eps2 + epsp2 + (eps2 - epsp2) *
-			(eps2 - epsp2)))) / s;
+	case 3: // t1 = t2 = 0
+		tmin = T(-0.5) * x * (T(1.0) + sqrt(fabs(T(1.0) - T(4.0) * e1)));
+		tmax = T(-0.5) * x * (T(1.0) - sqrt(fabs(T(1.0) - T(4.0) * e1)));
+		// TODO: separate code path for small e1
+		break;
+
+	case 4: // s1 = s2 = t2 = 0
+	case 8: // s1 = s2 = t1 = 0
+		tmin = -lambdat;
+		// tmax is zero
+		break;
+
+	case 5: // s2 = t2 = 0
+		tmin = -s + s1 + t1 - s1 * t1 / s;
+		// tmax is zero
+		break;
+
+	case 6: // s1 = t2 = 0
+		tmin = -s + s2 + t1;
+		tmax = s2 * t1 / s;
+		break;
+
+	case 9: // s2 = t1 = 0
+		tmin = -s + s1 + t2;
+		tmax = s1 * t2 / s;
+		break;
+
+	case 10: // s1 = t1 = 0
+		tmin = -s + s2 + t2 - s2 * t2 / s;
+		// tmax is zero
+		break;
+
+	case 12: // s1 = s2 = 0
+		tmin = T(-0.5) * y * (T(1.0) + sqrt(fabs(T(1.0) - T(4.0) * e2)));
+		tmax = T(-0.5) * y * (T(1.0) - sqrt(fabs(T(1.0) - T(4.0) * e2)));
+		// TODO: separate code path for small e2
+		break;
+
+	default:
+		T tmp = (s + s1 - s2) * (s + t1 - t2);
+		tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
+		tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
+
+		if ((e1 < threshold) && (e2 < threshold))
+		{
+			// TODO: add order six terms?
+			tmax = ((t2 * s1 + t1 * s2) - (x * y * (e1 + e2 + (e1 - e2) *
+				(e1 - e2)))) / s;
+		}
 	}
-
-	assert( tmax > tmin );
 
 	return { tmin, tmax, lambdas, lambdat };
 }
