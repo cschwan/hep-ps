@@ -71,8 +71,35 @@ T kaellen(T x, T y, T z)
 	return (x - y - z) * (x - y - z) - T(4.0) * y * z;
 }
 
+template <typename T>
+T sqrt_kaellen(T x, T y, T z)
+{
+	using std::fabs;
+	using std::sqrt;
+
+	if (x == T{})
+	{
+		return fabs(y + z);
+	}
+	else if (y == T{})
+	{
+		return fabs(x - z);
+	}
+	else if (z == T{})
+	{
+		return fabs(x - y);
+	}
+
+	T const diff = fabs(x - y - z);
+	T const arg = T(4.0) * y * z / (diff * diff);
+	T const result = diff * sqrt(fabs(T(1.0) - arg));
+
+	return result;
+}
+
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template double kaellen(double, double, double);
+template double sqrt_kaellen(double, double, double);
 
 }

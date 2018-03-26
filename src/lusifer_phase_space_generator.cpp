@@ -294,8 +294,8 @@ tinv<T> calc_tinv(T s, T s1, T s2, T t1, T t2)
 	using std::fabs;
 	using std::sqrt;
 
-	T const lambdas = sqrt(fabs(hep::kaellen(s, s1, s2)));
-	T const lambdat = sqrt(fabs(hep::kaellen(s, t1, t2)));
+	T const lambdas = hep::sqrt_kaellen(s, s1, s2);
+	T const lambdat = hep::sqrt_kaellen(s, t1, t2);
 
 	T const tmp = (s + s1 - s2) * (s + t1 - t2);
 	T const tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
@@ -708,7 +708,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
 		T const s2 = this->s[decay.out2];
 
 		T const jacobian = T(2.0) * s / (acos(T(-1.0)) *
-			sqrt(fabs(hep::kaellen(s, s1, s2))));
+			hep::sqrt_kaellen(s, s1, s2));
 
 		decay_jacobians.push_back(jacobian);
 	}
@@ -920,7 +920,7 @@ void lusifer_psg<T>::generate(
 		T const sqrts = sqrt(s);
 
 		p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
-			T(0.5) * sqrt(fabs(hep::kaellen(s, s1, s2))) / sqrts };
+			T(0.5) * hep::sqrt_kaellen(s, s1, s2) / sqrts };
 
 		T const phi = T(2.0) * acos(T(-1.0)) * *r++;
 		T const cos_theta = T(2.0) * *r++ - T(1.0);

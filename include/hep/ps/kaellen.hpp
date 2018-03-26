@@ -27,6 +27,10 @@ namespace hep
 template <typename T>
 T kaellen(T x, T y, T z);
 
+/// Calculates the square root of the Källén function.
+template <typename T>
+T sqrt_kaellen(T x, T y, T z);
+
 }
 
 #endif
