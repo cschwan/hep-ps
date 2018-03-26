@@ -849,10 +849,12 @@ void lusifer_psg<T>::generate(
 		T const s2 = this->s[process.out2];
 		T const t1 = this->s[process.in1];
 		T const t2 = this->s[process.in2];
+		T& t = this->s[process.virt];
 
 		auto const& tinv = calc_tinv(s, s1, s2, t1, t2);
 		T phi = T(2.0) * acos(T(-1.0)) * *r++;
-		T const h = map(
+
+		t = -map(
 			 particle_infos.at(process.idhep).power,
 			-particle_infos.at(process.idhep).mass,
 			 particle_infos.at(process.idhep).width,
@@ -861,7 +863,7 @@ void lusifer_psg<T>::generate(
 			-tinv.tmin
 		);
 		T cos_theta = ((s + s1 - s2) * (s + t1 - t2) - T(2.0) * s *
-			(t1 + s1 + h)) / (tinv.lambdas * tinv.lambdat);
+			(t1 + s1 - t)) / (tinv.lambdas * tinv.lambdat);
 
 		auto& p1 = p[process.out1];
 
@@ -906,9 +908,6 @@ void lusifer_psg<T>::generate(
 
 		auto& qt = p[process.virt];
 		qt = { q1[0] - p1[0], q1[1] - p1[1], q1[2] - p1[2], q1[3] - p1[3] };
-
-		T& t = this->s[process.virt];
-		t = qt[0] * qt[0] - qt[1] * qt[1] - qt[2] * qt[2] - qt[3] * qt[3];
 	}
 
 	for (auto const& decay : channels_[channel].decays)
