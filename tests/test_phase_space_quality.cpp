@@ -200,12 +200,6 @@ TEST_CASE("Lusifer 1 TeV VBS Real QCD PS Quality", "[]")
 
 	run_phase_space_generator(psg.get(), mc_histogram, os_histogram, 8);
 
-
-
-
-
-
-
 	CHECK( mc_histogram.at( 0) == 0 );
 	CHECK( mc_histogram.at( 1) == 0 );
 	CHECK( mc_histogram.at( 2) == 0 );
@@ -218,12 +212,12 @@ TEST_CASE("Lusifer 1 TeV VBS Real QCD PS Quality", "[]")
 	CHECK( mc_histogram.at( 9) == 0 );
 	CHECK( mc_histogram.at(10) == 0 );
 	CHECK( mc_histogram.at(11) == 0 );
-	CHECK( mc_histogram.at(12) == 1053  );
-	CHECK( mc_histogram.at(13) == 31250 );
-	CHECK( mc_histogram.at(14) == 43143 );
-	CHECK( mc_histogram.at(15) == 16797 );
-	CHECK( mc_histogram.at(16) == 115 );
-	CHECK( mc_histogram.at(17) == 1 );
+	CHECK( mc_histogram.at(12) == 1045 );
+	CHECK( mc_histogram.at(13) == 31180 );
+	CHECK( mc_histogram.at(14) == 43130 );
+	CHECK( mc_histogram.at(15) == 16895 );
+	CHECK( mc_histogram.at(16) == 139 );
+	CHECK( mc_histogram.at(17) == 0 );
 	CHECK( mc_histogram.at(18) == 0 );
 	CHECK( mc_histogram.at(19) == 0 );
 	CHECK( mc_histogram.at(20) == 0 );
@@ -235,7 +229,7 @@ TEST_CASE("Lusifer 1 TeV VBS Real QCD PS Quality", "[]")
 	CHECK( mc_histogram.at(26) == 0 );
 	CHECK( mc_histogram.at(27) == 0 );
 	CHECK( mc_histogram.at(28) == 0 );
-	CHECK( mc_histogram.at(29) == 641 );
+	CHECK( mc_histogram.at(29) == 611 );
 
 	CHECK( os_histogram.at( 0) == 0 );
 	CHECK( os_histogram.at( 1) == 0 );
@@ -246,27 +240,27 @@ TEST_CASE("Lusifer 1 TeV VBS Real QCD PS Quality", "[]")
 	CHECK( os_histogram.at( 6) == 0 );
 	CHECK( os_histogram.at( 7) == 0 );
 	CHECK( os_histogram.at( 8) == 0 );
-	CHECK( os_histogram.at( 9) == 326 );
-	CHECK( os_histogram.at(10) == 21765 );
-	CHECK( os_histogram.at(11) == 86471 );
-	CHECK( os_histogram.at(12) == 117521 );
-	CHECK( os_histogram.at(13) == 95894 );
-	CHECK( os_histogram.at(14) == 86077 );
-	CHECK( os_histogram.at(15) == 54122 );
-	CHECK( os_histogram.at(16) == 28603 );
-	CHECK( os_histogram.at(17) == 15129 );
-	CHECK( os_histogram.at(18) == 9599 );
-	CHECK( os_histogram.at(19) == 4603 );
-	CHECK( os_histogram.at(20) == 2066 );
-	CHECK( os_histogram.at(21) == 990 );
-	CHECK( os_histogram.at(22) == 425 );
-	CHECK( os_histogram.at(23) == 189 );
-	CHECK( os_histogram.at(24) == 70 );
+	CHECK( os_histogram.at( 9) == 312 );
+	CHECK( os_histogram.at(10) == 21823 );
+	CHECK( os_histogram.at(11) == 86032 );
+	CHECK( os_histogram.at(12) == 117726 );
+	CHECK( os_histogram.at(13) == 96545 );
+	CHECK( os_histogram.at(14) == 85627 );
+	CHECK( os_histogram.at(15) == 54535 );
+	CHECK( os_histogram.at(16) == 28179 );
+	CHECK( os_histogram.at(17) == 15292 );
+	CHECK( os_histogram.at(18) == 9431 );
+	CHECK( os_histogram.at(19) == 4527 );
+	CHECK( os_histogram.at(20) == 2103 );
+	CHECK( os_histogram.at(21) == 1020 );
+	CHECK( os_histogram.at(22) == 418 );
+	CHECK( os_histogram.at(23) == 201 );
+	CHECK( os_histogram.at(24) == 78 );
 	CHECK( os_histogram.at(25) == 20 );
 	CHECK( os_histogram.at(26) == 0 );
 	CHECK( os_histogram.at(27) == 0 );
 	CHECK( os_histogram.at(28) == 0 );
-	CHECK( os_histogram.at(29) == 220130 );
+	CHECK( os_histogram.at(29) == 220131 );
 }
 
 TEST_CASE("Lusifer 100 TeV VBS Real QCD PS Quality", "[]")
@@ -296,13 +290,13 @@ TEST_CASE("Lusifer 100 TeV VBS Real QCD PS Quality", "[]")
 	CHECK( mc_histogram.at( 7) == 0 );
 	CHECK( mc_histogram.at( 8) == 0 );
 	CHECK( mc_histogram.at( 9) == 0 );
-	CHECK( mc_histogram.at(10) == 606 );
-	CHECK( mc_histogram.at(11) == 15189 );
-	CHECK( mc_histogram.at(12) == 23448 );
-	CHECK( mc_histogram.at(13) == 21544 );
-	CHECK( mc_histogram.at(14) == 22553 );
-	CHECK( mc_histogram.at(15) == 8147 );
-	CHECK( mc_histogram.at(16) == 80 );
+	CHECK( mc_histogram.at(10) == 607 );
+	CHECK( mc_histogram.at(11) == 15185 );
+	CHECK( mc_histogram.at(12) == 23508 );
+	CHECK( mc_histogram.at(13) == 21524 );
+	CHECK( mc_histogram.at(14) == 22522 );
+	CHECK( mc_histogram.at(15) == 8182 );
+	CHECK( mc_histogram.at(16) == 73 );
 	CHECK( mc_histogram.at(17) == 0 );
 	CHECK( mc_histogram.at(18) == 0 );
 	CHECK( mc_histogram.at(19) == 0 );
@@ -315,36 +309,36 @@ TEST_CASE("Lusifer 100 TeV VBS Real QCD PS Quality", "[]")
 	CHECK( mc_histogram.at(26) == 0 );
 	CHECK( mc_histogram.at(27) == 0 );
 	CHECK( mc_histogram.at(28) == 0 );
-	CHECK( mc_histogram.at(29) == 1433 );
+	CHECK( mc_histogram.at(29) == 1399 );
 
 	CHECK( os_histogram.at( 0) == 0 );
 	CHECK( os_histogram.at( 1) == 0 );
 	CHECK( os_histogram.at( 2) == 0 );
 	CHECK( os_histogram.at( 3) == 0 );
 	CHECK( os_histogram.at( 4) == 0 );
-	CHECK( os_histogram.at( 5) == 192 );
-	CHECK( os_histogram.at( 6) == 12542 );
-	CHECK( os_histogram.at( 7) == 35009 );
-	CHECK( os_histogram.at( 8) == 46606 );
-	CHECK( os_histogram.at( 9) == 59737 );
-	CHECK( os_histogram.at(10) == 59042 );
-	CHECK( os_histogram.at(11) == 69579 );
-	CHECK( os_histogram.at(12) == 68445 );
-	CHECK( os_histogram.at(13) == 51835 );
-	CHECK( os_histogram.at(14) == 44407 );
-	CHECK( os_histogram.at(15) == 27207 );
-	CHECK( os_histogram.at(16) == 15075 );
-	CHECK( os_histogram.at(17) == 8196 );
-	CHECK( os_histogram.at(18) == 5222 );
-	CHECK( os_histogram.at(19) == 2430 );
-	CHECK( os_histogram.at(20) == 1202 );
-	CHECK( os_histogram.at(21) == 430 );
-	CHECK( os_histogram.at(22) == 288 );
-	CHECK( os_histogram.at(23) == 94 );
-	CHECK( os_histogram.at(24) == 23 );
+	CHECK( os_histogram.at( 5) == 203 );
+	CHECK( os_histogram.at( 6) == 12503 );
+	CHECK( os_histogram.at( 7) == 34772 );
+	CHECK( os_histogram.at( 8) == 46744 );
+	CHECK( os_histogram.at( 9) == 59963 );
+	CHECK( os_histogram.at(10) == 59097 );
+	CHECK( os_histogram.at(11) == 69217 );
+	CHECK( os_histogram.at(12) == 68662 );
+	CHECK( os_histogram.at(13) == 52037 );
+	CHECK( os_histogram.at(14) == 43881 );
+	CHECK( os_histogram.at(15) == 27705 );
+	CHECK( os_histogram.at(16) == 15019 );
+	CHECK( os_histogram.at(17) == 8149 );
+	CHECK( os_histogram.at(18) == 5157 );
+	CHECK( os_histogram.at(19) == 2486 );
+	CHECK( os_histogram.at(20) == 1140 );
+	CHECK( os_histogram.at(21) == 441 );
+	CHECK( os_histogram.at(22) == 258 );
+	CHECK( os_histogram.at(23) == 100 );
+	CHECK( os_histogram.at(24) == 18 );
 	CHECK( os_histogram.at(25) == 0 );
 	CHECK( os_histogram.at(26) == 0 );
 	CHECK( os_histogram.at(27) == 0 );
 	CHECK( os_histogram.at(28) == 0 );
-	CHECK( os_histogram.at(29) == 236439 );
+	CHECK( os_histogram.at(29) == 236448 );
 }

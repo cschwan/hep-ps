@@ -213,31 +213,57 @@ T map(T power, T mass, T width, T x, T xmin, T xmax)
 
 	T m2 = copysign(mass * mass, mass);
 	mass = fabs(mass);
+	T result;
 
 	if (width > T())
 	{
 		T const mg = mass * width;
-		T const min = atan((xmin - m2) / mg);
-		T const max = atan((xmax - m2) / mg);
+		T const min = (xmin - m2) / mg;
+		T const max = (xmax - m2) / mg;
 
-		return m2 + mg * tan(x * (max - min) + min);
+		// formula for the difference of two arctans
+		T max_min = atan((xmax - xmin) / mg / (T(1.0) + max * min));
+
+		if (min * max < T(-1.0))
+		{
+			max_min += (max > T()) ? acos(T(-1.0)) : -acos(T(-1.0));
+		}
+
+		result = m2 + mg * tan(x * max_min + atan(min));
 	}
-
-	if (power == T())
+	else if (power == T())
 	{
-		return x * xmax + (T(1.0) - x) * xmin;
-	}
+		result = x * xmax + (T(1.0) - x) * xmin;
 
-	if (power == T(1.0))
+		// capture this case and return to avoid infinite recursion
+		if ((result < xmin) || (result > xmax))
+		{
+			// returning the upper bound produces the least problems
+			return xmax;
+		}
+	}
+	else if (power == T(1.0))
 	{
 		// TODO: WARNING this branch is untested!
-		return m2 + exp(x * log(xmax - m2) + (T(1.0) - x) * log(xmin - m2));
+		result = m2 + exp(x * log(xmax - m2) + (T(1.0) - x) * log(xmin - m2));
+	}
+	else
+	{
+		T const omp = T(1.0) - power;
+
+		result = m2 + pow(x * pow(fabs(xmax - m2), omp) + (T(1.0) - x) *
+			pow(fabs(xmin - m2), omp), T(1.0) / omp);
 	}
 
-	T const omp = T(1.0) - power;
+	// if the result is outside of the expected interval, calculate it linearly;
+	// this will only happen if `xmax` is ridiculously small or if `xmin` is
+	// close to `xmax`, in which case it is a valid approximation
+	if ((result < xmin) || (result > xmax))
+	{
+		return map(T{}, T{}, T{}, x, xmin, xmax);
+	}
 
-	return m2 + pow(x * pow(xmax - m2, omp) + (T(1.0) - x) *
-		pow(xmin - m2, omp), T(1.0) / omp);
+	return result;
 }
 
 template <typename T>
