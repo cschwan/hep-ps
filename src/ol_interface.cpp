@@ -142,7 +142,7 @@ int ol_interface::register_process(char const* process, int amptype)
 int ol_interface::n_external(int id)
 {
 #ifdef HAVE_OPENLOOPS
-	ol_n_external(id);
+	return ol_n_external(id);
 #else
 	ignore(id);
 
