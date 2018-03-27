@@ -98,10 +98,6 @@ void p_type_photon_parton_recombiner<T>::recombine(
 			dib_photons_.begin(),
 			dib_photons_.end()
 		);
-		std::size_t const min_ib_photon = std::distance(
-			dib_photons_.begin(),
-			min_dib_photon
-		);
 
 		T min_dij = std::numeric_limits<T>::max();
 		std::size_t min_i = 0;

@@ -116,6 +116,12 @@ constexpr parton state_parton_one(initial_state state)
 	case initial_state::sb_cb:
 	case initial_state::sb_dq:
 		return parton::anti_strange;
+
+#if __GNUC__ > 5
+	default:
+		// if this happens, we didn't cover all the cases
+		throw 0;
+#endif
 	}
 }
 
@@ -171,6 +177,12 @@ constexpr parton state_parton_two(initial_state state)
 	case initial_state::q23_cg:
 	case initial_state::q13_sg:
 		return parton::gluon;
+
+#if __GNUC__ > 5
+	default:
+		// if this happens, we didn't cover all the cases
+		throw 0;
+#endif
 	}
 }
 

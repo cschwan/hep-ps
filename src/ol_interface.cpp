@@ -30,6 +30,16 @@ void ol_evaluate_full(int id, double* pp, double* m2tree, double* m2loop, double
 }
 #endif
 
+namespace
+{
+
+template <typename T>
+void ignore(T const&)
+{
+}
+
+}
+
 namespace hep
 {
 
@@ -71,6 +81,9 @@ void ol_interface::setparameter_int(char const* param, int val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_setparameter_int(param, val);
+#else
+	ignore(param);
+	ignore(val);
 #endif
 }
 
@@ -78,6 +91,9 @@ void ol_interface::setparameter_double(char const* param, double val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_setparameter_double(param, val);
+#else
+	ignore(param);
+	ignore(val);
 #endif
 }
 
@@ -85,6 +101,9 @@ void ol_interface::setparameter_string(char const* param, char* val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_setparameter_string(param, val);
+#else
+	ignore(param);
+	ignore(val);
 #endif
 }
 
@@ -92,6 +111,9 @@ void ol_interface::getparameter_int(char const* param, int* val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_getparameter_int(param, val);
+#else
+	ignore(param);
+	ignore(val);
 #endif
 }
 
@@ -99,6 +121,9 @@ void ol_interface::getparameter_double(char const* param, double* val)
 {
 #ifdef HAVE_OPENLOOPS
 	ol_getparameter_double(param, val);
+#else
+	ignore(param);
+	ignore(val);
 #endif
 }
 
@@ -107,6 +132,9 @@ int ol_interface::register_process(char const* process, int amptype)
 #ifdef HAVE_OPENLOOPS
 	return ol_register_process(process, amptype);
 #else
+	ignore(process);
+	ignore(amptype);
+
 	return -1;
 #endif
 }
@@ -116,6 +144,8 @@ int ol_interface::n_external(int id)
 #ifdef HAVE_OPENLOOPS
 	ol_n_external(id);
 #else
+	ignore(id);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
@@ -125,6 +155,10 @@ void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_tree(id, pp, m2tree);
 #else
+	ignore(id);
+	ignore(pp);
+	ignore(m2tree);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
@@ -139,6 +173,12 @@ void ol_interface::evaluate_cc(
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
 #else
+	ignore(id);
+	ignore(pp);
+	ignore(m2tree);
+	ignore(m2cc);
+	ignore(m2ew);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
@@ -153,6 +193,12 @@ void ol_interface::evaluate_sc(
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
 #else
+	ignore(id);
+	ignore(pp);
+	ignore(emitter);
+	ignore(polvect);
+	ignore(m2sc);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
@@ -167,6 +213,12 @@ void ol_interface::evaluate_loop(
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_loop(id, pp, m2tree, m2loop, acc);
 #else
+	ignore(id);
+	ignore(pp);
+	ignore(m2tree);
+	ignore(m2loop);
+	ignore(acc);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
@@ -180,6 +232,11 @@ void ol_interface::evaluate_loop2(
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_loop2(id, pp, m2loop2, acc);
 #else
+	ignore(id);
+	ignore(pp);
+	ignore(m2loop2);
+	ignore(acc);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
@@ -193,6 +250,11 @@ void ol_interface::evaluate_ct(
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_ct(id, pp, m2_tree, m2_ct);
 #else
+	ignore(id);
+	ignore(pp);
+	ignore(m2_tree);
+	ignore(m2_ct);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
@@ -210,6 +272,15 @@ void ol_interface::evaluate_full(
 #ifdef HAVE_OPENLOOPS
 	ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
 #else
+	ignore(id);
+	ignore(pp);
+	ignore(m2tree);
+	ignore(m2loop);
+	ignore(m2ir1);
+	ignore(m2loop2);
+	ignore(m2ir2);
+	ignore(acc);
+
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }

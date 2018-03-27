@@ -70,10 +70,10 @@ public:
 	}
 
 	void insertion_terms2(
-		hep::insertion_term const& term,
-		std::vector<hep::scales<T>> const& scales,
+		hep::insertion_term const& /*term*/,
+		std::vector<hep::scales<T>> const& /*scales*/,
 		std::vector<T> const& /*phase_space*/,
-		std::vector<T>& results
+		std::vector<T>& /*results*/
 	) const {
 		// TODO: test this call
 	}

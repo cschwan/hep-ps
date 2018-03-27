@@ -58,6 +58,12 @@ constexpr parton_type parton_type_of(parton p)
 
 	case photon:
 		return parton_type::photon_;
+
+#if __GNUC__ > 5
+	default:
+		// if this happens, we didn't cover all the cases
+		throw 0;
+#endif
 	}
 }
 

@@ -99,7 +99,7 @@ std::size_t ol_ioperator<T>::alphas_power() const
 template <typename T>
 void ol_ioperator<T>::borns(
 	std::vector<T> const& phase_space,
-	initial_state_set set,
+	initial_state_set /*set*/,
 	std::vector<scales<T>> const& scales,
 	std::vector<initial_state_array<T>>& results
 ) {
