@@ -1,4 +1,4 @@
-libcatch = static_library(
+libcatch = shared_library(
 	'catch',
 	'catch.hpp',
 	'catch.cpp'
