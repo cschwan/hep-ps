@@ -58,11 +58,13 @@ void test_observables_real(
 
 	if (inclusive)
 	{
-		CHECK( result.front().value() == T(6.3165579739733147e-11) );
+		CHECK_THAT( result.front().value() ,
+			Catch::WithinULP(T(6.3165579739733147e-11), 5) );
 	}
 	else
 	{
-		CHECK( result.front().value() == T(-6.3165579739733147e-11) );
+		CHECK_THAT( result.front().value() ,
+			Catch::WithinULP(T(-6.3165579739733147e-11), 5) );
 	}
 }
 

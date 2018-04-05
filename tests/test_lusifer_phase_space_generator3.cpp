@@ -4642,7 +4642,8 @@ TEST_CASE("numerical densities", "[lusifer_phase_space_generator]")
 		{
 			CAPTURE( j );
 
-			CHECK( d.at(j) == densities.at(channel).at(j) );
+			CHECK_THAT( d.at(j) ,
+				Catch::WithinULP(densities.at(channel).at(j), 5) );
 		}
 	}
 }

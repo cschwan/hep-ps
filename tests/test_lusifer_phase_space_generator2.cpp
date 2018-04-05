@@ -1752,7 +1752,8 @@ TEST_CASE("numerical momenta", "[lusifer_phase_space_generator]")
 		{
 			CAPTURE( j );
 
-			CHECK( p.at(j) == momenta.at(channel).at(j) );
+			CHECK_THAT( p.at(j) ,
+				Catch::WithinULP(momenta.at(channel).at(j), 5) );
 		}
 	}
 }

@@ -52,7 +52,8 @@ void test_trivial_cutter_and_recombiner(
 		std::vector<std::size_t>{1}
 	);
 
-	CHECK( result.front().value() == T(0.0015980493564892501) );
+	CHECK_THAT( result.front().value() ,
+		Catch::WithinULP(T(0.0015980493564892501), 5) );
 }
 
 TEST_CASE("check trivial cutter and recombiner",

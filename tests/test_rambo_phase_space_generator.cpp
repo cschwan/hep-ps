@@ -90,10 +90,10 @@ TEST_CASE("numerical momenta", "[rambo_phase_space_generator]")
 
 	for (std::size_t j = 0; j != momenta.size(); ++j)
 	{
-		CHECK( p.at(j) == momenta.at(j) );
+		CHECK_THAT( p.at(j) , Catch::WithinULP(momenta.at(j), 5) );
 	}
 
 	psg->densities(d);
 
-	CHECK( d.front() == densities.front() );
+	CHECK_THAT( d.front() , Catch::WithinULP(densities.front(), 5) );
 }
