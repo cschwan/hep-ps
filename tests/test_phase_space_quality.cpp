@@ -20,7 +20,7 @@ hep::lusifer_constants<T> constants(
 	T(91.1876), T(2.4952)
 );
 
-std::size_t histogram(T value, std::vector<std::size_t>& histogram)
+void histogram(T value, std::vector<std::size_t>& histogram)
 {
 	using std::fabs;
 	using std::pow;
@@ -31,20 +31,17 @@ std::size_t histogram(T value, std::vector<std::size_t>& histogram)
 		{
 			++histogram.at(power);
 
-			return power;
+			return;
 		}
 	}
 
 	++histogram.front();
-
-	return 0;
 }
 
 void run_phase_space_generator(
 	hep::phase_space_generator<T>* psg,
 	std::vector<std::size_t>& mc_histogram,
-	std::vector<std::size_t>& os_histogram,
-	std::size_t precision
+	std::vector<std::size_t>& os_histogram
 ) {
 	std::mt19937 rng;
 	std::vector<T> random_numbers(psg->dimensions());
@@ -76,15 +73,12 @@ void run_phase_space_generator(
 				sums.at(3) += sign * p.at(4 * particle + 3);
 			}
 
-			CAPTURE( i );
-			CAPTURE( channel );
-
 			// pick the largest absolute value
 			T const value = *std::max_element(sums.begin(), sums.end(),
 				[](T one, T two) { return fabs(one) < fabs(two); });
 
 			// check momentum conservation
-			CHECK( histogram(value, mc_histogram) > precision );
+			histogram(value, mc_histogram);
 
 			for (std::size_t particle = 0; particle != particles; ++particle)
 			{
@@ -94,10 +88,7 @@ void run_phase_space_generator(
 					p.at(4 * particle + 2) * p.at(4 * particle + 2) -
 					p.at(4 * particle + 3) * p.at(4 * particle + 3);
 
-				CAPTURE( particle );
-
-				// check on-shellness
-				CHECK( histogram(invariant, os_histogram) > precision );
+				histogram(invariant, os_histogram);
 			}
 		}
 	}
@@ -118,69 +109,20 @@ TEST_CASE("Cofferaa 1 TeV VBS Real QCD PS Quality", "[]")
 	std::vector<std::size_t> mc_histogram(30);
 	std::vector<std::size_t> os_histogram(30);
 
-	run_phase_space_generator(psg.get(), mc_histogram, os_histogram, 9);
+	std::vector<std::size_t> reference_mc = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18087, 184728, 206748, 45555, 127,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 755
+	};
+	std::vector<std::size_t> reference_os = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25071, 180500, 573990, 432003, 406643,
+		368135, 240630, 152021, 114142, 62151, 33942, 20295, 8343, 4387, 2081,
+		864, 177, 13, 0, 1478612
+	};
 
-	CHECK( mc_histogram.at( 0) == 0 );
-	CHECK( mc_histogram.at( 1) == 0 );
-	CHECK( mc_histogram.at( 2) == 0 );
-	CHECK( mc_histogram.at( 3) == 0 );
-	CHECK( mc_histogram.at( 4) == 0 );
-	CHECK( mc_histogram.at( 5) == 0 );
-	CHECK( mc_histogram.at( 6) == 0 );
-	CHECK( mc_histogram.at( 7) == 0 );
-	CHECK( mc_histogram.at( 8) == 0 );
-	CHECK( mc_histogram.at( 9) == 0 );
-	CHECK( mc_histogram.at(10) == 0 );
-	CHECK( mc_histogram.at(11) == 0 );
-	CHECK( mc_histogram.at(12) == 18087 );
-	CHECK( mc_histogram.at(13) == 184728 );
-	CHECK( mc_histogram.at(14) == 206748 );
-	CHECK( mc_histogram.at(15) == 45555 );
-	CHECK( mc_histogram.at(16) == 127 );
-	CHECK( mc_histogram.at(17) == 0 );
-	CHECK( mc_histogram.at(18) == 0 );
-	CHECK( mc_histogram.at(19) == 0 );
-	CHECK( mc_histogram.at(20) == 0 );
-	CHECK( mc_histogram.at(21) == 0 );
-	CHECK( mc_histogram.at(22) == 0 );
-	CHECK( mc_histogram.at(23) == 0 );
-	CHECK( mc_histogram.at(24) == 0 );
-	CHECK( mc_histogram.at(25) == 0 );
-	CHECK( mc_histogram.at(26) == 0 );
-	CHECK( mc_histogram.at(27) == 0 );
-	CHECK( mc_histogram.at(28) == 0 );
-	CHECK( mc_histogram.at(29) == 755 );
+	run_phase_space_generator(psg.get(), mc_histogram, os_histogram);
 
-	CHECK( os_histogram.at( 0) == 0 );
-	CHECK( os_histogram.at( 1) == 0 );
-	CHECK( os_histogram.at( 2) == 0 );
-	CHECK( os_histogram.at( 3) == 0 );
-	CHECK( os_histogram.at( 4) == 0 );
-	CHECK( os_histogram.at( 5) == 0 );
-	CHECK( os_histogram.at( 6) == 0 );
-	CHECK( os_histogram.at( 7) == 0 );
-	CHECK( os_histogram.at( 8) == 0 );
-	CHECK( os_histogram.at( 9) == 0 );
-	CHECK( os_histogram.at(10) == 25071 );
-	CHECK( os_histogram.at(11) == 180500 );
-	CHECK( os_histogram.at(12) == 573990 );
-	CHECK( os_histogram.at(13) == 432003 );
-	CHECK( os_histogram.at(14) == 406643 );
-	CHECK( os_histogram.at(15) == 368135 );
-	CHECK( os_histogram.at(16) == 240630 );
-	CHECK( os_histogram.at(17) == 152021 );
-	CHECK( os_histogram.at(18) == 114142 );
-	CHECK( os_histogram.at(19) == 62151 );
-	CHECK( os_histogram.at(20) == 33942 );
-	CHECK( os_histogram.at(21) == 20295 );
-	CHECK( os_histogram.at(22) == 8343 );
-	CHECK( os_histogram.at(23) == 4387 );
-	CHECK( os_histogram.at(24) == 2081 );
-	CHECK( os_histogram.at(25) == 864 );
-	CHECK( os_histogram.at(26) == 177 );
-	CHECK( os_histogram.at(27) == 13 );
-	CHECK( os_histogram.at(28) == 0 );
-	CHECK( os_histogram.at(29) == 1478612 );
+	CHECK_THAT( mc_histogram , Catch::Equals(reference_mc) );
+	CHECK_THAT( os_histogram , Catch::Equals(reference_os) );
 }
 
 TEST_CASE("Lusifer 1 TeV VBS Real QCD PS Quality", "[]")
@@ -198,69 +140,20 @@ TEST_CASE("Lusifer 1 TeV VBS Real QCD PS Quality", "[]")
 	std::vector<std::size_t> mc_histogram(30);
 	std::vector<std::size_t> os_histogram(30);
 
-	run_phase_space_generator(psg.get(), mc_histogram, os_histogram, 8);
+	std::vector<std::size_t> reference_mc = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1033, 31209, 43103, 16900, 130, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 625
+	};
+	std::vector<std::size_t> reference_os = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 344, 21672, 86042, 117614, 96461, 85921,
+		54567, 28165, 15260, 9459, 4505, 2110, 1022, 416, 198, 77, 18, 0, 0, 0,
+		220149
+	};
 
-	CHECK( mc_histogram.at( 0) == 0 );
-	CHECK( mc_histogram.at( 1) == 0 );
-	CHECK( mc_histogram.at( 2) == 0 );
-	CHECK( mc_histogram.at( 3) == 0 );
-	CHECK( mc_histogram.at( 4) == 0 );
-	CHECK( mc_histogram.at( 5) == 0 );
-	CHECK( mc_histogram.at( 6) == 0 );
-	CHECK( mc_histogram.at( 7) == 0 );
-	CHECK( mc_histogram.at( 8) == 0 );
-	CHECK( mc_histogram.at( 9) == 0 );
-	CHECK( mc_histogram.at(10) == 0 );
-	CHECK( mc_histogram.at(11) == 0 );
-	CHECK( mc_histogram.at(12) == 1033 );
-	CHECK( mc_histogram.at(13) == 31209 );
-	CHECK( mc_histogram.at(14) == 43103 );
-	CHECK( mc_histogram.at(15) == 16900 );
-	CHECK( mc_histogram.at(16) == 130 );
-	CHECK( mc_histogram.at(17) == 0 );
-	CHECK( mc_histogram.at(18) == 0 );
-	CHECK( mc_histogram.at(19) == 0 );
-	CHECK( mc_histogram.at(20) == 0 );
-	CHECK( mc_histogram.at(21) == 0 );
-	CHECK( mc_histogram.at(22) == 0 );
-	CHECK( mc_histogram.at(23) == 0 );
-	CHECK( mc_histogram.at(24) == 0 );
-	CHECK( mc_histogram.at(25) == 0 );
-	CHECK( mc_histogram.at(26) == 0 );
-	CHECK( mc_histogram.at(27) == 0 );
-	CHECK( mc_histogram.at(28) == 0 );
-	CHECK( mc_histogram.at(29) == 625 );
+	run_phase_space_generator(psg.get(), mc_histogram, os_histogram);
 
-	CHECK( os_histogram.at( 0) == 0 );
-	CHECK( os_histogram.at( 1) == 0 );
-	CHECK( os_histogram.at( 2) == 0 );
-	CHECK( os_histogram.at( 3) == 0 );
-	CHECK( os_histogram.at( 4) == 0 );
-	CHECK( os_histogram.at( 5) == 0 );
-	CHECK( os_histogram.at( 6) == 0 );
-	CHECK( os_histogram.at( 7) == 0 );
-	CHECK( os_histogram.at( 8) == 0 );
-	CHECK( os_histogram.at( 9) == 344 );
-	CHECK( os_histogram.at(10) == 21672 );
-	CHECK( os_histogram.at(11) == 86042 );
-	CHECK( os_histogram.at(12) == 117614 );
-	CHECK( os_histogram.at(13) == 96461 );
-	CHECK( os_histogram.at(14) == 85921 );
-	CHECK( os_histogram.at(15) == 54567 );
-	CHECK( os_histogram.at(16) == 28165 );
-	CHECK( os_histogram.at(17) == 15260 );
-	CHECK( os_histogram.at(18) == 9459 );
-	CHECK( os_histogram.at(19) == 4505 );
-	CHECK( os_histogram.at(20) == 2110 );
-	CHECK( os_histogram.at(21) == 1022 );
-	CHECK( os_histogram.at(22) == 416 );
-	CHECK( os_histogram.at(23) == 198 );
-	CHECK( os_histogram.at(24) == 77 );
-	CHECK( os_histogram.at(25) == 18 );
-	CHECK( os_histogram.at(26) == 0 );
-	CHECK( os_histogram.at(27) == 0 );
-	CHECK( os_histogram.at(28) == 0 );
-	CHECK( os_histogram.at(29) == 220149 );
+	CHECK_THAT( mc_histogram , Catch::Equals(reference_mc) );
+	CHECK_THAT( os_histogram , Catch::Equals(reference_os) );
 }
 
 TEST_CASE("Lusifer 100 TeV VBS Real QCD PS Quality", "[]")
@@ -278,67 +171,18 @@ TEST_CASE("Lusifer 100 TeV VBS Real QCD PS Quality", "[]")
 	std::vector<std::size_t> mc_histogram(30);
 	std::vector<std::size_t> os_histogram(30);
 
-	run_phase_space_generator(psg.get(), mc_histogram, os_histogram, 4);
+	std::vector<std::size_t> reference_mc = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 672, 15063, 23498, 21491, 22578, 8183, 71,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1444
+	};
+	std::vector<std::size_t> reference_os = {
+		0, 0, 0, 0, 0, 246, 12421, 34584, 46830, 60194, 58934, 69256, 68720,
+		51885, 43890, 27734, 15134, 8117, 5135, 2489, 1144, 442, 256, 101, 18,
+		0, 0, 0, 0, 236470
+	};
 
-	CHECK( mc_histogram.at( 0) == 0 );
-	CHECK( mc_histogram.at( 1) == 0 );
-	CHECK( mc_histogram.at( 2) == 0 );
-	CHECK( mc_histogram.at( 3) == 0 );
-	CHECK( mc_histogram.at( 4) == 0 );
-	CHECK( mc_histogram.at( 5) == 0 );
-	CHECK( mc_histogram.at( 6) == 0 );
-	CHECK( mc_histogram.at( 7) == 0 );
-	CHECK( mc_histogram.at( 8) == 0 );
-	CHECK( mc_histogram.at( 9) == 0 );
-	CHECK( mc_histogram.at(10) == 672 );
-	CHECK( mc_histogram.at(11) == 15063 );
-	CHECK( mc_histogram.at(12) == 23498 );
-	CHECK( mc_histogram.at(13) == 21491 );
-	CHECK( mc_histogram.at(14) == 22578 );
-	CHECK( mc_histogram.at(15) == 8183 );
-	CHECK( mc_histogram.at(16) == 71 );
-	CHECK( mc_histogram.at(17) == 0 );
-	CHECK( mc_histogram.at(18) == 0 );
-	CHECK( mc_histogram.at(19) == 0 );
-	CHECK( mc_histogram.at(20) == 0 );
-	CHECK( mc_histogram.at(21) == 0 );
-	CHECK( mc_histogram.at(22) == 0 );
-	CHECK( mc_histogram.at(23) == 0 );
-	CHECK( mc_histogram.at(24) == 0 );
-	CHECK( mc_histogram.at(25) == 0 );
-	CHECK( mc_histogram.at(26) == 0 );
-	CHECK( mc_histogram.at(27) == 0 );
-	CHECK( mc_histogram.at(28) == 0 );
-	CHECK( mc_histogram.at(29) == 1444 );
+	run_phase_space_generator(psg.get(), mc_histogram, os_histogram);
 
-	CHECK( os_histogram.at( 0) == 0 );
-	CHECK( os_histogram.at( 1) == 0 );
-	CHECK( os_histogram.at( 2) == 0 );
-	CHECK( os_histogram.at( 3) == 0 );
-	CHECK( os_histogram.at( 4) == 0 );
-	CHECK( os_histogram.at( 5) == 246 );
-	CHECK( os_histogram.at( 6) == 12421 );
-	CHECK( os_histogram.at( 7) == 34584 );
-	CHECK( os_histogram.at( 8) == 46830 );
-	CHECK( os_histogram.at( 9) == 60194 );
-	CHECK( os_histogram.at(10) == 58934 );
-	CHECK( os_histogram.at(11) == 69256 );
-	CHECK( os_histogram.at(12) == 68720 );
-	CHECK( os_histogram.at(13) == 51885 );
-	CHECK( os_histogram.at(14) == 43890 );
-	CHECK( os_histogram.at(15) == 27734 );
-	CHECK( os_histogram.at(16) == 15134 );
-	CHECK( os_histogram.at(17) == 8117 );
-	CHECK( os_histogram.at(18) == 5135 );
-	CHECK( os_histogram.at(19) == 2489 );
-	CHECK( os_histogram.at(20) == 1144 );
-	CHECK( os_histogram.at(21) == 442 );
-	CHECK( os_histogram.at(22) == 256 );
-	CHECK( os_histogram.at(23) == 101 );
-	CHECK( os_histogram.at(24) == 18 );
-	CHECK( os_histogram.at(25) == 0 );
-	CHECK( os_histogram.at(26) == 0 );
-	CHECK( os_histogram.at(27) == 0 );
-	CHECK( os_histogram.at(28) == 0 );
-	CHECK( os_histogram.at(29) == 236470 );
+	CHECK_THAT( mc_histogram , Catch::Equals(reference_mc) );
+	CHECK_THAT( os_histogram , Catch::Equals(reference_os) );
 }
