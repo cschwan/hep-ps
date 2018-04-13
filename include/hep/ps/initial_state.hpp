@@ -46,6 +46,8 @@ HEP_ENUM(initial_state,
 	sx_sx, /*!< anti-strange anti-strange initial state. */
 	uq_gl, /*!< up gluon initial state. */
 	cq_gl, /*!< charm gluon initial state. */
+	uq_ph, /*!< up photon initial state. */
+	cq_ph, /*!< charm photon initial state. */
 
 	/* Q=1/3 */
 	dx_gl, /*!< anti-down gluon initial state. */
@@ -83,6 +85,7 @@ constexpr parton state_parton_one(initial_state state)
 	{
 	case uq_uq:
 	case uq_gl:
+	case uq_ph:
 	case uq_dq:
 	case uq_sq:
 	case uq_ux:
@@ -92,6 +95,7 @@ constexpr parton state_parton_one(initial_state state)
 	case cq_uq:
 	case cq_cq:
 	case cq_gl:
+	case cq_ph:
 	case cq_dq:
 	case cq_sq:
 	case cq_cx:
@@ -155,6 +159,10 @@ constexpr parton state_parton_two(initial_state state)
 	case dx_gl:
 	case sx_gl:
 		return parton::gluon;
+
+	case uq_ph:
+	case cq_ph:
+		return parton::photon;
 
 	case uq_dq:
 	case cq_dq:
