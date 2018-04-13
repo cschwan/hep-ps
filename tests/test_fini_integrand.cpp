@@ -318,7 +318,7 @@ void test_fini_integrand(
 TEST_CASE("fini integrand static scale", "[fini_integrand]")
 {
 	// choose an initial state that doesn't have a symmetry factor
-	hep::initial_state_set set{hep::initial_state::q43_cu};
+	hep::initial_state_set set{hep::initial_state::cq_uq};
 
 	test_fini_integrand(set, 0, T(10.0), false);
 	test_fini_integrand(set, 1, T(10.0), false);
@@ -330,7 +330,7 @@ TEST_CASE("fini integrand static scale", "[fini_integrand]")
 TEST_CASE("fini integrand dynamic scale", "[fini_integrand]")
 {
 	// choose an initial state that doesn't have a symmetry factor
-	hep::initial_state_set set{hep::initial_state::q43_cu};
+	hep::initial_state_set set{hep::initial_state::cq_uq};
 
 	test_fini_integrand(set, 0, T(10.0), true);
 	test_fini_integrand(set, 1, T(10.0), true);

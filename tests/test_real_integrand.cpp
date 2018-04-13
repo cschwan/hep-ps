@@ -182,7 +182,7 @@ public:
 	{
 		return { hep::dipole_with_set{ 2, 4, 3, hep::particle_type::fermion,
 			hep::particle_type::boson, hep::particle_type::fermion,
-			hep::initial_state_set{hep::initial_state::q43_cu}} };
+			hep::initial_state_set{hep::initial_state::cq_uq}} };
 	}
 
 	std::vector<hep::final_state> final_states() const
@@ -350,7 +350,7 @@ void test_real_integrand(
 TEST_CASE("real integrand static scale", "[real_integrand]")
 {
 	// choose an initial state that doesn't have a symmetry factor
-	hep::initial_state_set set{hep::initial_state::q43_cu};
+	hep::initial_state_set set{hep::initial_state::cq_uq};
 
 	test_real_integrand(set, 0, T(10.0), false);
 	test_real_integrand(set, 1, T(10.0), false);
@@ -362,7 +362,7 @@ TEST_CASE("real integrand static scale", "[real_integrand]")
 TEST_CASE("real integrand dynamic scale", "[real_integrand]")
 {
 	// choose an initial state that doesn't have a symmetry factor
-	hep::initial_state_set set{hep::initial_state::q43_cu};
+	hep::initial_state_set set{hep::initial_state::cq_uq};
 
 	test_real_integrand(set, 0, T(10.0), true);
 	test_real_integrand(set, 1, T(10.0), true);

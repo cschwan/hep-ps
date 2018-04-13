@@ -54,11 +54,11 @@ initial_state pdg_ids_to_initial_state(int id1, int id2)
 {
 	if (id1 == 2 && id2 == 2)
 	{
-		return initial_state::q43_uu;
+		return initial_state::uq_uq;
 	}
 	else if (id1 == -3 && id2 == 2)
 	{
-		return initial_state::q33_su;
+		return initial_state::sx_uq;
 	}
 	else
 	{

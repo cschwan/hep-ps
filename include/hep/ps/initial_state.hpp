@@ -29,45 +29,47 @@ namespace hep
 /// for the correspoding matrix elements, because of the PDFs. Initial states
 /// with transposed partons are automatically taken into account.
 HEP_ENUM(initial_state,
-	q43_uu, /*!< \f$ Q=4/3 \f$ up/up initial state. */
-	q43_cu, /*!< \f$ Q=4/3 \f$ charm/up initial state. */
-	q43_cc, /*!< \f$ Q=4/3 \f$ charm/charm initial state. */
-	q33_du, /*!< \f$ Q=3/3 \f$ anti-down/up initial state. */
-	q33_dc, /*!< \f$ Q=3/3 \f$ anti-down/charm initial state. */
-	q33_su, /*!< \f$ Q=3/3 \f$ anti-strange/up initial state. */
-	q33_sc, /*!< \f$ Q=3/3 \f$ anti-strange/charm initial state. */
-	q23_dd, /*!< \f$ Q=2/3 \f$ anti-down/anti-down initial state. */
-	q23_sd, /*!< \f$ Q=2/3 \f$ anti-strange/anti-down initial state. */
-	q23_ss, /*!< \f$ Q=2/3 \f$ anti-strange/anti-strange initial state. */
-	q23_ug, /*!< \f$ Q=2/3 \f$ up/gluon initial state. */
-	q23_cg, /*!< \f$ Q=2/3 \f$ charm/gluon initial state. */
-	q13_dg, /*!< \f$ Q=1/3 \f$ anti-down/gluon initial state. */
-	q13_sg, /*!< \f$ Q=1/3 \f$ anti-strange/gluon initial state. */
+	/* Q=4/3 */
+	uq_uq, /*!< up up initial state. */
+	cq_uq, /*!< charm up initial state. */
+	cq_cq, /*!< charm charm initial state. */
+
+	/* Q=1 */
+	dx_uq, /*!< anti-down up initial state. */
+	dx_cq, /*!< anti-down charm initial state. */
+	sx_uq, /*!< anti-strange up initial state. */
+	sx_cq, /*!< anti-strange charm initial state. */
+
+	/* Q=2/3 */
+	dx_dx, /*!< anti-down anti-down initial state. */
+	sx_dx, /*!< anti-strange anti-down initial state. */
+	sx_sx, /*!< anti-strange anti-strange initial state. */
+	uq_gl, /*!< up gluon initial state. */
+	cq_gl, /*!< charm gluon initial state. */
 
 	/* Q=1/3 */
-
-	uq_dq,
-	uq_sq,
-	cq_dq,
-	cq_sq,
+	dx_gl, /*!< anti-down gluon initial state. */
+	sx_gl, /*!< anti-strange gluon initial state. */
+	uq_dq, /*!< up down initial state. */
+	uq_sq, /*!< up strange initial state. */
+	cq_dq, /*!< charm down initial state. */
+	cq_sq, /*!< charm strange initial state. */
 
 	/* Q=0 */
-
-	uq_ub,
-	cq_cb,
-	db_dq,
-	sb_sq,
-	sb_dq,
-	db_sq,
-	cq_ub,
-	uq_cb,
+	uq_ux, /*!< up anti-up initial state. */
+	cq_cx, /*!< charm anti-charm initial state. */
+	dx_dq, /*!< anti-down down initial state. */
+	sx_sq, /*!< anti-strange strange initial state. */
+	sx_dq, /*!< anti-strange down initial state. */
+	dx_sq, /*!< anti-down strange initial state. */
+	cq_ux, /*!< charm anti-up initial state. */
+	uq_cx, /*!< up anti-charm initial state. */
 
 	/* Q=-1/3 */
-
-	db_ub,
-	sb_ub,
-	db_cb,
-	sb_cb
+	dx_ux, /*!< anti-down anti-up initial state. */
+	sx_ux, /*!< anti-strange anti-up initial state. */
+	dx_cx, /*!< anti-down anti-charm initial state. */
+	sx_cx  /*!< anti-strange anti-charm initial state. */
 );
 
 HEP_ENUM_ARRAY(initial_state);
@@ -79,42 +81,42 @@ constexpr parton state_parton_one(initial_state state)
 {
 	switch (state)
 	{
-	case initial_state::q43_uu:
-	case initial_state::q23_ug:
-	case initial_state::uq_dq:
-	case initial_state::uq_sq:
-	case initial_state::uq_ub:
-	case initial_state::uq_cb:
+	case uq_uq:
+	case uq_gl:
+	case uq_dq:
+	case uq_sq:
+	case uq_ux:
+	case uq_cx:
 		return parton::up;
 
-	case initial_state::q23_dd:
-	case initial_state::q33_du:
-	case initial_state::q33_dc:
-	case initial_state::q13_dg:
-	case initial_state::db_dq:
-	case initial_state::db_ub:
-	case initial_state::db_cb:
-	case initial_state::db_sq:
-		return parton::anti_down;
-
-	case initial_state::q43_cc:
-	case initial_state::q43_cu:
-	case initial_state::q23_cg:
-	case initial_state::cq_cb:
-	case initial_state::cq_ub:
-	case initial_state::cq_dq:
-	case initial_state::cq_sq:
+	case cq_uq:
+	case cq_cq:
+	case cq_gl:
+	case cq_dq:
+	case cq_sq:
+	case cq_cx:
+	case cq_ux:
 		return parton::charm;
 
-	case initial_state::q33_su:
-	case initial_state::q23_sd:
-	case initial_state::q33_sc:
-	case initial_state::q23_ss:
-	case initial_state::q13_sg:
-	case initial_state::sb_sq:
-	case initial_state::sb_ub:
-	case initial_state::sb_cb:
-	case initial_state::sb_dq:
+	case dx_uq:
+	case dx_cq:
+	case dx_dx:
+	case dx_gl:
+	case dx_dq:
+	case dx_sq:
+	case dx_ux:
+	case dx_cx:
+		return parton::anti_down;
+
+	case sx_uq:
+	case sx_cq:
+	case sx_dx:
+	case sx_sx:
+	case sx_gl:
+	case sx_sq:
+	case sx_dq:
+	case sx_ux:
+	case sx_cx:
 		return parton::anti_strange;
 
 #if __GNUC__ > 5
@@ -130,53 +132,53 @@ constexpr parton state_parton_two(initial_state state)
 {
 	switch (state)
 	{
-	case initial_state::q43_uu:
-	case initial_state::q33_du:
-	case initial_state::q43_cu:
-	case initial_state::q33_su:
+	case uq_uq:
+	case cq_uq:
+	case dx_uq:
+	case sx_uq:
 		return parton::up;
 
-	case initial_state::db_ub:
-	case initial_state::sb_ub:
-	case initial_state::uq_ub:
-	case initial_state::cq_ub:
-		return parton::anti_up;
-
-	case initial_state::cq_cb:
-	case initial_state::uq_cb:
-	case initial_state::db_cb:
-	case initial_state::sb_cb:
-		return parton::anti_charm;
-
-	case initial_state::q33_dc:
-	case initial_state::q43_cc:
-	case initial_state::q33_sc:
+	case cq_cq:
+	case dx_cq:
+	case sx_cq:
 		return parton::charm;
 
-	case initial_state::uq_dq:
-	case initial_state::cq_dq:
-	case initial_state::db_dq:
-	case initial_state::sb_dq:
-		return parton::down;
-
-	case initial_state::q23_dd:
-	case initial_state::q23_sd:
+	case dx_dx:
+	case sx_dx:
 		return parton::anti_down;
 
-	case initial_state::uq_sq:
-	case initial_state::cq_sq:
-	case initial_state::sb_sq:
-	case initial_state::db_sq:
-		return parton::strange;
-
-	case initial_state::q23_ss:
+	case sx_sx:
 		return parton::anti_strange;
 
-	case initial_state::q23_ug:
-	case initial_state::q13_dg:
-	case initial_state::q23_cg:
-	case initial_state::q13_sg:
+	case uq_gl:
+	case cq_gl:
+	case dx_gl:
+	case sx_gl:
 		return parton::gluon;
+
+	case uq_dq:
+	case cq_dq:
+	case dx_dq:
+	case sx_dq:
+		return parton::down;
+
+	case uq_sq:
+	case cq_sq:
+	case sx_sq:
+	case dx_sq:
+		return parton::strange;
+
+	case uq_ux:
+	case cq_ux:
+	case dx_ux:
+	case sx_ux:
+		return parton::anti_up;
+
+	case cq_cx:
+	case uq_cx:
+	case dx_cx:
+	case sx_cx:
+		return parton::anti_charm;
 
 #if __GNUC__ > 5
 	default:
