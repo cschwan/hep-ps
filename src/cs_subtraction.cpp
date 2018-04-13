@@ -26,16 +26,9 @@ cs_subtraction<T>::cs_subtraction(
 	, nf_{nf}
 	, fscheme_{fscheme}
 	, rscheme_{rscheme}
+	// TODO: make `type_` a function parameter for mixed corrections
 	, type_{type}
 {
-	if (type_ == correction_type::ew)
-	{
-		using std::sqrt;
-
-		// this value of Nc sets Cf to one
-		nc_ = T(0.5) * (T(1.0) + sqrt(T(5.0)));
-		tf_ = T(1.0);
-	}
 }
 
 template <typename T>
@@ -291,7 +284,11 @@ T cs_subtraction<T>::fermion_function(
 
 		if (dipole_info.unresolved_type() == particle_type::fermion)
 		{
-			factor *= tf_ / cf;
+			if (type_ == correction_type::qcd)
+			{
+				factor *= tf_ / cf;
+			}
+
 			dipole = T(1.0) - T(2.0) * x * (T(1.0) - x);
 		}
 		else
@@ -333,8 +330,10 @@ void cs_subtraction<T>::insertion_terms(
 	// TODO: DIS scheme is NYI
 	assert( fscheme_ == factorization_scheme::msbar );
 
-	T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
 	T const pi = acos(T(-1.0));
+	T const color = (type_ == correction_type::ew)
+		? nc_
+		: (nc_ / (nc_ * nc_ - T(1.0))); // tf/cf
 
 	results.clear();
 
@@ -347,7 +346,7 @@ void cs_subtraction<T>::insertion_terms(
 		T const dilogome = gsl_sf_dilog(T(1.0) - eta);
 		T const logome = log(T(1.0) - eta);
 
-		T const value1 = T(0.5) * tf_ / cf / pi * ((x * x + omx * omx) *
+		T const value1 = T(0.5) * color / pi * ((x * x + omx * omx) *
 			logomxbx + T(2.0) * x * omx);
 		T const value2 = T(0.5) / pi * (((T(1.0) + x * x) / omx) * logomxbx +
 			omx);
@@ -408,7 +407,7 @@ void cs_subtraction<T>::insertion_terms(
 		T const omx = T(1.0) - x;
 		T const sai = ps.m2(term.emitter(), term.spectator());
 
-		T const value1 = T(0.5) * tf_ / cf / pi * (x * x + omx * omx);
+		T const value1 = T(0.5) * color / pi * (x * x + omx * omx);
 		T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
 		T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) +
 			T(2.0) * log(T(1.0) - eta));
@@ -447,7 +446,7 @@ void cs_subtraction<T>::insertion_terms(
 		T const logomx = log(omx);
 		T const logome = log(T(1.0) - eta);
 
-		T const value1 = T(0.5) * tf_ / cf / pi * (x * x + omx * omx);
+		T const value1 = T(0.5) * color / pi * (x * x + omx * omx);
 		T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
 		T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) +
 			T(2.0) * logome);
