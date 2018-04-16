@@ -21,7 +21,7 @@
 
 #include "hep/mc/projector.hpp"
 
-#include "hep/ps/abc_terms.hpp"
+#include "hep/ps/ab_terms.hpp"
 #include "hep/ps/convolute.hpp"
 #include "hep/ps/finite_parts.hpp"
 #include "hep/ps/initial_state.hpp"
@@ -179,10 +179,10 @@ public:
 					phase_space,
 					xprime[1 - i],
 					eta[1 - i],
-					abc_neg_
+					ab_neg_
 				);
 
-				assert( abc_neg_.size() == scales_.size() );
+				assert( ab_neg_.size() == scales_.size() );
 
 				subtraction_.insertion_terms(
 					term,
@@ -190,15 +190,15 @@ public:
 					phase_space,
 					xprime[i],
 					eta[i],
-					abc_pos_
+					ab_pos_
 				);
 
-				assert( abc_neg_.size() == scales_.size() );
+				assert( ab_neg_.size() == scales_.size() );
 
 				for (std::size_t j = 0; j != scales_.size(); ++j)
 				{
 					auto const pdf_neg = effective_pdf(
-						abc_neg_.at(j),
+						ab_neg_.at(j),
 						xprime[1 - i],
 						(i == 0) ? info.x2() : info.x1(),
 						(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
@@ -206,7 +206,7 @@ public:
 					);
 
 					auto const pdf_pos = effective_pdf(
-						abc_pos_.at(j),
+						ab_pos_.at(j),
 						xprime[i],
 						(i == 0) ? info.x1() : info.x2(),
 						(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
@@ -228,7 +228,7 @@ public:
 				for (std::size_t j = 0; j != pdf_pdfsa1_.size(); ++j)
 				{
 					auto const pdf_neg = effective_pdf(
-						abc_neg_.front(),
+						ab_neg_.front(),
 						xprime[1 - i],
 						(i == 0) ? info.x2() : info.x1(),
 						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pdfsa1_.at(j),
@@ -236,7 +236,7 @@ public:
 					);
 
 					auto const pdf_pos = effective_pdf(
-						abc_pos_.front(),
+						ab_pos_.front(),
 						xprime[i],
 						(i == 0) ? info.x1() : info.x2(),
 						(i == 0) ? pdf_pdfsa1_.at(j) : pdf_pdfsa2_.at(j),
@@ -308,7 +308,7 @@ public:
 
 protected:
 	parton_array<T> effective_pdf(
-		abc_terms<T> const& abc,
+		ab_terms<T> const& ab,
 		T xprime,
 		T eta,
 		parton_array<T> const& pdfa,
@@ -330,9 +330,8 @@ protected:
 				auto const at = parton_type_of(a);
 				auto const apt = parton_type_of(ap);
 
-				pdf[a] += pdfb[ap] * abc.a[apt][at] * (T(1.0) - eta) / xprime;
-				pdf[a] -= pdfa[ap] * abc.b[apt][at] * (T(1.0) - eta);
-				pdf[a] += pdfa[ap] * abc.c[apt][at];
+				pdf[a] += pdfb[ap] * ab.a[apt][at] * (T(1.0) - eta) / xprime;
+				pdf[a] += pdfa[ap] * ab.b[apt][at];
 			}
 		}
 
@@ -386,8 +385,8 @@ private:
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
 	std::vector<insertion_term> insertion_terms_;
-	std::vector<abc_terms<T>> abc_neg_;
-	std::vector<abc_terms<T>> abc_pos_;
+	std::vector<ab_terms<T>> ab_neg_;
+	std::vector<ab_terms<T>> ab_pos_;
 	std::vector<T> terms2_;
 	T alphas_power_;
 };

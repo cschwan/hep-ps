@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/abc_terms.hpp"
+#include "hep/ps/ab_terms.hpp"
 #include "hep/ps/boost.hpp"
 #include "hep/ps/born_integrand.hpp"
 #include "hep/ps/cofferaa_phase_space_generator.hpp"

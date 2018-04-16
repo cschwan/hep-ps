@@ -315,7 +315,7 @@ void cs_subtraction<T>::insertion_terms(
 	std::vector<T> const& phase_space,
 	T x,
 	T eta,
-	std::vector<abc_terms<T>>& results
+	std::vector<ab_terms<T>>& results
 ) const {
 	using std::acos;
 	using std::log;
@@ -354,17 +354,15 @@ void cs_subtraction<T>::insertion_terms(
 		T const value4 = T(0.5) / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
 			T(2.0) * dilogome + logome * logome);
 
-		abc_terms<T> result;
+		ab_terms<T> result;
 
 		result.a[bo][aq] = value1;
 		result.a[bo][qq] = value1;
 
 		result.a[aq][aq] = value2;
 		result.a[qq][qq] = value2;
-		result.b[aq][aq] = value3;
-		result.b[qq][qq] = value3;
-		result.c[aq][aq] = value4;
-		result.c[qq][qq] = value4;
+		result.b[aq][aq] = (eta - T(1.0)) * value3 + value4;
+		result.b[qq][qq] = (eta - T(1.0)) * value3 + value4;
 
 		// TODO: qg and gg are NYI
 
@@ -384,14 +382,12 @@ void cs_subtraction<T>::insertion_terms(
 		T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
 		T const value2 = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
 
-		abc_terms<T> result;
+		ab_terms<T> result;
 
 		result.a[aq][aq] = value1;
 		result.a[qq][qq] = value1;
-		result.b[aq][aq] = value1;
-		result.b[qq][qq] = value1;
-		result.c[aq][aq] = value2;
-		result.c[qq][qq] = value2;
+		result.b[aq][aq] = (eta - T(1.0)) * value1 + value2;
+		result.b[qq][qq] = (eta - T(1.0)) * value1 + value2;
 
 		// TODO: qg and gg are NYI
 
@@ -417,17 +413,18 @@ void cs_subtraction<T>::insertion_terms(
 			T const mu2 = mu.factorization() * mu.factorization();
 			T const logmu2bsai = log(mu2 / sai);
 
-			abc_terms<T> result;
+			T const result1 = logmu2bsai * value1;
+			T const result2 = logmu2bsai * value2;
+			T const result3 = logmu2bsai * ((eta - T(1.0)) * value2 + value3);
 
-			result.a[bo][aq] = value1 * logmu2bsai;
-			result.a[bo][qq] = value1 * logmu2bsai;
+			ab_terms<T> result;
 
-			result.a[aq][aq] = value2 * logmu2bsai;
-			result.a[qq][qq] = value2 * logmu2bsai;
-			result.b[aq][aq] = value2 * logmu2bsai;
-			result.b[qq][qq] = value2 * logmu2bsai;
-			result.c[aq][aq] = value3 * logmu2bsai;
-			result.c[qq][qq] = value3 * logmu2bsai;
+			result.a[bo][aq] = result1;
+			result.a[bo][qq] = result1;
+			result.a[aq][aq] = result2;
+			result.a[qq][qq] = result2;
+			result.b[aq][aq] = result3;
+			result.b[qq][qq] = result3;
 
 			// TODO: qg and gg are NYI
 
@@ -458,17 +455,19 @@ void cs_subtraction<T>::insertion_terms(
 			T const mu2 = mu.factorization() * mu.factorization();
 			T const logmu2bsai = log(mu2 / sai);
 
-			abc_terms<T> result;
+			T const result1 = value1 * (logmu2bsai - logomx);
+			T const result2 = value2 * (logmu2bsai - logomx);
+			T const result3 = (eta - T(1.0)) * (value2 * logmu2bsai - value4) +
+				value3 * logmu2bsai + value5;
 
-			result.a[bo][aq] = value1 * (logmu2bsai - logomx);
-			result.a[bo][qq] = value1 * (logmu2bsai - logomx);
+			ab_terms<T> result;
 
-			result.a[aq][aq] = value2 * (logmu2bsai - logomx);
-			result.a[qq][qq] = value2 * (logmu2bsai - logomx);
-			result.b[aq][aq] = value2 * logmu2bsai - value4;
-			result.b[qq][qq] = value2 * logmu2bsai - value4;
-			result.c[aq][aq] = value3 * logmu2bsai + value5;
-			result.c[qq][qq] = value3 * logmu2bsai + value5;
+			result.a[bo][aq] = result1;
+			result.a[bo][qq] = result1;
+			result.a[aq][aq] = result2;
+			result.a[qq][qq] = result2;
+			result.b[aq][aq] = result3;
+			result.b[qq][qq] = result3;
 
 			// TODO: qg and gg are NYI
 

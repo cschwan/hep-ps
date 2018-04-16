@@ -1,9 +1,9 @@
-#ifndef HEP_PS_ABC_TERMS_HPP
-#define HEP_PS_ABC_TERMS_HPP
+#ifndef HEP_PS_AB_TERMS_HPP
+#define HEP_PS_AB_TERMS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@ namespace hep
 {
 
 template <typename T>
-struct abc_terms
+struct ab_terms
 {
 	parton_type_array<parton_type_array<T>> a;
 	parton_type_array<parton_type_array<T>> b;
-	parton_type_array<parton_type_array<T>> c;
 };
 
 }

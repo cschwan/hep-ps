@@ -1,7 +1,7 @@
 incdir = include_directories('.')
 
 headers1 = [
-	'hep/ps/abc_terms.hpp',
+	'hep/ps/ab_terms.hpp',
 	'hep/ps/boost.hpp',
 	'hep/ps/born_integrand.hpp',
 	'hep/ps/cofferaa_phase_space_generator.hpp',

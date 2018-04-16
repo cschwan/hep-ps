@@ -3,7 +3,7 @@
 #include "hep/mc/multi_channel_integrand.hpp"
 #include "hep/mc/projector.hpp"
 
-#include "hep/ps/abc_terms.hpp"
+#include "hep/ps/ab_terms.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/fini_integrand.hpp"
@@ -51,8 +51,8 @@ public:
 		std::vector<hep::scales<T>> const& scales,
 		std::vector<T> const& /*phase_space*/,
 		T /*x*/,
-		T /*eta*/,
-		std::vector<hep::abc_terms<T>>& results
+		T eta,
+		std::vector<hep::ab_terms<T>>& results
 	) const {
 		results.clear();
 
@@ -60,10 +60,10 @@ public:
 
 		for (auto const& scale : scales)
 		{
-			hep::abc_terms<T> term;
-			term.a[hep::parton_type::quark][hep::parton_type::quark] = T(1.0);
-			term.b[hep::parton_type::quark][hep::parton_type::quark] = T(2.0);
-			term.c[hep::parton_type::quark][hep::parton_type::quark] = T(1.0);
+			constexpr auto quark = hep::parton_type::quark;
+			hep::ab_terms<T> term;
+			term.a[quark][quark] = T(1.0);
+			term.b[quark][quark] = (eta - T(1.0)) * T(2.0) + T(1.0);
 
 			results.push_back(term);
 		}

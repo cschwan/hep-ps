@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/abc_terms.hpp"
+#include "hep/ps/ab_terms.hpp"
 #include "hep/ps/correction_type.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
@@ -74,7 +74,7 @@ public:
 		std::vector<T> const& phase_space,
 		T x,
 		T eta,
-		std::vector<abc_terms<T>>& results
+		std::vector<ab_terms<T>>& results
 	) const;
 
 	/// Returns the finite part of the integrated dipoles not covered by the
