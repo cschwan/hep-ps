@@ -47,6 +47,7 @@ sources = [
 	'pdg_functions.cpp',
 	'phase_space_generator.cpp',
 	'phase_space_point.cpp',
+	'phase_space_tools.cpp',
 	'propagator.cpp',
 	'rambo_phase_space_generator.cpp',
 	'static_scale_function.cpp',

@@ -49,6 +49,7 @@ headers1 = [
 	'hep/ps/permutation.hpp',
 	'hep/ps/phase_space_generator.hpp',
 	'hep/ps/phase_space_point.hpp',
+	'hep/ps/phase_space_tools.hpp',
 	'hep/ps/propagator.hpp',
 	'hep/ps/ps_integrand.hpp',
 	'hep/ps/rambo_phase_space_generator.hpp',
