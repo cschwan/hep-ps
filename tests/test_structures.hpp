@@ -126,7 +126,7 @@ public:
 	{
 	}
 
-	hep::initial_state_array<T> borns(
+	void borns(
 		std::vector<T> const& phase_space,
 		hep::initial_state_set set,
 		std::vector<hep::scales<T>> const& scales,
@@ -137,14 +137,10 @@ public:
 		CHECK( scales.size() == 1 );
 		CHECK( me.size() == 1 );
 
-		hep::initial_state_array<T> result;
-
 		for (auto const process : set)
 		{
 			me.front().emplace(process, T(1.0));
 		}
-
-		return result;
 	}
 
 	std::vector<hep::final_state> final_states() const
