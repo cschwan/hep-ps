@@ -33,7 +33,7 @@ template <typename T, typename I>
 inline neg_pos_results<T> convolute(
 	parton_array<T> const& pdfx1,
 	parton_array<T> const& pdfx2,
-	initial_state_array<T> const& matrix_elements,
+	initial_state_map<T> const& matrix_elements,
 	initial_state_set set,
 	T factor,
 	cut_result_with_info<I> const& cut
@@ -41,20 +41,28 @@ inline neg_pos_results<T> convolute(
 	T neg{};
 	T pos{};
 
-	for (auto const state : set)
+	for (auto const& keyvals : matrix_elements)
 	{
+		auto const state = keyvals.first;
+
+		if (!set.includes(state))
+		{
+			continue;
+		}
+
 		auto const one = state_parton_one(state);
 		auto const two = state_parton_two(state);
 		auto const sym = (one == two) ? T(0.5) : T(1.0);
+		auto const me = keyvals.second;
 
 		if (!cut.pos_cutted())
 		{
-			pos += sym * pdfx1[one] * pdfx2[two] * matrix_elements[state];
+			pos += sym * pdfx1[one] * pdfx2[two] * me;
 		}
 
 		if (!cut.neg_cutted())
 		{
-			neg += sym * pdfx1[two] * pdfx2[one] * matrix_elements[state];
+			neg += sym * pdfx1[two] * pdfx2[one] * me;
 		}
 	}
 
@@ -67,7 +75,7 @@ inline neg_pos_results<T> convolute(
 	parton_array<T> const& pdfx2_neg,
 	parton_array<T> const& pdfx1_pos,
 	parton_array<T> const& pdfx2_pos,
-	initial_state_array<T> const& matrix_elements,
+	initial_state_map<T> const& matrix_elements,
 	initial_state_set set,
 	T factor,
 	cut_result_with_info<I> const& cut
@@ -75,20 +83,28 @@ inline neg_pos_results<T> convolute(
 	T neg{};
 	T pos{};
 
-	for (auto const state : set)
+	for (auto const& keyvals : matrix_elements)
 	{
+		auto const state = keyvals.first;
+
+		if (!set.includes(state))
+		{
+			continue;
+		}
+
 		auto const one = state_parton_one(state);
 		auto const two = state_parton_two(state);
 		auto const sym = (one == two) ? T(0.5) : T(1.0);
+		auto const me = keyvals.second;
 
 		if (!cut.pos_cutted())
 		{
-			pos += sym * pdfx1_pos[one] * pdfx2_pos[two] * matrix_elements[state];
+			pos += sym * pdfx1_pos[one] * pdfx2_pos[two] * me;
 		}
 
 		if (!cut.neg_cutted())
 		{
-			neg += sym * pdfx1_neg[one] * pdfx2_neg[two] * matrix_elements[state];
+			neg += sym * pdfx1_neg[one] * pdfx2_neg[two] * me;
 		}
 	}
 
@@ -103,7 +119,7 @@ inline void convolute_mes_with_pdfs(
 	std::vector<parton_array<T>> const& scale_uncertainty_pdfs_two,
 	std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_one,
 	std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_two,
-	std::vector<initial_state_array<T>> const& matrix_elements,
+	std::vector<initial_state_map<T>> const& matrix_elements,
 	initial_state_set set,
 	std::vector<T> const& alphas_factors,
 	T global_factor,

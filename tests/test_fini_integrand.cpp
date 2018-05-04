@@ -129,18 +129,18 @@ public:
 
 	// MATRIX ELEMENT MEMBER FUNCTIONS
 
-	std::array<hep::initial_state_array<T>, 2> correlated_me(
+	void correlated_me(
 		std::vector<T> const& /*phase_space*/,
-		hep::initial_state_set set
+		hep::initial_state_set set,
+		std::vector<hep::initial_state_map<T>>& results
 	) {
-		hep::initial_state_array<T> result;
-
 		for (auto const state : set)
 		{
-			result[state] = pow(alphas_, T(alphas_power_)) * T(1.0);
+			results.at(0).emplace(state,
+				pow(alphas_, T(alphas_power_)) * T(1.0));
+			results.at(1).emplace(state,
+				pow(alphas_, T(alphas_power_)) * T(1.0));
 		}
-
-		return { result, result };
 	}
 
 	void alphas(T alphas)

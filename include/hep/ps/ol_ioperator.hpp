@@ -55,7 +55,7 @@ public:
 		std::vector<T> const& phase_space,
 		initial_state_set set,
 		std::vector<scales<T>> const& scales,
-		std::vector<initial_state_array<T>>& results
+		std::vector<initial_state_map<T>>& results
 	);
 
 	///

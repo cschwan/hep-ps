@@ -20,6 +20,7 @@
  */
 
 #include <array>
+#include <bitset>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -29,6 +30,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 /// Returns the number of arguments given to this preprocessor macro.
 #define HEP_ENUM_SIZEOF(...) \
@@ -92,6 +94,56 @@
 	                                                                           \
 	private:                                                                   \
 		std::array<T, name ## _list().size()> array_;                          \
+	}
+
+///
+#define HEP_ENUM_MAP(name)                                                     \
+	template <typename T>                                                      \
+	class name ## _map                                                         \
+	{                                                                          \
+	public:                                                                    \
+		/**  */                                                                \
+		using const_iterator =                                                 \
+			typename std::vector<std::pair<name, T>>::const_iterator;          \
+                                                                               \
+		/** Default constructor. */                                            \
+		name ## _map()                                                         \
+			: vector_()                                                        \
+		{                                                                      \
+        }                                                                      \
+                                                                               \
+		/**  */                                                                \
+		void emplace(name index, T value)                                      \
+		{                                                                      \
+			vector_.emplace_back(index, value);                                \
+		}                                                                      \
+                                                                               \
+		/**  */                                                                \
+		const_iterator begin() const                                           \
+		{                                                                      \
+			return vector_.begin();                                            \
+		}                                                                      \
+                                                                               \
+		/**  */                                                                \
+		const_iterator end() const                                             \
+		{                                                                      \
+			return vector_.end();                                              \
+		}                                                                      \
+                                                                               \
+		/**  */                                                                \
+		void clear()                                                           \
+		{                                                                      \
+			vector_.clear();                                                   \
+		}                                                                      \
+                                                                               \
+		/**  */                                                                \
+		void reserve(std::size_t size)                                         \
+		{                                                                      \
+			vector_.reserve(size);                                             \
+		}                                                                      \
+                                                                               \
+	private:                                                                   \
+		std::vector<std::pair<name, T>> vector_;                               \
 	}
 
 /// Defines a class that is able to contain a unique element of the given
@@ -221,6 +273,11 @@
 		{                                                                      \
 			auto const index = static_cast <std::size_t> (object);             \
 			return set_ & (1 << index);                                        \
+		}                                                                      \
+                                                                               \
+		std::size_t size() const                                               \
+		{                                                                      \
+			return std::bitset<64>(set_).count();                              \
 		}                                                                      \
                                                                                \
 		bool operator==(name ## _set other) const                              \

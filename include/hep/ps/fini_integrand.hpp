@@ -96,6 +96,7 @@ public:
 		{
 			set_scales(std::vector<T>());
 			results_.reserve(scales_.size());
+			corr_me_.resize(insertion_terms_.size());
 		}
 
 		pdfs_.register_partons(partons_in_initial_state_set(set));
@@ -128,6 +129,7 @@ public:
 		{
 			set_scales(recombined_ps_);
 			results_.reserve(scales_.size());
+			corr_me_.resize(insertion_terms_.size());
 		}
 
 		results_.clear();
@@ -153,7 +155,12 @@ public:
 		assert( (pdfs_.count() == 1) || (pdf_pdfsb1_.size() == pdfs_.count()) );
 		assert( (pdfs_.count() == 1) || (pdf_pdfsb2_.size() == pdfs_.count()) );
 
-		auto const& corr_me = matrix_elements_.correlated_me(phase_space, set_);
+		for (auto& me : corr_me_)
+		{
+			me.clear();
+		}
+
+		matrix_elements_.correlated_me(phase_space, set_, corr_me_);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		T const eta[] = { info.x1(), info.x2() };
@@ -165,7 +172,7 @@ public:
 		// loop over all Born, FI, IF, II, and FF
 		for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
 		{
-			auto const me = corr_me.at(index);
+			auto const me = corr_me_.at(index);
 			auto const& term = insertion_terms_.at(index);
 
 			if ((parts_ != finite_parts::insertion_term2) &&
@@ -384,6 +391,7 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
+	std::vector<initial_state_map<T>> corr_me_;
 	std::vector<insertion_term> insertion_terms_;
 	std::vector<ab_terms<T>> ab_neg_;
 	std::vector<ab_terms<T>> ab_pos_;

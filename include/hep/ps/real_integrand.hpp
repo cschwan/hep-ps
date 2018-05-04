@@ -97,6 +97,7 @@ public:
 		{
 			set_scales(std::vector<T>());
 			results_.reserve(scales_.size());
+			me_.resize(scales_.size());
 		}
 
 		pdfs_.register_partons(partons_in_initial_state_set(set));
@@ -176,6 +177,7 @@ public:
 		{
 			set_scales(recombined_ps_);
 			results_.reserve(scales_.size());
+			me_.resize(scales_.size());
 		}
 
 		pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
@@ -220,6 +222,11 @@ public:
 				assert( false );
 			}
 
+			for (auto& me : me_)
+			{
+				me.clear();
+			}
+
 			matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
 
 			convolute_mes_with_pdfs(
@@ -250,6 +257,11 @@ public:
 
 		if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
 		{
+			for (auto& me : me_)
+			{
+				me.clear();
+			}
+
 			matrix_elements_.reals(real_phase_space, set_, scales_, me_);
 
 			convolute_mes_with_pdfs(
@@ -329,7 +341,7 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
-	std::vector<initial_state_array<T>> me_;
+	std::vector<initial_state_map<T>> me_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 	T alphas_power_;
 };

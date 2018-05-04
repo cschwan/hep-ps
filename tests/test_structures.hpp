@@ -130,7 +130,7 @@ public:
 		std::vector<T> const& phase_space,
 		hep::initial_state_set set,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::initial_state_array<T>>& me
+		std::vector<hep::initial_state_map<T>>& me
 	) const {
 		CHECK( phase_space.size() == 4 * (final_states_ + 2) );
 		CHECK( set == set_ );
@@ -141,7 +141,7 @@ public:
 
 		for (auto const process : set)
 		{
-			me.front()[process] = T(1.0);
+			me.front().emplace(process, T(1.0));
 		}
 
 		return result;

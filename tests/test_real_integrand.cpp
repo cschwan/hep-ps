@@ -134,15 +134,15 @@ public:
 		std::vector<T> const&,
 		hep::initial_state_set set,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::initial_state_array<T>>& results
+		std::vector<hep::initial_state_map<T>>& results
 	) const {
 		using std::pow;
 
-		hep::initial_state_array<T> result;
+		hep::initial_state_map<T> result;
 
 		for (auto const state : set)
 		{
-			result[state] = pow(alphas_, T(alphas_power_)) * T(2.0);
+			result.emplace(state, pow(alphas_, T(alphas_power_)) * T(2.0));
 		}
 
 		results.assign(scales.size(), result);
@@ -153,13 +153,13 @@ public:
 		std::vector<T> const& /*phase_space*/,
 		hep::initial_state_set set,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::initial_state_array<T>>& results
+		std::vector<hep::initial_state_map<T>>& results
 	) {
-		hep::initial_state_array<T> result;
+		hep::initial_state_map<T> result;
 
 		for (auto const state : set)
 		{
-			result[state] = pow(alphas_, T(alphas_power_)) * T(1.0);
+			result.emplace(state, pow(alphas_, T(alphas_power_)) * T(1.0));
 		}
 
 		results.assign(scales.size(), result);

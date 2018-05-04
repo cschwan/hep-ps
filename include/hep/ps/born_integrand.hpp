@@ -87,6 +87,7 @@ public:
 		{
 			set_scales(std::vector<T>());
 			results_.reserve(scales_.size());
+			borns_.resize(scales_.size());
 		}
 
 		pdfs_.register_partons(partons_in_initial_state_set(set));
@@ -119,6 +120,7 @@ public:
 		{
 			set_scales(recombined_ps_);
 			results_.reserve(scales_.size());
+			borns_.resize(scales_.size());
 		}
 
 		T const factor = T(0.5) * hbarc2_ / info.energy_squared();
@@ -132,6 +134,11 @@ public:
 		assert( scale_pdf_x2_.size() == scales_.size() );
 		assert( (pdfs_.count() == 1) || (pdf_pdf_x1_.size() == pdfs_.count()) );
 		assert( (pdfs_.count() == 1) || (pdf_pdf_x2_.size() == pdfs_.count()) );
+
+		for (auto& born : borns_)
+		{
+			born.clear();
+		}
 
 		matrix_elements_.borns(phase_space, set_, scales_, borns_);
 
@@ -204,7 +211,7 @@ private:
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
-	std::vector<initial_state_array<T>> borns_;
+	std::vector<initial_state_map<T>> borns_;
 	T alphas_power_;
 	bool dynamic_scales_;
 };

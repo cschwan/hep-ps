@@ -74,7 +74,7 @@ HEP_ENUM(initial_state,
 	sx_cx  /*!< anti-strange anti-charm initial state. */
 );
 
-HEP_ENUM_ARRAY(initial_state);
+HEP_ENUM_MAP(initial_state);
 
 HEP_ENUM_SET(initial_state);
 

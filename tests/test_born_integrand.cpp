@@ -97,7 +97,7 @@ public:
 		std::vector<T> const&,
 		hep::initial_state_set set,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::initial_state_array<T>>& results
+		std::vector<hep::initial_state_map<T>>& results
 	) const {
 		using std::pow;
 
@@ -109,8 +109,8 @@ public:
 
 			for (auto const state : set)
 			{
-				results.at(i)[state] = pow(alphas_,
-					T(alphas_power_)) * (T(1.0) + mur);
+				results.at(i).emplace(state, pow(alphas_,
+					T(alphas_power_)) * (T(1.0) + mur));
 			}
 		}
 	}

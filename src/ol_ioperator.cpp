@@ -101,7 +101,7 @@ void ol_ioperator<T>::borns(
 	std::vector<T> const& phase_space,
 	initial_state_set /*set*/,
 	std::vector<scales<T>> const& scales,
-	std::vector<initial_state_array<T>>& results
+	std::vector<initial_state_map<T>>& results
 ) {
 	auto& ol = ol_interface::instance();
 
@@ -133,9 +133,10 @@ void ol_ioperator<T>::borns(
 	ol.evaluate_full(id_, pp.data(), &m2tree, m2loop, m2ir1, m2loop2, m2ir2,
 		&acc);
 
-	initial_state_array<T> result;
-	result[state_] = T(m2ir1[0]);
-	results.assign(scales.size(), result);
+	for (auto& result : results)
+	{
+		result.emplace(state_, T(m2ir1[0]));
+	}
 }
 
 template <typename T>
