@@ -22,6 +22,7 @@
 #include "hep/mc/projector.hpp"
 
 #include "hep/ps/convolute.hpp"
+#include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
@@ -39,7 +40,6 @@
 #include <iterator>
 #include <memory>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 namespace hep
@@ -82,6 +82,7 @@ public:
 		, alpha_min_(alpha_min)
 		, final_states_real_(matrix_elements_.final_states_real())
 		, final_states_dipole_(matrix_elements_.final_states())
+		, dipoles_(matrix_elements_.dipoles())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
 		std::size_t const fs = final_states_real_.size();
@@ -91,7 +92,13 @@ public:
 		recombined_dipole_states_.reserve(fs - 1);
 		pdf_results_.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());
 
-		non_zero_dipoles_.reserve(matrix_elements_.dipoles().size());
+		non_zero_dipoles_.reserve(dipoles_.size());
+		dipole_phase_spaces_.resize(dipoles_.size());
+
+		for (auto& phase_space : dipole_phase_spaces_)
+		{
+			phase_space.resize(4 * (fs + 2));
+		}
 
 		if (!scale_setter_.dynamic())
 		{
@@ -110,11 +117,12 @@ public:
 	) override {
 		non_zero_dipoles_.clear();
 
-		for (auto const dipole_with_set : matrix_elements_.dipoles())
+		std::size_t index = 0;
+
+		for (auto const dipole_with_set : dipoles_)
 		{
 			auto const& dipole = dipole_with_set.dipole();
-
-			std::vector<T> phase_space(real_phase_space.size() - 4);
+			auto& phase_space = dipole_phase_spaces_.at(index);
 
 			// map the real phase space on the dipole phase space
 			auto const invariants = subtraction_.map_phase_space(
@@ -146,7 +154,7 @@ public:
 			}
 
 			non_zero_dipoles_.emplace_back(
-				std::move(phase_space),
+				index++,
 				invariants,
 				dipole,
 				dipole_cut_result
@@ -196,8 +204,9 @@ public:
 		{
 			auto const& dipole = non_zero_dipole.dipole();
 			auto const& dipole_cut_result = non_zero_dipole.cut_result();
-			auto const& phase_space = non_zero_dipole.phase_space();
 			auto const& invariants = non_zero_dipole.invariants();
+			auto const& phase_space =
+				dipole_phase_spaces_.at(non_zero_dipole.index());
 
 			bool const fermion_i = dipole.emitter_type() ==
 				particle_type::fermion;
@@ -329,6 +338,7 @@ private:
 		std::vector<recombined_state>{}))::info_t;
 
 	std::vector<T> recombined_ps_;
+	std::vector<std::vector<T>> dipole_phase_spaces_;
 	std::vector<recombined_state> recombined_states_;
 	std::vector<recombined_state> recombined_dipole_states_;
 	std::vector<final_state> final_states_real_;
@@ -343,6 +353,7 @@ private:
 	std::vector<T> factors_;
 	std::vector<initial_state_map<T>> me_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
+	std::vector<dipole_with_set> dipoles_;
 	T alphas_power_;
 };
 

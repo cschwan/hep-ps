@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,21 +36,21 @@ class non_zero_dipole
 {
 public:
 	non_zero_dipole(
-		std::vector<T>&& phase_space,
+		std::size_t index,
 		dipole_invariants<T> const& invariants,
 		dipole const& dipole,
 		cut_result_with_info<I> const& cut_result
 	)
-		: phase_space_(std::move(phase_space))
+		: index_(index)
 		, invariants_(invariants)
 		, dipole_(dipole)
 		, cut_result_(cut_result)
 	{
 	}
 
-	std::vector<T> const& phase_space() const
+	std::size_t index() const
 	{
-		return phase_space_;
+		return index_;
 	}
 
 	dipole_invariants<T> const& invariants() const
@@ -69,7 +69,7 @@ public:
 	}
 
 private:
-	std::vector<T> phase_space_;
+	std::size_t index_;
 	dipole_invariants<T> invariants_;
 	hep::dipole dipole_;
 	cut_result_with_info<I> cut_result_;

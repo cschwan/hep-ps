@@ -178,7 +178,7 @@ public:
 		return alphas_power_;
 	}
 
-	std::array<hep::dipole_with_set, 1> dipoles() const
+	std::vector<hep::dipole_with_set> dipoles() const
 	{
 		return { hep::dipole_with_set{ 2, 4, 3, hep::particle_type::fermion,
 			hep::particle_type::boson, hep::particle_type::fermion,
