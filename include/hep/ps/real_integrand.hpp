@@ -97,7 +97,7 @@ public:
 
 		for (auto& phase_space : dipole_phase_spaces_)
 		{
-			phase_space.resize(4 * (fs + 2));
+			phase_space.resize(4 * (fs + 1));
 		}
 
 		if (!scale_setter_.dynamic())
