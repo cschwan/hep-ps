@@ -135,7 +135,7 @@ void ol_ioperator<T>::borns(
 
 	for (auto& result : results)
 	{
-		result.emplace(state_, T(m2ir1[0]));
+		result.emplace_back(state_, T(m2ir1[0]));
 	}
 }
 

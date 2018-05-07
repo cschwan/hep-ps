@@ -142,7 +142,7 @@ public:
 
 		for (auto const state : set)
 		{
-			result.emplace(state, pow(alphas_, T(alphas_power_)) * T(2.0));
+			result.emplace_back(state, pow(alphas_, T(alphas_power_)) * T(2.0));
 		}
 
 		results.assign(scales.size(), result);
@@ -159,7 +159,7 @@ public:
 
 		for (auto const state : set)
 		{
-			result.emplace(state, pow(alphas_, T(alphas_power_)) * T(1.0));
+			result.emplace_back(state, pow(alphas_, T(alphas_power_)) * T(1.0));
 		}
 
 		results.assign(scales.size(), result);

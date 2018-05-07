@@ -136,9 +136,9 @@ public:
 	) {
 		for (auto const state : set)
 		{
-			results.at(0).emplace(state,
+			results.at(0).emplace_back(state,
 				pow(alphas_, T(alphas_power_)) * T(1.0));
-			results.at(1).emplace(state,
+			results.at(1).emplace_back(state,
 				pow(alphas_, T(alphas_power_)) * T(1.0));
 		}
 	}

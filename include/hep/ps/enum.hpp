@@ -99,52 +99,7 @@
 ///
 #define HEP_ENUM_MAP(name)                                                     \
 	template <typename T>                                                      \
-	class name ## _map                                                         \
-	{                                                                          \
-	public:                                                                    \
-		/**  */                                                                \
-		using const_iterator =                                                 \
-			typename std::vector<std::pair<name, T>>::const_iterator;          \
-                                                                               \
-		/** Default constructor. */                                            \
-		name ## _map()                                                         \
-			: vector_()                                                        \
-		{                                                                      \
-        }                                                                      \
-                                                                               \
-		/**  */                                                                \
-		void emplace(name index, T value)                                      \
-		{                                                                      \
-			vector_.emplace_back(index, value);                                \
-		}                                                                      \
-                                                                               \
-		/**  */                                                                \
-		const_iterator begin() const                                           \
-		{                                                                      \
-			return vector_.begin();                                            \
-		}                                                                      \
-                                                                               \
-		/**  */                                                                \
-		const_iterator end() const                                             \
-		{                                                                      \
-			return vector_.end();                                              \
-		}                                                                      \
-                                                                               \
-		/**  */                                                                \
-		void clear()                                                           \
-		{                                                                      \
-			vector_.clear();                                                   \
-		}                                                                      \
-                                                                               \
-		/**  */                                                                \
-		void reserve(std::size_t size)                                         \
-		{                                                                      \
-			vector_.reserve(size);                                             \
-		}                                                                      \
-                                                                               \
-	private:                                                                   \
-		std::vector<std::pair<name, T>> vector_;                               \
-	}
+	using name ## _map = std::vector<std::pair<name, T>>
 
 /// Defines a class that is able to contain a unique element of the given
 /// enumeration `name` that must be previously declared with \ref HEP_ENUM.

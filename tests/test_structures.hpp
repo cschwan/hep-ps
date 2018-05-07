@@ -139,7 +139,7 @@ public:
 
 		for (auto const process : set)
 		{
-			me.front().emplace(process, T(1.0));
+			me.front().emplace_back(process, T(1.0));
 		}
 	}
 
