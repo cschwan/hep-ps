@@ -79,15 +79,11 @@ public:
 		, hbarc2_(hbarc2)
 		, parts_{parts}
 		, final_states_(matrix_elements_.final_states())
+		, insertion_terms_(matrix_elements_.insertion_terms())
 		, alphas_power_(matrix_elements_.alphas_power())
 	{
-		using std::begin;
-		using std::end;
-
-		auto const terms = matrix_elements_.insertion_terms();
-		insertion_terms_.assign(begin(terms), end(terms));
-
 		std::size_t const fs = final_states_.size();
+
 		recombined_ps_.reserve(4 * (fs + 2));
 		recombined_states_.reserve(fs);
 		pdf_results_.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());

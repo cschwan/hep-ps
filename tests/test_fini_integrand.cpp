@@ -156,7 +156,7 @@ public:
 		return alphas_power_;
 	}
 
-	std::array<hep::insertion_term, 2> insertion_terms() const
+	std::vector<hep::insertion_term> insertion_terms() const
 	{
 		return { hep::insertion_term{0}, hep::insertion_term{1} };
 	}
