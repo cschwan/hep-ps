@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,24 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+namespace
+{
+
+inline std::size_t lsb_position(std::bitset<64> x)
+{
+	x |= (x <<  1);
+	x |= (x <<  2);
+	x |= (x <<  4);
+	x |= (x <<  8);
+	x |= (x << 16);
+	x |= (x << 32);
+	x.flip();
+
+	return x.count();
+}
+
+}
 
 /// Returns the number of arguments given to this preprocessor macro.
 #define HEP_ENUM_SIZEOF(...) \
@@ -127,7 +145,7 @@
                                                                                \
 			const_iterator& operator=(const const_iterator&) = default;        \
                                                                                \
-			explicit const_iterator(std::size_t set)                           \
+			explicit const_iterator(std::bitset<64> set)                       \
 				: set_{set}                                                    \
 			{                                                                  \
 			}                                                                  \
@@ -139,9 +157,7 @@
                                                                                \
 			const_iterator& operator++()                                       \
 			{                                                                  \
-				std::size_t const least_significant_bit = set_ &               \
-					-static_cast <std::make_signed<std::size_t>::type> (set_); \
-				set_ ^= least_significant_bit;                                 \
+				set_ ^= std::bitset<64>(1) << lsb_position(set_);              \
                                                                                \
 				return *this;                                                  \
 			}                                                                  \
@@ -165,24 +181,11 @@
                                                                                \
 			reference operator*() const                                        \
 			{                                                                  \
-				assert( set_ <= std::numeric_limits<std::int32_t>::max() );    \
-                                                                               \
-				std::size_t v = set_;                                          \
-				std::size_t c = 32;                                            \
-				v &= -static_cast <std::make_signed<std::size_t>::type> (v);   \
-                                                                               \
-				if (v) c--;                                                    \
-				if (v & 0x0000FFFF) c -= 16;                                   \
-				if (v & 0x00FF00FF) c -= 8;                                    \
-				if (v & 0x0F0F0F0F) c -= 4;                                    \
-				if (v & 0x33333333) c -= 2;                                    \
-				if (v & 0x55555555) c -= 1;                                    \
-                                                                               \
-				return static_cast <name> (c);                                 \
+				return static_cast <name> (lsb_position(set_));                \
 			}                                                                  \
                                                                                \
 		private:                                                               \
-			std::size_t set_;                                                  \
+			std::bitset<64> set_;                                              \
 		};                                                                     \
                                                                                \
 		const_iterator begin() const                                           \
@@ -201,16 +204,17 @@
 		}                                                                      \
                                                                                \
 		name ## _set(std::initializer_list<name> list)                         \
-			: set_(std::accumulate(list.begin(), list.end(), 0u,               \
-				[](std::size_t set, name object) {                             \
-					return set | (1 << static_cast <std::size_t> (object));    \
+			: set_(std::accumulate(list.begin(), list.end(),                   \
+				std::bitset<64>(), [](std::bitset<64> set, name object) {      \
+					return set | (std::bitset<64>(1) <<                        \
+						static_cast <std::size_t> (object));                   \
 			  }))                                                              \
 		{                                                                      \
 		}                                                                      \
                                                                                \
 		bool empty() const                                                     \
 		{                                                                      \
-			return set_ == 0;                                                  \
+			return set_.none();                                                \
 		}                                                                      \
                                                                                \
 		void subtract(name ## _set other_set)                                  \
@@ -221,18 +225,18 @@
 		void add(name object)                                                  \
 		{                                                                      \
 			auto const index = static_cast <std::size_t> (object);             \
-			set_ |= (1 << index);                                              \
+			set_ |= (std::bitset<64>(1) << index);                             \
 		}                                                                      \
                                                                                \
 		bool includes(name object) const                                       \
 		{                                                                      \
 			auto const index = static_cast <std::size_t> (object);             \
-			return set_ & (1 << index);                                        \
+			return (set_ & (std::bitset<64>(1) << index)).any();               \
 		}                                                                      \
                                                                                \
 		std::size_t size() const                                               \
 		{                                                                      \
-			return std::bitset<64>(set_).count();                              \
+			return set_.count();                                               \
 		}                                                                      \
                                                                                \
 		bool operator==(name ## _set other) const                              \
@@ -241,7 +245,7 @@
 		}                                                                      \
                                                                                \
 	private:                                                                   \
-		std::size_t set_;                                                      \
+		std::bitset<64> set_;                                                  \
 	}
 
 #endif

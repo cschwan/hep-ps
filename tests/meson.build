@@ -56,6 +56,13 @@ test_headers = executable(
 	link_with : [ libcatch, libhep_ps ]
 )
 
+test_initial_state = executable(
+	'test_initial_state',
+	'test_initial_state.cpp',
+	include_directories : incdir,
+	link_with : [ libcatch, libhep_ps ]
+)
+
 test_insertion_term = executable(
 	'test_insertion_term',
 	'test_insertion_term.cpp',
@@ -176,6 +183,7 @@ test('test_fini_integrand', test_fini_integrand)
 test('test_fortran_helper', test_fortran_helper)
 test('test_headers', test_headers)
 test('test_insertion_term', test_insertion_term)
+test('test_initial_state', test_initial_state)
 test('test_list_phase_space_generator', test_list_phase_space_generator)
 test('test_lusifer_diagram_generator', test_lusifer_diagram_generator)
 test('test_lusifer_phase_space_generator', test_lusifer_phase_space_generator)
