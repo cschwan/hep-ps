@@ -115,6 +115,14 @@ test_lusifer_phase_space_generator3 = executable(
 	link_with : [ libcatch, libhep_ps ]
 )
 
+test_ol_born_matrix_elements = executable(
+	'test_ol_born_matrix_elements',
+	'test_ol_born_matrix_elements.cpp',
+	include_directories : incdir,
+	cpp_args : '-DHEP_TYPE_T=double',
+	link_with : [ libcatch, libhep_ps ]
+)
+
 test_pdg_functions = executable(
 	'test_pdg_functions',
 	'test_pdg_functions.cpp',
@@ -189,6 +197,7 @@ test('test_lusifer_diagram_generator', test_lusifer_diagram_generator)
 test('test_lusifer_phase_space_generator', test_lusifer_phase_space_generator)
 test('test_lusifer_phase_space_generator2', test_lusifer_phase_space_generator2)
 test('test_lusifer_phase_space_generator3', test_lusifer_phase_space_generator3)
+test('test_ol_born_matrix_elements', test_ol_born_matrix_elements)
 test('test_pdg_functions', test_pdg_functions)
 test('test_permutation', test_permutation)
 test('test_phase_space_point', test_phase_space_point)
