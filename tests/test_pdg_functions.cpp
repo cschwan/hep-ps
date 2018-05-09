@@ -1,8 +1,8 @@
-#include "hep/ps/parton.hpp"
+#include "hep/ps/pdg_functions.hpp"
 
 #include "catch.hpp"
 
-TEST_CASE("test parton_to_pdg_id()", "[parton]")
+TEST_CASE("test parton_to_pdg_id()", "[pdg_functions]")
 {
 	// http://pdg.lbl.gov/2017/reviews/rpp2017-rev-monte-carlo-numbering.pdf
 	CHECK( hep::parton_to_pdg_id(hep::parton::anti_charm)   == -4 );

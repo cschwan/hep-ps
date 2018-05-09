@@ -115,9 +115,9 @@ test_lusifer_phase_space_generator3 = executable(
 	link_with : [ libcatch, libhep_ps ]
 )
 
-test_parton = executable(
-	'test_parton',
-	'test_parton.cpp',
+test_pdg_functions = executable(
+	'test_pdg_functions',
+	'test_pdg_functions.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
 	link_with : [ libcatch, libhep_ps ]
@@ -189,7 +189,7 @@ test('test_lusifer_diagram_generator', test_lusifer_diagram_generator)
 test('test_lusifer_phase_space_generator', test_lusifer_phase_space_generator)
 test('test_lusifer_phase_space_generator2', test_lusifer_phase_space_generator2)
 test('test_lusifer_phase_space_generator3', test_lusifer_phase_space_generator3)
-test('test_parton', test_parton)
+test('test_pdg_functions', test_pdg_functions)
 test('test_permutation', test_permutation)
 test('test_phase_space_point', test_phase_space_point)
 test('test_phase_space_quality', test_phase_space_quality, timeout : 120)

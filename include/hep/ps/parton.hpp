@@ -41,10 +41,6 @@ HEP_ENUM_ARRAY(parton);
 
 HEP_ENUM_SET(parton);
 
-/// Converts the \ref parton `p` to the corresponding particle data group (PDG)
-/// ID.
-int parton_to_pdg_id(parton p);
-
 }
 
 #endif

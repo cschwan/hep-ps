@@ -41,7 +41,6 @@ sources = [
 	'ol_ioperator.cpp',
 	'p_type_jet_algorithm.cpp',
 	'p_type_photon_parton_recombiner.cpp',
-	'parton.cpp',
 	'parton_dfs.cpp',
 	'parton_df_unc.cpp',
 	'pdg_functions.cpp',

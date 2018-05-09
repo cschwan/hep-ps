@@ -1,4 +1,5 @@
 #include "hep/ps/parton_dfs.hpp"
+#include "hep/ps/pdg_functions.hpp"
 #include "hep/ps/suppress_banners.hpp"
 
 #include <LHAPDF/PDF.h>

@@ -290,6 +290,9 @@ constexpr parton state_parton_two(initial_state state)
 /// Returns a \ref parton_set with all partons that are in `set`.
 parton_set partons_in_initial_state_set(initial_state_set set);
 
+/// Returns an `initial_state` constructed from two \ref parton instances.
+initial_state partons_to_initial_state(parton one, parton two);
+
 }
 
 #endif
