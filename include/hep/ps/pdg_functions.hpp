@@ -42,6 +42,11 @@ int parton_to_pdg_id(parton p);
 /// Converts an OpenLoops process string into a vector of PDG identifiers.
 std::vector<int> ol_process_string_to_pdg_ids(std::string const& process);
 
+/// Returns the electromagnetic charge of the particle with the given PDG
+/// identifier `id`.
+template <typename T>
+T pdg_id_to_charge(int id);
+
 }
 
 #endif

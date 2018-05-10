@@ -129,4 +129,68 @@ std::vector<int> ol_process_string_to_pdg_ids(std::string const& process)
 	return result;
 }
 
+template <typename T>
+T pdg_id_to_charge(int id)
+{
+	switch (id)
+	{
+	// anti-up-type quarks
+	case  -6:
+	case  -4:
+	case  -2:
+		return T(-2.0) / T(3.0);
+
+	// anti-down-type quarks
+	case  -5:
+	case  -3:
+	case  -1:
+		return T( 1.0) / T(3.0);
+
+	// down-type quarks
+	case   1:
+	case   3:
+	case   5:
+		return T(-1.0) / T(3.0);
+
+	// up-type quarks
+	case   2:
+	case   4:
+	case   6:
+		return T( 2.0) / T(3.0);
+
+	// anti-leptons
+	case -15:
+	case -13:
+	case -11:
+		return T( 1.0);
+
+	// leptons
+	case  11:
+	case  13:
+	case  15:
+		return T(-1.0);
+
+	// neutrinos
+	case -16:
+	case -14:
+	case -12:
+	case  12:
+	case  14:
+	case  16:
+	// gluon
+	case  21:
+	// photon
+	case 22:
+		return T();
+
+	default:
+		// TODO: NYI
+		assert( false );
+	}
+}
+
+// -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
+
+template double pdg_id_to_charge(int);
+
 }
