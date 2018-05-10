@@ -39,6 +39,7 @@ sources = [
 	'lusifer_interfaces.hpp',
 	'lusifer_phase_space_generator.cpp',
 	'ol_born_matrix_elements.cpp',
+	'ol_integrated_matrix_elements.cpp',
 	'ol_interface.cpp',
 	'ol_ioperator.cpp',
 	'p_type_jet_algorithm.cpp',
