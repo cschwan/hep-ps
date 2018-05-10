@@ -96,4 +96,37 @@ int parton_to_pdg_id(parton p)
 	}
 }
 
+std::vector<int> ol_process_string_to_pdg_ids(std::string const& process)
+{
+	// format int int `->` int int ...
+	std::vector<int> result;
+
+	std::size_t begin = 0;
+	std::size_t end = 0;
+
+	while (end != process.size())
+	{
+		begin = process.find_first_not_of(' ', begin);
+		end = process.find(' ', begin + 1);
+
+		if (end == std::string::npos)
+		{
+			end = process.size();
+		}
+
+		auto const& substring = process.substr(begin, end - begin);
+
+		begin = end;
+
+		if (substring == "->")
+		{
+			continue;
+		}
+
+		result.push_back(std::stoi(substring));
+	}
+
+	return result;
+}
+
 }

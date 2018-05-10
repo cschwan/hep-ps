@@ -2,31 +2,7 @@
 #include "hep/ps/ol_interface.hpp"
 #include "hep/ps/pdg_functions.hpp"
 
-#include <sstream>
 #include <stdexcept>
-
-namespace
-{
-
-std::vector<int> parse_ol_process_string(std::string process)
-{
-	std::size_t marker = process.find("->");
-	process.erase(marker, 2);
-
-	std::istringstream stream{process};
-	std::vector<int> result;
-
-	while (stream.good())
-	{
-		int id;
-		stream >> id;
-		result.push_back(id);
-	}
-
-	return result;
-}
-
-}
 
 namespace hep
 {
@@ -72,8 +48,9 @@ ol_ioperator<T>::ol_ioperator(
 		throw std::runtime_error("OpenLoops didn't find the given process");
 	}
 
-	auto const& pdg_ids = parse_ol_process_string(process);
-	state_ = pdg_ids_to_initial_state(pdg_ids.at(0), pdg_ids.at(1));
+	auto const& pdg_ids = ol_process_string_to_pdg_ids(process);
+	state_ = partons_to_initial_state(pdg_id_to_parton(pdg_ids.at(0)),
+		pdg_id_to_parton(pdg_ids.at(1)));
 	final_states_.reserve(pdg_ids.size() - 2);
 
 	for (std::size_t i = 2; i != pdg_ids.size(); ++i)

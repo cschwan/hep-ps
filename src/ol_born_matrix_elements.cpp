@@ -1,6 +1,6 @@
 #include "hep/ps/ol_born_matrix_elements.hpp"
-#include "hep/ps/ol_helpers.hpp"
 #include "hep/ps/ol_interface.hpp"
+#include "hep/ps/pdg_functions.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -20,23 +20,29 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
 
 	for (auto const& process : processes)
 	{
-		auto const& parse_result = parse_ol_process_string(process);
+		auto const& pdg_ids = ol_process_string_to_pdg_ids(process);
+
+		std::vector<final_state> final_states(pdg_ids.size() - 2);
+		std::transform(pdg_ids.begin() + 2, pdg_ids.end(), final_states.begin(),
+			pdg_id_to_final_state);
+
+		auto const state = partons_to_initial_state(
+			pdg_id_to_parton(pdg_ids.at(0)), pdg_id_to_parton(pdg_ids.at(1)));
 
 		if (final_states_.empty())
 		{
-			final_states_ = parse_result.second;
+			final_states_ = final_states;
 		}
 		else
 		{
 			if (!std::equal(final_states_.begin(), final_states_.end(),
-				parse_result.second.begin()))
+				final_states.begin()))
 			{
 				throw std::invalid_argument("processes are not compatible");
 			}
 		}
 
-		ids_.emplace(parse_result.first,
-			ol.register_process(process.c_str(), 1));
+		ids_.emplace(state, ol.register_process(process.c_str(), 1));
 	}
 
 	final_states_.shrink_to_fit();

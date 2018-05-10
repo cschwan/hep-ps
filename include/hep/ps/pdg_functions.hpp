@@ -23,6 +23,9 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/parton.hpp"
 
+#include <string>
+#include <vector>
+
 namespace hep
 {
 
@@ -36,12 +39,8 @@ parton pdg_id_to_parton(int id);
 /// ID.
 int parton_to_pdg_id(parton p);
 
-/// Convert two PDG identifiers to an \ref initial_state.
-inline initial_state pdg_ids_to_initial_state(int id1, int id2)
-{
-	return partons_to_initial_state(pdg_id_to_parton(id1),
-		pdg_id_to_parton(id2));
-}
+/// Converts an OpenLoops process string into a vector of PDG identifiers.
+std::vector<int> ol_process_string_to_pdg_ids(std::string const& process);
 
 }
 

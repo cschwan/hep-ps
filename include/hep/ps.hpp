@@ -53,7 +53,6 @@
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/ol_born_matrix_elements.hpp"
-#include "hep/ps/ol_helpers.hpp"
 #include "hep/ps/ol_interface.hpp"
 #include "hep/ps/ol_ioperator.hpp"
 #include "hep/ps/p_type_jet_algorithm.hpp"
