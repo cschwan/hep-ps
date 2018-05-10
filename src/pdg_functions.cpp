@@ -73,6 +73,46 @@ parton pdg_id_to_parton(int id)
 	}
 }
 
+particle_type pdg_id_to_particle_type(int id)
+{
+	switch (id)
+	{
+	case -16:
+	case -15:
+	case -14:
+	case -13:
+	case -12:
+	case -11:
+	case  -6:
+	case  -5:
+	case  -4:
+	case  -3:
+	case  -2:
+	case  -1:
+	case   1:
+	case   2:
+	case   3:
+	case   4:
+	case   5:
+	case   6:
+	case  11:
+	case  12:
+	case  13:
+	case  14:
+	case  15:
+	case  16:
+		return particle_type::fermion;
+
+	case  22:
+	case  21:
+		return particle_type::boson;
+
+	default:
+		// TODO: NYI
+		assert( false );
+	}
+}
+
 int parton_to_pdg_id(parton p)
 {
 	// reference:

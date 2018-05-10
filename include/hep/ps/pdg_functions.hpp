@@ -22,6 +22,7 @@
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/particle_type.hpp"
 
 #include <string>
 #include <vector>
@@ -34,6 +35,9 @@ final_state pdg_id_to_final_state(int id);
 
 /// Converts the PDG identifier to a \ref parton.
 parton pdg_id_to_parton(int id);
+
+/// Converts the PDG identifier to a \ref particle_type.
+particle_type pdg_id_to_particle_type(int id);
 
 /// Converts the \ref parton `p` to the corresponding particle data group (PDG)
 /// ID.
