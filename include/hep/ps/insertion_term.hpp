@@ -134,6 +134,12 @@ private:
 	std::size_t spectator_;
 };
 
+/// Comparison operator for two instances of \ref insertion_term `a` and `b`.
+bool operator<(insertion_term const& a, insertion_term const& b);
+
+/// Comparison operator for two instances of \ref insertion_term `a` and `b`.
+bool operator==(insertion_term const& a, insertion_term const& b);
+
 }
 
 #endif

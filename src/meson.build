@@ -29,6 +29,7 @@ sources = [
 	'generator.f',
 	'hadron_hadron_psg_adapter.hpp',
 	'initial_state.cpp',
+	'insertion_term.cpp',
 	'inv_idx.cpp',
 	'kaellen.cpp',
 	'list_phase_space_generator.cpp',
