@@ -46,4 +46,33 @@ initial_state partons_to_initial_state(parton one, parton two)
 	return result->second;
 }
 
+template <typename T>
+T casimir_operator(initial_state state, std::size_t index)
+{
+	if (index == 0)
+	{
+		switch (state_parton_one(state))
+		{
+		case parton::photon:  return T();
+		case parton::gluon:   return T(3.0);
+		default:              return T(4.0) / T(3.0);
+		}
+	}
+	else if (index == 1)
+	{
+		switch (state_parton_two(state))
+		{
+		case parton::photon:  return T();
+		case parton::gluon:   return T(3.0);
+		default:              return T(4.0) / T(3.0);
+		}
+	}
+
+	assert( false );
+}
+
+// -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
+
+template double casimir_operator(initial_state, std::size_t);
+
 }

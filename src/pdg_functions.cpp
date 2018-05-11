@@ -136,6 +136,46 @@ int parton_to_pdg_id(parton p)
 	}
 }
 
+bool pdg_id_particle_has_color(int id)
+{
+	switch (id)
+	{
+	case  -6:
+	case  -5:
+	case  -4:
+	case  -3:
+	case  -2:
+	case  -1:
+	case   1:
+	case   2:
+	case   3:
+	case   4:
+	case   5:
+	case   6:
+	case  21:
+		return true;
+
+	case -16:
+	case -15:
+	case -14:
+	case -13:
+	case -12:
+	case -11:
+	case  11:
+	case  13:
+	case  15:
+	case  12:
+	case  14:
+	case  16:
+	case  22:
+		return false;
+
+	default:
+		// TODO: NYI
+		assert( false );
+	}
+}
+
 std::vector<int> ol_process_string_to_pdg_ids(std::string const& process)
 {
 	// format int int `->` int int ...

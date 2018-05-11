@@ -43,6 +43,9 @@ particle_type pdg_id_to_particle_type(int id);
 /// ID.
 int parton_to_pdg_id(parton p);
 
+/// Checks if the particle with the given PDG identifier carries color.
+bool pdg_id_particle_has_color(int id);
+
 /// Converts an OpenLoops process string into a vector of PDG identifiers.
 std::vector<int> ol_process_string_to_pdg_ids(std::string const& process);
 

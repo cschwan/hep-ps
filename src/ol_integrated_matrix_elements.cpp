@@ -21,7 +21,8 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 	, type_(type)
 {
 	auto& ol = ol_interface::instance();
-	ol.setparameter_int("order_qcd", alphas_power);
+	ol.setparameter_int("order_qcd", (type == correction_type::qcd) ?
+		(alphas_power - 1) : alphas_power);
 
 	for (auto const& process : processes)
 	{
@@ -50,10 +51,17 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 		int const process_id = ol.register_process(process.c_str(), 1);
 		ids_.emplace(state, process_id);
 
+		std::vector<std::size_t> indices;
+
 		if (type == correction_type::qcd)
 		{
-			// TODO: NYI
-			assert( false );
+			for (std::size_t i = 0; i != pdg_ids.size(); ++i)
+			{
+				if (pdg_id_particle_has_color(pdg_ids.at(i)))
+				{
+					indices.push_back(i);
+				}
+			}
 		}
 		else if (type == correction_type::ew)
 		{
@@ -64,7 +72,6 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 			charges.at(0) *= T(-1.0);
 			charges.at(1) *= T(-1.0);
 
-			std::vector<std::size_t> indices;
 			indices.reserve(charges.size());
 
 			for (std::size_t i = 0; i != charges.size(); ++i)
@@ -76,22 +83,22 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 			}
 
 			charge_table_.emplace(process_id, std::move(charges));
+		}
 
-			terms_.emplace_back(0);
-			terms_.emplace_back(1);
+		terms_.emplace_back(0);
+		terms_.emplace_back(1);
 
-			for (std::size_t i = 0; i < indices.size() - 1; ++i)
+		for (std::size_t i = 0; i < indices.size() - 1; ++i)
+		{
+			for (std::size_t j = i + 1; j != indices.size(); ++j)
 			{
-				for (std::size_t j = i + 1; j != indices.size(); ++j)
-				{
-					auto const k = indices.at(i);
-					auto const l = indices.at(j);
-					auto const type_k = pdg_id_to_particle_type(pdg_ids.at(k));
-					auto const type_l = pdg_id_to_particle_type(pdg_ids.at(l));
+				auto const k = indices.at(i);
+				auto const l = indices.at(j);
+				auto const type_k = pdg_id_to_particle_type(pdg_ids.at(k));
+				auto const type_l = pdg_id_to_particle_type(pdg_ids.at(l));
 
-					terms_.emplace_back(k, type_k, l);
-					terms_.emplace_back(l, type_l, k);
-				}
+				terms_.emplace_back(k, type_k, l);
+				terms_.emplace_back(l, type_l, k);
 			}
 		}
 	}
@@ -101,6 +108,8 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 	terms_.shrink_to_fit();
 
 	final_states_.shrink_to_fit();
+	std::size_t const n = final_states_.size() + 2;
+	ol_m2cc_.resize(n * (n - 1) / 2);
 	ol_phase_space_.resize(5 * (final_states_.size() + 2));
 }
 
@@ -145,8 +154,46 @@ void ol_integrated_matrix_elements<T>::correlated_me(
 
 	if (type_ == correction_type::qcd)
 	{
-		// TODO: NYI
-		assert( false );
+		double m2tree;
+		double m2ew;
+		double alphas;
+		ol.getparameter_double("alphas", &alphas);
+
+		for (auto const state : set)
+		{
+			auto const range = ids_.equal_range(state);
+
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				ol.evaluate_cc(i->second, ol_phase_space_.data(), &m2tree,
+					ol_m2cc_.data(), &m2ew);
+
+				for (std::size_t j = 0; j != terms_.size(); ++j)
+				{
+					auto const& term = terms_.at(j);
+
+					if (term.type() == insertion_term_type::born)
+					{
+						T const casimir = casimir_operator<T>(state,
+							term.initial_particle());
+
+						results.at(j).emplace_back(state,
+							casimir * T(alphas) * T(m2tree));
+					}
+					else
+					{
+						std::size_t const k = std::min(term.emitter(),
+							term.spectator());
+						std::size_t const l = std::max(term.emitter(),
+							term.spectator());
+						std::size_t const index = k + l * (l - 1) / 2;
+
+						results.at(j).emplace_back(state,
+							T(alphas) * T(ol_m2cc_.at(index)));
+					}
+				}
+			}
+		}
 	}
 	else if (type_ == correction_type::ew)
 	{

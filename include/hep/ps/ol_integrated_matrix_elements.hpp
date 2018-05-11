@@ -61,6 +61,7 @@ private:
 	std::unordered_map<int, std::vector<T>> charge_table_;
 	std::vector<final_state> final_states_;
 	std::unordered_multimap<initial_state, int> ids_;
+	std::vector<double> ol_m2cc_;
 	std::vector<double> ol_phase_space_;
 	std::vector<insertion_term> terms_;
 	correction_type type_;
