@@ -72,6 +72,10 @@ public:
 	/// `k`, and `l`.
 	T mt(std::size_t i, std::size_t j, std::size_t k, std::size_t l) const;
 
+	/// Calculates the squared R-distance for two particles with indices `i` and
+	/// `j` with pseudo-rapidity.
+	T pdist2(std::size_t i, std::size_t j) const;
+
 	/// Calculates the azimuthal angle for the particle with index `i`.
 	T phi(std::size_t i) const;
 
@@ -86,6 +90,10 @@ public:
 	/// Returns the difference of rapidities of the particles with indices `i`
 	/// and `j`.
 	T rap_diff(std::size_t i, std::size_t j) const;
+
+	/// Returns the difference of rapidities of the particles with indices `i`
+	/// and `j`.
+	T prap_diff(std::size_t i, std::size_t j) const;
 
 	/// Calculates the rapidity of the particle with index `i`.
 	T rap_neg(std::size_t i) const;

@@ -155,6 +155,15 @@ T phase_space_point<T>::mt(
 }
 
 template <typename T>
+T phase_space_point<T>::pdist2(std::size_t i, std::size_t j) const
+{
+	T const rap = prap_diff(i, j);
+	T const phi = abs_phi_diff(i, j);
+
+	return rap * rap + phi * phi;
+}
+
+template <typename T>
 T phase_space_point<T>::phi(std::size_t i) const
 {
 	using std::atan2;
@@ -192,6 +201,14 @@ T phase_space_point<T>::rap_diff(std::size_t i, std::size_t j) const
 	T const y = p_[4*j+3] / p_[4*j+0];
 
 	return atanh((x - y) / (T(1.0) - x * y));
+}
+
+template <typename T>
+T phase_space_point<T>::prap_diff(std::size_t i, std::size_t j) const
+{
+	using std::fabs;
+
+	return fabs(prap_pos(i) - prap_pos(j));
 }
 
 template <typename T>
