@@ -125,6 +125,12 @@ private:
 	dipole_type type_;
 };
 
+/// Dipole comparison operator.
+bool operator<(dipole const& a, dipole const& b);
+
+/// Dipole comparison operator.
+bool operator==(dipole const& a, dipole const& b);
+
 }
 
 #endif
