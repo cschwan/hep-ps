@@ -188,6 +188,11 @@ T jacobian(T power, T mass, T width, T x, T xmin, T xmax)
 		return T(1.0) / (xmax - xmin);
 	}
 
+	if (mass == T())
+	{
+		m2 -= T(1e-6);
+	}
+
 	if (power == T(1.0))
 	{
 		// TODO: WARNING this branch is untested!
@@ -242,17 +247,28 @@ T map(T power, T mass, T width, T x, T xmin, T xmax)
 			return xmax;
 		}
 	}
-	else if (power == T(1.0))
-	{
-		// TODO: WARNING this branch is untested!
-		result = m2 + exp(x * log(xmax - m2) + (T(1.0) - x) * log(xmin - m2));
-	}
 	else
 	{
-		T const omp = T(1.0) - power;
+		if (mass == T())
+		{
+			// this reduces the number of extremely small invariants which
+			// introduce numerical problems in the matrix elements
+			m2 -= T(1e-6);
+		}
 
-		result = m2 + pow(x * pow(fabs(xmax - m2), omp) + (T(1.0) - x) *
-			pow(fabs(xmin - m2), omp), T(1.0) / omp);
+		if (power == T(1.0))
+		{
+			// TODO: WARNING this branch is untested!
+			result = m2 + exp(x * log(xmax - m2) + (T(1.0) - x) *
+				log(xmin - m2));
+		}
+		else
+		{
+			T const omp = T(1.0) - power;
+
+			result = m2 + pow(x * pow(fabs(xmax - m2), omp) + (T(1.0) - x) *
+				pow(fabs(xmin - m2), omp), T(1.0) / omp);
+		}
 	}
 
 	// if the result is outside of the expected interval, calculate it linearly;
