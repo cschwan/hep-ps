@@ -110,6 +110,8 @@ public:
 	);
 
 private:
+	bool started_;
+
 	ol_interface();
 };
 

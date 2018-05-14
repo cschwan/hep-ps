@@ -59,21 +59,23 @@ bool ol_interface::enabled()
 }
 
 ol_interface::ol_interface()
+	: started_(false)
 {
 #ifdef HAVE_OPENLOOPS
 	if (suppress_banners())
 	{
 		ol_setparameter_int("nosplash", 1);
 	}
-
-	ol_start();
 #endif
 }
 
 ol_interface::~ol_interface()
 {
 #ifdef HAVE_OPENLOOPS
-	ol_finish();
+	if (started_)
+	{
+		ol_finish();
+	}
 #endif
 }
 
@@ -153,6 +155,12 @@ int ol_interface::n_external(int id)
 void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 {
 #ifdef HAVE_OPENLOOPS
+	if (!started_)
+	{
+		started_ = true;
+		ol_start();
+	}
+
 	ol_evaluate_tree(id, pp, m2tree);
 #else
 	ignore(id);
@@ -171,6 +179,12 @@ void ol_interface::evaluate_cc(
 	double* m2ew
 ) {
 #ifdef HAVE_OPENLOOPS
+	if (!started_)
+	{
+		started_ = true;
+		ol_start();
+	}
+
 	ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
 #else
 	ignore(id);
@@ -191,6 +205,12 @@ void ol_interface::evaluate_sc(
 	double* m2sc
 ) {
 #ifdef HAVE_OPENLOOPS
+	if (!started_)
+	{
+		started_ = true;
+		ol_start();
+	}
+
 	ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
 #else
 	ignore(id);
@@ -211,6 +231,12 @@ void ol_interface::evaluate_loop(
 	double* acc
 ) {
 #ifdef HAVE_OPENLOOPS
+	if (!started_)
+	{
+		started_ = true;
+		ol_start();
+	}
+
 	ol_evaluate_loop(id, pp, m2tree, m2loop, acc);
 #else
 	ignore(id);
@@ -230,6 +256,12 @@ void ol_interface::evaluate_loop2(
 	double* acc
 ) {
 #ifdef HAVE_OPENLOOPS
+	if (!started_)
+	{
+		started_ = true;
+		ol_start();
+	}
+
 	ol_evaluate_loop2(id, pp, m2loop2, acc);
 #else
 	ignore(id);
@@ -248,6 +280,12 @@ void ol_interface::evaluate_ct(
 	double* m2_ct
 ) {
 #ifdef HAVE_OPENLOOPS
+	if (!started_)
+	{
+		started_ = true;
+		ol_start();
+	}
+
 	ol_evaluate_ct(id, pp, m2_tree, m2_ct);
 #else
 	ignore(id);
@@ -270,6 +308,12 @@ void ol_interface::evaluate_full(
 	double* acc
 ) {
 #ifdef HAVE_OPENLOOPS
+	if (!started_)
+	{
+		started_ = true;
+		ol_start();
+	}
+
 	ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
 #else
 	ignore(id);
