@@ -43,6 +43,7 @@ sources = [
 	'ol_integrated_matrix_elements.cpp',
 	'ol_interface.cpp',
 	'ol_ioperator.cpp',
+	'ol_real_matrix_elements.cpp',
 	'p_type_jet_algorithm.cpp',
 	'p_type_photon_parton_recombiner.cpp',
 	'parton_dfs.cpp',
