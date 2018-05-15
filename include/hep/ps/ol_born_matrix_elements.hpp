@@ -21,6 +21,7 @@
 
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
+#include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 
 #include <cstddef>
@@ -37,7 +38,9 @@ class ol_born_matrix_elements
 public:
 	ol_born_matrix_elements(
 		std::vector<std::string> const& processes,
-		std::size_t alphas_power
+		std::size_t alphas_power,
+		bool loop_mes = false,
+		regularization_scheme scheme = regularization_scheme::dim_reg_blha
 	);
 
 	void alphas(T alphas);
@@ -55,6 +58,7 @@ public:
 
 private:
 	std::size_t alphas_power_;
+	bool loop_mes_;
 	std::vector<final_state> final_states_;
 	std::unordered_multimap<initial_state, int> ids_;
 	std::vector<double> ol_phase_space_;

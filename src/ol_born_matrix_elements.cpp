@@ -11,12 +11,28 @@ namespace hep
 template <typename T>
 ol_born_matrix_elements<T>::ol_born_matrix_elements(
 	std::vector<std::string> const& processes,
-	std::size_t alphas_power
+	std::size_t alphas_power,
+	bool loop_mes,
+	regularization_scheme scheme
 )
 	: alphas_power_(alphas_power)
+	, loop_mes_(loop_mes)
 {
 	auto& ol = ol_interface::instance();
 	ol.setparameter_int("order_qcd", alphas_power);
+
+	if (scheme == regularization_scheme::dim_reg_blha)
+	{
+		ol.setparameter_int("polenorm", 0);
+	}
+	else if (scheme == regularization_scheme::dim_reg_coli)
+	{
+		ol.setparameter_int("polenorm", 1);
+	}
+	else
+	{
+		assert( false );
+	}
 
 	for (auto const& process : processes)
 	{
@@ -42,7 +58,8 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
 			}
 		}
 
-		ids_.emplace(state, ol.register_process(process.c_str(), 1));
+		int const amptype = loop_mes ? 11 : 1;
+		ids_.emplace(state, ol.register_process(process.c_str(), amptype));
 	}
 
 	final_states_.shrink_to_fit();
@@ -90,25 +107,93 @@ void ol_born_matrix_elements<T>::borns(
 		ol_phase_space_.at(5 * i + 4) = 0.0;
 	}
 
-	double m2tree;
-
-	for (auto const state : set)
+	if (loop_mes_)
 	{
-		auto const range = ids_.equal_range(state);
-		T value = T();
+		double m2tree;
+		double m2loop[3];
+		double acc;
 
-		for (auto i = range.first; i != range.second; ++i)
+		double mu = static_cast <double> (scales.front().renormalization());
+		ol.setparameter_double("mu", mu);
+
+		// TODO: `scales` usually has more than one entry with the same
+		// renormalization scale - cache it?
+
+		for (auto const state : set)
 		{
-			ol.evaluate_tree(i->second, ol_phase_space_.data(), &m2tree);
-			value += T(m2tree);
+			auto const range = ids_.equal_range(state);
+			T value = T();
+
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				// TODO: this assumes that the matrix element itself does
+				// not depend directly on the renormalization scale, for
+				// example through MSBar masses
+
+				ol.evaluate_loop(i->second, ol_phase_space_.data(), &m2tree,
+					m2loop, &acc);
+
+				value += T(m2loop[0]);
+
+				ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
+					m2loop);
+
+				value -= T(m2loop[0]);
+			}
+
+			results.front().emplace_back(state, value);
 		}
 
-		result.emplace_back(state, value);
-	}
+		for (std::size_t j = 0; j != scales.size(); ++j)
+		{
+			mu = scales.at(j).renormalization();
+			ol.setparameter_int("mu", mu);
 
-	for (std::size_t i = 1; i != scales.size(); ++i)
+			if (j != 0)
+			{
+				results.at(j) = results.front();
+			}
+
+			std::size_t k = 0;
+
+			for (auto const state : set)
+			{
+				auto const range = ids_.equal_range(state);
+				T value = T();
+
+				for (auto i = range.first; i != range.second; ++i)
+				{
+					ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
+						m2loop);
+					value += T(m2loop[0]);
+				}
+
+				results.at(j).at(k++).second += value;
+			}
+		}
+	}
+	else
 	{
-		results.at(i) = result;
+		double m2tree;
+
+		for (auto const state : set)
+		{
+			auto const range = ids_.equal_range(state);
+			T value = T();
+
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				ol.evaluate_tree(i->second, ol_phase_space_.data(), &m2tree);
+				value += T(m2tree);
+			}
+
+			result.emplace_back(state, value);
+		}
+
+		for (std::size_t i = 1; i != scales.size(); ++i)
+		{
+			results.at(i) = results.front();
+		}
 	}
 }
 
