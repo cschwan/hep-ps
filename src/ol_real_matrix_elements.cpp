@@ -59,10 +59,91 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
 		if (type == correction_type::ew)
 		{
-			// TODO: NYI
-			assert( false );
+			std::vector<final_state> final_states;
+			std::vector<T> charges;
 
-			// TODO: initialize `charge_table`
+			for (std::size_t i = 0; i != pdg_ids.size(); ++i)
+			{
+				charges.push_back(pdg_id_to_charge<T>(pdg_ids.at(i)));
+
+				if (pdg_ids.at(i) == 22)
+				{
+					unresolved.push_back(i);
+				}
+				else if (charges.back() != T())
+				{
+					indices.push_back(i);
+				}
+			}
+
+			charges.at(0) *= T(-1.0);
+			charges.at(1) *= T(-1.0);
+
+			for (auto const un : unresolved)
+			{
+				final_states = final_states_real_;
+				final_states.erase(final_states.begin() + un - 2);
+
+				if (final_states_.empty())
+				{
+					final_states_ = final_states;
+				}
+				else
+				{
+					assert( std::equal(final_states.begin(), final_states.end(),
+						final_states_.begin()) );
+				}
+
+				std::string dipole_process;
+				dipole_process.append(std::to_string(pdg_ids.at(0)));
+				dipole_process.append(" ");
+				dipole_process.append(std::to_string(pdg_ids.at(1)));
+				dipole_process.append(" -> ");
+
+				for (std::size_t i = 2; i != pdg_ids.size(); ++i)
+				{
+					if (i != un)
+					{
+						dipole_process.append(std::to_string(pdg_ids.at(i)));
+						dipole_process.append(" ");
+					}
+				}
+
+				ol.setparameter_int("order_qcd", dipole_qcd_order);
+
+				int const dipole_id =
+					ol.register_process(dipole_process.c_str(), 1);
+				ids_dipoles_.emplace(state, dipole_id);
+
+				if (charge_table_.count(dipole_id) == 0)
+				{
+					// add the charges of the real process and remove the
+					// charge of the unresolved particle
+					auto dipole_charges = charge_table_.emplace(dipole_id,
+						charges).first->second;
+					dipole_charges.erase(dipole_charges.begin() + un);
+				}
+
+				auto const un_t = pdg_id_to_particle_type(pdg_ids.at(un));
+
+				for (std::size_t i = 0; i < (indices.size() - 1); ++i)
+				{
+					std::size_t const em = indices.at(i);
+					auto const em_t = pdg_id_to_particle_type(pdg_ids.at(em));
+
+					for (std::size_t k = i + 1; k != indices.size(); ++k)
+					{
+						std::size_t const sp = indices.at(k);
+						auto const sp_t = pdg_id_to_particle_type(
+							pdg_ids.at(sp));
+
+						dipoles_with_state.insert(std::make_pair(dipole(em, un,
+							sp, em_t, un_t, sp_t), state));
+						dipoles_with_state.insert(std::make_pair(dipole(sp, un,
+							em, sp_t, un_t, em_t), state));
+					}
+				}
+			}
 		}
 		else if (type == correction_type::qcd)
 		{
