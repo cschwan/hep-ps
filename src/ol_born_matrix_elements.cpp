@@ -137,13 +137,11 @@ void ol_born_matrix_elements<T>::borns(
 
 				ol.evaluate_loop(i->second, ol_phase_space_.data(), &m2tree,
 					m2loop, &acc);
-
 				value += T(m2loop[0]);
 
-				ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
-					m2loop);
-
-				value -= T(m2loop[0]);
+//				ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
+//					m2loop);
+//				value -= T(m2loop[0]);
 			}
 
 			results.front().emplace_back(state, value);
@@ -151,30 +149,30 @@ void ol_born_matrix_elements<T>::borns(
 
 		for (std::size_t j = 0; j != scales.size(); ++j)
 		{
-			mu = scales.at(j).renormalization();
-			ol.setparameter_int("mu", mu);
+//			mu = scales.at(j).renormalization();
+//			ol.setparameter_int("mu", mu);
 
 			if (j != 0)
 			{
 				results.at(j) = results.front();
 			}
 
-			std::size_t k = 0;
-
-			for (auto const state : set)
-			{
-				auto const range = ids_.equal_range(state);
-				T value = T();
-
-				for (auto i = range.first; i != range.second; ++i)
-				{
-					ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
-						m2loop);
-					value += T(m2loop[0]);
-				}
-
-				results.at(j).at(k++).second += value;
-			}
+//			std::size_t k = 0;
+//
+//			for (auto const state : set)
+//			{
+//				auto const range = ids_.equal_range(state);
+//				T value = T();
+//
+//				for (auto i = range.first; i != range.second; ++i)
+//				{
+//					ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
+//						m2loop);
+//					value += T(m2loop[0]);
+//				}
+//
+//				results.at(j).at(k++).second += value;
+//			}
 		}
 	}
 	else
