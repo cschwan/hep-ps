@@ -40,7 +40,8 @@ public:
 		std::vector<std::string> const& processes,
 		std::size_t alphas_power,
 		bool loop_mes = false,
-		regularization_scheme scheme = regularization_scheme::dim_reg_blha
+		regularization_scheme scheme = regularization_scheme::dim_reg_blha,
+		bool set_ol_coupling_order = true
 	);
 
 	void alphas(T alphas);

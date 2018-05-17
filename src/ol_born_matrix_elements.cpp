@@ -13,13 +13,18 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
 	std::vector<std::string> const& processes,
 	std::size_t alphas_power,
 	bool loop_mes,
-	regularization_scheme scheme
+	regularization_scheme scheme,
+	bool set_ol_coupling_order
 )
 	: alphas_power_(alphas_power)
 	, loop_mes_(loop_mes)
 {
 	auto& ol = ol_interface::instance();
-	ol.setparameter_int("order_qcd", alphas_power);
+
+	if (set_ol_coupling_order)
+	{
+		ol.setparameter_int("order_qcd", alphas_power);
+	}
 
 	if (scheme == regularization_scheme::dim_reg_blha)
 	{
