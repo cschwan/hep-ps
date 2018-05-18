@@ -4,6 +4,7 @@
 #include "hep/mc/projector.hpp"
 
 #include "hep/ps/ab_terms.hpp"
+#include "hep/ps/correction_type.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/fini_integrand.hpp"
@@ -158,7 +159,8 @@ public:
 
 	std::vector<hep::insertion_term> insertion_terms() const
 	{
-		return { hep::insertion_term{0}, hep::insertion_term{1} };
+		return { hep::insertion_term{0, hep::correction_type::ew},
+			hep::insertion_term{1, hep::correction_type::ew} };
 	}
 
 	std::vector<hep::final_state> final_states() const

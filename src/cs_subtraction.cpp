@@ -18,16 +18,13 @@ cs_subtraction<T>::cs_subtraction(
 	T tf,
 	T nf,
 	factorization_scheme fscheme,
-	regularization_scheme rscheme,
-	correction_type type
+	regularization_scheme rscheme
 )
 	: nc_{nc}
 	, tf_{tf}
 	, nf_{nf}
 	, fscheme_{fscheme}
 	, rscheme_{rscheme}
-	// TODO: make `type_` a function parameter for mixed corrections
-	, type_{type}
 {
 }
 
@@ -265,7 +262,12 @@ T cs_subtraction<T>::fermion_function(
 
 		if (dipole_info.unresolved_type() == particle_type::fermion)
 		{
-			factor *= tf_ / cf;
+			// TODO: check that the `if` was missing previously
+			if (dipole_info.corr_type() == correction_type::qcd)
+			{
+				factor *= tf_ / cf;
+			}
+
 			dipole = T(1.0) - T(2.0) * x * (T(1.0) - x);
 		}
 		else
@@ -284,7 +286,7 @@ T cs_subtraction<T>::fermion_function(
 
 		if (dipole_info.unresolved_type() == particle_type::fermion)
 		{
-			if (type_ == correction_type::qcd)
+			if (dipole_info.corr_type() == correction_type::qcd)
 			{
 				factor *= tf_ / cf;
 			}
@@ -320,7 +322,7 @@ void cs_subtraction<T>::insertion_terms(
 	using std::acos;
 	using std::log;
 
-	parton_type const bo = (type_ == correction_type::ew)
+	parton_type const bo = (term.corr_type() == correction_type::ew)
 		? parton_type::photon_
 		: parton_type::gluon_;
 
@@ -331,7 +333,7 @@ void cs_subtraction<T>::insertion_terms(
 	assert( fscheme_ == factorization_scheme::msbar );
 
 	T const pi = acos(T(-1.0));
-	T const color = (type_ == correction_type::ew)
+	T const color = (term.corr_type() == correction_type::ew)
 		? nc_
 		: (nc_ / (nc_ * nc_ - T(1.0))); // tf/cf
 

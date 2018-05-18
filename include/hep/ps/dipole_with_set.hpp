@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/correction_type.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/initial_state.hpp"
@@ -41,10 +42,11 @@ public:
 		particle_type emitter_type,
 		particle_type unresolved_type,
 		particle_type spectator_type,
+		correction_type corr_type,
 		initial_state_set set
 	)
 		: dipole_(emitter, unresolved, spectator, emitter_type, unresolved_type,
-			spectator_type)
+			spectator_type, corr_type)
 		, set_(set)
 	{
 	}

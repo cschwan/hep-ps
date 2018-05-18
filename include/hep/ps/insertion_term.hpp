@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/correction_type.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/particle_type.hpp"
 
@@ -37,11 +38,13 @@ public:
 	insertion_term(
 		std::size_t emitter,
 		particle_type emitter_type,
-		std::size_t spectator
+		std::size_t spectator,
+		correction_type corr_type
 	)
 		: emitter_(emitter)
 		, emitter_type_(emitter_type)
 		, spectator_(spectator)
+		, corr_type_(corr_type)
 	{
 		int type = (emitter < 2) | ((spectator < 2) << 1);
 
@@ -66,11 +69,12 @@ public:
 	}
 
 	/// Constructor for `born` insertion terms.
-	insertion_term(std::size_t initial)
+	insertion_term(std::size_t initial, correction_type corr_type)
 		: type_(insertion_term_type::born)
 		, emitter_{initial}
 		, emitter_type_{particle_type::boson}
 		, spectator_{0}
+		, corr_type_(corr_type)
 	{
 	}
 
@@ -127,11 +131,18 @@ public:
 		}
 	}
 
+	/// Returns whether this insertion term is a QCD or an EW one.
+	correction_type corr_type() const
+	{
+		return corr_type_;
+	}
+
 private:
 	insertion_term_type type_;
 	std::size_t emitter_;
 	particle_type emitter_type_;
 	std::size_t spectator_;
+	correction_type corr_type_;
 };
 
 /// Comparison operator for two instances of \ref insertion_term `a` and `b`.

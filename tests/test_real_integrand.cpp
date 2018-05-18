@@ -3,6 +3,7 @@
 #include "hep/mc/multi_channel_integrand.hpp"
 #include "hep/mc/projector.hpp"
 
+#include "hep/ps/correction_type.hpp"
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
@@ -182,6 +183,7 @@ public:
 	{
 		return { hep::dipole_with_set{ 2, 4, 3, hep::particle_type::fermion,
 			hep::particle_type::boson, hep::particle_type::fermion,
+			hep::correction_type::qcd,
 			hep::initial_state_set{hep::initial_state::cq_uq}} };
 	}
 

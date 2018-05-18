@@ -20,7 +20,6 @@
  */
 
 #include "hep/ps/ab_terms.hpp"
-#include "hep/ps/correction_type.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/factorization_scheme.hpp"
@@ -49,8 +48,7 @@ public:
 		T tf,
 		T nf,
 		factorization_scheme fscheme,
-		regularization_scheme rscheme,
-		correction_type type
+		regularization_scheme rscheme
 	);
 
 	/// Maps the `real_phase_space` onto the `born_phase_space` using the maps
@@ -92,7 +90,6 @@ private:
 	T nf_;
 	factorization_scheme fscheme_;
 	regularization_scheme rscheme_;
-	correction_type type_;
 };
 
 }

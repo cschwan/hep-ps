@@ -22,6 +22,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 {
 	auto& ol = ol_interface::instance();
 
+	// FIXME: `type` is not always unique
+
 	std::size_t const dipole_qcd_order = (type == correction_type::qcd) ?
 		(alphas_power - 1) : alphas_power;
 
@@ -138,9 +140,9 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 							pdg_ids.at(sp));
 
 						dipoles_with_state.insert(std::make_pair(dipole(em, un,
-							sp, em_t, un_t, sp_t), state));
+							sp, em_t, un_t, sp_t, type), state));
 						dipoles_with_state.insert(std::make_pair(dipole(sp, un,
-							em, sp_t, un_t, em_t), state));
+							em, sp_t, un_t, em_t, type), state));
 					}
 				}
 			}
@@ -214,9 +216,9 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 							pdg_ids.at(sp));
 
 						dipoles_with_state.insert(std::make_pair(dipole(em, un,
-							sp, em_t, un_t, sp_t), state));
+							sp, em_t, un_t, sp_t, type), state));
 						dipoles_with_state.insert(std::make_pair(dipole(sp, un,
-							em, sp_t, un_t, em_t), state));
+							em, sp_t, un_t, em_t, type), state));
 					}
 				}
 			}
@@ -256,6 +258,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 			dipole.emitter_type(),
 			dipole.unresolved_type(),
 			dipole.spectator_type(),
+			dipole.corr_type(),
 			set
 		);
 	}

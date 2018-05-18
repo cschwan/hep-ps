@@ -24,6 +24,8 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 	ol.setparameter_int("order_qcd", (type == correction_type::qcd) ?
 		(alphas_power - 1) : alphas_power);
 
+	// FIXME: `type` is not always unique
+
 	for (auto const& process : processes)
 	{
 		auto const& pdg_ids = ol_process_string_to_pdg_ids(process);
@@ -85,8 +87,8 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 			charge_table_.emplace(process_id, std::move(charges));
 		}
 
-		terms_.emplace_back(0);
-		terms_.emplace_back(1);
+		terms_.emplace_back(0, type);
+		terms_.emplace_back(1, type);
 
 		for (std::size_t i = 0; i < indices.size() - 1; ++i)
 		{
@@ -97,8 +99,8 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 				auto const type_k = pdg_id_to_particle_type(pdg_ids.at(k));
 				auto const type_l = pdg_id_to_particle_type(pdg_ids.at(l));
 
-				terms_.emplace_back(k, type_k, l);
-				terms_.emplace_back(l, type_l, k);
+				terms_.emplace_back(k, type_k, l, type);
+				terms_.emplace_back(l, type_l, k, type);
 			}
 		}
 	}

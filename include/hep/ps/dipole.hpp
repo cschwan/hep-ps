@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/correction_type.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/particle_type.hpp"
 
@@ -38,7 +39,8 @@ public:
 		std::size_t spectator,
 		particle_type emitter_type,
 		particle_type unresolved_type,
-		particle_type spectator_type
+		particle_type spectator_type,
+		correction_type corr_type
 	)
 		: emitter_(emitter)
 		, unresolved_(unresolved)
@@ -46,6 +48,7 @@ public:
 		, emitter_type_(emitter_type)
 		, unresolved_type_(unresolved_type)
 		, spectator_type_(spectator_type)
+		, corr_type_(corr_type)
 	{
 		int type = (emitter < 2) | ((spectator < 2) << 1);
 
@@ -115,6 +118,12 @@ public:
 		return type_;
 	}
 
+	/// Returns whether this dipole is a QCD or an EW one.
+	correction_type corr_type() const
+	{
+		return corr_type_;
+	}
+
 private:
 	std::size_t emitter_;
 	std::size_t unresolved_;
@@ -123,6 +132,7 @@ private:
 	particle_type unresolved_type_;
 	particle_type spectator_type_;
 	dipole_type type_;
+	correction_type corr_type_;
 };
 
 /// Dipole comparison operator.
