@@ -1,3 +1,4 @@
+#include "hep/ps/correction_type.hpp"
 #include "hep/ps/ol_interface.hpp"
 #include "hep/ps/ol_real_matrix_elements.hpp"
 #include "hep/ps/pdg_functions.hpp"
@@ -8,229 +9,205 @@
 #include <stdexcept>
 #include <utility>
 
+namespace
+{
+
+std::vector<int> dipole_me(
+	std::vector<int> const& pdg_ids,
+	std::size_t i,
+	std::size_t j,
+	std::size_t k,
+	hep::correction_type type,
+	hep::coupling_order real_me_order
+) {
+	std::vector<int> result;
+
+	int const id_i = pdg_ids.at(i);
+	int const id_j = pdg_ids.at(j);
+	int const id_k = pdg_ids.at(k);
+	int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
+
+	if (type == hep::correction_type::ew)
+	{
+		if (hep::pdg_id_has_charge(id_i) && hep::pdg_id_has_charge(id_k))
+		{
+			if (id_j == hep::pdg_id_of_photon())
+			{
+				result = pdg_ids;
+				result.erase(result.begin() + j);
+			}
+			else if (hep::pdg_id_has_charge(id_j) &&
+				((id_i + sign * id_j) == 0))
+			{
+				result = pdg_ids;
+				result.erase(result.begin() + j);
+				result.at(i) = hep::pdg_id_of_photon();
+			}
+		}
+	}
+	else if (type == hep::correction_type::qcd)
+	{
+		if (hep::pdg_id_has_color(id_i) && hep::pdg_id_has_color(id_j) &&
+			hep::pdg_id_has_color(id_k))
+		{
+			if (id_j == hep::pdg_id_of_gluon())
+			{
+				result = pdg_ids;
+				result.erase(result.begin() + j);
+			}
+			else if ((id_i + sign * id_j) == 0)
+			{
+				result = pdg_ids;
+				result.erase(result.begin() + j);
+				result.at(i) = hep::pdg_id_of_gluon();
+			}
+		}
+	}
+	else
+	{
+		assert( false );
+	}
+
+	std::size_t const gluons = std::count_if(result.begin(), result.end(),
+		hep::pdg_id_is_gluon);
+	std::size_t const quarks = std::count_if(result.begin(), result.end(),
+		hep::pdg_id_is_quark);
+
+	std::size_t n_qcd_min;
+	std::size_t n_qcd_max;
+
+	if (gluons >= (result.size() - 2))
+	{
+		// pure gluon case and one quark line
+		n_qcd_min = (gluons == result.size()) ? (gluons - 2) : gluons;
+		n_qcd_max = n_qcd_min;
+	}
+	else
+	{
+		// starting with two quark lines it is possible to have photons or
+		// gluons in between the quark lines
+		n_qcd_min = gluons;
+		n_qcd_max = n_qcd_min + quarks / 2;
+	}
+
+	std::size_t order_qcd = (type == hep::correction_type::qcd) ?
+		(real_me_order.alphas_power() - 1) : real_me_order.alphas_power();
+
+	// check if the matrix element with given coupling order exists
+	if ((order_qcd < n_qcd_min) || (order_qcd > n_qcd_max))
+	{
+		result.clear();
+	}
+
+	return result;
+}
+
+}
+
 namespace hep
 {
 
 template <typename T>
 ol_real_matrix_elements<T>::ol_real_matrix_elements(
 	std::vector<std::string> const& real_processes,
-	std::size_t alphas_power,
-	correction_type type
+	std::vector<final_state> const& dipole_final_states,
+	coupling_order order
 )
-	: alphas_power_(alphas_power)
-	, type_(type)
+	: alphas_power_(order.alphas_power())
+	, final_states_(dipole_final_states)
 {
 	auto& ol = ol_interface::instance();
-
-	// FIXME: `type` is not always unique
-
-	std::size_t const dipole_qcd_order = (type == correction_type::qcd) ?
-		(alphas_power - 1) : alphas_power;
 
 	std::multimap<dipole, initial_state> dipoles_with_state;
 
 	for (auto const& process : real_processes)
 	{
 		auto const& pdg_ids = ol_process_string_to_pdg_ids(process);
-
-		std::vector<final_state> final_states(pdg_ids.size() - 2);
-		std::transform(pdg_ids.begin() + 2, pdg_ids.end(), final_states.begin(),
-			pdg_id_to_final_state);
-
-		auto const state = partons_to_initial_state(
-			pdg_id_to_parton(pdg_ids.at(0)), pdg_id_to_parton(pdg_ids.at(1)));
+		auto const& states = pdg_ids_to_states(pdg_ids);
 
 		if (final_states_real_.empty())
 		{
-			final_states_real_ = final_states;
+			final_states_real_ = states.second;
 		}
 		else
 		{
-			if (!std::equal(final_states.begin(), final_states.end(),
+			if (!std::equal(states.second.begin(), states.second.end(),
 				final_states_real_.begin()))
 			{
 				throw std::invalid_argument("processes are not compatible");
 			}
 		}
 
-		ol.setparameter_int("order_qcd", alphas_power);
-		ids_reals_.emplace(state, ol.register_process(process.c_str(), 1));
+		ol.setparameter_int("order_qcd", order.alphas_power());
+		ids_reals_.emplace(states.first,
+			ol.register_process(process.c_str(), 1));
 
-		std::vector<std::size_t> unresolved;
-		std::vector<std::size_t> indices;
-
-		if (type == correction_type::ew)
+		// construct all possible QCD and EW dipoles
+		for (std::size_t i = 0; i != pdg_ids.size(); ++i)
 		{
-			std::vector<final_state> final_states;
-			std::vector<T> charges;
-
-			for (std::size_t i = 0; i != pdg_ids.size(); ++i)
+		for (std::size_t j = 2; j != pdg_ids.size(); ++j)
+		{
+		for (std::size_t k = 0; k != pdg_ids.size(); ++k)
+		{
+			if ((i == j) || (i == k) || (j == k))
 			{
-				charges.push_back(T(pdg_id_to_charge_times_three(pdg_ids.at(i)))
-					/ T(3.0));
-
-				if (pdg_ids.at(i) == 22)
-				{
-					unresolved.push_back(i);
-				}
-				else if (charges.back() != T())
-				{
-					indices.push_back(i);
-				}
+				continue;
 			}
 
-			charges.at(0) *= T(-1.0);
-			charges.at(1) *= T(-1.0);
-
-			for (auto const un : unresolved)
+			for (auto const type : correction_type_list())
 			{
-				final_states = final_states_real_;
-				final_states.erase(final_states.begin() + un - 2);
+				auto const& ids = ::dipole_me(pdg_ids, i, j, k, type, order);
 
-				if (final_states_.empty())
+				if (ids.empty())
 				{
-					final_states_ = final_states;
-				}
-				else
-				{
-					assert( std::equal(final_states.begin(), final_states.end(),
-						final_states_.begin()) );
+					// there is no matrix element for this dipole
+					continue;
 				}
 
-				std::string dipole_process;
-				dipole_process.append(std::to_string(pdg_ids.at(0)));
-				dipole_process.append(" ");
-				dipole_process.append(std::to_string(pdg_ids.at(1)));
-				dipole_process.append(" -> ");
+				auto const& states = pdg_ids_to_states(ids);
 
-				for (std::size_t i = 2; i != pdg_ids.size(); ++i)
+				// if the signature does not match, throw the dipole away
+				if (!std::equal(states.second.begin(), states.second.end(),
+					final_states_.begin()))
 				{
-					if (i != un)
+					continue;
+				}
+
+				ol.setparameter_int("order_qcd", (type == correction_type::qcd)
+					? (order.alphas_power() - 1) : order.alphas_power());
+				auto const process = pdg_ids_to_ol_process_string(ids);
+				int const dipole_id = ol.register_process(process.c_str(), 1);
+
+				if (type == correction_type::ew)
+				{
+					std::vector<T> charges;
+					charges.reserve(ids.size());
+
+					for (int const id : ids)
 					{
-						dipole_process.append(std::to_string(pdg_ids.at(i)));
-						dipole_process.append(" ");
+						charges.push_back(T(pdg_id_to_charge_times_three(id)) /
+							T(3.0));
 					}
+
+					charge_table_.emplace(dipole_id, std::move(charges));
 				}
 
-				ol.setparameter_int("order_qcd", dipole_qcd_order);
+				ids_dipoles_.emplace(states.first, dipole_id);
 
-				int const dipole_id =
-					ol.register_process(dipole_process.c_str(), 1);
-				ids_dipoles_.emplace(state, dipole_id);
+				auto const type_i = pdg_id_to_particle_type(pdg_ids.at(i));
+				auto const type_j = pdg_id_to_particle_type(pdg_ids.at(j));
+				auto const type_k = pdg_id_to_particle_type(pdg_ids.at(k));
 
-				if (charge_table_.count(dipole_id) == 0)
-				{
-					// add the charges of the real process and remove the
-					// charge of the unresolved particle
-					auto dipole_charges = charge_table_.emplace(dipole_id,
-						charges).first->second;
-					dipole_charges.erase(dipole_charges.begin() + un);
-				}
-
-				auto const un_t = pdg_id_to_particle_type(pdg_ids.at(un));
-
-				for (std::size_t i = 0; i < (indices.size() - 1); ++i)
-				{
-					std::size_t const em = indices.at(i);
-					auto const em_t = pdg_id_to_particle_type(pdg_ids.at(em));
-
-					for (std::size_t k = i + 1; k != indices.size(); ++k)
-					{
-						std::size_t const sp = indices.at(k);
-						auto const sp_t = pdg_id_to_particle_type(
-							pdg_ids.at(sp));
-
-						dipoles_with_state.insert(std::make_pair(dipole(em, un,
-							sp, em_t, un_t, sp_t, type), state));
-						dipoles_with_state.insert(std::make_pair(dipole(sp, un,
-							em, sp_t, un_t, em_t, type), state));
-					}
-				}
+				dipoles_with_state.emplace(dipole(i, j, k, type_i, type_j,
+					type_k, type), states.first);
 			}
 		}
-		else if (type == correction_type::qcd)
-		{
-			// TODO: the following construction only works if there are no
-			// initial state gluons and if there are no gluon -> fermion
-			// anti-fermion splittings
-
-			std::vector<final_state> final_states;
-
-			for (std::size_t i = 0; i != pdg_ids.size(); ++i)
-			{
-				if (pdg_ids.at(i) == 21)
-				{
-					unresolved.push_back(i);
-				}
-				else if (pdg_id_has_color(pdg_ids.at(i)))
-				{
-					indices.push_back(i);
-				}
-			}
-
-			for (auto const un : unresolved)
-			{
-				final_states = final_states_real_;
-				final_states.erase(final_states.begin() + un - 2);
-
-				if (final_states_.empty())
-				{
-					final_states_ = final_states;
-				}
-				else
-				{
-					assert( std::equal(final_states.begin(), final_states.end(),
-						final_states_.begin()) );
-				}
-
-				std::string dipole_process;
-				dipole_process.append(std::to_string(pdg_ids.at(0)));
-				dipole_process.append(" ");
-				dipole_process.append(std::to_string(pdg_ids.at(1)));
-				dipole_process.append(" -> ");
-
-				for (std::size_t i = 2; i != pdg_ids.size(); ++i)
-				{
-					if (i != un)
-					{
-						dipole_process.append(std::to_string(pdg_ids.at(i)));
-						dipole_process.append(" ");
-					}
-				}
-
-				ol.setparameter_int("order_qcd", dipole_qcd_order);
-
-				ids_dipoles_.emplace(state,
-					ol.register_process(dipole_process.c_str(), 1));
-
-				auto const un_t = pdg_id_to_particle_type(pdg_ids.at(un));
-
-				for (std::size_t i = 0; i < (indices.size() - 1); ++i)
-				{
-					std::size_t const em = indices.at(i);
-					auto const em_t = pdg_id_to_particle_type(pdg_ids.at(em));
-
-					for (std::size_t k = i + 1; k != indices.size(); ++k)
-					{
-						std::size_t const sp = indices.at(k);
-						auto const sp_t = pdg_id_to_particle_type(
-							pdg_ids.at(sp));
-
-						dipoles_with_state.insert(std::make_pair(dipole(em, un,
-							sp, em_t, un_t, sp_t, type), state));
-						dipoles_with_state.insert(std::make_pair(dipole(sp, un,
-							em, sp_t, un_t, em_t, type), state));
-					}
-				}
-			}
 		}
-		else
-		{
-			assert( false );
 		}
 	}
 
 	std::vector<dipole> dipoles;
+
 	for (auto const& dip : dipoles_with_state)
 	{
 		auto const& dipole = dip.first;
@@ -263,9 +240,6 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 			set
 		);
 	}
-
-	// TODO: merge entries of `dipoles_` which have the same dipole but a
-	// different set
 
 	final_states_real_.shrink_to_fit();
 	final_states_.shrink_to_fit();
@@ -315,7 +289,7 @@ void ol_real_matrix_elements<T>::dipole_me(
 		ol_phase_space_.at(5 * i + 4) = 0.0;
 	}
 
-	if (type_ == correction_type::qcd)
+	if (dipole.corr_type() == correction_type::qcd)
 	{
 		double m2tree;
 		double m2ew;
@@ -342,7 +316,7 @@ void ol_real_matrix_elements<T>::dipole_me(
 			}
 		}
 	}
-	else if (type_ == correction_type::ew)
+	else if (dipole.corr_type() == correction_type::ew)
 	{
 		double m2tree;
 		double alpha;

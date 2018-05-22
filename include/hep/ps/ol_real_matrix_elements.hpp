@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/correction_type.hpp"
+#include "hep/ps/coupling_order.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/final_state.hpp"
@@ -40,8 +40,8 @@ class ol_real_matrix_elements
 public:
 	ol_real_matrix_elements(
 		std::vector<std::string> const& real_processes,
-		std::size_t alphas_power,
-		correction_type type
+		std::vector<final_state> const& dipole_final_states,
+		coupling_order order
 	);
 
 	void alphas(T alphas);
@@ -79,7 +79,6 @@ private:
 	std::unordered_multimap<initial_state, int> ids_reals_;
 	std::vector<T> ol_m2cc_;
 	std::vector<T> ol_phase_space_;
-	correction_type type_;
 };
 
 }
