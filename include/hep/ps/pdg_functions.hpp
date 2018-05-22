@@ -44,15 +44,34 @@ particle_type pdg_id_to_particle_type(int id);
 int parton_to_pdg_id(parton p);
 
 /// Checks if the particle with the given PDG identifier carries color.
-bool pdg_id_particle_has_color(int id);
+bool pdg_id_has_color(int id);
 
-/// Converts an OpenLoops process string into a vector of PDG identifiers.
+/// Returns true if the particle with the given PDF identifier carries an
+/// electric charge.
+bool pdg_id_has_charge(int id);
+
+/// Returns the PDG identifier of the photon.
+int pdg_id_of_photon();
+
+/// Returns the PDG identifier of the gluon.
+int pdg_id_of_gluon();
+
+///
+std::pair<initial_state, std::vector<final_state>> pdg_ids_to_states(
+	std::vector<int> const& ids
+);
+
+/// Converts an OpenLoops process string into a vector of PDG identifiers. This
+/// is the inverse function of \ref pdg_ids_to_ol_process_string.
 std::vector<int> ol_process_string_to_pdg_ids(std::string const& process);
+
+/// Converts a vector of PDG identifiers to an OpenLoops process string. This
+/// is the inverse function of \ref ol_process_string_to_pdg_ids.
+std::string pdg_ids_to_ol_process_string(std::vector<int> const& ids);
 
 /// Returns the electromagnetic charge of the particle with the given PDG
 /// identifier `id`.
-template <typename T>
-T pdg_id_to_charge(int id);
+int pdg_id_to_charge_times_three(int id);
 
 }
 

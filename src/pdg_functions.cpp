@@ -1,5 +1,6 @@
 #include "hep/ps/pdg_functions.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <stdexcept>
 #include <map>
@@ -136,7 +137,7 @@ int parton_to_pdg_id(parton p)
 	}
 }
 
-bool pdg_id_particle_has_color(int id)
+bool pdg_id_has_color(int id)
 {
 	switch (id)
 	{
@@ -176,6 +177,57 @@ bool pdg_id_particle_has_color(int id)
 	}
 }
 
+bool pdg_id_has_charge(int id)
+{
+	switch (id)
+	{
+	case -15:
+	case -13:
+	case -11:
+	case  -6:
+	case  -5:
+	case  -4:
+	case  -3:
+	case  -2:
+	case  -1:
+	case   1:
+	case   2:
+	case   3:
+	case   4:
+	case   5:
+	case   6:
+	case  11:
+	case  13:
+	case  15:
+		return true;
+
+	// neutrinos
+	case -16:
+	case -14:
+	case -12:
+	case  12:
+	case  14:
+	case  16:
+	case  21:
+	case  22:
+		return false;
+
+	default:
+		// TODO: NYI
+		assert( false );
+	}
+}
+
+int pdg_id_of_photon()
+{
+	return 22;
+}
+
+int pdg_id_of_gluon()
+{
+	return 21;
+}
+
 std::vector<int> ol_process_string_to_pdg_ids(std::string const& process)
 {
 	// format int int `->` int int ...
@@ -209,8 +261,28 @@ std::vector<int> ol_process_string_to_pdg_ids(std::string const& process)
 	return result;
 }
 
-template <typename T>
-T pdg_id_to_charge(int id)
+std::string pdg_ids_to_ol_process_string(std::vector<int> const& ids)
+{
+	std::string result;
+
+	// reserve space for each id and the separator
+	result.reserve((ids.size() + 1) * 4);
+
+	result.append(std::to_string(ids.at(0)));
+	result.append(" ");
+	result.append(std::to_string(ids.at(1)));
+	result.append(" ->");
+
+	for (std::size_t i = 2; i != ids.size(); ++i)
+	{
+		result.append(" ");
+		result.append(std::to_string(ids.at(i)));
+	}
+
+	return result;
+}
+
+int pdg_id_to_charge_times_three(int id)
 {
 	switch (id)
 	{
@@ -218,37 +290,37 @@ T pdg_id_to_charge(int id)
 	case  -6:
 	case  -4:
 	case  -2:
-		return T(-2.0) / T(3.0);
+		return -2;
 
 	// anti-down-type quarks
 	case  -5:
 	case  -3:
 	case  -1:
-		return T( 1.0) / T(3.0);
+		return 1;
 
 	// down-type quarks
 	case   1:
 	case   3:
 	case   5:
-		return T(-1.0) / T(3.0);
+		return -1;
 
 	// up-type quarks
 	case   2:
 	case   4:
 	case   6:
-		return T( 2.0) / T(3.0);
+		return 2;
 
 	// anti-leptons
 	case -15:
 	case -13:
 	case -11:
-		return T( 1.0);
+		return 1;
 
 	// leptons
 	case  11:
 	case  13:
 	case  15:
-		return T(-1.0);
+		return -1;
 
 	// neutrinos
 	case -16:
@@ -260,8 +332,8 @@ T pdg_id_to_charge(int id)
 	// gluon
 	case  21:
 	// photon
-	case 22:
-		return T();
+	case  22:
+		return 0;
 
 	default:
 		// TODO: NYI
@@ -269,8 +341,17 @@ T pdg_id_to_charge(int id)
 	}
 }
 
-// -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
+std::pair<initial_state, std::vector<final_state>> pdg_ids_to_states(
+	std::vector<int> const& ids
+) {
+	std::vector<final_state> final_states(ids.size() - 2);
+	std::transform(ids.begin() + 2, ids.end(), final_states.begin(),
+		pdg_id_to_final_state);
 
-template double pdg_id_to_charge(int);
+	auto const state = partons_to_initial_state(pdg_id_to_parton(ids.at(0)),
+		pdg_id_to_parton(ids.at(1)));
+
+	return { state , final_states };
+}
 
 }

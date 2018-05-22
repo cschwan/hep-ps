@@ -59,7 +59,7 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 		{
 			for (std::size_t i = 0; i != pdg_ids.size(); ++i)
 			{
-				if (pdg_id_particle_has_color(pdg_ids.at(i)))
+				if (pdg_id_has_color(pdg_ids.at(i)))
 				{
 					indices.push_back(i);
 				}
@@ -69,7 +69,7 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 		{
 			std::vector<T> charges(pdg_ids.size());
 			std::transform(pdg_ids.begin(), pdg_ids.end(), charges.begin(),
-				pdg_id_to_charge<T>);
+				[](int id) { return T(pdg_id_to_charge_times_three(id)) / T(3.0);});
 
 			charges.at(0) *= T(-1.0);
 			charges.at(1) *= T(-1.0);

@@ -66,7 +66,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
 			for (std::size_t i = 0; i != pdg_ids.size(); ++i)
 			{
-				charges.push_back(pdg_id_to_charge<T>(pdg_ids.at(i)));
+				charges.push_back(T(pdg_id_to_charge_times_three(pdg_ids.at(i)))
+					/ T(3.0));
 
 				if (pdg_ids.at(i) == 22)
 				{
@@ -161,7 +162,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				{
 					unresolved.push_back(i);
 				}
-				else if (pdg_id_particle_has_color(pdg_ids.at(i)))
+				else if (pdg_id_has_color(pdg_ids.at(i)))
 				{
 					indices.push_back(i);
 				}
