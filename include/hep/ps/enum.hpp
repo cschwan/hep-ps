@@ -35,7 +35,7 @@
 namespace
 {
 
-inline std::size_t lsb_position(std::bitset<64> x)
+inline std::size_t lsb_position(std::bitset<128> x)
 {
 	x |= (x <<  1);
 	x |= (x <<  2);
@@ -43,6 +43,7 @@ inline std::size_t lsb_position(std::bitset<64> x)
 	x |= (x <<  8);
 	x |= (x << 16);
 	x |= (x << 32);
+	x |= (x << 64);
 	x.flip();
 
 	return x.count();
@@ -124,6 +125,9 @@ inline std::size_t lsb_position(std::bitset<64> x)
 #define HEP_ENUM_SET(name)                                                     \
 	class name ## _set                                                         \
 	{                                                                          \
+	private:                                                                   \
+		using bitset = std::bitset<128>;                                       \
+                                                                               \
 	public:                                                                    \
 		class const_iterator                                                   \
 		{                                                                      \
@@ -145,7 +149,7 @@ inline std::size_t lsb_position(std::bitset<64> x)
                                                                                \
 			const_iterator& operator=(const const_iterator&) = default;        \
                                                                                \
-			explicit const_iterator(std::bitset<64> set)                       \
+			explicit const_iterator(bitset set)                                \
 				: set_{set}                                                    \
 			{                                                                  \
 			}                                                                  \
@@ -157,7 +161,7 @@ inline std::size_t lsb_position(std::bitset<64> x)
                                                                                \
 			const_iterator& operator++()                                       \
 			{                                                                  \
-				set_ ^= std::bitset<64>(1) << lsb_position(set_);              \
+				set_ ^= bitset(1) << lsb_position(set_);                       \
                                                                                \
 				return *this;                                                  \
 			}                                                                  \
@@ -185,7 +189,7 @@ inline std::size_t lsb_position(std::bitset<64> x)
 			}                                                                  \
                                                                                \
 		private:                                                               \
-			std::bitset<64> set_;                                              \
+			bitset set_;                                                       \
 		};                                                                     \
                                                                                \
 		const_iterator begin() const                                           \
@@ -204,9 +208,9 @@ inline std::size_t lsb_position(std::bitset<64> x)
 		}                                                                      \
                                                                                \
 		name ## _set(std::initializer_list<name> list)                         \
-			: set_(std::accumulate(list.begin(), list.end(),                   \
-				std::bitset<64>(), [](std::bitset<64> set, name object) {      \
-					return set | (std::bitset<64>(1) <<                        \
+			: set_(std::accumulate(list.begin(), list.end(), bitset(),         \
+				[](bitset set, name object) {                                  \
+					return set | (bitset(1) <<                                 \
 						static_cast <std::size_t> (object));                   \
 			  }))                                                              \
 		{                                                                      \
@@ -225,13 +229,13 @@ inline std::size_t lsb_position(std::bitset<64> x)
 		void add(name object)                                                  \
 		{                                                                      \
 			auto const index = static_cast <std::size_t> (object);             \
-			set_ |= (std::bitset<64>(1) << index);                             \
+			set_ |= (bitset(1) << index);                                      \
 		}                                                                      \
                                                                                \
 		bool includes(name object) const                                       \
 		{                                                                      \
 			auto const index = static_cast <std::size_t> (object);             \
-			return (set_ & (std::bitset<64>(1) << index)).any();               \
+			return (set_ & (bitset(1) << index)).any();                        \
 		}                                                                      \
                                                                                \
 		std::size_t size() const                                               \
@@ -245,7 +249,7 @@ inline std::size_t lsb_position(std::bitset<64> x)
 		}                                                                      \
                                                                                \
 	private:                                                                   \
-		std::bitset<64> set_;                                                  \
+		bitset set_;                                                           \
 	}
 
 #endif

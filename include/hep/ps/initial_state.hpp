@@ -41,10 +41,14 @@ HEP_ENUM(initial_state,
 	cq_ux, /*!< \f$ Q=0 \f$ charm anti-up initial state. */
 	cx_cq, /*!< \f$ Q=0 \f$ anti-charm charm initial state. */
 	cx_dx, /*!< \f$ Q=-1/3 \f$ anti-charm anti-down initial state. */
+	cx_gl, /*!< \f$ Q=-2/3 \f$ anti-charm gluon initial state. */
+	cx_ph, /*!< \f$ Q=-2/3 \f$ anti-charm photon initial state. */
 	cx_sx, /*!< \f$ Q=-1/3 \f$ anti-charm anti-strange initial state. */
 	cx_uq, /*!< \f$ Q=0 \f$ anti-charm up initial state. */
 	dq_cq, /*!< \f$ Q=1/3 \f$ down charm initial state. */
 	dq_dx, /*!< \f$ Q=0 \f$ down anti-down initial state. */
+	dq_gl, /*!< \f$ Q=-1/3 \f$ down gluon initial state. */
+	dq_ph, /*!< \f$ Q=-1/3 \f$ down photon initial state. */
 	dq_sx, /*!< \f$ Q=0 \f$ down anti-strange initial state. */
 	dq_uq, /*!< \f$ Q=1/3 \f$ down up initial state. */
 	dx_cq, /*!< \f$ Q=1 \f$ anti-down charm initial state. */
@@ -52,6 +56,7 @@ HEP_ENUM(initial_state,
 	dx_dq, /*!< \f$ Q=0 \f$ anti-down down initial state. */
 	dx_dx, /*!< \f$ Q=2/3 \f$ anti-down anti-down initial state. */
 	dx_gl, /*!< \f$ Q=1/3 \f$ anti-down gluon initial state. */
+	dx_ph, /*!< \f$ Q=1/3 \f$ anti-down photon initial state. */
 	dx_sq, /*!< \f$ Q=0 \f$ anti-down strange initial state. */
 	dx_sx, /*!< \f$ Q=2/3 \f$ anti-strange anti-down initial state. */
 	dx_uq, /*!< \f$ Q=1 \f$ anti-down up initial state. */
@@ -62,10 +67,14 @@ HEP_ENUM(initial_state,
 	gl_sx, /*!< \f$ Q=1/3 \f$ gluon anti-strange initial state. */
 	gl_uq, /*!< \f$ Q=2/3 \f$ gluon up initial state. */
 	ph_cq, /*!< \f$ Q=2/3 \f$ photon charm initial state. */
+	ph_dx, /*!< \f$ Q=1/3 \f$ photon anti-down initial state. */
 	ph_ph, /*!< \f$ Q=0 \f$ photon photon initial state. */
+	ph_sx, /*!< \f$ Q=1/3 \f$ photon anti-strange initial state. */
 	ph_uq, /*!< \f$ Q=2/3 \f$ photon up initial state. */
 	sq_cq, /*!< \f$ Q=1/3 \f$ strange charm initial state. */
 	sq_dx, /*!< \f$ Q=0 \f$ strange anti-down initial state. */
+	sq_gl, /*!< \f$ Q=-1/3 \f$ strange gluon initial state. */
+	sq_ph, /*!< \f$ Q=-1/3 \f$ strange photon initial state. */
 	sq_sx, /*!< \f$ Q=0 \f$ strange anti-strange initial state. */
 	sq_uq, /*!< \f$ Q=1/3 \f$ strange up initial state. */
 	sx_cq, /*!< \f$ Q=1 \f$ anti-strange charm initial state. */
@@ -73,6 +82,7 @@ HEP_ENUM(initial_state,
 	sx_dq, /*!< \f$ Q=0 \f$ anti-strange down initial state. */
 	sx_dx, /*!< \f$ Q=2/3 \f$ anti-strange anti-down initial state. */
 	sx_gl, /*!< \f$ Q=1/3 \f$ anti-strange gluon initial state. */
+	sx_ph, /*!< \f$ Q=1/3 \f$ anti-strange photon initial state. */
 	sx_sq, /*!< \f$ Q=0 \f$ anti-strange strange initial state. */
 	sx_sx, /*!< \f$ Q=2/3 \f$ anti-strange anti-strange initial state. */
 	sx_uq, /*!< \f$ Q=1 \f$ anti-strange up initial state. */
@@ -89,6 +99,8 @@ HEP_ENUM(initial_state,
 	uq_ux, /*!< \f$ Q=0 \f$ up anti-up initial state. */
 	ux_cq, /*!< \f$ Q=0 \f$ anti-up charm initial state. */
 	ux_dx, /*!< \f$ Q=-1/3 \f$ anti-up anti-down initial state. */
+	ux_gl, /*!< \f$ Q=-2/3 \f$ anti-up gluon initial state. */
+	ux_ph, /*!< \f$ Q=-2/3 \f$ anti-up photon initial state. */
 	ux_sx, /*!< \f$ Q=-1/3 \f$ anti-up anti-strange initial state. */
 	ux_uq  /*!< \f$ Q=0 \f$ anti-up up initial state. */
 );
@@ -116,12 +128,16 @@ constexpr parton state_parton_one(initial_state state)
 
 	case cx_cq:
 	case cx_dx:
+	case cx_gl:
+	case cx_ph:
 	case cx_sx:
 	case cx_uq:
 		return parton::anti_charm;
 
 	case dq_cq:
 	case dq_dx:
+	case dq_gl:
+	case dq_ph:
 	case dq_sx:
 	case dq_uq:
 		return parton::down;
@@ -131,6 +147,7 @@ constexpr parton state_parton_one(initial_state state)
 	case dx_dq:
 	case dx_dx:
 	case dx_gl:
+	case dx_ph:
 	case dx_sq:
 	case dx_sx:
 	case dx_uq:
@@ -144,13 +161,17 @@ constexpr parton state_parton_one(initial_state state)
 	case gl_uq:
 		return parton::gluon;
 
+	case ph_dx:
 	case ph_cq:
 	case ph_ph:
+	case ph_sx:
 	case ph_uq:
 		return parton::photon;
 
 	case sq_cq:
 	case sq_dx:
+	case sq_gl:
+	case sq_ph:
 	case sq_sx:
 	case sq_uq:
 		return parton::strange;
@@ -160,6 +181,7 @@ constexpr parton state_parton_one(initial_state state)
 	case sx_dq:
 	case sx_dx:
 	case sx_gl:
+	case sx_ph:
 	case sx_sq:
 	case sx_sx:
 	case sx_uq:
@@ -180,6 +202,8 @@ constexpr parton state_parton_one(initial_state state)
 
 	case ux_cq:
 	case ux_dx:
+	case ux_gl:
+	case ux_ph:
 	case ux_sx:
 	case ux_uq:
 		return parton::anti_up;
@@ -226,6 +250,7 @@ constexpr parton state_parton_two(initial_state state)
 	case dq_dx:
 	case dx_dx:
 	case gl_dx:
+	case ph_dx:
 	case sq_dx:
 	case sx_dx:
 	case uq_dx:
@@ -233,15 +258,25 @@ constexpr parton state_parton_two(initial_state state)
 		return parton::anti_down;
 
 	case cq_gl:
+	case cx_gl:
+	case dq_gl:
 	case dx_gl:
 	case gl_gl:
+	case sq_gl:
 	case sx_gl:
 	case uq_gl:
+	case ux_gl:
 		return parton::gluon;
 
 	case cq_ph:
+	case cx_ph:
+	case dq_ph:
+	case dx_ph:
 	case ph_ph:
+	case sq_ph:
+	case sx_ph:
 	case uq_ph:
+	case ux_ph:
 		return parton::photon;
 
 	case cq_sq:
@@ -255,6 +290,7 @@ constexpr parton state_parton_two(initial_state state)
 	case dq_sx:
 	case dx_sx:
 	case gl_sx:
+	case ph_sx:
 	case sq_sx:
 	case sx_sx:
 	case uq_sx:
