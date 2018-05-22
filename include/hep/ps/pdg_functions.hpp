@@ -56,6 +56,12 @@ int pdg_id_of_photon();
 /// Returns the PDG identifier of the gluon.
 int pdg_id_of_gluon();
 
+/// Returns true if `id` is the PDG identifier of the gluon.
+bool pdg_id_is_gluon(int id);
+
+/// Returns `true` if `id` is the PDG identifier of a quark (or an anti-quark).
+bool pdg_id_is_quark(int id);
+
 ///
 std::pair<initial_state, std::vector<final_state>> pdg_ids_to_states(
 	std::vector<int> const& ids

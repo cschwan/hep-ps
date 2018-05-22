@@ -12,7 +12,6 @@ final_state pdg_id_to_final_state(int id)
 {
 	switch (id)
 	{
-	// quarks
 	case  -6:
 	case  -5:
 	case  -4:
@@ -280,6 +279,34 @@ std::string pdg_ids_to_ol_process_string(std::vector<int> const& ids)
 	}
 
 	return result;
+}
+
+bool pdg_id_is_gluon(int id)
+{
+	return id == pdg_id_of_gluon();
+}
+
+bool pdg_id_is_quark(int id)
+{
+	switch (id)
+	{
+	case -6:
+	case -5:
+	case -4:
+	case -3:
+	case -2:
+	case -1:
+	case  1:
+	case  2:
+	case  3:
+	case  4:
+	case  5:
+	case  6:
+		return true;
+
+	default:
+		return false;
+	}
 }
 
 int pdg_id_to_charge_times_three(int id)
