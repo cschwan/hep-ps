@@ -8,21 +8,21 @@ namespace hep
 bool operator<(dipole const& a, dipole const& b)
 {
 	return std::make_tuple(
+		a.corr_type(),
 		a.emitter(),
 		a.unresolved(),
 		a.spectator(),
 		a.emitter_type(),
 		a.unresolved_type(),
-		a.spectator_type(),
-		a.corr_type()
+		a.spectator_type()
 	) < std::make_tuple(
+		b.corr_type(),
 		b.emitter(),
 		b.unresolved(),
 		b.spectator(),
 		b.emitter_type(),
 		b.unresolved_type(),
-		b.spectator_type(),
-		b.corr_type()
+		b.spectator_type()
 	);
 }
 
