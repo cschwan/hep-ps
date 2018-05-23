@@ -203,9 +203,9 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 		}
 	}
 
+	std::sort(dipoles_.begin(), dipoles_.end());
 	auto new_end = std::unique(dipoles_.begin(), dipoles_.end());
 	dipoles_.erase(new_end, dipoles_.end());
-	std::sort(dipoles_.begin(), dipoles_.end());
 	dipoles_.shrink_to_fit();
 
 	final_states_real_.shrink_to_fit();
