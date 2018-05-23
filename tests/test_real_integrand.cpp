@@ -8,7 +8,6 @@
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
-#include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
@@ -179,12 +178,11 @@ public:
 		return alphas_power_;
 	}
 
-	std::vector<hep::dipole_with_set> dipoles() const
+	std::vector<hep::dipole> dipoles() const
 	{
-		return { hep::dipole_with_set{ 2, 4, 3, hep::particle_type::fermion,
+		return { hep::dipole{ 2, 4, 3, hep::particle_type::fermion,
 			hep::particle_type::boson, hep::particle_type::fermion,
-			hep::correction_type::qcd,
-			hep::initial_state_set{hep::initial_state::cq_uq}} };
+			hep::correction_type::qcd} };
 	}
 
 	std::vector<hep::final_state> final_states() const

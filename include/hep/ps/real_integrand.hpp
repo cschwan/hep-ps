@@ -22,7 +22,6 @@
 #include "hep/mc/projector.hpp"
 
 #include "hep/ps/convolute.hpp"
-#include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
@@ -119,9 +118,8 @@ public:
 
 		std::size_t index = 0;
 
-		for (auto const dipole_with_set : dipoles_)
+		for (auto const& dipole : dipoles_)
 		{
-			auto const& dipole = dipole_with_set.dipole();
 			auto& phase_space = dipole_phase_spaces_.at(index);
 
 			// map the real phase space on the dipole phase space
@@ -353,7 +351,7 @@ private:
 	std::vector<T> factors_;
 	std::vector<initial_state_map<T>> me_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
-	std::vector<dipole_with_set> dipoles_;
+	std::vector<dipole> dipoles_;
 	T alphas_power_;
 };
 

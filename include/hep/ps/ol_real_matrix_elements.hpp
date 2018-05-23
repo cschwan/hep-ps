@@ -21,7 +21,6 @@
 
 #include "hep/ps/coupling_order.hpp"
 #include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_with_set.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/scales.hpp"
@@ -56,7 +55,7 @@ public:
 		std::vector<initial_state_map<T>>& results
 	);
 
-	std::vector<dipole_with_set> const& dipoles() const;
+	std::vector<dipole> const& dipoles() const;
 
 	std::vector<final_state> const& final_states() const;
 
@@ -72,7 +71,7 @@ public:
 private:
 	std::size_t alphas_power_;
 	std::unordered_map<int, std::vector<T>> charge_table_;
-	std::vector<dipole_with_set> dipoles_;
+	std::vector<dipole> dipoles_;
 	std::vector<final_state> final_states_;
 	std::vector<final_state> final_states_real_;
 	std::unordered_multimap<initial_state, int> ids_dipoles_;

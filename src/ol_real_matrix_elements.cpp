@@ -118,8 +118,6 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 {
 	auto& ol = ol_interface::instance();
 
-	std::multimap<dipole, initial_state> dipoles_with_state;
-
 	for (auto const& process : real_processes)
 	{
 		auto const& pdg_ids = ol_process_string_to_pdg_ids(process);
@@ -198,48 +196,15 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				auto const type_j = pdg_id_to_particle_type(pdg_ids.at(j));
 				auto const type_k = pdg_id_to_particle_type(pdg_ids.at(k));
 
-				dipoles_with_state.emplace(dipole(i, j, k, type_i, type_j,
-					type_k, type), states.first);
+				dipoles_.emplace_back(i, j, k, type_i, type_j, type_k, type);
 			}
 		}
 		}
 		}
 	}
 
-	std::vector<dipole> dipoles;
-
-	for (auto const& dip : dipoles_with_state)
-	{
-		auto const& dipole = dip.first;
-
-		if (std::find(dipoles.begin(), dipoles.end(), dipole) == dipoles.end())
-		{
-			dipoles.push_back(dipole);
-		}
-	}
-
-	for (auto const& dipole : dipoles)
-	{
-		initial_state_set set;
-
-		auto const range = dipoles_with_state.equal_range(dipole);
-
-		for (auto i = range.first; i != range.second; ++i)
-		{
-			set.add(i->second);
-		}
-
-		dipoles_.emplace_back(
-			dipole.emitter(),
-			dipole.unresolved(),
-			dipole.spectator(),
-			dipole.emitter_type(),
-			dipole.unresolved_type(),
-			dipole.spectator_type(),
-			dipole.corr_type(),
-			set
-		);
-	}
+	auto new_end = std::unique(dipoles_.begin(), dipoles_.end());
+	dipoles_.erase(new_end, dipoles_.end());
 
 	final_states_real_.shrink_to_fit();
 	final_states_.shrink_to_fit();
@@ -352,8 +317,7 @@ void ol_real_matrix_elements<T>::dipole_me(
 }
 
 template <typename T>
-std::vector<dipole_with_set> const&
-ol_real_matrix_elements<T>::dipoles() const
+std::vector<dipole> const& ol_real_matrix_elements<T>::dipoles() const
 {
 	return dipoles_;
 }
