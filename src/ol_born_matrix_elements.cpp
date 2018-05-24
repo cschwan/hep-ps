@@ -26,17 +26,25 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
 		ol.setparameter_int("order_qcd", alphas_power);
 	}
 
-	if (scheme == regularization_scheme::dim_reg_blha)
+	if (loop_mes)
 	{
-		ol.setparameter_int("polenorm", 0);
-	}
-	else if (scheme == regularization_scheme::dim_reg_coli)
-	{
-		ol.setparameter_int("polenorm", 1);
-	}
-	else
-	{
-		assert( false );
+		// TODO: if we calculate EW corrections, set `ew_renorm` to `1`
+
+		// we will calculate the counterterms separately
+		ol.setparameter_int("CT_on", 0);
+
+		if (scheme == regularization_scheme::dim_reg_blha)
+		{
+			ol.setparameter_int("polenorm", 0);
+		}
+		else if (scheme == regularization_scheme::dim_reg_coli)
+		{
+			ol.setparameter_int("polenorm", 1);
+		}
+		else
+		{
+			assert( false );
+		}
 	}
 
 	for (auto const& process : processes)
@@ -118,8 +126,12 @@ void ol_born_matrix_elements<T>::borns(
 		double m2loop[3];
 		double acc;
 
-		double mu = static_cast <double> (scales.front().renormalization());
-		ol.setparameter_double("mu", mu);
+		double const mureg =
+			static_cast <double> (scales.front().regularization());
+
+		ol.setparameter_double("mureg", mureg);
+		ol.setparameter_double("muren",
+			static_cast <double> (scales.front().renormalization()));
 
 		// TODO: `scales` usually has more than one entry with the same
 		// renormalization scale - cache it?
@@ -128,6 +140,11 @@ void ol_born_matrix_elements<T>::borns(
 		{
 			auto const range = ids_.equal_range(state);
 			T value = T();
+
+			if (range.first == range.second)
+			{
+				continue;
+			}
 
 			for (auto i = range.first; i != range.second; ++i)
 			{
@@ -138,41 +155,44 @@ void ol_born_matrix_elements<T>::borns(
 				ol.evaluate_loop(i->second, ol_phase_space_.data(), &m2tree,
 					m2loop, &acc);
 				value += T(m2loop[0]);
-
-//				ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
-//					m2loop);
-//				value -= T(m2loop[0]);
 			}
 
-			results.front().emplace_back(state, value);
+			for (std::size_t i = 0; i != scales.size(); ++i)
+			{
+				results.at(i).emplace_back(state, value);
+			}
 		}
 
 		for (std::size_t j = 0; j != scales.size(); ++j)
 		{
-//			mu = scales.at(j).renormalization();
-//			ol.setparameter_int("mu", mu);
-
-			if (j != 0)
+			if (scales.at(j).regularization() !=
+				scales.front().regularization())
 			{
-				results.at(j) = results.front();
+				throw std::runtime_error(
+					"regularization scales must be the same");
 			}
 
-//			std::size_t k = 0;
-//
-//			for (auto const state : set)
-//			{
-//				auto const range = ids_.equal_range(state);
-//				T value = T();
-//
-//				for (auto i = range.first; i != range.second; ++i)
-//				{
-//					ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
-//						m2loop);
-//					value += T(m2loop[0]);
-//				}
-//
-//				results.at(j).at(k++).second += value;
-//			}
+			double const muren =
+				static_cast <double> (scales.at(j).renormalization());
+
+			ol.setparameter_double("muren", muren);
+
+			std::size_t k = 0;
+
+			for (auto const state : set)
+			{
+				auto const range = ids_.equal_range(state);
+				T value = T();
+
+				for (auto i = range.first; i != range.second; ++i)
+				{
+					ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
+						m2loop);
+					value += T(m2loop[0]);
+				}
+
+				results.at(j).at(k++).second += value;
+			}
 		}
 	}
 	else
