@@ -50,29 +50,24 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
 	for (auto const& process : processes)
 	{
 		auto const& pdg_ids = ol_process_string_to_pdg_ids(process);
-
-		std::vector<final_state> final_states(pdg_ids.size() - 2);
-		std::transform(pdg_ids.begin() + 2, pdg_ids.end(), final_states.begin(),
-			pdg_id_to_final_state);
-
-		auto const state = partons_to_initial_state(
-			pdg_id_to_parton(pdg_ids.at(0)), pdg_id_to_parton(pdg_ids.at(1)));
+		auto const& states = pdg_ids_to_states(pdg_ids);
 
 		if (final_states_.empty())
 		{
-			final_states_ = final_states;
+			final_states_ = states.second;
 		}
 		else
 		{
-			if (!std::equal(final_states_.begin(), final_states_.end(),
-				final_states.begin()))
+			if (!std::equal(states.second.begin(), states.second.end(),
+				final_states_.begin()))
 			{
 				throw std::invalid_argument("processes are not compatible");
 			}
 		}
 
 		int const amptype = loop_mes ? 11 : 1;
-		ids_.emplace(state, ol.register_process(process.c_str(), amptype));
+		ids_.emplace(states.first,
+			ol.register_process(process.c_str(), amptype));
 	}
 
 	final_states_.shrink_to_fit();
