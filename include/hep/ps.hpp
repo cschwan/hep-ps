@@ -78,6 +78,7 @@
 #include "hep/ps/scales.hpp"
 #include "hep/ps/static_scale_function.hpp"
 #include "hep/ps/suppress_banners.hpp"
+#include "hep/ps/tensor_decompose.hpp"
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_distributions.hpp"
 #include "hep/ps/trivial_recombiner.hpp"

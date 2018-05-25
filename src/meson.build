@@ -56,6 +56,7 @@ sources = [
 	'rambo_phase_space_generator.cpp',
 	'static_scale_function.cpp',
 	'suppress_banners.cpp',
+	'tensor_decompose.cpp',
 	'trivial_cutter.cpp',
 	'trivial_recombiner.cpp',
 	'vertex.cpp'

@@ -63,6 +63,7 @@ headers1 = [
 	'hep/ps/scales.hpp',
 	'hep/ps/static_scale_function.hpp',
 	'hep/ps/suppress_banners.hpp',
+	'hep/ps/tensor_decompose.hpp',
 	'hep/ps/trivial_cutter.hpp',
 	'hep/ps/trivial_distributions.hpp',
 	'hep/ps/trivial_recombiner.hpp',

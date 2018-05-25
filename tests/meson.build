@@ -175,6 +175,14 @@ test_real_integrand = executable(
 	link_with : [ libcatch, libhep_ps ]
 )
 
+test_tensor_decompose = executable(
+	'test_tensor_decompose',
+	'test_tensor_decompose.cpp',
+	include_directories : incdir,
+	cpp_args : '-DHEP_TYPE_T=double',
+	link_with : [ libcatch, libhep_ps ]
+)
+
 test_trivial_cutter_and_recombiner = executable(
 	'test_trivial_cutter_and_recombiner',
 	'test_trivial_cutter_and_recombiner.cpp',
@@ -204,6 +212,7 @@ test('test_phase_space_point', test_phase_space_point)
 test('test_phase_space_quality', test_phase_space_quality, timeout : 120)
 test('test_rambo_phase_space_generator', test_rambo_phase_space_generator)
 test('test_real_integrand', test_real_integrand)
+test('test_tensor_decompose', test_tensor_decompose)
 test('test_trivial_cutter_and_recombiner', test_trivial_cutter_and_recombiner)
 
 if get_option('additional-tests')
