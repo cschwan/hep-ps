@@ -190,7 +190,21 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 					charge_table_.emplace(dipole_id, std::move(charges));
 				}
 
-				ids_dipoles_.emplace(states.first, dipole_id);
+				bool not_already_emplaced = true;
+				auto const range = ids_dipoles_.equal_range(states.first);
+
+				for (auto i = range.first; i != range.second; ++i)
+				{
+					if (i->second == dipole_id)
+					{
+						not_already_emplaced = false;
+					}
+				}
+
+				if (not_already_emplaced)
+				{
+					ids_dipoles_.emplace(states.first, dipole_id);
+				}
 
 				auto const type_i = pdg_id_to_particle_type(pdg_ids.at(i));
 				auto const type_j = pdg_id_to_particle_type(pdg_ids.at(j));
