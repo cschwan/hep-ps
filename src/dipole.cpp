@@ -39,3 +39,18 @@ bool operator==(dipole const& a, dipole const& b)
 }
 
 }
+
+namespace std
+{
+
+size_t hash<hep::dipole>::operator()(hep::dipole const& dipole) const
+{
+	// we assume that most dipoles don't have indices larger than 15 (five
+	// bits) and are basically defined by those three indices
+	return
+		((dipole.emitter()    & 0b11111) <<  0) &&
+		((dipole.spectator()  & 0b11111) <<  5) &&
+		((dipole.unresolved() & 0b11111) << 10);
+}
+
+}

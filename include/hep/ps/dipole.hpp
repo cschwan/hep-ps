@@ -24,6 +24,7 @@
 #include "hep/ps/particle_type.hpp"
 
 #include <cstddef>
+#include <functional>
 
 namespace hep
 {
@@ -140,6 +141,17 @@ bool operator<(dipole const& a, dipole const& b);
 
 /// Dipole comparison operator.
 bool operator==(dipole const& a, dipole const& b);
+
+}
+
+namespace std
+{
+
+template <>
+struct hash<hep::dipole>
+{
+	size_t operator()(hep::dipole const& dipole) const;
+};
 
 }
 
