@@ -42,36 +42,7 @@ public:
 		particle_type unresolved_type,
 		particle_type spectator_type,
 		correction_type corr_type
-	)
-		: emitter_(emitter)
-		, unresolved_(unresolved)
-		, spectator_(spectator)
-		, emitter_type_(emitter_type)
-		, unresolved_type_(unresolved_type)
-		, spectator_type_(spectator_type)
-		, corr_type_(corr_type)
-	{
-		int type = (emitter < 2) | ((spectator < 2) << 1);
-
-		switch (type)
-		{
-		case 0:
-			type_ = dipole_type::final_final;
-			break;
-
-		case 1:
-			type_ = dipole_type::initial_final;
-			break;
-
-		case 2:
-			type_ = dipole_type::final_initial;
-			break;
-
-		case 3:
-			type_ = dipole_type::initial_initial;
-			break;
-		}
-	}
+	);
 
 	/// Returns the index of the particle of the real process that is the
 	/// emitter in this dipole.
