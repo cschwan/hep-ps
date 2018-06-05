@@ -238,6 +238,11 @@ inline std::size_t lsb_position(std::bitset<128> x)
 			return (set_ & (bitset(1) << index)).any();                        \
 		}                                                                      \
                                                                                \
+		name ## _set intersection(name ## _set const& other) const             \
+		{                                                                      \
+			return set_ & other.set_;                                          \
+		}                                                                      \
+                                                                               \
 		std::size_t size() const                                               \
 		{                                                                      \
 			return set_.count();                                               \
@@ -250,6 +255,11 @@ inline std::size_t lsb_position(std::bitset<128> x)
                                                                                \
 	private:                                                                   \
 		bitset set_;                                                           \
+                                                                               \
+		name ## _set(bitset set)                                               \
+			: set_(set)                                                        \
+		{                                                                      \
+		}                                                                      \
 	}
 
 #endif
