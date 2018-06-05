@@ -341,13 +341,13 @@ int pdg_id_to_charge_times_three(int id)
 	case -15:
 	case -13:
 	case -11:
-		return 1;
+		return 3;
 
 	// leptons
 	case  11:
 	case  13:
 	case  15:
-		return -1;
+		return -3;
 
 	// neutrinos
 	case -16:
