@@ -120,8 +120,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
 	for (auto const& process : real_processes)
 	{
-		auto const& pdg_ids = ol_process_string_to_pdg_ids(process);
-		auto const& states = pdg_ids_to_states(pdg_ids);
+		auto const& ids = ol_process_string_to_pdg_ids(process);
+		auto const& states = pdg_ids_to_states(ids);
 
 		if (final_states_real_.empty())
 		{
@@ -141,11 +141,11 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 			ol.register_process(process.c_str(), 1));
 
 		// construct all possible QCD and EW dipoles
-		for (std::size_t i = 0; i != pdg_ids.size(); ++i)
+		for (std::size_t i = 0; i != ids.size(); ++i)
 		{
-		for (std::size_t j = 2; j != pdg_ids.size(); ++j)
+		for (std::size_t j = 2; j != ids.size(); ++j)
 		{
-		for (std::size_t k = 0; k != pdg_ids.size(); ++k)
+		for (std::size_t k = 0; k != ids.size(); ++k)
 		{
 			if ((i == j) || (i == k) || (j == k))
 			{
@@ -154,63 +154,80 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
 			for (auto const type : correction_type_list())
 			{
-				auto const& ids = ::dipole_me(pdg_ids, i, j, k, type, order);
+				auto const& dipole_ids = ::dipole_me(ids, i, j, k, type, order);
 
-				if (ids.empty())
+				if (dipole_ids.empty())
 				{
 					// there is no matrix element for this dipole
 					continue;
 				}
 
-				auto const& states = pdg_ids_to_states(ids);
+				auto const& dipole_states = pdg_ids_to_states(dipole_ids);
 
 				// if the signature does not match, throw the dipole away
-				if (!std::equal(states.second.begin(), states.second.end(),
-					final_states_.begin()))
+				if (!std::equal(dipole_states.second.begin(),
+					dipole_states.second.end(), final_states_.begin()))
 				{
 					continue;
 				}
 
 				ol.setparameter_int("order_qcd", (type == correction_type::qcd)
 					? (order.alphas_power() - 1) : order.alphas_power());
-				auto const process = pdg_ids_to_ol_process_string(ids);
+				auto const process = pdg_ids_to_ol_process_string(dipole_ids);
 				int const dipole_id = ol.register_process(process.c_str(), 1);
 
-				if (type == correction_type::ew)
+				// add a charge table if neccessary
+				if ((type == correction_type::ew) &&
+					(charge_table_.find(dipole_id) == charge_table_.end()))
 				{
 					std::vector<T> charges;
 					charges.reserve(ids.size());
 
+					// we need the charges of the real matrix element
 					for (int const id : ids)
 					{
-						charges.push_back(T(pdg_id_to_charge_times_three(id)) /
-							T(3.0));
+						int const charge = pdg_id_to_charge_times_three(id);
+						charges.push_back(T(charge) / T(3.0));
 					}
+
+					// sign of the crossing
+					charges.at(0) *= T(-1.0);
+					charges.at(1) *= T(-1.0);
 
 					charge_table_.emplace(dipole_id, std::move(charges));
 				}
 
-				bool not_already_emplaced = true;
-				auto const range = ids_dipoles_.equal_range(states.first);
+				auto const type_i = pdg_id_to_particle_type(ids.at(i));
+				auto const type_j = pdg_id_to_particle_type(ids.at(j));
+				auto const type_k = pdg_id_to_particle_type(ids.at(k));
+
+				auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
+
+				// add a dipole if it doesn't exist yet
+				if (std::find(dipoles_.begin(), dipoles_.end(), dip) ==
+					dipoles_.end())
+				{
+					dipoles_.push_back(dip);
+				}
+
+				auto range = mes_.equal_range(dip);
+				bool found = false;
 
 				for (auto i = range.first; i != range.second; ++i)
 				{
-					if (i->second == dipole_id)
+					if (i->second.second == dipole_id)
 					{
-						not_already_emplaced = false;
+						// there is already a matrix element for this dipole
+						i->second.first.add(states.first);
+						found = true;
 					}
 				}
 
-				if (not_already_emplaced)
+				if (!found)
 				{
-					ids_dipoles_.emplace(states.first, dipole_id);
+					mes_.emplace(dip, std::make_pair(
+						initial_state_set{states.first}, dipole_id));
 				}
-
-				auto const type_i = pdg_id_to_particle_type(pdg_ids.at(i));
-				auto const type_j = pdg_id_to_particle_type(pdg_ids.at(j));
-				auto const type_k = pdg_id_to_particle_type(pdg_ids.at(k));
-
-				dipoles_.emplace_back(i, j, k, type_i, type_j, type_k, type);
 			}
 		}
 		}
@@ -218,8 +235,6 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 	}
 
 	std::sort(dipoles_.begin(), dipoles_.end());
-	auto new_end = std::unique(dipoles_.begin(), dipoles_.end());
-	dipoles_.erase(new_end, dipoles_.end());
 	dipoles_.shrink_to_fit();
 
 	final_states_real_.shrink_to_fit();
@@ -270,54 +285,67 @@ void ol_real_matrix_elements<T>::dipole_me(
 		ol_phase_space_.at(5 * i + 4) = 0.0;
 	}
 
+	auto const range = mes_.equal_range(dipole);
+	auto const em = dipole.emitter();
+	auto const sp = dipole.spectator();
+
 	if (dipole.corr_type() == correction_type::qcd)
 	{
-		double m2tree;
-		double m2ew;
-		double alphas;
-		ol.getparameter_double("alphas", &alphas);
+		double as;
+		ol.getparameter_double("alphas", &as);
+		T const alphas = T(as);
 
-		for (auto const state : set)
+		for (auto i = range.first; i != range.second; ++i)
 		{
-			auto const range = ids_dipoles_.equal_range(state);
+			auto const dipole_set = i->second.first;
+			auto const id = i->second.second;
+			auto const this_set = set.intersection(dipole_set);
 
-			for (auto i = range.first; i != range.second; ++i)
+			if (!this_set.empty())
 			{
-				ol.evaluate_cc(i->second, ol_phase_space_.data(), &m2tree,
+				double m2tree;
+				double m2ew;
+				ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
 					ol_m2cc_.data(), &m2ew);
 
-				std::size_t const k = std::min(dipole.emitter(),
-					dipole.spectator());
-				std::size_t const l = std::max(dipole.emitter(),
-					dipole.spectator());
-				std::size_t const index = k + l * (l - 1) / 2;
+				auto const k = std::min(em, sp);
+				auto const l = std::max(em, sp);
+				auto const index = k + l * (l - 1) / 2;
 
-				results.front().emplace_back(state,
-					T(alphas) * T(ol_m2cc_.at(index)));
+				T const result = alphas * T(ol_m2cc_.at(index));
+
+				for (auto const state : this_set)
+				{
+					results.front().emplace_back(state, result);
+				}
 			}
 		}
 	}
 	else if (dipole.corr_type() == correction_type::ew)
 	{
-		double m2tree;
-		double alpha;
-		ol.getparameter_double("alpha", &alpha);
+		double a;
+		ol.getparameter_double("alpha", &a);
+		T const alpha = T(a);
 
-		for (auto const state : set)
+		for (auto i = range.first; i != range.second; ++i)
 		{
-			auto const range = ids_dipoles_.equal_range(state);
+			auto const dipole_set = i->second.first;
+			auto const id = i->second.second;
+			auto const this_set = set.intersection(dipole_set);
 
-			for (auto i = range.first; i != range.second; ++i)
+			if (!this_set.empty())
 			{
-				ol.evaluate_tree(i->second, ol_phase_space_.data(), &m2tree);
+				double m2tree;
+				ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
 
-				T const charge_em = charge_table_.at(i->second).at(
-					dipole.emitter());
-				T const charge_sp = charge_table_.at(i->second).at(
-					dipole.spectator());
+				T const charge_em = charge_table_.at(id).at(em);
+				T const charge_sp = charge_table_.at(id).at(sp);
+				T const result = charge_em * charge_sp * alpha * T(m2tree);
 
-				results.front().emplace_back(state,
-					charge_em * charge_sp * T(alpha) * T(m2tree));
+				for (auto const state : this_set)
+				{
+					results.front().emplace_back(state, result);
+				}
 			}
 		}
 	}
