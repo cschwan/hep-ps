@@ -77,8 +77,8 @@ private:
 	std::vector<final_state> final_states_;
 	std::vector<final_state> final_states_real_;
 	std::unordered_multimap<initial_state, int> ids_reals_;
-	std::vector<T> ol_m2cc_;
-	std::vector<T> ol_phase_space_;
+	std::vector<double> ol_m2cc_;
+	std::vector<double> ol_phase_space_;
 };
 
 }
