@@ -21,6 +21,7 @@
 #include "catch.hpp"
 #include "test_phase_space_generator.hpp"
 
+#include <array>
 #include <cstddef>
 #include <functional>
 #include <vector>
@@ -52,6 +53,15 @@ public:
 		hep::dipole const& /*dipole_info*/
 	) {
 		return {};
+	}
+
+	void boson_function(
+		hep::dipole const& /*dipole_info*/,
+		hep::dipole_invariants<T> const& /*invariants*/,
+		std::vector<T> const& /*phase_space*/,
+		std::array<std::array<T, 4>, 4>& /*vectors*/,
+		std::array<T, 4>& /*factors*/
+	) {
 	}
 
 	T fermion_function(
@@ -163,6 +173,16 @@ public:
 		}
 
 		results.assign(scales.size(), result);
+	}
+
+	void dipole_sc(
+		hep::dipole const& /*dipole*/,
+		std::vector<T> const& /*phase_space*/,
+		std::array<T, 4> const& /*correlation_vector*/,
+		hep::initial_state_set /*set*/,
+		std::vector<hep::scales<T>> const& /*scales*/,
+		std::vector<hep::initial_state_map<T>>& /*results*/
+	) {
 	}
 
 	void alphas(T alphas)

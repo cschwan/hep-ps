@@ -56,6 +56,15 @@ public:
 		std::vector<initial_state_map<T>>& results
 	);
 
+	void dipole_sc(
+		hep::dipole const& dipole,
+		std::vector<T> const& phase_space,
+		std::array<T, 4> const& correlation_vector,
+		hep::initial_state_set set,
+		std::vector<hep::scales<T>> const& scales,
+		std::vector<hep::initial_state_map<T>>& results
+	);
+
 	std::vector<dipole> const& dipoles() const;
 
 	std::vector<final_state> const& final_states() const;
@@ -77,7 +86,7 @@ private:
 	std::vector<final_state> final_states_;
 	std::vector<final_state> final_states_real_;
 	std::unordered_multimap<initial_state, int> ids_reals_;
-	std::vector<double> ol_m2cc_;
+	std::vector<double> ol_m2_;
 	std::vector<double> ol_phase_space_;
 };
 

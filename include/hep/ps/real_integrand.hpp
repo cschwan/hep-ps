@@ -34,6 +34,7 @@
 #include "hep/ps/scales.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <iterator>
@@ -104,6 +105,7 @@ public:
 			set_scales(std::vector<T>());
 			results_.reserve(scales_.size());
 			me_.resize(scales_.size());
+			me_tmp_.resize(scales_.size());
 		}
 
 		pdfs_.register_partons(partons_in_initial_state_set(set));
@@ -184,6 +186,7 @@ public:
 			set_scales(recombined_ps_);
 			results_.reserve(scales_.size());
 			me_.resize(scales_.size());
+			me_tmp_.resize(scales_.size());
 		}
 
 		pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
@@ -206,35 +209,78 @@ public:
 			auto const& phase_space =
 				dipole_phase_spaces_.at(non_zero_dipole.index());
 
-			bool const fermion_i = dipole.emitter_type() ==
-				particle_type::fermion;
-			bool const fermion_j = dipole.unresolved_type() ==
-				particle_type::fermion;
+			T function = T(1.0);
 
-			T function;
+			if ((dipole.emitter_type() == particle_type::fermion) !=
+				(dipole.unresolved_type() == particle_type::fermion))
+			{
+				function = -subtraction_.fermion_function(dipole, invariants);
 
-			if (fermion_i != fermion_j)
-			{
-				function = subtraction_.fermion_function(dipole,
-					invariants);
-			}
-			else if (fermion_i && fermion_j)
-			{
-				// TODO: NYI
-				assert( false );
+				for (auto& me : me_)
+				{
+					me.clear();
+				}
+
+				matrix_elements_.dipole_me(
+					dipole,
+					phase_space,
+					set_,
+					scales_,
+					me_
+				);
 			}
 			else
 			{
-				// TODO: NYI
-				assert( false );
-			}
+				std::array<std::array<T, 4>, 4> vectors;
+				std::array<T, 4> functions;
 
-			for (auto& me : me_)
-			{
-				me.clear();
-			}
+				subtraction_.boson_function(dipole, invariants, phase_space,
+					vectors, functions);
 
-			matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
+				for (std::size_t i = 0; i != vectors.size(); ++i)
+				{
+					for (auto& me : me_)
+					{
+						me.clear();
+					}
+
+					matrix_elements_.dipole_sc(
+						dipole,
+						phase_space,
+						vectors[i],
+						set_,
+						scales_,
+						(i == 0) ? me_ : me_tmp_
+					);
+
+					if (i == 0)
+					{
+						for (std::size_t j = 0; j != me_tmp_.size(); ++j)
+						{
+							for (std::size_t k = 0; me_tmp_[j].size(); ++k)
+							{
+								me_[j].emplace_back(me_tmp_[j][k].first,
+									functions[i] * me_tmp_[j][k].second);
+							}
+						}
+					}
+					else
+					{
+						for (std::size_t j = 0; j != me_.size(); ++j)
+						{
+							for (std::size_t k = 0; me_[j].size(); ++k)
+							{
+								// order of `me_` and `me_tmp_` must be the same
+								assert(me_[j][k].first ==
+									me_tmp_[j].at(k).first);
+
+								me_[j][k].second += functions[i] *
+									me_tmp_.at(j).at(k).second;
+							}
+						}
+					}
+				}
+			}
 
 			convolute_mes_with_pdfs(
 				results_,
@@ -246,7 +292,7 @@ public:
 				me_,
 				set_,
 				factors_,
-				-function * factor,
+				function * factor,
 				dipole_cut_result
 			);
 
@@ -350,6 +396,7 @@ private:
 	std::vector<scales<T>> scales_;
 	std::vector<T> factors_;
 	std::vector<initial_state_map<T>> me_;
+	std::vector<initial_state_map<T>> me_tmp_;
 	std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
 	std::vector<dipole> dipoles_;
 	T alphas_power_;

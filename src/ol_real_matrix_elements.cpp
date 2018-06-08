@@ -240,7 +240,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 	final_states_real_.shrink_to_fit();
 	final_states_.shrink_to_fit();
 	std::size_t const n = final_states_.size() + 2;
-	ol_m2cc_.resize(n * (n - 1) / 2);
+	ol_m2_.resize(n * (n - 1) / 2);
 	ol_phase_space_.resize(5 * (n + 1));
 }
 
@@ -306,13 +306,13 @@ void ol_real_matrix_elements<T>::dipole_me(
 				double m2tree;
 				double m2ew;
 				ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
-					ol_m2cc_.data(), &m2ew);
+					ol_m2_.data(), &m2ew);
 
 				auto const k = std::min(em, sp);
 				auto const l = std::max(em, sp);
 				auto const index = k + l * (l - 1) / 2;
 
-				T const result = alphas * T(ol_m2cc_.at(index));
+				T const result = alphas * T(ol_m2_.at(index));
 
 				for (auto const state : this_set)
 				{
@@ -341,6 +341,110 @@ void ol_real_matrix_elements<T>::dipole_me(
 				T const charge_em = charge_table_.at(id).at(em);
 				T const charge_sp = charge_table_.at(id).at(sp);
 				T const result = charge_em * charge_sp * alpha * T(m2tree);
+
+				for (auto const state : this_set)
+				{
+					results.front().emplace_back(state, result);
+				}
+			}
+		}
+	}
+	else
+	{
+		assert( false );
+	}
+
+	for (std::size_t i = 1; i != scales.size(); ++i)
+	{
+		results.at(i) = results.front();
+	}
+}
+
+template <typename T>
+void ol_real_matrix_elements<T>::dipole_sc(
+	hep::dipole const& dipole,
+	std::vector<T> const& phase_space,
+	std::array<T, 4> const& correlation_vector,
+	hep::initial_state_set set,
+	std::vector<hep::scales<T>> const& scales,
+	std::vector<hep::initial_state_map<T>>& results
+) {
+	auto& ol = hep::ol_interface::instance();
+
+	// TODO: for the time being we assume that the matrix elements do only
+	// indirectly depend on the renormalization scales (through alphas)
+
+	std::size_t const n = phase_space.size() / 4;
+
+	for (std::size_t i = 0; i != n; ++i)
+	{
+		ol_phase_space_.at(5 * i + 0) =
+			static_cast <double> (phase_space.at(4 * i + 0));
+		ol_phase_space_.at(5 * i + 1) =
+			static_cast <double> (phase_space.at(4 * i + 1));
+		ol_phase_space_.at(5 * i + 2) =
+			static_cast <double> (phase_space.at(4 * i + 2));
+		ol_phase_space_.at(5 * i + 3) =
+			static_cast <double> (phase_space.at(4 * i + 3));
+		ol_phase_space_.at(5 * i + 4) = 0.0;
+	}
+
+	std::array<double, 4> vector = {
+		static_cast <double> (correlation_vector.at(0)),
+		static_cast <double> (correlation_vector.at(1)),
+		static_cast <double> (correlation_vector.at(2)),
+		static_cast <double> (correlation_vector.at(3))
+	};
+
+	auto const range = mes_.equal_range(dipole);
+	auto const em = dipole.emitter();
+	auto const sp = dipole.spectator();
+
+	if (dipole.corr_type() == correction_type::qcd)
+	{
+		double as;
+		ol.getparameter_double("alphas", &as);
+		T const alphas = T(as);
+
+		for (auto i = range.first; i != range.second; ++i)
+		{
+			auto const dipole_set = i->second.first;
+			auto const id = i->second.second;
+			auto const this_set = set.intersection(dipole_set);
+
+			if (!this_set.empty())
+			{
+				ol.evaluate_sc(id, ol_phase_space_.data(), em, vector.data(),
+					ol_m2_.data());
+
+				T const result = alphas * T(ol_m2_.at(sp));
+
+				for (auto const state : this_set)
+				{
+					results.front().emplace_back(state, result);
+				}
+			}
+		}
+	}
+	else if (dipole.corr_type() == correction_type::ew)
+	{
+		double a;
+		ol.getparameter_double("alpha", &a);
+		T const alpha = T(a);
+
+		for (auto i = range.first; i != range.second; ++i)
+		{
+			auto const dipole_set = i->second.first;
+			auto const id = i->second.second;
+			auto const this_set = set.intersection(dipole_set);
+
+			if (!this_set.empty())
+			{
+				ol.evaluate_sc(id, ol_phase_space_.data(), em, vector.data(),
+					ol_m2_.data());
+
+				// no charge factors!
+				T const result = alpha * T(ol_m2_.at(sp));
 
 				for (auto const state : this_set)
 				{
