@@ -219,21 +219,19 @@ dipole_invariants<T> cs_subtraction<T>::map_phase_space(
 }
 
 template <typename T>
-void cs_subtraction<T>::boson_function(
+spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 	dipole const& dipole_info,
 	dipole_invariants<T> const& invariants,
-	std::vector<T> const& phase_space,
-	std::array<std::array<T, 4>, 4>& results,
-	std::array<T, 4>& factors
+	std::vector<T> const& phase_space
 ) {
 	using std::acos;
+
+	spin_correlation_matrix<T> result;
 
 	std::size_t j = dipole_info.unresolved();
 	std::size_t k = dipole_info.spectator();
 
-//	T const cf = tf_ * (nc_ * nc_ - T(1.0)) / nc_;
-	T factor = T(8.0) * acos(T(-1.0));
-
+	T const factor = T(8.0) * acos(T(-1.0));
 	T propagator;
 
 	// TODO: gluon splitting into gluons NYI
@@ -256,20 +254,18 @@ void cs_subtraction<T>::boson_function(
 		T const uk = (dipole_info.type() == dipole_type::initial_initial)
 			? T(1.0) : T(1.0) - uj;
 
-		std::array<T, 4> vector = {
+		result.p = {
 			phase_space.at(4 * j + 0) / uj - phase_space.at(4 * k + 0) / uk,
 			phase_space.at(4 * j + 1) / uj - phase_space.at(4 * k + 1) / uk,
 			phase_space.at(4 * j + 2) / uj - phase_space.at(4 * k + 2) / uk,
 			phase_space.at(4 * j + 3) / uj - phase_space.at(4 * k + 3) / uk,
 		};
 
-		T const x = invariants.one;
-		T const denominator = T(-0.25) * x * x / (T(1.0) - x);
-
-		tensor_decompose(vector, denominator, results, factors);
-
 		// factor `x` is not missing, because we factored it off the dipole
 		propagator = T(-1.0) * invariants.sij;
+
+		T const x = invariants.one;
+		result.b = T(-4.0) * (T(1.0) - x) / x / x * factor * propagator;
 	}
 
 		break;
@@ -278,10 +274,9 @@ void cs_subtraction<T>::boson_function(
 		assert( false );
 	}
 
-	factors[0] *= factor * propagator;
-	factors[1] *= factor * propagator;
-	factors[2] *= factor * propagator;
-	factors[3] *= factor * propagator;
+	result.a = factor * propagator;
+
+	return result;
 }
 
 template <typename T>

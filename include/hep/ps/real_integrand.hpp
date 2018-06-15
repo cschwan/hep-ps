@@ -209,75 +209,53 @@ public:
 			auto const& phase_space =
 				dipole_phase_spaces_.at(non_zero_dipole.index());
 
+			for (auto& me : me_)
+			{
+				me.clear();
+			}
+
+			matrix_elements_.dipole_me(
+				dipole,
+				phase_space,
+				set_,
+				scales_,
+				me_
+			);
+
 			T function = T(1.0);
 
 			if ((dipole.emitter_type() == particle_type::fermion) !=
 				(dipole.unresolved_type() == particle_type::fermion))
 			{
 				function = -subtraction_.fermion_function(dipole, invariants);
+			}
+			else
+			{
+				auto const correlator = subtraction_.boson_function(dipole,
+					invariants, phase_space);
 
-				for (auto& me : me_)
+				for (auto& me : me_tmp_)
 				{
 					me.clear();
 				}
 
-				matrix_elements_.dipole_me(
+				matrix_elements_.dipole_sc(
 					dipole,
 					phase_space,
+					correlator.p,
 					set_,
 					scales_,
-					me_
+					me_tmp_
 				);
-			}
-			else
-			{
-				std::array<std::array<T, 4>, 4> vectors;
-				std::array<T, 4> functions;
 
-				subtraction_.boson_function(dipole, invariants, phase_space,
-					vectors, functions);
-
-				for (std::size_t i = 0; i != vectors.size(); ++i)
+				for (std::size_t j = 0; j != me_.size(); ++j)
 				{
-					for (auto& me : me_)
+					for (std::size_t k = 0; k != me_[j].size(); ++k)
 					{
-						me.clear();
-					}
+						assert( me_[j][k].first == me_tmp_[j][k].first );
 
-					matrix_elements_.dipole_sc(
-						dipole,
-						phase_space,
-						vectors[i],
-						set_,
-						scales_,
-						(i == 0) ? me_ : me_tmp_
-					);
-
-					if (i == 0)
-					{
-						for (std::size_t j = 0; j != me_tmp_.size(); ++j)
-						{
-							for (std::size_t k = 0; me_tmp_[j].size(); ++k)
-							{
-								me_[j].emplace_back(me_tmp_[j][k].first,
-									functions[i] * me_tmp_[j][k].second);
-							}
-						}
-					}
-					else
-					{
-						for (std::size_t j = 0; j != me_.size(); ++j)
-						{
-							for (std::size_t k = 0; me_[j].size(); ++k)
-							{
-								// order of `me_` and `me_tmp_` must be the same
-								assert(me_[j][k].first ==
-									me_tmp_[j].at(k).first);
-
-								me_[j][k].second += functions[i] *
-									me_tmp_.at(j).at(k).second;
-							}
-						}
+						me_[j][k].second *= correlator.a;
+						me_[j][k].second += me_tmp_[j][k].second * correlator.b;
 					}
 				}
 			}

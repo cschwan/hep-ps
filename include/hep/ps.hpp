@@ -76,6 +76,7 @@
 #include "hep/ps/renormalization_scheme.hpp"
 #include "hep/ps/scale_variation.hpp"
 #include "hep/ps/scales.hpp"
+#include "hep/ps/spin_correlation_matrix.hpp"
 #include "hep/ps/static_scale_function.hpp"
 #include "hep/ps/suppress_banners.hpp"
 #include "hep/ps/tensor_decompose.hpp"

@@ -61,6 +61,7 @@ headers1 = [
 	'hep/ps/renormalization_scheme.hpp',
 	'hep/ps/scale_variation.hpp',
 	'hep/ps/scales.hpp',
+	'hep/ps/spin_correlation_matrix.hpp',
 	'hep/ps/static_scale_function.hpp',
 	'hep/ps/suppress_banners.hpp',
 	'hep/ps/tensor_decompose.hpp',

@@ -27,6 +27,7 @@
 #include "hep/ps/insertion_term_mode.hpp"
 #include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/scales.hpp"
+#include "hep/ps/spin_correlation_matrix.hpp"
 
 #include <array>
 #include <cstddef>
@@ -60,14 +61,14 @@ public:
 		dipole const& dipole_info
 	);
 
-	void boson_function(
+	///
+	spin_correlation_matrix<T> boson_function(
 		dipole const& dipole_info,
 		dipole_invariants<T> const& invariants,
-		std::vector<T> const& phase_space,
-		std::array<std::array<T, 4>, 4>& results,
-		std::array<T, 4>& factors
+		std::vector<T> const& phase_space
 	);
 
+	///
 	T fermion_function(
 		dipole const& dipole_info,
 		dipole_invariants<T> const& invariants

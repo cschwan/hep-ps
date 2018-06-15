@@ -15,6 +15,7 @@
 #include "hep/ps/real_integrand.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
+#include "hep/ps/spin_correlation_matrix.hpp"
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
 
@@ -55,13 +56,12 @@ public:
 		return {};
 	}
 
-	void boson_function(
+	hep::spin_correlation_matrix<T> boson_function(
 		hep::dipole const& /*dipole_info*/,
 		hep::dipole_invariants<T> const& /*invariants*/,
-		std::vector<T> const& /*phase_space*/,
-		std::array<std::array<T, 4>, 4>& /*vectors*/,
-		std::array<T, 4>& /*factors*/
+		std::vector<T> const& /*phase_space*/
 	) {
+		return {};
 	}
 
 	T fermion_function(

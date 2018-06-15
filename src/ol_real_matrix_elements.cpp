@@ -364,7 +364,7 @@ template <typename T>
 void ol_real_matrix_elements<T>::dipole_sc(
 	hep::dipole const& dipole,
 	std::vector<T> const& phase_space,
-	std::array<T, 4> const& correlation_vector,
+	std::array<T, 4> const& vector,
 	hep::initial_state_set set,
 	std::vector<hep::scales<T>> const& scales,
 	std::vector<hep::initial_state_map<T>>& results
@@ -389,11 +389,11 @@ void ol_real_matrix_elements<T>::dipole_sc(
 		ol_phase_space_.at(5 * i + 4) = 0.0;
 	}
 
-	std::array<double, 4> vector = {
-		static_cast <double> (correlation_vector.at(0)),
-		static_cast <double> (correlation_vector.at(1)),
-		static_cast <double> (correlation_vector.at(2)),
-		static_cast <double> (correlation_vector.at(3))
+	std::array<double, 4> double_vector = {
+		static_cast <double> (vector.at(0)),
+		static_cast <double> (vector.at(1)),
+		static_cast <double> (vector.at(2)),
+		static_cast <double> (vector.at(3))
 	};
 
 	auto const range = mes_.equal_range(dipole);
@@ -414,8 +414,8 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 			if (!this_set.empty())
 			{
-				ol.evaluate_sc(id, ol_phase_space_.data(), em, vector.data(),
-					ol_m2_.data());
+				ol.evaluate_sc(id, ol_phase_space_.data(), em,
+					double_vector.data(), ol_m2_.data());
 
 				T const result = alphas * T(ol_m2_.at(sp));
 
@@ -440,8 +440,8 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 			if (!this_set.empty())
 			{
-				ol.evaluate_sc(id, ol_phase_space_.data(), em, vector.data(),
-					ol_m2_.data());
+				ol.evaluate_sc(id, ol_phase_space_.data(), em,
+					double_vector.data(), ol_m2_.data());
 
 				// no charge factors!
 				T const result = alpha * T(ol_m2_.at(sp));
