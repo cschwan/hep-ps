@@ -518,6 +518,12 @@ void ol_real_matrix_elements<T>::reals(
 		auto const range = ids_reals_.equal_range(state);
 		T value = T();
 
+		// don't write zeros into `results`
+		if (range.first == range.second)
+		{
+			continue;
+		}
+
 		for (auto i = range.first; i != range.second; ++i)
 		{
 			ol.evaluate_tree(i->second, ol_phase_space_.data(), &m2tree);
