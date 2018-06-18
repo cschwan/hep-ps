@@ -65,7 +65,8 @@ public:
 		std::array<T, 4> const& vector,
 		hep::initial_state_set set,
 		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::initial_state_map<T>>& results
+		std::vector<hep::initial_state_map<T>>& results_one,
+		std::vector<hep::initial_state_map<T>>& results_two
 	);
 
 	std::vector<dipole> const& dipoles() const;

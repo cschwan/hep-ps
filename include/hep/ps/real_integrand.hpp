@@ -214,19 +214,19 @@ public:
 				me.clear();
 			}
 
-			matrix_elements_.dipole_me(
-				dipole,
-				phase_space,
-				set_,
-				scales_,
-				me_
-			);
-
 			T function = T(1.0);
 
 			if ((dipole.emitter_type() == particle_type::fermion) !=
 				(dipole.unresolved_type() == particle_type::fermion))
 			{
+				matrix_elements_.dipole_me(
+					dipole,
+					phase_space,
+					set_,
+					scales_,
+					me_
+				);
+
 				function = -subtraction_.fermion_function(dipole, invariants);
 			}
 			else
@@ -245,6 +245,7 @@ public:
 					correlator.p,
 					set_,
 					scales_,
+					me_,
 					me_tmp_
 				);
 

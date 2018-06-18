@@ -399,7 +399,8 @@ void ol_real_matrix_elements<T>::dipole_sc(
 	std::array<T, 4> const& vector,
 	hep::initial_state_set set,
 	std::vector<hep::scales<T>> const& scales,
-	std::vector<hep::initial_state_map<T>>& results
+	std::vector<hep::initial_state_map<T>>& results_one,
+	std::vector<hep::initial_state_map<T>>& results_two
 ) {
 	auto& ol = hep::ol_interface::instance();
 
@@ -446,14 +447,30 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 			if (!this_set.empty())
 			{
-				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
-					double_vector.data(), ol_m2_.data());
+				double m2tree;
+				double m2ew;
+				ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
+					ol_m2_.data(), &m2ew);
 
-				T const result = alphas * T(ol_m2_.at(sp));
+				auto const k = std::min(em, sp);
+				auto const l = std::max(em, sp);
+				auto const index = k + l * (l - 1) / 2;
+
+				T const result_one = alphas * T(ol_m2_.at(index));
 
 				for (auto const state : this_set)
 				{
-					results.front().emplace_back(state, result);
+					results_one.front().emplace_back(state, result_one);
+				}
+
+				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
+					double_vector.data(), ol_m2_.data());
+
+				T const result_two = alphas * T(ol_m2_.at(sp));
+
+				for (auto const state : this_set)
+				{
+					results_two.front().emplace_back(state, result_two);
 				}
 			}
 		}
@@ -472,15 +489,27 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 			if (!this_set.empty())
 			{
-				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
-					double_vector.data(), ol_m2_.data());
+				T const charge_em = charge_table_.at(id).at(em);
 
-				// no charge factors!
-				T const result = alpha * T(ol_m2_.at(sp));
+				double m2tree;
+				ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
+
+				T const result_one = charge_em * charge_em * alpha * T(m2tree);
 
 				for (auto const state : this_set)
 				{
-					results.front().emplace_back(state, result);
+					results_one.front().emplace_back(state, result_one);
+				}
+
+				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
+					double_vector.data(), ol_m2_.data());
+
+				T const result_two = charge_em * charge_em * alpha *
+					T(ol_m2_.at(sp));
+
+				for (auto const state : this_set)
+				{
+					results_two.front().emplace_back(state, result_two);
 				}
 			}
 		}
@@ -492,7 +521,8 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 	for (std::size_t i = 1; i != scales.size(); ++i)
 	{
-		results.at(i) = results.front();
+		results_one.at(i) = results_one.front();
+		results_two.at(i) = results_two.front();
 	}
 }
 
