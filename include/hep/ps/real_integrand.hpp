@@ -232,7 +232,7 @@ public:
 			else
 			{
 				auto const correlator = subtraction_.boson_function(dipole,
-					invariants, phase_space);
+					invariants, real_phase_space);
 
 				for (auto& me : me_tmp_)
 				{
