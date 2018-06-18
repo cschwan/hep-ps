@@ -446,7 +446,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 			if (!this_set.empty())
 			{
-				ol.evaluate_sc(id, ol_phase_space_.data(), em,
+				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
 					double_vector.data(), ol_m2_.data());
 
 				T const result = alphas * T(ol_m2_.at(sp));
@@ -472,7 +472,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 			if (!this_set.empty())
 			{
-				ol.evaluate_sc(id, ol_phase_space_.data(), em,
+				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
 					double_vector.data(), ol_m2_.data());
 
 				// no charge factors!
