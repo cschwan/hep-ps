@@ -262,7 +262,7 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 		};
 
 		// factor `x` is not missing, because we factored it off the dipole
-		propagator = T(-1.0) * invariants.sij;
+		propagator = T(-1.0) / invariants.sij;
 
 		T const x = invariants.one;
 		result.b = T(-4.0) * (T(1.0) - x) / x / x * factor * propagator;
