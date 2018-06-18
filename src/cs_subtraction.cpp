@@ -255,10 +255,10 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 			? T(1.0) : T(1.0) - uj;
 
 		result.p = {
-			phase_space.at(4 * j + 0) / uj - phase_space.at(4 * k + 0) / uk,
-			phase_space.at(4 * j + 1) / uj - phase_space.at(4 * k + 1) / uk,
-			phase_space.at(4 * j + 2) / uj - phase_space.at(4 * k + 2) / uk,
-			phase_space.at(4 * j + 3) / uj - phase_space.at(4 * k + 3) / uk,
+			phase_space.at(4 * j + 0) * uk - phase_space.at(4 * k + 0) * uj,
+			phase_space.at(4 * j + 1) * uk - phase_space.at(4 * k + 1) * uj,
+			phase_space.at(4 * j + 2) * uk - phase_space.at(4 * k + 2) * uj,
+			phase_space.at(4 * j + 3) * uk - phase_space.at(4 * k + 3) * uj,
 		};
 
 		// factor `x` is not missing, because we factored it off the dipole
