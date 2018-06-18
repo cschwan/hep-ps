@@ -27,6 +27,9 @@ std::vector<int> dipole_me(
 	int const id_k = pdg_ids.at(k);
 	int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
 
+	// TODO: technically we should also allow dipoles with uncharged particles
+	// as spectators if they are proportional to EW spin-correlated dipoles
+
 	if (type == hep::correction_type::ew)
 	{
 		if (hep::pdg_id_has_charge(id_i) && hep::pdg_id_has_charge(id_k))
@@ -111,7 +114,8 @@ template <typename T>
 ol_real_matrix_elements<T>::ol_real_matrix_elements(
 	std::vector<std::string> const& real_processes,
 	std::vector<final_state> const& dipole_final_states,
-	coupling_order order
+	coupling_order order,
+	photon_dipole_selector const& selector
 )
 	: alphas_power_(order.alphas_power())
 	, final_states_(dipole_final_states)
@@ -140,7 +144,9 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 		ids_reals_.emplace(states.first,
 			ol.register_process(process.c_str(), 1));
 
-		// construct all possible QCD and EW dipoles
+		// construct all possible EW and QCD dipoles
+		for (auto const type : correction_type_list())
+		{
 		for (std::size_t i = 0; i != ids.size(); ++i)
 		{
 		for (std::size_t j = 2; j != ids.size(); ++j)
@@ -152,83 +158,109 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				continue;
 			}
 
-			for (auto const type : correction_type_list())
+			auto const& dipole_ids = ::dipole_me(ids, i, j, k, type, order);
+
+			if (dipole_ids.empty())
 			{
-				auto const& dipole_ids = ::dipole_me(ids, i, j, k, type, order);
+				// there is no matrix element for this dipole
+				continue;
+			}
 
-				if (dipole_ids.empty())
+			auto const& dipole_states = pdg_ids_to_states(dipole_ids);
+
+			// if the signature does not match, throw the dipole away
+			if (!std::equal(dipole_states.second.begin(),
+				dipole_states.second.end(), final_states_.begin()))
+			{
+				continue;
+			}
+
+			bool photon_dipole_selected = false;
+
+			if (type == correction_type::ew)
+			{
+				int const id_i = ids.at(i);
+				int const id_j = ids.at(j);
+				int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
+
+				// check if this is a photon dipole
+				if (id_i + sign * id_j == 0)
 				{
-					// there is no matrix element for this dipole
-					continue;
-				}
-
-				auto const& dipole_states = pdg_ids_to_states(dipole_ids);
-
-				// if the signature does not match, throw the dipole away
-				if (!std::equal(dipole_states.second.begin(),
-					dipole_states.second.end(), final_states_.begin()))
-				{
-					continue;
-				}
-
-				ol.setparameter_int("order_qcd", (type == correction_type::qcd)
-					? (order.alphas_power() - 1) : order.alphas_power());
-				auto const process = pdg_ids_to_ol_process_string(dipole_ids);
-				int const dipole_id = ol.register_process(process.c_str(), 1);
-
-				// add a charge table if neccessary
-				if ((type == correction_type::ew) &&
-					(charge_table_.find(dipole_id) == charge_table_.end()))
-				{
-					std::vector<T> charges;
-					charges.reserve(ids.size());
-
-					// we need the charges of the real matrix element
-					for (int const id : ids)
+					if (selector(dipole_ids, i, j, k))
 					{
-						int const charge = pdg_id_to_charge_times_three(id);
-						charges.push_back(T(charge) / T(3.0));
+						photon_dipole_selected = true;
 					}
-
-					// sign of the crossing
-					charges.at(0) *= T(-1.0);
-					charges.at(1) *= T(-1.0);
-
-					charge_table_.emplace(dipole_id, std::move(charges));
-				}
-
-				auto const type_i = pdg_id_to_particle_type(ids.at(i));
-				auto const type_j = pdg_id_to_particle_type(ids.at(j));
-				auto const type_k = pdg_id_to_particle_type(ids.at(k));
-
-				auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
-
-				// add a dipole if it doesn't exist yet
-				if (std::find(dipoles_.begin(), dipoles_.end(), dip) ==
-					dipoles_.end())
-				{
-					dipoles_.push_back(dip);
-				}
-
-				auto range = mes_.equal_range(dip);
-				bool found = false;
-
-				for (auto i = range.first; i != range.second; ++i)
-				{
-					if (i->second.second == dipole_id)
+					else
 					{
-						// there is already a matrix element for this dipole
-						i->second.first.add(states.first);
-						found = true;
+						continue;
 					}
-				}
-
-				if (!found)
-				{
-					mes_.emplace(dip, std::make_pair(
-						initial_state_set{states.first}, dipole_id));
 				}
 			}
+
+			ol.setparameter_int("order_qcd", (type == correction_type::qcd)
+				? (order.alphas_power() - 1) : order.alphas_power());
+			auto const process = pdg_ids_to_ol_process_string(dipole_ids);
+			int const dipole_id = ol.register_process(process.c_str(), 1);
+
+			// add a charge table if neccessary
+			if ((type == correction_type::ew) &&
+				(charge_table_.find(dipole_id) == charge_table_.end()))
+			{
+				std::vector<T> charges;
+				charges.reserve(ids.size());
+
+				// we need the charges of the real matrix element
+				for (int const id : ids)
+				{
+					int const charge = pdg_id_to_charge_times_three(id);
+					charges.push_back(T(charge) / T(3.0));
+				}
+
+				// sign of the crossing
+				charges.at(0) *= T(-1.0);
+				charges.at(1) *= T(-1.0);
+
+				charge_table_.emplace(dipole_id, std::move(charges));
+			}
+
+			auto const type_i = pdg_id_to_particle_type(ids.at(i));
+			auto const type_j = pdg_id_to_particle_type(ids.at(j));
+			auto const type_k = pdg_id_to_particle_type(ids.at(k));
+
+			auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
+
+			// add a dipole if it doesn't exist yet
+			if (std::find(dipoles_.begin(), dipoles_.end(), dip) ==
+				dipoles_.end())
+			{
+				dipoles_.push_back(dip);
+			}
+
+			auto range = mes_.equal_range(dip);
+			bool found = false;
+
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				if (i->second.second == dipole_id)
+				{
+					// there is already a matrix element for this dipole
+					i->second.first.add(states.first);
+					found = true;
+				}
+			}
+
+			if (!found)
+			{
+				mes_.emplace(dip, std::make_pair(
+					initial_state_set{states.first}, dipole_id));
+			}
+
+			// currently we only support one photon dipole per spectator
+			if (photon_dipole_selected)
+			{
+				break;
+			}
+		}
 		}
 		}
 		}

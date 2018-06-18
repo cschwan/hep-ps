@@ -67,6 +67,7 @@
 #include "hep/ps/permutation.hpp"
 #include "hep/ps/phase_space_generator.hpp"
 #include "hep/ps/phase_space_point.hpp"
+#include "hep/ps/photon_dipole_selector.hpp"
 #include "hep/ps/propagator.hpp"
 #include "hep/ps/ps_integrand.hpp"
 #include "hep/ps/rambo_phase_space_generator.hpp"

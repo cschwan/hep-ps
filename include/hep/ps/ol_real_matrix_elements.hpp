@@ -23,6 +23,7 @@
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
+#include "hep/ps/photon_dipole_selector.hpp"
 #include "hep/ps/scales.hpp"
 
 #include <cstddef>
@@ -41,7 +42,9 @@ public:
 	ol_real_matrix_elements(
 		std::vector<std::string> const& real_processes,
 		std::vector<final_state> const& dipole_final_states,
-		coupling_order order
+		coupling_order order,
+		photon_dipole_selector const& selector =
+			default_photon_dipole_selector()
 	);
 
 	void alphas(T alphas);
