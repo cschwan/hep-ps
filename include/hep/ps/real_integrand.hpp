@@ -255,8 +255,8 @@ public:
 					{
 						assert( me_[j][k].first == me_tmp_[j][k].first );
 
-						me_[j][k].second *= correlator.a;
-						me_[j][k].second += me_tmp_[j][k].second * correlator.b;
+						me_[j][k].second *= -correlator.a;
+						me_[j][k].second -= me_tmp_[j][k].second * correlator.b;
 					}
 				}
 			}
