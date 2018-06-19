@@ -501,11 +501,12 @@ void ol_real_matrix_elements<T>::dipole_sc(
 					results_one.front().emplace_back(state, result_one);
 				}
 
+				// OpenLoops returns the spin-correlator with an additonal sign
 				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
 					double_vector.data(), ol_m2_.data());
 
 				T const result_two = -charge_em * charge_em * alpha *
-					T(ol_m2_.at(sp));
+					T(-ol_m2_.at(sp));
 
 				for (auto const state : this_set)
 				{
