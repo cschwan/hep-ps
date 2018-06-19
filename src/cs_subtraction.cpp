@@ -228,10 +228,13 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 
 	spin_correlation_matrix<T> result;
 
+	std::size_t const i = dipole_info.emitter();
 	std::size_t const j = dipole_info.unresolved();
 	std::size_t const k = dipole_info.spectator();
 
 	T const factor = T(8.0) * acos(T(-1.0));
+
+	// FIXME: color is probably missing in the QCD case
 
 	// TODO: gluon splitting into gluons NYI
 	assert( (dipole_info.emitter_type() == particle_type::fermion) &&
@@ -241,10 +244,29 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 	{
 	case dipole_type::final_final:
 	case dipole_type::final_initial:
-		assert( false );
+	{
+		T const zi = invariants.two;
+		T const zj = T(1.0) - zi;
 
-	// TODO: check signs for the EW case
-	// TODO: check for color in the QCD case
+		result.a = factor * T(-1.0) / invariants.sij;
+		result.b = factor * T(-1.0) / invariants.sij * T(2.0) * zi * zj;
+
+		if (dipole_info.type() == dipole_type::final_initial)
+		{
+			result.a /= invariants.one;
+			result.b /= invariants.one;
+		}
+
+		result.p = {
+			phase_space.at(4 * i + 0) * zi - phase_space.at(4 * j + 0) * zj,
+			phase_space.at(4 * i + 1) * zi - phase_space.at(4 * j + 1) * zj,
+			phase_space.at(4 * i + 2) * zi - phase_space.at(4 * j + 2) * zj,
+			phase_space.at(4 * i + 3) * zi - phase_space.at(4 * j + 3) * zj,
+		};
+
+	}
+
+		break;
 
 	case dipole_type::initial_final:
 	case dipole_type::initial_initial:
