@@ -228,11 +228,10 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 
 	spin_correlation_matrix<T> result;
 
-	std::size_t j = dipole_info.unresolved();
-	std::size_t k = dipole_info.spectator();
+	std::size_t const j = dipole_info.unresolved();
+	std::size_t const k = dipole_info.spectator();
 
 	T const factor = T(8.0) * acos(T(-1.0));
-	T propagator;
 
 	// TODO: gluon splitting into gluons NYI
 	assert( (dipole_info.emitter_type() == particle_type::fermion) &&
@@ -250,9 +249,15 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 	case dipole_type::initial_final:
 	case dipole_type::initial_initial:
 	{
+		T const x = invariants.one;
+
+		result.a = factor * T(-1.0) / invariants.sij;
+		result.b = factor * T(-1.0) / invariants.sij * T(4.0) * (x - T(1.0)) /
+			(x * x);
+
 		T const uj = invariants.two;
 		T const uk = (dipole_info.type() == dipole_type::initial_initial)
-			? T(1.0) : T(1.0) - uj;
+			? T(1.0) : (T(1.0) - uj);
 
 		result.p = {
 			phase_space.at(4 * j + 0) * uk - phase_space.at(4 * k + 0) * uj,
@@ -261,11 +266,6 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 			phase_space.at(4 * j + 3) * uk - phase_space.at(4 * k + 3) * uj,
 		};
 
-		// factor `x` is not missing, because we factored it off the dipole
-		propagator = T(-1.0) / invariants.sij;
-
-		T const x = invariants.one;
-		result.b = T(-4.0) * (T(1.0) - x) / x / x * factor * propagator;
 	}
 
 		break;
@@ -274,7 +274,6 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 		assert( false );
 	}
 
-	result.a = factor * propagator;
 
 	return result;
 }
