@@ -58,6 +58,12 @@ std::vector<int> dipole_me(
 				result = pdg_ids;
 				result.erase(result.begin() + j);
 			}
+			else if (id_i == hep::pdg_id_of_gluon())
+			{
+				result = pdg_ids;
+				result.at(i) = pdg_ids.at(j) * sign;
+				result.erase(result.begin() + j);
+			}
 			else if ((id_i + sign * id_j) == 0)
 			{
 				result = pdg_ids;
