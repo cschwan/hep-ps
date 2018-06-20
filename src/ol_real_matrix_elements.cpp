@@ -168,11 +168,21 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
 			auto const& dipole_states = pdg_ids_to_states(dipole_ids);
 
-			// if the signature does not match, throw the dipole away
-			if (!std::equal(dipole_states.second.begin(),
-				dipole_states.second.end(), final_states_.begin()))
+			auto const mismatch = std::mismatch(final_states_.begin(),
+				final_states_.end(), dipole_states.second.begin());
+
+			if (mismatch.first != final_states_.end())
 			{
-				continue;
+				// check if the mismatch is caused by a quark-antiquark-pair
+				// that got recombined into a photon; if this is the case allow
+				// the dipole
+				if ((*mismatch.first != final_state::quark_gluon) ||
+					(*mismatch.second != final_state::photon) ||
+					!std::equal(mismatch.first + 1, final_states_.end(),
+						mismatch.second + 1))
+				{
+					continue;
+				}
 			}
 
 			bool photon_dipole_selected = false;
