@@ -15,6 +15,7 @@ headers1 = [
 	'hep/ps/dipole.hpp',
 	'hep/ps/dipole_invariants.hpp',
 	'hep/ps/dipole_type.hpp',
+	'hep/ps/dipole_veto.hpp',
 	'hep/ps/enum.hpp',
 	'hep/ps/factorization_scheme.hpp',
 	'hep/ps/final_state.hpp',

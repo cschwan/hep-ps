@@ -21,6 +21,7 @@
 
 #include "hep/ps/coupling_order.hpp"
 #include "hep/ps/dipole.hpp"
+#include "hep/ps/dipole_veto.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/photon_dipole_selector.hpp"
@@ -43,6 +44,7 @@ public:
 		std::vector<std::string> const& real_processes,
 		std::vector<final_state> const& dipole_final_states,
 		coupling_order order,
+		dipole_veto const& veto = default_dipole_veto(),
 		photon_dipole_selector const& selector =
 			default_photon_dipole_selector()
 	);

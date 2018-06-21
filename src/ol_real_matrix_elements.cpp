@@ -18,6 +18,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 	std::vector<std::string> const& real_processes,
 	std::vector<final_state> const& dipole_final_states,
 	coupling_order order,
+	dipole_veto const& veto,
 	photon_dipole_selector const& selector
 )
 	: alphas_power_(order.alphas_power())
@@ -69,23 +70,9 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				continue;
 			}
 
-			auto const& dipole_states = pdg_ids_to_states(dipole_ids);
-
-			auto const mismatch = std::mismatch(final_states_.begin(),
-				final_states_.end(), dipole_states.second.begin());
-
-			if (mismatch.first != final_states_.end())
+			if (veto(dipole_ids, final_states_))
 			{
-				// check if the mismatch is caused by a quark-antiquark-pair
-				// that got recombined into a photon; if this is the case allow
-				// the dipole
-				if ((*mismatch.first != final_state::quark_gluon) ||
-					(*mismatch.second != final_state::photon) ||
-					!std::equal(mismatch.first + 1, final_states_.end(),
-						mismatch.second + 1))
-				{
-					continue;
-				}
+				continue;
 			}
 
 			bool photon_dipole_selected = false;

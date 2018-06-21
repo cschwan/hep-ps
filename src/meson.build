@@ -25,6 +25,7 @@ sources = [
 	'cs_subtraction.cpp',
 	'diagram.cpp',
 	'dipole.cpp',
+	'dipole_veto.cpp',
 	'find_hep_ps.cpp',
 	'fortran_helper.cpp',
 	'generate_dipole.cpp',
