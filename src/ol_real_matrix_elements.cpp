@@ -40,7 +40,7 @@ std::vector<int> dipole_me(
 			result.erase(result.begin() + j);
 		}
 		// fermion -> photon + fermion
-		else if (hep::pdg_id_is_photon(id_i) && charged_j)
+		else if (hep::pdg_id_is_photon(id_i) && charged_j && (i < 2))
 		{
 			// TODO: NYI
 			assert( false );
@@ -63,7 +63,8 @@ std::vector<int> dipole_me(
 				result = pdg_ids;
 				result.erase(result.begin() + j);
 			}
-			else if (id_i == hep::pdg_id_of_gluon())
+			// fermion -> gluon + fermion
+			else if (hep::pdg_id_is_gluon(id_i) && (i < 2))
 			{
 				result = pdg_ids;
 				result.at(i) = pdg_ids.at(j) * sign;
