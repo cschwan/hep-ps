@@ -309,6 +309,11 @@ bool pdg_id_is_quark(int id)
 	}
 }
 
+bool pdg_id_is_photon(int id)
+{
+	return id == pdg_id_of_photon();
+}
+
 int pdg_id_to_charge_times_three(int id)
 {
 	switch (id)

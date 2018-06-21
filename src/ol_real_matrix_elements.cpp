@@ -27,25 +27,30 @@ std::vector<int> dipole_me(
 	int const id_k = pdg_ids.at(k);
 	int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
 
-	// TODO: technically we should also allow dipoles with uncharged particles
-	// as spectators if they are proportional to EW spin-correlated dipoles
-
 	if (type == hep::correction_type::ew)
 	{
-		if (hep::pdg_id_has_charge(id_i) && hep::pdg_id_has_charge(id_k))
+		bool const charged_i = hep::pdg_id_has_charge(id_i);
+		bool const charged_j = hep::pdg_id_has_charge(id_j);
+		bool const charged_k = hep::pdg_id_has_charge(id_k);
+
+		// fermion -> fermion + photon
+		if (hep::pdg_id_is_photon(id_j) && charged_i && charged_k)
 		{
-			if (id_j == hep::pdg_id_of_photon())
-			{
-				result = pdg_ids;
-				result.erase(result.begin() + j);
-			}
-			else if (hep::pdg_id_has_charge(id_j) &&
-				((id_i + sign * id_j) == 0))
-			{
-				result = pdg_ids;
-				result.at(i) = hep::pdg_id_of_photon();
-				result.erase(result.begin() + j);
-			}
+			result = pdg_ids;
+			result.erase(result.begin() + j);
+		}
+		// fermion -> photon + fermion
+		else if (hep::pdg_id_is_photon(id_i) && charged_j)
+		{
+			// TODO: NYI
+			assert( false );
+		}
+		// photon -> fermion + antifermion
+		else if (charged_j && ((id_i + sign * id_j) == 0))
+		{
+			result = pdg_ids;
+			result.at(i) = hep::pdg_id_of_photon();
+			result.erase(result.begin() + j);
 		}
 	}
 	else if (type == hep::correction_type::qcd)
