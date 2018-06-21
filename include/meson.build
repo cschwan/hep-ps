@@ -22,6 +22,7 @@ headers1 = [
 	'hep/ps/fini_integrand.hpp',
 	'hep/ps/finite_parts.hpp',
 	'hep/ps/fortran_helper.hpp',
+	'hep/ps/generate_dipole.hpp',
 	'hep/ps/initial_state.hpp',
 	'hep/ps/insertion_term.hpp',
 	'hep/ps/insertion_term_mode.hpp',

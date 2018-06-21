@@ -38,6 +38,7 @@
 #include "hep/ps/fini_integrand.hpp"
 #include "hep/ps/finite_parts.hpp"
 #include "hep/ps/fortran_helper.hpp"
+#include "hep/ps/generate_dipole.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_mode.hpp"

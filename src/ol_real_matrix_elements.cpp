@@ -1,4 +1,5 @@
 #include "hep/ps/correction_type.hpp"
+#include "hep/ps/generate_dipole.hpp"
 #include "hep/ps/ol_interface.hpp"
 #include "hep/ps/ol_real_matrix_elements.hpp"
 #include "hep/ps/pdg_functions.hpp"
@@ -8,116 +9,6 @@
 #include <map>
 #include <stdexcept>
 #include <utility>
-
-namespace
-{
-
-std::vector<int> dipole_me(
-	std::vector<int> const& pdg_ids,
-	std::size_t i,
-	std::size_t j,
-	std::size_t k,
-	hep::correction_type type,
-	hep::coupling_order real_me_order
-) {
-	std::vector<int> result;
-
-	int const id_i = pdg_ids.at(i);
-	int const id_j = pdg_ids.at(j);
-	int const id_k = pdg_ids.at(k);
-	int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
-
-	if (type == hep::correction_type::ew)
-	{
-		bool const charged_i = hep::pdg_id_has_charge(id_i);
-		bool const charged_j = hep::pdg_id_has_charge(id_j);
-		bool const charged_k = hep::pdg_id_has_charge(id_k);
-
-		// fermion -> fermion + photon
-		if (hep::pdg_id_is_photon(id_j) && charged_i && charged_k)
-		{
-			result = pdg_ids;
-			result.erase(result.begin() + j);
-		}
-		// fermion -> photon + fermion
-		else if (hep::pdg_id_is_photon(id_i) && charged_j && (i < 2))
-		{
-			// TODO: NYI
-			assert( false );
-		}
-		// photon -> fermion + antifermion
-		else if (charged_j && ((id_i + sign * id_j) == 0))
-		{
-			result = pdg_ids;
-			result.at(i) = hep::pdg_id_of_photon();
-			result.erase(result.begin() + j);
-		}
-	}
-	else if (type == hep::correction_type::qcd)
-	{
-		if (hep::pdg_id_has_color(id_i) && hep::pdg_id_has_color(id_j) &&
-			hep::pdg_id_has_color(id_k))
-		{
-			if (id_j == hep::pdg_id_of_gluon())
-			{
-				result = pdg_ids;
-				result.erase(result.begin() + j);
-			}
-			// fermion -> gluon + fermion
-			else if (hep::pdg_id_is_gluon(id_i) && (i < 2))
-			{
-				result = pdg_ids;
-				result.at(i) = pdg_ids.at(j) * sign;
-				result.erase(result.begin() + j);
-			}
-			else if ((id_i + sign * id_j) == 0)
-			{
-				result = pdg_ids;
-				result.at(i) = hep::pdg_id_of_gluon();
-				result.erase(result.begin() + j);
-			}
-		}
-	}
-	else
-	{
-		assert( false );
-	}
-
-	std::size_t const gluons = std::count_if(result.begin(), result.end(),
-		hep::pdg_id_is_gluon);
-	std::size_t const quarks = std::count_if(result.begin(), result.end(),
-		hep::pdg_id_is_quark);
-
-	std::size_t n_qcd_min;
-	std::size_t n_qcd_max;
-
-	if (gluons >= (result.size() - 2))
-	{
-		// pure gluon case and one quark line
-		n_qcd_min = (gluons == result.size()) ? (gluons - 2) : gluons;
-		n_qcd_max = n_qcd_min;
-	}
-	else
-	{
-		// starting with two quark lines it is possible to have photons or
-		// gluons in between the quark lines
-		n_qcd_min = gluons;
-		n_qcd_max = n_qcd_min + quarks / 2;
-	}
-
-	std::size_t order_qcd = (type == hep::correction_type::qcd) ?
-		(real_me_order.alphas_power() - 1) : real_me_order.alphas_power();
-
-	// check if the matrix element with given coupling order exists
-	if ((order_qcd < n_qcd_min) || (order_qcd > n_qcd_max))
-	{
-		result.clear();
-	}
-
-	return result;
-}
-
-}
 
 namespace hep
 {
@@ -170,7 +61,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				continue;
 			}
 
-			auto const& dipole_ids = ::dipole_me(ids, i, j, k, type, order);
+			auto const& dipole_ids = generate_dipole(ids, order, type, i, j, k);
 
 			if (dipole_ids.empty())
 			{

@@ -47,6 +47,13 @@ test_fortran_helper = executable(
 	link_with : [ libcatch, libhep_ps ]
 )
 
+test_generate_dipole = executable(
+	'test_generate_dipole',
+	'test_generate_dipole.cpp',
+	include_directories : incdir,
+	link_with : [ libcatch, libhep_ps ]
+)
+
 test_headers = executable(
 	'test_headers',
 	'test_headers.cpp',

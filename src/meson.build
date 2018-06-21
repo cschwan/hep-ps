@@ -27,6 +27,7 @@ sources = [
 	'dipole.cpp',
 	'find_hep_ps.cpp',
 	'fortran_helper.cpp',
+	'generate_dipole.cpp',
 	'generator.f',
 	'hadron_hadron_psg_adapter.hpp',
 	'initial_state.cpp',
