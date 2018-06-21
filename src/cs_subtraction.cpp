@@ -249,7 +249,7 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 		T const zj = T(1.0) - zi;
 
 		result.a = factor * T(-1.0) / invariants.sij;
-		result.b = factor * T(-1.0) / invariants.sij * T(2.0) * zi * zj;
+		result.b = factor * T(-1.0) / invariants.sij * T(4.0) * zi * zj;
 
 		if (dipole_info.type() == dipole_type::final_initial)
 		{
