@@ -207,6 +207,12 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				// check if this is a photon dipole
 				if (id_i + sign * id_j == 0)
 				{
+					// do not consider (j,i;k) if we already have (i,j;k)
+					if (i > j)
+					{
+						continue;
+					}
+
 					if (selector(dipole_ids, i, j, k))
 					{
 						photon_dipole_selected = true;
