@@ -398,11 +398,14 @@ void ol_real_matrix_elements<T>::dipole_sc(
 			if (!this_set.empty())
 			{
 				T const charge_em = charge_table_.at(id).at(em);
+				T const nc = T(3.0);
+				T const factor = ((dipole.emitter() >= 2) ? nc : T(1.0)) *
+					charge_em * charge_em;
 
 				double m2tree;
 				ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
 
-				T const result_one = -charge_em * charge_em * alpha * T(m2tree);
+				T const result_one = -factor * alpha * T(m2tree);
 
 				for (auto const state : this_set)
 				{
@@ -413,8 +416,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
 				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
 					double_vector.data(), ol_m2_.data());
 
-				T const result_two = -charge_em * charge_em * alpha *
-					T(-ol_m2_.at(sp));
+				T const result_two = -factor * alpha * T(-ol_m2_.at(sp));
 
 				for (auto const state : this_set)
 				{
