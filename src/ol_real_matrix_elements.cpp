@@ -224,8 +224,9 @@ void ol_real_matrix_elements<T>::dipole_me(
 	}
 
 	auto const range = mes_.equal_range(dipole);
-	auto const em = dipole.emitter();
-	auto const sp = dipole.spectator();
+	auto const un = dipole.unresolved();
+	auto const em = dipole.emitter() - (dipole.emitter() > un ? 1 : 0);
+	auto const sp = dipole.spectator() - (dipole.spectator() > un ? 1 : 0);
 
 	if (dipole.corr_type() == correction_type::qcd)
 	{
@@ -336,8 +337,9 @@ void ol_real_matrix_elements<T>::dipole_sc(
 	};
 
 	auto const range = mes_.equal_range(dipole);
-	auto const em = dipole.emitter();
-	auto const sp = dipole.spectator();
+	auto const un = dipole.unresolved();
+	auto const em = dipole.emitter() - (dipole.emitter() > un ? 1 : 0);
+	auto const sp = dipole.spectator() - (dipole.spectator() > un ? 1 : 0);
 
 	if (dipole.corr_type() == correction_type::qcd)
 	{
