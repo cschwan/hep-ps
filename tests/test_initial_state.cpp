@@ -136,3 +136,14 @@ TEST_CASE("test partons_in_initial_state_set", "[initial_state]")
 	CHECK( *std::next(set.begin(), 61) == hep::initial_state::ux_uq );
 	CHECK(  std::next(set.begin(), 62) == set.end() );
 }
+
+TEST_CASE("are `state_parton_{one,two}` complete?")
+{
+	for (auto state : hep::initial_state_list())
+	{
+		CAPTURE( state );
+
+		CHECK_NOTHROW( state_parton_one(state) );
+		CHECK_NOTHROW( state_parton_two(state) );
+	}
+}
