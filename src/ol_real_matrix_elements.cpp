@@ -225,8 +225,13 @@ void ol_real_matrix_elements<T>::dipole_me(
 
 	auto const range = mes_.equal_range(dipole);
 	auto const un = dipole.unresolved();
-	auto const em = dipole.emitter() - (dipole.emitter() > un ? 1 : 0);
-	auto const sp = dipole.spectator() - (dipole.spectator() > un ? 1 : 0);
+	auto const em_real = dipole.emitter();
+	auto const sp_real = dipole.spectator();
+
+	// when we remove the particle with index `un`, the emitter and spectator
+	// indices for the born change
+	auto const em_born = em_real - (em_real > un ? 1 : 0);
+	auto const sp_born = sp_real - (sp_real > un ? 1 : 0);
 
 	if (dipole.corr_type() == correction_type::qcd)
 	{
@@ -247,8 +252,8 @@ void ol_real_matrix_elements<T>::dipole_me(
 				ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
 					ol_m2_.data(), &m2ew);
 
-				auto const k = std::min(em, sp);
-				auto const l = std::max(em, sp);
+				auto const k = std::min(em_born, sp_born);
+				auto const l = std::max(em_born, sp_born);
 				auto const index = k + l * (l - 1) / 2;
 
 				T const result = alphas * T(ol_m2_.at(index));
@@ -277,8 +282,8 @@ void ol_real_matrix_elements<T>::dipole_me(
 				double m2tree;
 				ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
 
-				T const charge_em = charge_table_.at(id).at(em);
-				T const charge_sp = charge_table_.at(id).at(sp);
+				T const charge_em = charge_table_.at(id).at(em_real);
+				T const charge_sp = charge_table_.at(id).at(sp_real);
 				T const result = charge_em * charge_sp * alpha * T(m2tree);
 
 				for (auto const state : this_set)
@@ -338,8 +343,13 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 	auto const range = mes_.equal_range(dipole);
 	auto const un = dipole.unresolved();
-	auto const em = dipole.emitter() - (dipole.emitter() > un ? 1 : 0);
-	auto const sp = dipole.spectator() - (dipole.spectator() > un ? 1 : 0);
+	auto const em_real = dipole.emitter();
+	auto const sp_real = dipole.spectator();
+
+	// when we remove the particle with index `un`, the emitter and spectator
+	// indices for the born change
+	auto const em_born = em_real - (em_real > un ? 1 : 0);
+	auto const sp_born = sp_real - (sp_real > un ? 1 : 0);
 
 	if (dipole.corr_type() == correction_type::qcd)
 	{
@@ -360,8 +370,8 @@ void ol_real_matrix_elements<T>::dipole_sc(
 				ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
 					ol_m2_.data(), &m2ew);
 
-				auto const k = std::min(em, sp);
-				auto const l = std::max(em, sp);
+				auto const k = std::min(em_born, sp_born);
+				auto const l = std::max(em_born, sp_born);
 				auto const index = k + l * (l - 1) / 2;
 
 				T const result_one = alphas * T(ol_m2_.at(index));
@@ -371,10 +381,10 @@ void ol_real_matrix_elements<T>::dipole_sc(
 					results_one.front().emplace_back(state, result_one);
 				}
 
-				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
+				ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1,
 					double_vector.data(), ol_m2_.data());
 
-				T const result_two = alphas * T(ol_m2_.at(sp));
+				T const result_two = alphas * T(ol_m2_.at(sp_born));
 
 				for (auto const state : this_set)
 				{
@@ -397,9 +407,12 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 			if (!this_set.empty())
 			{
-				T const charge_em = charge_table_.at(id).at(em);
+				T const charge_em = charge_table_.at(id).at(em_real);
 				T const nc = T(3.0);
-				T const factor = ((dipole.emitter() >= 2) ? nc : T(1.0)) *
+
+				// `em_real >= 2` and `em_born >= 2` are the same statements,
+				// because `un` is always larger or equal to two
+				T const factor = ((em_real >= 2) ? nc : T(1.0)) *
 					charge_em * charge_em;
 
 				double m2tree;
@@ -413,10 +426,10 @@ void ol_real_matrix_elements<T>::dipole_sc(
 				}
 
 				// OpenLoops returns the spin-correlator with an additonal sign
-				ol.evaluate_sc(id, ol_phase_space_.data(), em + 1,
+				ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1,
 					double_vector.data(), ol_m2_.data());
 
-				T const result_two = -factor * alpha * T(-ol_m2_.at(sp));
+				T const result_two = -factor * alpha * T(-ol_m2_.at(sp_born));
 
 				for (auto const state : this_set)
 				{
