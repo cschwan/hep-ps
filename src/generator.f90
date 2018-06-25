@@ -5,9 +5,12 @@
 !     written by Markus Roth                                      c
 !                                                                 c
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine lusifer_initphasespace(name,generator,lightfermions, &
-        includecuts,sout)
+      subroutine lusifer_initphasespace(c_name,generator,lightfermions, &
+        includecuts,sout) bind(c)
+      use, intrinsic :: iso_c_binding
       implicit none
+      character(kind=c_char), intent(in), dimension(*) :: c_name
+      integer(kind=c_int), value :: generator,lightfermions,includecuts,sout
 ! local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
@@ -15,42 +18,42 @@
       integer idhep(maxe,maxe),binary(maxe,maxe),idhep2,idhep3
       integer i1,i2,i3,ns,nt,maxns,maxnt,binary1,binary2,binary3
       integer in1(maxe),in2(maxe),out1(maxe),out2(maxe),lusifer_id
-      integer lightfermions,virt(maxe),channel,generator,includecuts
-      integer prop2,prop3,sout
+      integer virt(maxe),channel
+      integer prop2,prop3
       character*3 gname(-maxv:maxv),name(maxe)
       logical lusifer_vertex,lusifer_included,exist,same, &
         lusifer_compareinv
       logical lusifer_comparedecay,lusifer_compareprocess
 ! general
-      real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
-      real*8 mass(0:maxv),width(0:maxv)
-      integer nchannel(maxg),nexternal(maxg),allbinary(maxg)
+      real(kind=c_double) alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
+      real(kind=c_double) mass(0:maxv),width(0:maxv)
+      integer(kind=c_int) nchannel(maxg),nexternal(maxg),allbinary(maxg)
 ! cinv
-      real*8 powerinv(maxe,maxch,maxg),mcutinv(0:2**maxe,maxg)
-      integer ininv(maxe,maxch,maxg),idhepinv(maxv,maxch,maxg)
-      integer ninv(maxch,maxg)
+      real(kind=c_double) powerinv(maxe,maxch,maxg),mcutinv(0:2**maxe,maxg)
+      integer(kind=c_int) ininv(maxe,maxch,maxg),idhepinv(maxv,maxch,maxg)
+      integer(kind=c_int) ninv(maxch,maxg)
       logical lmin(maxe,maxe,maxch,maxg),lmax(maxe,maxe,maxch,maxg)
 ! cprocess
-      real*8 powerprocess(maxe,maxch,maxg),ccutprocess(2**maxe,maxg)
-      integer in1process(maxe,maxch,maxg),in2process(maxe,maxch,maxg)
-      integer out1process(maxe,maxch,maxg),out2process(maxe,maxch,maxg)
-      integer inprocess(maxe,maxch,maxg),virtprocess(maxe,maxch,maxg)
-      integer idhepprocess(maxe,maxch,maxg),nprocess(maxch,maxg)
+      real(kind=c_double) powerprocess(maxe,maxch,maxg),ccutprocess(2**maxe,maxg)
+      integer(kind=c_int) in1process(maxe,maxch,maxg),in2process(maxe,maxch,maxg)
+      integer(kind=c_int) out1process(maxe,maxch,maxg),out2process(maxe,maxch,maxg)
+      integer(kind=c_int) inprocess(maxe,maxch,maxg),virtprocess(maxe,maxch,maxg)
+      integer(kind=c_int) idhepprocess(maxe,maxch,maxg),nprocess(maxch,maxg)
 ! cdecay
-      integer indecay(maxe,maxch,maxg),out1decay(maxe,maxch,maxg)
-      integer out2decay(maxe,maxch,maxg),ndecay(maxch,maxg)
+      integer(kind=c_int) indecay(maxe,maxch,maxg),out1decay(maxe,maxch,maxg)
+      integer(kind=c_int) out2decay(maxe,maxch,maxg),ndecay(maxch,maxg)
 ! cdensity
-      integer nsinv(maxch,maxg),chinv(maxch,maxg),maxinv(maxg)
-      integer ntprocess(maxch,maxg),chprocess(maxch,maxg)
-      integer maxprocess(maxg),nsdecay(maxch,maxg),chdecay(maxch,maxg)
-      integer maxdecay(maxg),numinv(maxe,maxch,maxg)
-      integer numprocess(maxe,maxch,maxg),numdecay(maxe,maxch,maxg)
+      integer(kind=c_int) nsinv(maxch,maxg),chinv(maxch,maxg),maxinv(maxg)
+      integer(kind=c_int) ntprocess(maxch,maxg),chprocess(maxch,maxg)
+      integer(kind=c_int) maxprocess(maxg),nsdecay(maxch,maxg),chdecay(maxch,maxg)
+      integer(kind=c_int) maxdecay(maxg),numinv(maxe,maxch,maxg)
+      integer(kind=c_int) numprocess(maxe,maxch,maxg),numdecay(maxe,maxch,maxg)
 ! output
-      integer nout,numout,maxout
+      integer(kind=c_int) nout,numout,maxout
 ! techparam
-      real*8 a,techcut
+      real(kind=c_double) a,techcut
 ! cuts
-      real*8 ecut(maxe),scut(maxe,maxe),ccut(maxe,maxe)
+      real(kind=c_double) ecut(maxe),scut(maxe,maxe),ccut(maxe,maxe)
       common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width, &
         nchannel,nexternal,allbinary
       common/lusifer_cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
@@ -63,6 +66,18 @@
       common/lusifer_output/nout,numout,maxout
       common/lusifer_techparam/a,techcut
       common/lusifer_cuts/ecut,scut,ccut
+      bind(c) :: /lusifer_general/
+      bind(c) :: /lusifer_cinv/
+      bind(c) :: /lusifer_cdecay/
+      bind(c) :: /lusifer_cprocess/
+      bind(c) :: /lusifer_cdensity/
+      bind(c) :: /lusifer_output/
+      bind(c) :: /lusifer_techparam/
+      bind(c) :: /lusifer_cuts/
+      integer i
+      do i = 1, maxe
+        name(i:i) = c_name(3*(i-1)+1)//c_name(3*(i-1)+2)//c_name(3*(i-1)+3)
+      enddo
 ! technical parameter in h function and subroutine process
       a=1d-6
       techcut=1d-7
@@ -614,6 +629,7 @@
 !                                                                 c
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       function lusifer_comparedecay(ns1,ch1,ns2,ch2,generator)
+      use, intrinsic :: iso_c_binding
       implicit none
 ! local variables
       integer maxe,maxch,maxg
@@ -621,9 +637,10 @@
       integer ns1,ns2,ch1,ch2,generator
       logical lusifer_comparedecay
 ! cdecay
-      integer indecay(maxe,maxch,maxg),out1decay(maxe,maxch,maxg)
-      integer out2decay(maxe,maxch,maxg),ndecay(maxch,maxg)
+      integer(kind=c_int) indecay(maxe,maxch,maxg),out1decay(maxe,maxch,maxg)
+      integer(kind=c_int) out2decay(maxe,maxch,maxg),ndecay(maxch,maxg)
       common/lusifer_cdecay/indecay,out1decay,out2decay,ndecay
+      bind(c) :: /lusifer_cdecay/
       lusifer_comparedecay=.false.
       if(indecay(ns1,ch1,generator).ne.indecay(ns2,ch2,generator)) &
         return
@@ -641,6 +658,7 @@
 !                                                                 c
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       function lusifer_compareprocess(ns1,ch1,ns2,ch2,generator)
+      use, intrinsic :: iso_c_binding
       implicit none
 ! local variables
       integer maxe,maxch,maxg,maxv
@@ -648,20 +666,22 @@
       integer ns1,ns2,ch1,ch2,generator,idhep1,idhep2
       logical lusifer_compareprocess
 ! general
-      real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
-      real*8 mass(0:maxv),width(0:maxv)
-      integer nchannel(maxg),nexternal(maxg),allbinary(maxg)
+      real(kind=c_double) alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
+      real(kind=c_double) mass(0:maxv),width(0:maxv)
+      integer(kind=c_int) nchannel(maxg),nexternal(maxg),allbinary(maxg)
 ! cprocess
-      real*8 powerprocess(maxe,maxch,maxg),ccutprocess(2**maxe,maxg)
-      integer in1process(maxe,maxch,maxg),in2process(maxe,maxch,maxg)
-      integer out1process(maxe,maxch,maxg),out2process(maxe,maxch,maxg)
-      integer inprocess(maxe,maxch,maxg),virtprocess(maxe,maxch,maxg)
-      integer idhepprocess(maxe,maxch,maxg),nprocess(maxch,maxg)
+      real(kind=c_double) powerprocess(maxe,maxch,maxg),ccutprocess(2**maxe,maxg)
+      integer(kind=c_int) in1process(maxe,maxch,maxg),in2process(maxe,maxch,maxg)
+      integer(kind=c_int) out1process(maxe,maxch,maxg),out2process(maxe,maxch,maxg)
+      integer(kind=c_int) inprocess(maxe,maxch,maxg),virtprocess(maxe,maxch,maxg)
+      integer(kind=c_int) idhepprocess(maxe,maxch,maxg),nprocess(maxch,maxg)
       common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width, &
         nchannel,nexternal,allbinary
       common/lusifer_cprocess/powerprocess,ccutprocess,in1process, &
         in2process,out1process,out2process,inprocess,virtprocess, &
         idhepprocess,nprocess
+      bind(c) :: /lusifer_general/
+      bind(c) :: /lusifer_cprocess/
       lusifer_compareprocess=.false.
       if(inprocess(ns1,ch1,generator).ne.inprocess(ns2,ch2,generator)) &
         return
@@ -686,6 +706,7 @@
 !                                                                 c
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       function lusifer_compareinv(ns1,ch1,ns2,ch2,generator)
+      use, intrinsic :: iso_c_binding
       implicit none
 ! local variables
       integer maxe,maxch,maxg,maxv
@@ -693,17 +714,19 @@
       integer i1,i2,ns1,ns2,ch1,ch2,generator,idhep1,idhep2
       logical lusifer_compareinv,lusifer_included
 ! general
-      real*8 alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
-      real*8 mass(0:maxv),width(0:maxv)
-      integer nchannel(maxg),nexternal(maxg),allbinary(maxg)
+      real(kind=c_double) alphaisr,scale,meisr,s(2**maxe),p(0:3,2**maxe)
+      real(kind=c_double) mass(0:maxv),width(0:maxv)
+      integer(kind=c_int) nchannel(maxg),nexternal(maxg),allbinary(maxg)
 ! cinv
-      real*8 powerinv(maxe,maxch,maxg),mcutinv(0:2**maxe,maxg)
-      integer ininv(maxe,maxch,maxg),idhepinv(maxv,maxch,maxg)
-      integer ninv(maxch,maxg)
+      real(kind=c_double) powerinv(maxe,maxch,maxg),mcutinv(0:2**maxe,maxg)
+      integer(kind=c_int) ininv(maxe,maxch,maxg),idhepinv(maxv,maxch,maxg)
+      integer(kind=c_int) ninv(maxch,maxg)
       logical lmin(maxe,maxe,maxch,maxg),lmax(maxe,maxe,maxch,maxg)
       common/lusifer_general/alphaisr,scale,meisr,s,p,mass,width, &
         nchannel,nexternal,allbinary
       common/lusifer_cinv/powerinv,mcutinv,ininv,idhepinv,ninv,lmin,lmax
+      bind(c) :: /lusifer_general/
+      bind(c) :: /lusifer_cinv/
       lusifer_compareinv=.false.
       if(ininv(ns1,ch1,generator).ne.ininv(ns2,ch2,generator))return
       if(powerinv(ns1,ch1,generator).ne.powerinv(ns2,ch2,generator)) &

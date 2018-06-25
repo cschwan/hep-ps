@@ -497,7 +497,7 @@ lusifer_psg<T>::lusifer_psg(
 			double gt = static_cast <double> (constants.width_t);
 
 			// set constants and the number of particles
-			lusifer_extra_set(&g, &nex, &mw, &gw, &mz, &gz, &mh, &gh, &mt, &gt);
+			lusifer_extra_set(g, nex, mw, gw, mz, gz, mh, gh, mt, gt);
 
 			// the number of particles must be supported by the generator
 			assert( nex <= maxex );
@@ -519,16 +519,15 @@ lusifer_psg<T>::lusifer_psg(
 
 		lusifer_initphasespace(
 			process0.c_str(),
-			&g,
-			&lightfermions,
-			&includecuts,
-			&sout,
-			process0.size()
+			g,
+			lightfermions,
+			includecuts,
+			sout
 		);
 	}
 
 	int channels;
-	lusifer_extra_data(&g, &channels);
+	lusifer_extra_data(g, &channels);
 
 	// there must be at least one channel, otherwise something went wrong
 	assert( channels > 0 );
@@ -545,9 +544,9 @@ lusifer_psg<T>::lusifer_psg(
 	{
 		auto& channel = this->channels_.at(i);
 
-		channel.invariants.reserve(lusifer_cinv_.ninv[0][i]);
-		channel.processes.reserve(lusifer_cprocess_.nprocess[0][i]);
-		channel.decays.reserve(lusifer_cdecay_.ndecay[0][i]);
+		channel.invariants.reserve(lusifer_cinv.ninv[0][i]);
+		channel.processes.reserve(lusifer_cprocess.nprocess[0][i]);
+		channel.decays.reserve(lusifer_cdecay.ndecay[0][i]);
 
 		for (std::size_t j = 0; j != channel.invariants.capacity(); ++j)
 		{
@@ -556,71 +555,71 @@ lusifer_psg<T>::lusifer_psg(
 
 			for (std::size_t k = 0; k != maxe; ++k)
 			{
-				lmin.set(k, lusifer_cinv_.lmin[0][i][j][k]);
-				lmax.set(k, lusifer_cinv_.lmax[0][i][j][k]);
+				lmin.set(k, lusifer_cinv.lmin[0][i][j][k]);
+				lmax.set(k, lusifer_cinv.lmax[0][i][j][k]);
 			}
 
 			channel.invariants.emplace_back(
-				lusifer_cinv_.ininv[0][i][j] - 1,
-				lusifer_cinv_.idhepinv[0][i][j],
+				lusifer_cinv.ininv[0][i][j] - 1,
+				lusifer_cinv.idhepinv[0][i][j],
 				lmin,
 				lmax,
-				lusifer_cdensity_.numinv[0][i][j] - 1
+				lusifer_cdensity.numinv[0][i][j] - 1
 			);
 		}
 
 		for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
 		{
 			channel.processes.emplace_back(
-				lusifer_cprocess_.in1process[0][i][j] - 1,
-				lusifer_cprocess_.in2process[0][i][j] - 1,
-				lusifer_cprocess_.out1process[0][i][j] - 1,
-				lusifer_cprocess_.out2process[0][i][j] - 1,
-				lusifer_cprocess_.inprocess[0][i][j] - 1,
-				lusifer_cprocess_.virtprocess[0][i][j] - 1,
-				lusifer_cprocess_.idhepprocess[0][i][j],
-				lusifer_cdensity_.numprocess[0][i][j] - 1
+				lusifer_cprocess.in1process[0][i][j] - 1,
+				lusifer_cprocess.in2process[0][i][j] - 1,
+				lusifer_cprocess.out1process[0][i][j] - 1,
+				lusifer_cprocess.out2process[0][i][j] - 1,
+				lusifer_cprocess.inprocess[0][i][j] - 1,
+				lusifer_cprocess.virtprocess[0][i][j] - 1,
+				lusifer_cprocess.idhepprocess[0][i][j],
+				lusifer_cdensity.numprocess[0][i][j] - 1
 			);
 		}
 
 		for (std::size_t j = 0; j != channel.decays.capacity(); ++j)
 		{
 			channel.decays.emplace_back(
-				lusifer_cdecay_.indecay[0][i][j] - 1,
-				lusifer_cdecay_.out1decay[0][i][j] - 1,
-				lusifer_cdecay_.out2decay[0][i][j] - 1,
-				lusifer_cdensity_.numdecay[0][i][j] - 1
+				lusifer_cdecay.indecay[0][i][j] - 1,
+				lusifer_cdecay.out1decay[0][i][j] - 1,
+				lusifer_cdecay.out2decay[0][i][j] - 1,
+				lusifer_cdensity.numdecay[0][i][j] - 1
 			);
 		}
 	}
 
-	invariants.reserve(lusifer_cdensity_.maxinv[0]);
+	invariants.reserve(lusifer_cdensity.maxinv[0]);
 
 	for (std::size_t i = 0; i != invariants.capacity(); ++i)
 	{
 		invariants.emplace_back(
-			lusifer_cdensity_.nsinv[0][i] - 1,
-			lusifer_cdensity_.chinv[0][i] - 1
+			lusifer_cdensity.nsinv[0][i] - 1,
+			lusifer_cdensity.chinv[0][i] - 1
 		);
 	}
 
-	processes_.reserve(lusifer_cdensity_.maxprocess[0]);
+	processes_.reserve(lusifer_cdensity.maxprocess[0]);
 
 	for (std::size_t i = 0; i != processes_.capacity(); ++i)
 	{
 		processes_.emplace_back(
-			lusifer_cdensity_.ntprocess[0][i] - 1,
-			lusifer_cdensity_.chprocess[0][i] - 1
+			lusifer_cdensity.ntprocess[0][i] - 1,
+			lusifer_cdensity.chprocess[0][i] - 1
 		);
 	}
 
-	decays.reserve(lusifer_cdensity_.maxdecay[0]);
+	decays.reserve(lusifer_cdensity.maxdecay[0]);
 
 	for (std::size_t i = 0; i != decays.capacity(); ++i)
 	{
 		decays.emplace_back(
-			lusifer_cdensity_.nsdecay[0][i] - 1,
-			lusifer_cdensity_.chdecay[0][i] - 1
+			lusifer_cdensity.nsdecay[0][i] - 1,
+			lusifer_cdensity.chdecay[0][i] - 1
 		);
 	}
 
@@ -630,8 +629,8 @@ lusifer_psg<T>::lusifer_psg(
 	{
 		// TODO: make this parameter available from outside
 		T power = T(0.9);
-		T mass  = lusifer_general_.mass[i];
-		T width = lusifer_general_.width[i];
+		T mass  = lusifer_general.mass[i];
+		T width = lusifer_general.width[i];
 
 		if ((width > T()) || (i == 0) || ((i >= 30) && (i < 33)))
 		{
@@ -643,8 +642,8 @@ lusifer_psg<T>::lusifer_psg(
 
 	// TODO: is the following needed?
 	mcut.assign(
-		std::begin(lusifer_cinv_.mcutinv[0]),
-		std::end(lusifer_cinv_.mcutinv[0])
+		std::begin(lusifer_cinv.mcutinv[0]),
+		std::end(lusifer_cinv.mcutinv[0])
 	);
 
 	invariant_jacobians.reserve(invariants.size());

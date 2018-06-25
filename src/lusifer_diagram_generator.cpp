@@ -15,8 +15,8 @@ std::vector<diagram> lusifer_diagram_generator(
 	std::vector<std::string> const& processes,
 	lusifer_constants<T> const& constants
 ) {
-	int maxex;
-	int maxgen;
+	int maxex = -1;
+	int maxgen = -1;
 	lusifer_extra_max(&maxex, &maxgen);
 
 	int nex = 0;
@@ -46,7 +46,7 @@ std::vector<diagram> lusifer_diagram_generator(
 			double gt = constants.width_t;
 
 			// set constants and the number of particles
-			lusifer_extra_set(&g, &nex, &mw, &gw, &mz, &gz, &mh, &gh, &mt, &gt);
+			lusifer_extra_set(g, nex, mw, gw, mz, gz, mh, gh, mt, gt);
 
 			// the number of particles must be supported by the generator
 			assert( nex <= maxex );
@@ -68,16 +68,15 @@ std::vector<diagram> lusifer_diagram_generator(
 
 		lusifer_initphasespace(
 			process0.c_str(),
-			&g,
-			&lightfermions,
-			&includecuts,
-			&sout,
-			process0.size()
+			g,
+			lightfermions,
+			includecuts,
+			sout
 		);
 	}
 
 	int channels;
-	lusifer_extra_data(&g, &channels);
+	lusifer_extra_data(g, &channels);
 
 	// there must be at least one channel, otherwise something went wrong
 	assert( channels > 0 );
@@ -93,22 +92,22 @@ std::vector<diagram> lusifer_diagram_generator(
 		// the number of decays is always smaller or equal than the number of
 		// invariants because the PS generator must generate invariants that do
 		// not belong to a decay in the diagram
-		int const decays = lusifer_cdecay_.ndecay[0][i];
+		int const decays = lusifer_cdecay.ndecay[0][i];
 
 		for (int j = 0; j != decays; ++j)
 		{
 			vertices.emplace_back(
-				inv_idx(lusifer_cdecay_.indecay[0][i][j], nex),
-				inv_idx(lusifer_cdecay_.out1decay[0][i][j], nex),
-				inv_idx(lusifer_cdecay_.out2decay[0][i][j], nex)
+				inv_idx(lusifer_cdecay.indecay[0][i][j], nex),
+				inv_idx(lusifer_cdecay.out1decay[0][i][j], nex),
+				inv_idx(lusifer_cdecay.out2decay[0][i][j], nex)
 			);
 
-			auto const begin = std::begin(lusifer_cinv_.ininv[0][i]);
+			auto const begin = std::begin(lusifer_cinv.ininv[0][i]);
 			auto const end = begin + decays;
 
 			// find the invariant corresponding to the decay
 			auto const result = std::find(begin, end,
-				lusifer_cdecay_.indecay[0][i][j]);
+				lusifer_cdecay.indecay[0][i][j]);
 
 			// there must be a valid search result, otherwise something went
 			// wrong in the initialization of the phase space generator
@@ -116,30 +115,30 @@ std::vector<diagram> lusifer_diagram_generator(
 
 			propagators.emplace_back(
 				*result,
-				inv_idx(lusifer_cdecay_.indecay[0][i][j], nex)
+				inv_idx(lusifer_cdecay.indecay[0][i][j], nex)
 			);
 		}
 
-		for (int j = 0; j != lusifer_cprocess_.nprocess[0][i]; ++j)
+		for (int j = 0; j != lusifer_cprocess.nprocess[0][i]; ++j)
 		{
 			vertices.emplace_back(
-				inv_idx(lusifer_cprocess_.in1process[0][i][j], nex),
-				inv_idx(lusifer_cprocess_.out1process[0][i][j], nex),
-				inv_idx(lusifer_cprocess_.virtprocess[0][i][j], nex)
+				inv_idx(lusifer_cprocess.in1process[0][i][j], nex),
+				inv_idx(lusifer_cprocess.out1process[0][i][j], nex),
+				inv_idx(lusifer_cprocess.virtprocess[0][i][j], nex)
 			);
 
 			propagators.emplace_back(
-				lusifer_cprocess_.idhepprocess[0][i][j],
-				inv_idx(lusifer_cprocess_.virtprocess[0][i][j], nex)
+				lusifer_cprocess.idhepprocess[0][i][j],
+				inv_idx(lusifer_cprocess.virtprocess[0][i][j], nex)
 			);
 		}
 
-		int last = lusifer_cprocess_.nprocess[0][i] - 1;
+		int last = lusifer_cprocess.nprocess[0][i] - 1;
 
 		vertices.emplace_back(
-			inv_idx(lusifer_cprocess_.in1process[0][i][last], nex),
-			inv_idx(lusifer_cprocess_.out1process[0][i][last], nex),
-			inv_idx(lusifer_cprocess_.virtprocess[0][i][last], nex)
+			inv_idx(lusifer_cprocess.in1process[0][i][last], nex),
+			inv_idx(lusifer_cprocess.out1process[0][i][last], nex),
+			inv_idx(lusifer_cprocess.virtprocess[0][i][last], nex)
 		);
 
 		diagrams.emplace_back(vertices, propagators);
