@@ -18,8 +18,8 @@ endif
 
 sources = [
 	'boost.cpp',
-	'cofferaa_generator.f',
-	'cofferaa_extra.f',
+	'cofferaa_generator.f90',
+	'cofferaa_extra.f90',
 	'cofferaa_interfaces.hpp',
 	'cofferaa_phase_space_generator.cpp',
 	'cs_subtraction.cpp',
@@ -29,7 +29,7 @@ sources = [
 	'find_hep_ps.cpp',
 	'fortran_helper.cpp',
 	'generate_dipole.cpp',
-	'generator.f',
+	'generator.f90',
 	'hadron_hadron_psg_adapter.hpp',
 	'initial_state.cpp',
 	'insertion_term.cpp',
@@ -38,7 +38,7 @@ sources = [
 	'list_phase_space_generator.cpp',
 	'lusifer_constants.cpp',
 	'lusifer_diagram_generator.cpp',
-	'lusifer_extra.f',
+	'lusifer_extra.f90',
 	'lusifer_interfaces.hpp',
 	'lusifer_phase_space_generator.cpp',
 	'ol_born_matrix_elements.cpp',
