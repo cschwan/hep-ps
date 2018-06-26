@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/coupling_order.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/regularization_scheme.hpp"
@@ -38,10 +39,9 @@ class ol_born_matrix_elements
 public:
 	ol_born_matrix_elements(
 		std::vector<std::string> const& processes,
-		std::size_t alphas_power,
+		coupling_order const& order,
 		bool loop_mes = false,
-		regularization_scheme scheme = regularization_scheme::dim_reg_blha,
-		bool set_ol_coupling_order = true
+		regularization_scheme scheme = regularization_scheme::dim_reg_blha
 	);
 
 	void alphas(T alphas);

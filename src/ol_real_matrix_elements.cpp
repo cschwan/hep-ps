@@ -27,6 +27,9 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 {
 	auto& ol = ol_interface::instance();
 
+	ol_register_mode real_mode = ol_register_mode::set_qcd_order;
+	ol_register_mode dipole_mode = ol_register_mode::set_qcd_order;
+
 	for (auto const& process : real_processes)
 	{
 		auto const& ids = ol_process_string_to_pdg_ids(process);
@@ -45,8 +48,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 			}
 		}
 
-		ol.setparameter_int("order_qcd", order.alphas_power());
-		int const real_id = ol.register_process(process.c_str(), 1);
+		int const real_id = register_process_try_hard(ol, process.c_str(), 1,
+			order.alphas_power(), order.alpha_power(), real_mode);
 		ids_reals_.emplace(states.first, real_id);
 
 		// construct all possible EW and QCD dipoles
@@ -107,10 +110,13 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				}
 			}
 
-			ol.setparameter_int("order_qcd", (type == correction_type::qcd)
-				? (order.alphas_power() - 1) : order.alphas_power());
 			auto const process = pdg_ids_to_ol_process_string(dipole_ids);
-			int const dipole_id = ol.register_process(process.c_str(), 1);
+			int const order_ew = (type == correction_type::qcd)
+				? order.alpha_power() : (order.alpha_power() - 1);
+			int const order_qcd = (type == correction_type::qcd)
+				? (order.alphas_power() - 1) : order.alphas_power();
+			int const dipole_id = register_process_try_hard(ol, process.c_str(),
+				1, order_qcd, order_ew, dipole_mode);
 
 			int charge_table_index = -1;
 

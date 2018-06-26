@@ -3,6 +3,8 @@
 
 #include "config.hpp"
 
+#include <cassert>
+#include <iostream>
 #include <stdexcept>
 
 #ifdef HAVE_OPENLOOPS
@@ -327,6 +329,63 @@ void ol_interface::evaluate_full(
 
 	throw std::runtime_error("OpenLoops support not enabled");
 #endif
+}
+
+int register_process_try_hard(
+	ol_interface& ol,
+	char const* process,
+	int amptype,
+	int order_qcd,
+	int order_ew,
+	ol_register_mode& mode
+) {
+	int result;
+
+	switch (mode)
+	{
+	case ol_register_mode::set_qcd_order:
+		ol.setparameter_int("order_ew", -1);
+		ol.setparameter_int("order_qcd", order_qcd);
+		break;
+
+	case ol_register_mode::set_ew_order:
+		ol.setparameter_int("order_ew", order_ew);
+		ol.setparameter_int("order_qcd", -1);
+		break;
+
+	default:
+		assert( false );
+	}
+
+	result = ol.register_process(process, amptype);
+
+	if (result == -1)
+	{
+		std::cout << "trying very hard...\n";
+
+		mode = (mode == ol_register_mode::set_ew_order) ?
+			ol_register_mode::set_qcd_order : ol_register_mode::set_ew_order;
+
+		switch (mode)
+		{
+		case ol_register_mode::set_qcd_order:
+			ol.setparameter_int("order_ew", -1);
+			ol.setparameter_int("order_qcd", order_qcd);
+			break;
+
+		case ol_register_mode::set_ew_order:
+			ol.setparameter_int("order_ew", order_ew);
+			ol.setparameter_int("order_qcd", -1);
+			break;
+
+		default:
+			assert( false );
+		}
+
+		result = ol.register_process(process, amptype);
+	}
+
+	return result;
 }
 
 }

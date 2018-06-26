@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/correction_type.hpp"
+#include "hep/ps/coupling_order.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
@@ -38,7 +39,7 @@ class ol_integrated_matrix_elements
 public:
 	ol_integrated_matrix_elements(
 		std::vector<std::string> const& processes,
-		std::size_t alphas_power,
+		coupling_order const& order,
 		correction_type type
 	);
 

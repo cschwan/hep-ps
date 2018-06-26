@@ -1,3 +1,4 @@
+#include "hep/ps/coupling_order.hpp"
 #include "hep/ps/ol_born_matrix_elements.hpp"
 
 #include "catch.hpp"
@@ -14,6 +15,6 @@ TEST_CASE("", "[]")
 			"2 2 -> -11 12 -13 13 1 2",
 			"4 4 -> -11 12 -13 13 3 4",
 			"2 4 -> -11 12 -13 13 3 2",
-			"4 2 -> -11 12 -13 13 1 4"}, 0)
+			"4 2 -> -11 12 -13 13 1 4"}, hep::coupling_order{6, 0})
 	);
 }

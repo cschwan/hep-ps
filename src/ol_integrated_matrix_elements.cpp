@@ -14,15 +14,19 @@ namespace hep
 template <typename T>
 ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 	std::vector<std::string> const& processes,
-	std::size_t alphas_power,
+	coupling_order const& order,
 	correction_type type
 )
-	: alphas_power_(alphas_power)
+	: alphas_power_{order.alphas_power()}
 	, type_(type)
 {
 	auto& ol = ol_interface::instance();
-	ol.setparameter_int("order_qcd", (type == correction_type::qcd) ?
-		(alphas_power - 1) : alphas_power);
+
+	int const order_ew = (type == correction_type::qcd) ? order.alpha_power() :
+		(order.alpha_power() - 1);
+	int const order_qcd = (type == correction_type::qcd) ?
+		(order.alphas_power() - 1) : order.alphas_power();
+	ol_register_mode mode = ol_register_mode::set_qcd_order;
 
 	// FIXME: `type` is not always unique
 
@@ -50,7 +54,8 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
 			}
 		}
 
-		int const process_id = ol.register_process(process.c_str(), 1);
+		int const process_id = register_process_try_hard(ol, process.c_str(),
+			1, order_qcd, order_ew, mode);
 		ids_.emplace(state, process_id);
 
 		std::vector<std::size_t> indices;

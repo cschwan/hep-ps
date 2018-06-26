@@ -115,6 +115,23 @@ private:
 	ol_interface();
 };
 
+///
+enum class ol_register_mode
+{
+	set_ew_order,
+	set_qcd_order
+};
+
+///
+int register_process_try_hard(
+	ol_interface& ol,
+	char const* process,
+	int amptype,
+	int order_qcd,
+	int order_ew,
+	ol_register_mode& mode
+);
+
 }
 
 #endif

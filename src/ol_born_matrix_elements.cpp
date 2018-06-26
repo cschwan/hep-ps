@@ -11,20 +11,16 @@ namespace hep
 template <typename T>
 ol_born_matrix_elements<T>::ol_born_matrix_elements(
 	std::vector<std::string> const& processes,
-	std::size_t alphas_power,
+	coupling_order const& order,
 	bool loop_mes,
-	regularization_scheme scheme,
-	bool set_ol_coupling_order
+	regularization_scheme scheme
 )
-	: alphas_power_(alphas_power)
+	: alphas_power_{order.alphas_power()}
 	, loop_mes_(loop_mes)
 {
 	auto& ol = ol_interface::instance();
 
-	if (set_ol_coupling_order)
-	{
-		ol.setparameter_int("order_qcd", alphas_power);
-	}
+	ol_register_mode mode = ol_register_mode::set_qcd_order;
 
 	if (loop_mes)
 	{
@@ -66,8 +62,9 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
 		}
 
 		int const amptype = loop_mes ? 11 : 1;
-		ids_.emplace(states.first,
-			ol.register_process(process.c_str(), amptype));
+		ids_.emplace(states.first, register_process_try_hard(ol,
+			process.c_str(), amptype, order.alphas_power(), order.alpha_power(),
+			mode));
 	}
 
 	final_states_.shrink_to_fit();
