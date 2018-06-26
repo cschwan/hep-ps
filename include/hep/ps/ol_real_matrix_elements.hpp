@@ -29,8 +29,8 @@
 
 #include <cstddef>
 #include <string>
+#include <tuple>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace hep
@@ -86,8 +86,9 @@ public:
 
 private:
 	std::size_t alphas_power_;
-	std::unordered_map<int, std::vector<T>> charge_table_;
-	std::unordered_multimap<dipole, std::pair<initial_state_set, int>> mes_;
+	std::vector<std::vector<T>> charge_table_;
+	std::unordered_multimap<dipole, std::tuple<initial_state_set, int,
+		T, int>> mes_;
 	std::vector<dipole> dipoles_;
 	std::vector<final_state> final_states_;
 	std::vector<final_state> final_states_real_;

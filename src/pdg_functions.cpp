@@ -314,6 +314,27 @@ bool pdg_id_is_photon(int id)
 	return id == pdg_id_of_photon();
 }
 
+std::size_t final_state_symmetry_factor(std::vector<int> const& ids)
+{
+	std::size_t result = 1;
+	std::vector<int> copy(ids.begin() + 2, ids.end());
+
+	while (!copy.empty())
+	{
+		int id = copy.front();
+		std::size_t count = std::count(copy.begin(), copy.end(), id);
+		copy.erase(std::remove(copy.begin(), copy.end(), id), copy.end());
+
+		while (count > 1)
+		{
+			result *= count;
+			--count;
+		}
+	}
+
+	return result;
+}
+
 int pdg_id_to_charge_times_three(int id)
 {
 	switch (id)
