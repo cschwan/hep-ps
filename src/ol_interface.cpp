@@ -344,13 +344,11 @@ int register_process_try_hard(
 	switch (mode)
 	{
 	case ol_register_mode::set_qcd_order:
-		ol.setparameter_int("order_ew", -1);
 		ol.setparameter_int("order_qcd", order_qcd);
 		break;
 
 	case ol_register_mode::set_ew_order:
 		ol.setparameter_int("order_ew", order_ew);
-		ol.setparameter_int("order_qcd", -1);
 		break;
 
 	default:
@@ -369,13 +367,11 @@ int register_process_try_hard(
 		switch (mode)
 		{
 		case ol_register_mode::set_qcd_order:
-			ol.setparameter_int("order_ew", -1);
 			ol.setparameter_int("order_qcd", order_qcd);
 			break;
 
 		case ol_register_mode::set_ew_order:
 			ol.setparameter_int("order_ew", order_ew);
-			ol.setparameter_int("order_qcd", -1);
 			break;
 
 		default:
