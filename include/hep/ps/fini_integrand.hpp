@@ -29,6 +29,7 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/neg_pos_results.hpp"
+#include "hep/ps/pdg_functions.hpp"
 #include "hep/ps/ps_integrand.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
@@ -333,8 +334,19 @@ protected:
 				auto const at = parton_type_of(a);
 				auto const apt = parton_type_of(ap);
 
-				pdf[a] += pdfb[ap] * ab.a[apt][at] * (T(1.0) - eta) / xprime;
-				pdf[a] += pdfa[ap] * ab.b[apt][at];
+				T q2 = T(1.0);
+
+				if (((apt == parton_type::anti_quark) ||
+					(apt == parton_type::quark)) &&
+					(at == parton_type::photon_))
+				{
+					T const charge = T(3.0) * pdg_id_to_charge_times_three(
+						parton_to_pdg_id(ap));
+					q2 = charge * charge;
+				}
+
+				pdf[a] += pdfb[ap] * q2 * ab.a[apt][at] * (T(1.0)-eta) / xprime;
+				pdf[a] += pdfa[ap] * q2 * ab.b[apt][at];
 			}
 		}
 

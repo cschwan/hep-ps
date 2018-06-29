@@ -420,6 +420,11 @@ void cs_subtraction<T>::insertion_terms(
 		? nc_
 		: (nc_ / (nc_ * nc_ - T(1.0))); // tf/cf
 
+	// TODO: check this term
+	T const color2 = (term.corr_type() == correction_type::ew)
+		? T(1.0)
+		: tf_ * (T(1.0) - T(1.0) / nc_ / nc_); // cf/ca
+
 	results.clear();
 
 	switch (term.type())
@@ -438,6 +443,8 @@ void cs_subtraction<T>::insertion_terms(
 		T const value3 = T(0.5) / pi * (T(2.0) / omx) * logomxbx;
 		T const value4 = T(0.5) / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
 			T(2.0) * dilogome + logome * logome);
+		T const value5 = T(0.5) * color2 / pi * (logomxbx * (T(1.0) - omx * omx)
+			/ x + x);
 
 		ab_terms<T> result;
 
@@ -449,7 +456,10 @@ void cs_subtraction<T>::insertion_terms(
 		result.b[aq][aq] = (eta - T(1.0)) * value3 + value4;
 		result.b[qq][qq] = (eta - T(1.0)) * value3 + value4;
 
-		// TODO: qg and gg are NYI
+		result.a[aq][bo] = value5;
+		result.a[qq][bo] = value5;
+
+		// TODO: gg is NYI
 
 		results.assign(scales.size(), result);
 	}
@@ -534,6 +544,7 @@ void cs_subtraction<T>::insertion_terms(
 			T(2.0) * logome);
 		T const value4 = T(0.5) / pi * T(2.0) * logomx / omx;
 		T const value5 = T(0.5) / pi * (pi*pi / T(3.0) - logome * logome);
+		T const value6 = T(0.5) * color2 / pi * (T(1.0) + omx * omx) / x;
 
 		for (auto const& mu : scales)
 		{
@@ -544,6 +555,7 @@ void cs_subtraction<T>::insertion_terms(
 			T const result2 = value2 * (logmu2bsai - logomx);
 			T const result3 = (eta - T(1.0)) * (value2 * logmu2bsai - value4) +
 				value3 * logmu2bsai + value5;
+			T const result4 = value6 * (logmu2bsai - logomx);
 
 			ab_terms<T> result;
 
@@ -554,7 +566,10 @@ void cs_subtraction<T>::insertion_terms(
 			result.b[aq][aq] = result3;
 			result.b[qq][qq] = result3;
 
-			// TODO: qg and gg are NYI
+			result.a[aq][bo] = result4;
+			result.a[qq][bo] = result4;
+
+			// TODO: gg is NYI
 
 			results.push_back(result);
 		}

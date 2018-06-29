@@ -224,9 +224,12 @@ void ol_integrated_matrix_elements<T>::correlated_me(
 					{
 						T const charge = charge_table_.at(i->second).at(
 							term.initial_particle());
+						T const	factor = (charge != T())
+							? charge * charge
+							: T(-1.0);
 
-						results.at(j).emplace_back(state,
-							charge * charge * T(alpha) * T(m2tree));
+						results.at(j).emplace_back(state, factor * T(alpha) *
+							T(m2tree));
 					}
 					else
 					{
@@ -234,9 +237,15 @@ void ol_integrated_matrix_elements<T>::correlated_me(
 							term.emitter());
 						T const charge_sp = charge_table_.at(i->second).at(
 							term.spectator());
+						T factor = charge_em * charge_sp;
 
-						results.at(j).emplace_back(state,
-							charge_em * charge_sp * T(alpha) * T(m2tree));
+						if (factor == T())
+						{
+							factor = T(-1.0);
+						}
+
+						results.at(j).emplace_back(state, factor * T(alpha) *
+							T(m2tree));
 					}
 				}
 			}
