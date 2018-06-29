@@ -175,10 +175,10 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 			for (auto i = range.first; i != range.second; ++i)
 			{
 				// check if there is already a dipole that has the same ME
-				if ((std::get<1>(i->second) == dipole_id) &&
+				if ((std::get<0>(i->second) == states.first) &&
+					(std::get<1>(i->second) == dipole_id) &&
 					(std::get<3>(i->second) == charge_table_index))
 				{
-					std::get<0>(i->second).add(states.first);
 					std::get<2>(i->second) += factor;
 
 					found = true;
@@ -189,9 +189,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
 			if (!found)
 			{
-				mes_.emplace(dip, std::make_tuple(
-					initial_state_set{states.first}, dipole_id, factor,
-					charge_table_index));
+				mes_.emplace(dip, std::make_tuple(states.first, dipole_id,
+					factor, charge_table_index));
 			}
 
 			// currently we only support one photon dipole per spectator
@@ -275,12 +274,11 @@ void ol_real_matrix_elements<T>::dipole_me(
 
 		for (auto i = range.first; i != range.second; ++i)
 		{
-			auto const dipole_set = std::get<0>(i->second);
+			auto const state = std::get<0>(i->second);
 			auto const id = std::get<1>(i->second);
 			auto const final_state_factor = std::get<2>(i->second);
-			auto const this_set = set.intersection(dipole_set);
 
-			if (!this_set.empty())
+			if (set.includes(state))
 			{
 				double m2tree;
 				double m2ew;
@@ -294,10 +292,7 @@ void ol_real_matrix_elements<T>::dipole_me(
 				T const result = final_state_factor * alphas *
 					T(ol_m2_.at(index));
 
-				for (auto const state : this_set)
-				{
-					results.front().emplace_back(state, result);
-				}
+				results.front().emplace_back(state, result);
 			}
 		}
 	}
@@ -309,13 +304,12 @@ void ol_real_matrix_elements<T>::dipole_me(
 
 		for (auto i = range.first; i != range.second; ++i)
 		{
-			auto const dipole_set = std::get<0>(i->second);
+			auto const state = std::get<0>(i->second);
 			auto const id = std::get<1>(i->second);
 			auto const final_state_factor = std::get<2>(i->second);
 			auto const index = std::get<3>(i->second);
-			auto const this_set = set.intersection(dipole_set);
 
-			if (!this_set.empty())
+			if (set.includes(state))
 			{
 				double m2tree;
 				ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
@@ -325,10 +319,7 @@ void ol_real_matrix_elements<T>::dipole_me(
 				T const result = final_state_factor * charge_em * charge_sp *
 					alpha * T(m2tree);
 
-				for (auto const state : this_set)
-				{
-					results.front().emplace_back(state, result);
-				}
+				results.front().emplace_back(state, result);
 			}
 		}
 	}
@@ -398,12 +389,11 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 		for (auto i = range.first; i != range.second; ++i)
 		{
-			auto const dipole_set = std::get<0>(i->second);
+			auto const state = std::get<0>(i->second);
 			auto const id = std::get<1>(i->second);
 			auto const final_state_factor = std::get<2>(i->second);
-			auto const this_set = set.intersection(dipole_set);
 
-			if (!this_set.empty())
+			if (set.includes(state))
 			{
 				double m2tree;
 				double m2ew;
@@ -417,10 +407,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
 				T const result_one = final_state_factor * alphas *
 					T(ol_m2_.at(index));
 
-				for (auto const state : this_set)
-				{
-					results_one.front().emplace_back(state, result_one);
-				}
+				results_one.front().emplace_back(state, result_one);
 
 				ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1,
 					double_vector.data(), ol_m2_.data());
@@ -428,10 +415,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
 				T const result_two = final_state_factor * alphas *
 					T(ol_m2_.at(sp_born));
 
-				for (auto const state : this_set)
-				{
-					results_two.front().emplace_back(state, result_two);
-				}
+				results_two.front().emplace_back(state, result_two);
 			}
 		}
 	}
@@ -443,13 +427,12 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
 		for (auto i = range.first; i != range.second; ++i)
 		{
-			auto const dipole_set = std::get<0>(i->second);
+			auto const state = std::get<0>(i->second);
 			auto const id = std::get<1>(i->second);
 			auto const final_state_factor = std::get<2>(i->second);
 			auto const index = std::get<3>(i->second);
-			auto const this_set = set.intersection(dipole_set);
 
-			if (!this_set.empty())
+			if (set.includes(state))
 			{
 				T const charge_em = charge_table_.at(index).at(em_real);
 				T const nc = T(3.0);
@@ -465,10 +448,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
 				T const result_one = -final_state_factor *
 					initial_state_factor * alpha * T(m2tree);
 
-				for (auto const state : this_set)
-				{
-					results_one.front().emplace_back(state, result_one);
-				}
+				results_one.front().emplace_back(state, result_one);
 
 				// OpenLoops returns the spin-correlator with an additonal sign
 				ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1,
@@ -477,10 +457,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
 				T const result_two = -final_state_factor *
 					initial_state_factor * alpha * T(-ol_m2_.at(sp_born));
 
-				for (auto const state : this_set)
-				{
-					results_two.front().emplace_back(state, result_two);
-				}
+				results_two.front().emplace_back(state, result_two);
 			}
 		}
 	}
