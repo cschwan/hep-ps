@@ -355,6 +355,11 @@ int register_process_try_hard(
 		assert( false );
 	}
 
+	// silence OpenLoops until we know how to correctly set the coupling order
+	int verbose = 0;
+	ol.getparameter_int("verbose", &verbose);
+	ol.setparameter_int("verbose", -1);
+
 	result = ol.register_process(process, amptype);
 
 	if (result == -1)
@@ -380,6 +385,10 @@ int register_process_try_hard(
 
 		result = ol.register_process(process, amptype);
 	}
+
+	// set `verbose` to default level and potentially print messages
+	ol.setparameter_int("verbose", verbose);
+	result = ol.register_process(process, amptype);
 
 	return result;
 }
