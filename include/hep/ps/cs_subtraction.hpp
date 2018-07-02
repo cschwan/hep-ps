@@ -48,7 +48,7 @@ public:
 	cs_subtraction(
 		T nc,
 		T tf,
-		T nf,
+		std::size_t nf,
 		factorization_scheme fscheme,
 		regularization_scheme rscheme
 	);
@@ -97,7 +97,7 @@ public:
 private:
 	T nc_;
 	T tf_;
-	T nf_;
+	std::size_t nf_;
 	factorization_scheme fscheme_;
 	regularization_scheme rscheme_;
 };

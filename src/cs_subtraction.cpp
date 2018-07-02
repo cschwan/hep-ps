@@ -17,7 +17,7 @@ template <typename T>
 cs_subtraction<T>::cs_subtraction(
 	T nc,
 	T tf,
-	T nf,
+	std::size_t nf,
 	factorization_scheme fscheme,
 	regularization_scheme rscheme
 )
@@ -472,7 +472,7 @@ void cs_subtraction<T>::insertion_terms(
 		T const gamma = (term.emitter_type() == particle_type::fermion)
 			? T(1.5)
 			// FIXME: the following branch has probably the wrong color factors
-			: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * nf_;
+			: T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * T(nf_);
 
 		T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
 		T const value2 = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
