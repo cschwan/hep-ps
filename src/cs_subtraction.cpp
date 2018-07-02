@@ -616,15 +616,53 @@ void cs_subtraction<T>::insertion_terms2(
 
 	results.clear();
 
+	phase_space_point<T> ps{phase_space};
+
+	T const pi = acos(T(-1.0));
+	T const sij = ps.m2(term.emitter(), term.spectator());
+
 	switch (term.emitter_type())
 	{
+	case particle_type::boson:
+	{
+		// QCD case is not yet implemented
+		assert( term.corr_type() == correction_type::ew );
+
+		std::array<T, 6> const ncq2 = {
+			// up
+			nc_ * (T(0.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+			// up, down
+			nc_ * (T(1.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+			// up, down, strange
+			nc_ * (T(2.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+			// up, down, strange, charm
+			nc_ * (T(2.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
+			// up, down, strange, charm, bottom
+			nc_ * (T(3.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
+			// up, down, strange, charm, bottom, top
+			nc_ * (T(3.0) * T(1.0) / T(9.0) + T(3.0) * T(4.0) / T(9.0))
+		};
+
+		T const gamma = T(-2.0) / T(3.0) * ncq2.at(nf_);
+
+		for (auto const& mu : scales)
+		{
+			T const mu2 = mu.regularization() * mu.regularization();
+			T const logmubsij = log(mu2 / sij);
+
+			// for photons there is no 1/eps^2 pole -> BHLA/COLI are the same
+			T result = T(8.0) / T(3.0) * gamma;
+			result += gamma * logmubsij;
+			result *= T(0.5) / pi;
+
+			results.push_back(result);
+		}
+	}
+
+		break;
+
 	case particle_type::fermion:
 	{
-		phase_space_point<T> ps{phase_space};
-
-		T const pi = acos(T(-1.0));
-		T const sij = ps.m2(term.emitter(), term.spectator());
-
 		for (auto const& mu : scales)
 		{
 			T const mu2 = mu.regularization() * mu.regularization();
