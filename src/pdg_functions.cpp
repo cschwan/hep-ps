@@ -56,6 +56,7 @@ parton pdg_id_to_parton(int id)
 {
 	switch (id)
 	{
+	case  -5: return parton::anti_bottom;
 	case  -4: return parton::anti_charm;
 	case  -3: return parton::anti_strange;
 	case  -2: return parton::anti_up;
@@ -64,6 +65,7 @@ parton pdg_id_to_parton(int id)
 	case   2: return parton::up;
 	case   3: return parton::strange;
 	case   4: return parton::charm;
+	case   5: return parton::bottom;
 	case  21: return parton::gluon;
 	case  22: return parton::photon;
 
@@ -119,6 +121,7 @@ int parton_to_pdg_id(parton p)
 	// http://pdg.lbl.gov/2017/reviews/rpp2017-rev-monte-carlo-numbering.pdf
 	switch (p)
 	{
+	case parton::anti_bottom:  return -5;
 	case parton::anti_charm:   return -4;
 	case parton::anti_strange: return -3;
 	case parton::anti_up:      return -2;
@@ -127,6 +130,7 @@ int parton_to_pdg_id(parton p)
 	case parton::up:           return  2;
 	case parton::strange:      return  3;
 	case parton::charm:        return  4;
+	case parton::bottom:       return  5;
 	case parton::gluon:        return 21;
 	case parton::photon:       return 22;
 

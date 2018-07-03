@@ -29,6 +29,16 @@ namespace hep
 /// for the correspoding matrix elements, because of the PDFs. Initial states
 /// with transposed partons are automatically taken into account.
 HEP_ENUM(initial_state,
+	bq_cq, /*!< \f$ Q=1/3 \f$ bottom charm initial state. */
+	bq_dx, /*!< \f$ Q=0 \f$ bottom anti-down initial state. */
+	bq_sx, /*!< \f$ Q=0 \f$ bottom anti-strange initial state. */
+	bq_uq, /*!< \f$ Q=1/3 \f$ bottom up initial state. */
+	bx_cq, /*!< \f$ Q=1 \f$ anti-bottom charm initial state. */
+	bx_dx, /*!< \f$ Q=2/3 \f$ anti-bottom anti-down initial state. */
+	bx_sx, /*!< \f$ Q=2/3 \f$ anti-bottom anti-strange initial state. */
+	bx_uq, /*!< \f$ Q=1 \f$ anti-bottom up initial state. */
+	cq_bq, /*!< \f$ Q=1/3 \f$ charm bottom initial state. */
+	cq_bx, /*!< \f$ Q=1 \f$ charm anti-bottom initial state. */
 	cq_cq, /*!< \f$ Q=4/3 \f$ charm charm initial state. */
 	cq_cx, /*!< \f$ Q=0 \f$ charm anti-charm initial state. */
 	cq_dq, /*!< \f$ Q=1/3 \f$ charm down initial state. */
@@ -51,6 +61,8 @@ HEP_ENUM(initial_state,
 	dq_ph, /*!< \f$ Q=-1/3 \f$ down photon initial state. */
 	dq_sx, /*!< \f$ Q=0 \f$ down anti-strange initial state. */
 	dq_uq, /*!< \f$ Q=1/3 \f$ down up initial state. */
+	dx_bq, /*!< \f$ Q=0 \f$ anti-down bottom initial state. */
+	dx_bx, /*!< \f$ Q=2/3 \f$ anti-down anti-bottom initial state. */
 	dx_cq, /*!< \f$ Q=1 \f$ anti-down charm initial state. */
 	dx_cx, /*!< \f$ Q=-1/3 \f$ anti-down anti-charm initial state. */
 	dx_dq, /*!< \f$ Q=0 \f$ anti-down down initial state. */
@@ -83,6 +95,8 @@ HEP_ENUM(initial_state,
 	sq_ph, /*!< \f$ Q=-1/3 \f$ strange photon initial state. */
 	sq_sx, /*!< \f$ Q=0 \f$ strange anti-strange initial state. */
 	sq_uq, /*!< \f$ Q=1/3 \f$ strange up initial state. */
+	sx_bq, /*!< \f$ Q=0 \f$ anti-strange bottom initial state. */
+	sx_bx, /*!< \f$ Q=2/3 \f$ anti-strange anti-bottom initial state. */
 	sx_cq, /*!< \f$ Q=1 \f$ anti-strange charm initial state. */
 	sx_cx, /*!< \f$ Q=-1/3 \f$ anti-strange anti-charm initial state. */
 	sx_dq, /*!< \f$ Q=0 \f$ anti-strange down initial state. */
@@ -93,6 +107,8 @@ HEP_ENUM(initial_state,
 	sx_sx, /*!< \f$ Q=2/3 \f$ anti-strange anti-strange initial state. */
 	sx_uq, /*!< \f$ Q=1 \f$ anti-strange up initial state. */
 	sx_ux, /*!< \f$ Q=-1/3 \f$ anti-strange anti-up initial state. */
+	uq_bq, /*!< \f$ Q=1/3 \f$ up bottom initial state. */
+	uq_bx, /*!< \f$ Q=1 \f$ up anti-bottom initial state. */
 	uq_cq, /*!< \f$ Q=4/3 \f$ up charm initial state. */
 	uq_cx, /*!< \f$ Q=0 \f$ up anti-charm initial state. */
 	uq_dq, /*!< \f$ Q=1/3 \f$ up down initial state. */
@@ -120,6 +136,20 @@ constexpr parton state_parton_one(initial_state state)
 {
 	switch (state)
 	{
+	case bq_cq:
+	case bq_dx:
+	case bq_sx:
+	case bq_uq:
+		return parton::bottom;
+
+	case bx_cq:
+	case bx_dx:
+	case bx_sx:
+	case bx_uq:
+		return parton::anti_bottom;
+
+	case cq_bq:
+	case cq_bx:
 	case cq_cq:
 	case cq_cx:
 	case cq_dq:
@@ -148,6 +178,8 @@ constexpr parton state_parton_one(initial_state state)
 	case dq_uq:
 		return parton::down;
 
+	case dx_bq:
+	case dx_bx:
 	case dx_cq:
 	case dx_cx:
 	case dx_dq:
@@ -188,6 +220,8 @@ constexpr parton state_parton_one(initial_state state)
 	case sq_uq:
 		return parton::strange;
 
+	case sx_bq:
+	case sx_bx:
 	case sx_cq:
 	case sx_cx:
 	case sx_dq:
@@ -200,6 +234,8 @@ constexpr parton state_parton_one(initial_state state)
 	case sx_ux:
 		return parton::anti_strange;
 
+	case uq_bq:
+	case uq_bx:
 	case uq_cq:
 	case uq_cx:
 	case uq_dq:
@@ -233,6 +269,20 @@ constexpr parton state_parton_two(initial_state state)
 {
 	switch (state)
 	{
+	case cq_bq:
+	case dx_bq:
+	case sx_bq:
+	case uq_bq:
+		return parton::bottom;
+
+	case cq_bx:
+	case dx_bx:
+	case sx_bx:
+	case uq_bx:
+		return parton::anti_bottom;
+
+	case bq_cq:
+	case bx_cq:
 	case cq_cq:
 	case cx_cq:
 	case dq_cq:
@@ -259,6 +309,8 @@ constexpr parton state_parton_two(initial_state state)
 	case uq_dq:
 		return parton::down;
 
+	case bq_dx:
+	case bx_dx:
 	case cq_dx:
 	case cx_dx:
 	case dq_dx:
@@ -302,6 +354,8 @@ constexpr parton state_parton_two(initial_state state)
 	case uq_sq:
 		return parton::strange;
 
+	case bq_sx:
+	case bx_sx:
 	case cq_sx:
 	case cx_sx:
 	case dq_sx:
@@ -314,6 +368,8 @@ constexpr parton state_parton_two(initial_state state)
 	case ux_sx:
 		return parton::anti_strange;
 
+	case bq_uq:
+	case bx_uq:
 	case cq_uq:
 	case cx_uq:
 	case dq_uq:
