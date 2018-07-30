@@ -45,6 +45,7 @@ constexpr parton_type parton_type_of(parton p)
 	case anti_down:
 	case anti_charm:
 	case anti_strange:
+	case anti_bottom:
 		return parton_type::anti_quark;
 
 	case gluon:
@@ -54,6 +55,7 @@ constexpr parton_type parton_type_of(parton p)
 	case down:
 	case charm:
 	case strange:
+	case bottom:
 		return parton_type::quark;
 
 	case photon:
