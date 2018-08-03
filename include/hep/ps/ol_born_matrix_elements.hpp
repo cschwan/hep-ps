@@ -61,7 +61,11 @@ private:
 	std::size_t alphas_power_;
 	bool loop_mes_;
 	std::vector<final_state> final_states_;
+#if __GNUC__ > 5
 	std::unordered_multimap<initial_state, int> ids_;
+#else
+	std::unordered_multimap<std::size_t, int> ids_;
+#endif
 	std::vector<double> ol_phase_space_;
 };
 

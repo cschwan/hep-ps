@@ -92,7 +92,11 @@ private:
 	std::vector<dipole> dipoles_;
 	std::vector<final_state> final_states_;
 	std::vector<final_state> final_states_real_;
+#if __GNUC__ > 5
 	std::unordered_multimap<initial_state, int> ids_reals_;
+#else
+	std::unordered_multimap<std::size_t, int> ids_reals_;
+#endif
 	std::vector<double> ol_m2_;
 	std::vector<double> ol_phase_space_;
 };
