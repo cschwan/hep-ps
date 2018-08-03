@@ -1,0 +1,517 @@
+#include "hep/ps/correction_type.hpp"
+#include "hep/ps/generate_dipole.hpp"
+#include "hep/ps/ol_interface.hpp"
+#include "hep/ps/ol_integrated_mes.hpp"
+#include "hep/ps/pdg_functions.hpp"
+
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <map>
+#include <stdexcept>
+#include <utility>
+
+namespace
+{
+
+bool same_process(
+	std::vector<int> process1,
+	std::vector<int> process2
+) {
+	// normal order initial and final state
+	std::sort(process1.begin(), process1.begin() + 2);
+	std::sort(process1.begin() + 2, process1.end());
+	std::sort(process2.begin(), process2.begin() + 2);
+	std::sort(process2.begin() + 2, process2.end());
+
+	return std::equal(process1.begin(), process1.end(), process2.begin());
+}
+
+}
+
+namespace hep
+{
+
+template <typename T>
+ol_integrated_mes<T>::ol_integrated_mes(
+	std::vector<std::string> const& real_processes,
+	std::vector<final_state> const& dipole_final_states,
+	coupling_order order,
+	dipole_veto const& veto,
+	photon_dipole_selector const& selector
+)
+	: alphas_power_(order.alphas_power())
+	, final_states_(dipole_final_states)
+{
+	auto& ol = ol_interface::instance();
+
+	ol_register_mode dipole_mode = ol_register_mode::set_qcd_order;
+
+	bool has_ew_dipoles = false;
+	bool has_qcd_dipoles = false;
+
+	std::unordered_multimap<insertion_term, std::tuple<std::vector<int>, int,
+		std::size_t>> mes;
+
+	for (auto const& process : real_processes)
+	{
+		auto const& ids = ol_process_string_to_pdg_ids(process);
+		auto const& states = pdg_ids_to_states(ids);
+
+		// construct all possible EW and QCD dipoles
+		for (auto const type : correction_type_list())
+		{
+		for (std::size_t i = 0; i != ids.size(); ++i)
+		{
+		for (std::size_t j = 2; j != ids.size(); ++j)
+		{
+		for (std::size_t k = 0; k != ids.size(); ++k)
+		{
+			if ((i == j) || (i == k) || (j == k))
+			{
+				continue;
+			}
+
+			auto dipole_ids = generate_dipole(ids, order, type, i, j, k);
+
+			if (dipole_ids.empty())
+			{
+				// there is no matrix element for this dipole
+				continue;
+			}
+
+			if (veto(dipole_ids, final_states_))
+			{
+				continue;
+			}
+
+			bool photon_dipole_selected = false;
+
+			if (type == correction_type::ew)
+			{
+				int const id_i = ids.at(i);
+				int const id_j = ids.at(j);
+				int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
+
+				// check if this is a photon dipole
+				if (id_i + sign * id_j == 0)
+				{
+					// do not consider (j,i;k) if we already have (i,j;k)
+					if (i > j)
+					{
+						continue;
+					}
+
+					if (selector(dipole_ids, i, j, k))
+					{
+						photon_dipole_selected = true;
+					}
+					else
+					{
+						continue;
+					}
+				}
+			}
+
+			auto const process = pdg_ids_to_ol_process_string(dipole_ids);
+			int const order_ew = (type == correction_type::qcd)
+				? order.alpha_power() : (order.alpha_power() - 1);
+			int const order_qcd = (type == correction_type::qcd)
+				? (order.alphas_power() - 1) : order.alphas_power();
+			int const dipole_id = register_process_try_hard(ol, process.c_str(),
+				1, order_qcd, order_ew, dipole_mode);
+
+			std::size_t charge_table_index = -1;
+
+			// add a charge table if neccessary
+			if (type == correction_type::ew)
+			{
+				std::vector<T> charges;
+				charges.reserve(dipole_ids.size());
+
+				// we need the charges of the real matrix element
+				for (int const id : dipole_ids)
+				{
+					int const charge = pdg_id_to_charge_times_three(id);
+					charges.push_back(T(charge) / T(3.0));
+				}
+
+				// sign of the crossing
+				charges.at(0) *= T(-1.0);
+				charges.at(1) *= T(-1.0);
+
+				// check if this charge table does already exist
+				auto const result = std::find_if(charge_table_.begin(),
+					charge_table_.end(), [&](std::vector<T> const& table) {
+						return std::equal(table.begin(), table.end(),
+							charges.begin());
+				});
+
+				if (result == charge_table_.end())
+				{
+					charge_table_index = charge_table_.size();
+					charge_table_.emplace_back(std::move(charges));
+				}
+				else
+				{
+					charge_table_index = std::distance(charge_table_.begin(),
+						result);
+				}
+			}
+
+			auto const type_i = pdg_id_to_particle_type(dipole_ids.at(i));
+
+			auto const dip = insertion_term(i, type_i, k, type);
+
+			// add a dipole if it doesn't exist yet
+			if (std::find(dipoles_.begin(), dipoles_.end(), dip) ==
+				dipoles_.end())
+			{
+				dipoles_.push_back(dip);
+
+				if (type == correction_type::ew)
+				{
+					has_ew_dipoles = true;
+				}
+				else if (type == correction_type::qcd)
+				{
+					has_qcd_dipoles = true;
+				}
+				else
+				{
+					assert( false );
+				}
+			}
+
+			auto range = mes.equal_range(dip);
+			bool found = false;
+
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				// check if the same matrix element or the one with exchanged
+				// initial states is already accounted for
+				if (same_process(dipole_ids, std::get<0>(i->second)))
+				{
+					found = true;
+					break;
+				}
+
+			}
+
+			if (!found)
+			{
+				mes.emplace(dip, std::make_tuple(dipole_ids, dipole_id,
+					charge_table_index));
+			}
+
+			// currently we only support one photon dipole per spectator
+			if (photon_dipole_selected)
+			{
+				break;
+			}
+		}
+		}
+		}
+		}
+	}
+
+	if (has_ew_dipoles)
+	{
+		bool has_one = false;
+		bool has_two = false;
+
+		std::unordered_multimap<insertion_term, std::tuple<std::vector<int>,
+			int, std::size_t>> add_mes;
+
+		for (auto const& me : mes)
+		{
+			if (me.first.corr_type() != correction_type::ew)
+			{
+				continue;
+			}
+
+			auto const result = std::find_if(add_mes.begin(), add_mes.end(),
+				[&](decltype (mes)::value_type const& element) {
+					return same_process(std::get<0>(me.second),
+						std::get<0>(element.second));
+			});
+
+			if (result == mes.end())
+			{
+				// if the corresponding initial state particle is a gluon there
+				// is no EW contribution
+
+				if (!pdg_id_is_gluon(std::get<0>(me.second).at(0)))
+				{
+					has_one = true;
+
+					add_mes.emplace(insertion_term{0, correction_type::ew},
+						me.second);
+				}
+
+				if (!pdg_id_is_gluon(std::get<0>(me.second).at(1)))
+				{
+					has_two = true;
+
+					add_mes.emplace(insertion_term{1, correction_type::ew},
+						me.second);
+				}
+			}
+		}
+
+		if (has_one)
+		{
+			dipoles_.emplace_back(0, correction_type::ew);
+		}
+
+		if (has_two)
+		{
+			dipoles_.emplace_back(1, correction_type::ew);
+		}
+
+		for (auto const& me : add_mes)
+		{
+			mes.emplace(me);
+		}
+	}
+
+	if (has_qcd_dipoles)
+	{
+		bool has_one = false;
+		bool has_two = false;
+
+		std::unordered_multimap<insertion_term, std::tuple<std::vector<int>,
+			int, std::size_t>> add_mes;
+
+		for (auto const& me : mes)
+		{
+			if (me.first.corr_type() != correction_type::qcd)
+			{
+				continue;
+			}
+
+			auto const result = std::find_if(add_mes.begin(), add_mes.end(),
+				[&](decltype (mes)::value_type const& element) {
+					return same_process(std::get<0>(me.second),
+						std::get<0>(element.second));
+			});
+
+			if (result == mes.end())
+			{
+				// if the corresponding initial state particle is a photon
+				// there is no QCD contribution
+
+				if (!pdg_id_is_photon(std::get<0>(me.second).at(0)))
+				{
+					has_one = true;
+
+					add_mes.emplace(insertion_term{0, correction_type::qcd},
+						me.second);
+				}
+
+				if (!pdg_id_is_photon(std::get<0>(me.second).at(1)))
+				{
+					has_two = true;
+
+					add_mes.emplace(insertion_term{1, correction_type::qcd},
+						me.second);
+				}
+			}
+		}
+
+		if (has_one)
+		{
+			dipoles_.emplace_back(0, correction_type::qcd);
+		}
+
+		if (has_two)
+		{
+			dipoles_.emplace_back(1, correction_type::qcd);
+		}
+
+		for (auto const& me : add_mes)
+		{
+			mes.emplace(me);
+		}
+	}
+
+	std::sort(dipoles_.begin(), dipoles_.end());
+	dipoles_.shrink_to_fit();
+	charge_table_.shrink_to_fit();
+	mes_.reserve(mes.size());
+
+	// we don't need the full particle info, only the initial state
+	for (auto const& me : mes)
+	{
+		mes_.emplace(me.first, std::make_tuple(
+			pdg_ids_to_states(std::get<0>(me.second)).first,
+			std::get<1>(me.second),
+			std::get<2>(me.second)
+		));
+	}
+
+	final_states_.shrink_to_fit();
+	std::size_t const n = final_states_.size() + 2;
+	ol_m2_.resize(n * (n - 1) / 2);
+	ol_phase_space_.resize(5 * (n + 1));
+}
+
+template <typename T>
+void ol_integrated_mes<T>::alphas(T alphas)
+{
+	auto& ol = ol_interface::instance();
+	ol.setparameter_double("alphas", static_cast <double>(alphas));
+}
+
+template <typename T>
+std::size_t ol_integrated_mes<T>::alphas_power() const
+{
+	return alphas_power_;
+}
+
+template <typename T>
+void ol_integrated_mes<T>::correlated_me(
+	std::vector<T> const& phase_space,
+	initial_state_set set,
+	std::vector<initial_state_map<T>>& results
+) {
+	auto& ol = hep::ol_interface::instance();
+
+	// TODO: for the time being we assume that the matrix elements do only
+	// indirectly depend on the renormalization scales (through alphas)
+
+	std::size_t const n = phase_space.size() / 4;
+
+	for (std::size_t i = 0; i != n; ++i)
+	{
+		ol_phase_space_.at(5 * i + 0) =
+			static_cast <double> (phase_space.at(4 * i + 0));
+		ol_phase_space_.at(5 * i + 1) =
+			static_cast <double> (phase_space.at(4 * i + 1));
+		ol_phase_space_.at(5 * i + 2) =
+			static_cast <double> (phase_space.at(4 * i + 2));
+		ol_phase_space_.at(5 * i + 3) =
+			static_cast <double> (phase_space.at(4 * i + 3));
+		ol_phase_space_.at(5 * i + 4) = 0.0;
+	}
+
+	std::size_t me = 0;
+
+	for (auto const& dipole : dipoles_)
+	{
+		auto const range = mes_.equal_range(dipole);
+
+		if (dipole.corr_type() == correction_type::qcd)
+		{
+			double as;
+			ol.getparameter_double("alphas", &as);
+			T const alphas = T(as);
+
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				auto const state = std::get<0>(i->second);
+				auto const id = std::get<1>(i->second);
+
+				if (set.includes(state))
+				{
+					double m2tree;
+					double m2ew;
+					ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
+						ol_m2_.data(), &m2ew);
+
+					if (dipole.type() == insertion_term_type::born)
+					{
+						T const casimir = casimir_operator<T>(state,
+							dipole.initial_particle());
+						T const result = casimir * alphas * T(m2tree);
+
+						results.at(me).emplace_back(state, result);
+					}
+					else
+					{
+						auto const em = dipole.emitter();
+						auto const sp = dipole.spectator();
+						auto const k = std::min(em, sp);
+						auto const l = std::max(em, sp);
+						auto const index = k + l * (l - 1) / 2;
+
+						T const result = alphas * T(ol_m2_.at(index));
+
+						results.at(me).emplace_back(state, result);
+					}
+				}
+			}
+		}
+		else if (dipole.corr_type() == correction_type::ew)
+		{
+			double a;
+			ol.getparameter_double("alpha", &a);
+			T const alpha = T(a);
+
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				auto const state = std::get<0>(i->second);
+				auto const id = std::get<1>(i->second);
+				auto const index = std::get<2>(i->second);
+
+				if (set.includes(state))
+				{
+					double m2tree;
+					ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
+
+					if (dipole.type() == insertion_term_type::born)
+					{
+						T charge = charge_table_.at(index).at(
+							dipole.initial_particle());
+
+						// if the initial state is a photon the charge factor
+						// of the quark is multiplied somewhere else
+						if (charge == T())
+						{
+							charge = T(-1.0);
+						}
+
+						results.at(me).emplace_back(state,
+							charge * charge * T(alpha) * T(m2tree));
+					}
+					else
+					{
+						auto const em = dipole.emitter();
+						auto const sp = dipole.spectator();
+						T const charge_em = charge_table_.at(index).at(em);
+						T const charge_sp = charge_table_.at(index).at(sp);
+						T const charges = (charge_em == T()) ? T(-1.0) :
+							(charge_em * charge_sp);
+						T const result = charges * alpha * T(m2tree);
+
+						results.at(me).emplace_back(state, result);
+					}
+				}
+			}
+		}
+		else
+		{
+			assert( false );
+		}
+
+		++me;
+	}
+}
+
+template <typename T>
+std::vector<insertion_term> const& ol_integrated_mes<T>::insertion_terms() const
+{
+	return dipoles_;
+}
+
+template <typename T>
+std::vector<final_state> const& ol_integrated_mes<T>::final_states() const
+{
+	return final_states_;
+}
+
+// -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
+
+template class ol_integrated_mes<double>;
+
+}

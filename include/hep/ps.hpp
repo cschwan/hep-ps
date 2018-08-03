@@ -55,6 +55,7 @@
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/ol_born_matrix_elements.hpp"
 #include "hep/ps/ol_integrated_matrix_elements.hpp"
+#include "hep/ps/ol_integrated_mes.hpp"
 #include "hep/ps/ol_interface.hpp"
 #include "hep/ps/ol_ioperator.hpp"
 #include "hep/ps/ol_real_matrix_elements.hpp"

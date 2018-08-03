@@ -43,6 +43,7 @@ sources = [
 	'lusifer_phase_space_generator.cpp',
 	'ol_born_matrix_elements.cpp',
 	'ol_integrated_matrix_elements.cpp',
+	'ol_integrated_mes.cpp',
 	'ol_interface.cpp',
 	'ol_ioperator.cpp',
 	'ol_real_matrix_elements.cpp',
