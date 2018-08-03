@@ -97,6 +97,28 @@ public:
 		}
 
 		pdfs_.register_partons(partons_in_initial_state_set(set));
+
+		for (auto const state : set)
+		{
+			me_set_.add(state);
+
+			auto const one = state_parton_one(state);
+			auto const two = state_parton_one(state);
+
+			if (parton_type_of(one) == parton_type::quark)
+			{
+				me_set_.add(partons_to_initial_state(parton::photon, two));
+				me_set_.add(partons_to_initial_state(parton::gluon, two));
+			}
+
+			if (parton_type_of(two) == parton_type::quark)
+			{
+				me_set_.add(partons_to_initial_state(one, parton::photon));
+				me_set_.add(partons_to_initial_state(one, parton::gluon));
+			}
+
+			// FIXME: add missing cases
+		}
 	}
 
 	T eval(
@@ -157,7 +179,7 @@ public:
 			me.clear();
 		}
 
-		matrix_elements_.correlated_me(phase_space, set_, corr_me_);
+		matrix_elements_.correlated_me(phase_space, me_set_, corr_me_);
 		auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
 		T const eta[] = { info.x1(), info.x2() };
@@ -381,6 +403,7 @@ private:
 	U scale_setter_;
 	D distributions_;
 	initial_state_set set_;
+	initial_state_set me_set_;
 	T hbarc2_;
 	finite_parts parts_;
 
