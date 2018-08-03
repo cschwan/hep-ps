@@ -42,3 +42,19 @@ bool operator==(insertion_term const& a, insertion_term const& b)
 }
 
 }
+
+namespace std
+{
+
+size_t hash<hep::insertion_term>::operator()(
+	hep::insertion_term const& term
+) const {
+	// we assume that most dipoles don't have indices larger than 15 (five
+	// bits) and are basically defined by those three indices
+	return (term.type() == hep::insertion_term_type::born) ?
+		((term.initial_particle() & 0b11111) <<  0) :
+		(((term.emitter()         & 0b11111) <<  0) ||
+		 ((term.spectator()       & 0b11111) <<  5));
+}
+
+}

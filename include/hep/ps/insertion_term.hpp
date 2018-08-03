@@ -153,4 +153,15 @@ bool operator==(insertion_term const& a, insertion_term const& b);
 
 }
 
+namespace std
+{
+
+template <>
+struct hash<hep::insertion_term>
+{
+	size_t operator()(hep::insertion_term const& term) const;
+};
+
+}
+
 #endif
