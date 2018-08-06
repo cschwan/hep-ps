@@ -362,8 +362,8 @@ protected:
 					(apt == parton_type::quark)) &&
 					(at == parton_type::photon_))
 				{
-					T const charge = T(3.0) * pdg_id_to_charge_times_three(
-						parton_to_pdg_id(ap));
+					T const charge = T(pdg_id_to_charge_times_three(
+						parton_to_pdg_id(ap))) / T(3.0);
 					q2 = charge * charge;
 				}
 
