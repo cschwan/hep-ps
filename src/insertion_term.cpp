@@ -20,15 +20,20 @@ bool operator<(insertion_term const& a, insertion_term const& b)
 
 		return true;
 	}
-	else if (b.type() != insertion_term_type::born)
+	else if (b.type() == insertion_term_type::born)
 	{
-		return (a.emitter() < b.emitter()) ||
-			(static_cast <int> (a.emitter_type()) <
-				static_cast <int> (b.emitter_type())) ||
-			(a.spectator() < b.spectator());
+		return false;
 	}
 
-	return false;
+	return std::make_tuple(
+		a.emitter(),
+		a.emitter_type(),
+		a.spectator()
+	) < std::make_tuple(
+		b.emitter(),
+		b.emitter_type(),
+		b.spectator()
+	);
 }
 
 bool operator==(insertion_term const& a, insertion_term const& b)
