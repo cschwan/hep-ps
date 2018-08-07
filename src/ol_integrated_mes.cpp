@@ -72,7 +72,12 @@ ol_integrated_mes<T>::ol_integrated_mes(
 				continue;
 			}
 
-			auto dipole_ids = generate_dipole(ids, order, type, i, j, k);
+			auto const type_i = pdg_id_to_particle_type(ids.at(i));
+			auto const type_j = pdg_id_to_particle_type(ids.at(j));
+			auto const type_k = pdg_id_to_particle_type(ids.at(k));
+			auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
+
+			auto dipole_ids = generate_dipole(ids, order, dip);
 
 			if (dipole_ids.empty())
 			{
@@ -80,7 +85,7 @@ ol_integrated_mes<T>::ol_integrated_mes(
 				continue;
 			}
 
-			if (veto(dipole_ids, final_states_))
+			if (veto(dipole_ids, final_states_, dip))
 			{
 				continue;
 			}
@@ -159,15 +164,13 @@ ol_integrated_mes<T>::ol_integrated_mes(
 				}
 			}
 
-			auto const type_i = pdg_id_to_particle_type(dipole_ids.at(i));
-
-			auto const dip = insertion_term(i, type_i, k, type);
+			auto const term = insertion_term(i, type_i, k, type);
 
 			// add a dipole if it doesn't exist yet
-			if (std::find(dipoles_.begin(), dipoles_.end(), dip) ==
+			if (std::find(dipoles_.begin(), dipoles_.end(), term) ==
 				dipoles_.end())
 			{
-				dipoles_.push_back(dip);
+				dipoles_.push_back(term);
 
 				if (type == correction_type::ew)
 				{
@@ -183,7 +186,7 @@ ol_integrated_mes<T>::ol_integrated_mes(
 				}
 			}
 
-			auto range = mes.equal_range(dip);
+			auto range = mes.equal_range(term);
 			bool found = false;
 
 			for (auto i = range.first; i != range.second; ++i)
@@ -200,7 +203,7 @@ ol_integrated_mes<T>::ol_integrated_mes(
 
 			if (!found)
 			{
-				mes.emplace(dip, std::make_tuple(dipole_ids, dipole_id,
+				mes.emplace(term, std::make_tuple(dipole_ids, dipole_id,
 					charge_table_index));
 			}
 

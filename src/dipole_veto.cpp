@@ -9,7 +9,7 @@ namespace hep
 dipole_veto default_dipole_veto()
 {
 	return [](std::vector<int> const& pdg_ids,
-		std::vector<final_state> const& final_states)
+		std::vector<final_state> const& final_states, dipole const&)
 	{
 		auto const& states = pdg_ids_to_states(pdg_ids).second;
 
@@ -20,7 +20,7 @@ dipole_veto default_dipole_veto()
 dipole_veto photon_in_jet()
 {
 	return [](std::vector<int> const& pdg_ids,
-		std::vector<final_state> const& final_states)
+		std::vector<final_state> const& final_states, dipole const&)
 	{
 		auto const& states = pdg_ids_to_states(pdg_ids).second;
 		auto const& mismatch = std::mismatch(final_states.begin(),

@@ -21,6 +21,7 @@
 
 #include "hep/ps/correction_type.hpp"
 #include "hep/ps/coupling_order.hpp"
+#include "hep/ps/dipole.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -28,20 +29,15 @@
 namespace hep
 {
 
-/// Tries to generate a dipole process for the real process given
-/// `process_pdg_ids` at the given coupling order. The parameter `type`
-/// determines whether the result should be an EW or a QCD dipole. The integers
-/// `i`, `j`, and `k` denote the indices of the emitter-, unresolved, and
-/// spectator-particle, respectively. The result is either the PDG identifiers
-/// of the dipole process, or an empty vector, in which case the dipole process
-/// does not exist.
+/// Tries to generate a dipole process for the real process given by
+/// `process_pdg_ids` at the given coupling `order`. The parameter
+/// `dipole_info` determines the dipole. The result is either the PDG
+/// identifiers of the dipole process, or an empty vector, in which case the
+/// dipole process does not exist.
 std::vector<int> generate_dipole(
 	std::vector<int> const& process_pdg_ids,
 	hep::coupling_order order,
-	hep::correction_type type,
-	std::size_t i,
-	std::size_t j,
-	std::size_t k
+	dipole const& dipole_info
 );
 
 }

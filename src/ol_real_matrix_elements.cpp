@@ -66,7 +66,12 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				continue;
 			}
 
-			auto const& dipole_ids = generate_dipole(ids, order, type, i, j, k);
+			auto const type_i = pdg_id_to_particle_type(ids.at(i));
+			auto const type_j = pdg_id_to_particle_type(ids.at(j));
+			auto const type_k = pdg_id_to_particle_type(ids.at(k));
+			auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
+
+			auto const& dipole_ids = generate_dipole(ids, order, dip);
 
 			if (dipole_ids.empty())
 			{
@@ -74,7 +79,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 				continue;
 			}
 
-			if (veto(dipole_ids, final_states_))
+			if (veto(dipole_ids, final_states_, dip))
 			{
 				continue;
 			}
@@ -155,12 +160,6 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 						result);
 				}
 			}
-
-			auto const type_i = pdg_id_to_particle_type(ids.at(i));
-			auto const type_j = pdg_id_to_particle_type(ids.at(j));
-			auto const type_k = pdg_id_to_particle_type(ids.at(k));
-
-			auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
 
 			// add a dipole if it doesn't exist yet
 			if (std::find(dipoles_.begin(), dipoles_.end(), dip) ==

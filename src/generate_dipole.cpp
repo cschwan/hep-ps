@@ -9,11 +9,13 @@ namespace hep
 std::vector<int> generate_dipole(
 	std::vector<int> const& process_pdg_ids,
 	hep::coupling_order order,
-	hep::correction_type type,
-	std::size_t i,
-	std::size_t j,
-	std::size_t k
+	dipole const& dipole_info
 ) {
+	auto const i = dipole_info.emitter();
+	auto const j = dipole_info.unresolved();
+	auto const k = dipole_info.spectator();
+	auto const type = dipole_info.corr_type();
+
 	std::vector<int> result;
 
 	int const id_i = process_pdg_ids.at(i);

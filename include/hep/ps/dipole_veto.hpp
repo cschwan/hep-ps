@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/dipole.hpp"
 #include "hep/ps/final_state.hpp"
 
 #include <functional>
@@ -29,10 +30,12 @@ namespace hep
 
 /// Type for dipole vetos. The first argument is a vector with the PDG
 /// identifiers of the matrix element that the dipole is proportional to, the
-/// second argument is the vector of final states for the dipole.
+/// second argument is the vector of final states for the dipole, and the third
+/// argument is the dipole.
 using dipole_veto = std::function<bool(
 	std::vector<int> const&,
-	std::vector<final_state> const&
+	std::vector<final_state> const&,
+	dipole const&
 )>;
 
 /// Returns the default dipole veto, which vetos all dipoles that do lead to
