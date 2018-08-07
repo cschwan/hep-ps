@@ -245,7 +245,7 @@ public:
 						(i == 0) ? pdf_pos       : pdfsa1_.at(j),
 						(i == 0) ? pdfsa2_.at(j) : pdf_pos,
 						me,
-						set_,
+						me_set_,
 						factors_.at(j) * factor,
 						cut_result
 					);
@@ -275,7 +275,7 @@ public:
 						(i == 0) ? pdf_pos             : pdf_pdfsa1_.at(j),
 						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pos,
 						me,
-						set_,
+						me_set_,
 						factor,
 						cut_result
 					);
@@ -300,7 +300,7 @@ public:
 						pdfsa1_.at(i),
 						pdfsa2_.at(i),
 						me,
-						set_,
+						me_set_,
 						factors_.at(i) * factor * terms2_.at(i),
 						cut_result
 					);
@@ -312,7 +312,7 @@ public:
 						pdf_pdfsa1_.at(i),
 						pdf_pdfsa2_.at(i),
 						me,
-						set_,
+						me_set_,
 						factor * terms2_.front(),
 						cut_result
 					);
