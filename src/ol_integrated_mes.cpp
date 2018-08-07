@@ -164,7 +164,12 @@ ol_integrated_mes<T>::ol_integrated_mes(
 				}
 			}
 
-			auto const term = insertion_term(i, type_i, k, type);
+			std::size_t const ins_i = (i < j) ? i : i - 1;
+			std::size_t const ins_k = (k < j) ? k : k - 1;
+			auto const ins_type_i = pdg_id_to_particle_type(
+				dipole_ids.at(ins_i));
+
+			auto const term = insertion_term(ins_i, ins_type_i, ins_k, type);
 
 			// add a dipole if it doesn't exist yet
 			if (std::find(dipoles_.begin(), dipoles_.end(), term) ==
