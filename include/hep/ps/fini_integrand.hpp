@@ -34,6 +34,7 @@
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <memory>
@@ -160,19 +161,19 @@ public:
 		T const x1p = info.x1() / (info.x1() * (T(1.0) - x) + x);
 		T const x2p = info.x2() / (info.x2() * (T(1.0) - x) + x);
 
-		pdfs_.eval(info.x1(), scales_, pdfsa1_, pdf_pdfsa1_);
-		pdfs_.eval(info.x2(), scales_, pdfsa2_, pdf_pdfsa2_);
-		pdfs_.eval(x1p, scales_, pdfsb1_, pdf_pdfsb1_);
-		pdfs_.eval(x2p, scales_, pdfsb2_, pdf_pdfsb2_);
+		pdfs_.eval(info.x1(), scales_, pdfsa_[0], pdf_pdfsa_[0]);
+		pdfs_.eval(info.x2(), scales_, pdfsa_[1], pdf_pdfsa_[1]);
+		pdfs_.eval(x1p, scales_, pdfsb_[0], pdf_pdfsb_[0]);
+		pdfs_.eval(x2p, scales_, pdfsb_[1], pdf_pdfsb_[1]);
 
-		assert( pdfsa1_.size() == scales_.size() );
-		assert( pdfsa2_.size() == scales_.size() );
-		assert( pdfsb1_.size() == scales_.size() );
-		assert( pdfsb2_.size() == scales_.size() );
-		assert( (pdfs_.count() == 1) || (pdf_pdfsa1_.size() == pdfs_.count()) );
-		assert( (pdfs_.count() == 1) || (pdf_pdfsa2_.size() == pdfs_.count()) );
-		assert( (pdfs_.count() == 1) || (pdf_pdfsb1_.size() == pdfs_.count()) );
-		assert( (pdfs_.count() == 1) || (pdf_pdfsb2_.size() == pdfs_.count()) );
+		assert( pdfsa_[0].size() == scales_.size() );
+		assert( pdfsa_[1].size() == scales_.size() );
+		assert( pdfsb_[0].size() == scales_.size() );
+		assert( pdfsb_[1].size() == scales_.size() );
+		assert( (pdfs_.count() == 1) || (pdf_pdfsa_[0].size() == pdfs_.count()) );
+		assert( (pdfs_.count() == 1) || (pdf_pdfsa_[1].size() == pdfs_.count()) );
+		assert( (pdfs_.count() == 1) || (pdf_pdfsb_[0].size() == pdfs_.count()) );
+		assert( (pdfs_.count() == 1) || (pdf_pdfsb_[1].size() == pdfs_.count()) );
 
 		for (auto& me : corr_me_)
 		{
@@ -226,24 +227,24 @@ public:
 					auto const pdf_neg = effective_pdf(
 						ab_neg_.at(j),
 						xprime[1 - i],
-						(i == 0) ? info.x2() : info.x1(),
-						(i == 0) ? pdfsa2_.at(j) : pdfsa1_.at(j),
-						(i == 0) ? pdfsb2_.at(j) : pdfsb1_.at(j)
+						eta[1 - i],
+						pdfsa_[1 - i].at(j),
+						pdfsb_[1 - i].at(j)
 					);
 
 					auto const pdf_pos = effective_pdf(
 						ab_pos_.at(j),
 						xprime[i],
-						(i == 0) ? info.x1() : info.x2(),
-						(i == 0) ? pdfsa1_.at(j) : pdfsa2_.at(j),
-						(i == 0) ? pdfsb1_.at(j) : pdfsb2_.at(j)
+						eta[i],
+						pdfsa_[i].at(j),
+						pdfsb_[i].at(j)
 					);
 
 					results_.at(j) += convolute(
-						(i == 0) ? pdf_neg       : pdfsa2_.at(j),
-						(i == 0) ? pdfsa1_.at(j) : pdf_neg,
-						(i == 0) ? pdf_pos       : pdfsa1_.at(j),
-						(i == 0) ? pdfsa2_.at(j) : pdf_pos,
+						(i == 0) ? pdf_neg         : pdfsa_[1].at(j),
+						(i == 0) ? pdfsa_[0].at(j) : pdf_neg,
+						(i == 0) ? pdf_pos         : pdfsa_[0].at(j),
+						(i == 0) ? pdfsa_[1].at(j) : pdf_pos,
 						me,
 						me_set_,
 						factors_.at(j) * factor,
@@ -251,29 +252,29 @@ public:
 					);
 				}
 
-				for (std::size_t j = 0; j != pdf_pdfsa1_.size(); ++j)
+				for (std::size_t j = 0; j != pdf_pdfsa_[0].size(); ++j)
 				{
 					auto const pdf_neg = effective_pdf(
 						ab_neg_.front(),
 						xprime[1 - i],
-						(i == 0) ? info.x2() : info.x1(),
-						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pdfsa1_.at(j),
-						(i == 0) ? pdf_pdfsb2_.at(j) : pdf_pdfsb1_.at(j)
+						eta[1 - i],
+						pdf_pdfsa_[1 - i].at(j),
+						pdf_pdfsb_[1 - i].at(j)
 					);
 
 					auto const pdf_pos = effective_pdf(
 						ab_pos_.front(),
 						xprime[i],
-						(i == 0) ? info.x1() : info.x2(),
-						(i == 0) ? pdf_pdfsa1_.at(j) : pdf_pdfsa2_.at(j),
-						(i == 0) ? pdf_pdfsb1_.at(j) : pdf_pdfsb2_.at(j)
+						eta[i],
+						pdf_pdfsa_[i].at(j),
+						pdf_pdfsb_[i].at(j)
 					);
 
 					pdf_results_.at(j) += convolute(
-						(i == 0) ? pdf_neg             : pdf_pdfsa2_.at(j),
-						(i == 0) ? pdf_pdfsa1_.at(j) : pdf_neg,
-						(i == 0) ? pdf_pos             : pdf_pdfsa1_.at(j),
-						(i == 0) ? pdf_pdfsa2_.at(j) : pdf_pos,
+						(i == 0) ? pdf_neg             : pdf_pdfsa_[1].at(j),
+						(i == 0) ? pdf_pdfsa_[0].at(j) : pdf_neg,
+						(i == 0) ? pdf_pos             : pdf_pdfsa_[0].at(j),
+						(i == 0) ? pdf_pdfsa_[1].at(j) : pdf_pos,
 						me,
 						me_set_,
 						factor,
@@ -294,11 +295,11 @@ public:
 
 				assert( terms2_.size() == scales_.size() );
 
-				for (std::size_t i = 0; i != pdfsa1_.size(); ++i)
+				for (std::size_t i = 0; i != pdfsa_[0].size(); ++i)
 				{
 					results_.at(i) += convolute(
-						pdfsa1_.at(i),
-						pdfsa2_.at(i),
+						pdfsa_[0].at(i),
+						pdfsa_[1].at(i),
 						me,
 						me_set_,
 						factors_.at(i) * factor * terms2_.at(i),
@@ -306,11 +307,11 @@ public:
 					);
 				}
 
-				for (std::size_t i = 0; i != pdf_pdfsa1_.size(); ++i)
+				for (std::size_t i = 0; i != pdf_pdfsa_[0].size(); ++i)
 				{
 					pdf_results_.at(i) += convolute(
-						pdf_pdfsa1_.at(i),
-						pdf_pdfsa2_.at(i),
+						pdf_pdfsa_[0].at(i),
+						pdf_pdfsa_[1].at(i),
 						me,
 						me_set_,
 						factor * terms2_.front(),
@@ -410,14 +411,10 @@ private:
 	std::vector<T> recombined_ps_;
 	std::vector<final_state> final_states_;
 	std::vector<recombined_state> recombined_states_;
-	std::vector<parton_array<T>> pdfsa1_;
-	std::vector<parton_array<T>> pdfsa2_;
-	std::vector<parton_array<T>> pdfsb1_;
-	std::vector<parton_array<T>> pdfsb2_;
-	std::vector<parton_array<T>> pdf_pdfsa1_;
-	std::vector<parton_array<T>> pdf_pdfsa2_;
-	std::vector<parton_array<T>> pdf_pdfsb1_;
-	std::vector<parton_array<T>> pdf_pdfsb2_;
+	std::array<std::vector<parton_array<T>>, 2> pdfsa_;
+	std::array<std::vector<parton_array<T>>, 2> pdfsb_;
+	std::array<std::vector<parton_array<T>>, 2> pdf_pdfsa_;
+	std::array<std::vector<parton_array<T>>, 2> pdf_pdfsb_;
 	std::vector<neg_pos_results<T>> pdf_results_;
 	std::vector<neg_pos_results<T>> results_;
 	std::vector<scales<T>> scales_;
