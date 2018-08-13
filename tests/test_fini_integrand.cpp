@@ -14,6 +14,7 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/parton_type.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/trivial_cutter.hpp"
@@ -138,6 +139,12 @@ public:
 	) {
 		for (auto const state : set)
 		{
+			if (parton_type_of(state_parton_one(state)) !=
+				parton_type_of(state_parton_two(state)))
+			{
+				continue;
+			}
+
 			results.at(0).emplace_back(state,
 				pow(alphas_, T(alphas_power_)) * T(1.0));
 			results.at(1).emplace_back(state,
