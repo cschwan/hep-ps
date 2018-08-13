@@ -8,7 +8,7 @@ project(
 	meson_version : '>=0.42'
 )
 
-hep_mc = dependency(
+hep_mc_dep = dependency(
 	'hep-mc',
 	fallback : ['hep-mc', 'hep_mc_dep'],
 	version : '>=0.7'
@@ -24,7 +24,6 @@ if get_option('doxygen')
 endif
 
 subdir('src')
-subdir('tests')
 
 pkg = import('pkgconfig')
 pkg.generate(
@@ -35,7 +34,10 @@ pkg.generate(
 )
 
 hep_ps_dep = declare_dependency(
-	dependencies : hep_mc,
+	dependencies : hep_mc_dep,
 	include_directories : incdir,
 	link_with : libhep_ps
 )
+
+# tests depend on `hep_ps_dep`
+subdir('tests')
