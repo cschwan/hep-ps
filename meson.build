@@ -5,7 +5,7 @@ project(
 	version : '0.0.1',
 	license : 'GPL3',
 	default_options : 'cpp_std=c++14',
-	meson_version : '>=0.42'
+	meson_version : '>=0.47'
 )
 
 hep_mc_dep = dependency(

@@ -68,10 +68,6 @@ sources = [
 deps += dependency('gsl')
 deps += dependency('lhapdf', version : '>=6')
 
-# remove this line once the following bug is fixed:
-# https://github.com/mesonbuild/meson/issues/2685
-deps += meson.get_compiler('cpp').find_library('gfortran')
-
 libhep_ps = library(
 	'hep-ps',
 	sources,
