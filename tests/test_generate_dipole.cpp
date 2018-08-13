@@ -3,7 +3,7 @@
 #include "hep/ps/generate_dipole.hpp"
 #include "hep/ps/particle_type.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 TEST_CASE("test electroweak two jet production")
 {

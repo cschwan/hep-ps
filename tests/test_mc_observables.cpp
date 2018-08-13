@@ -12,8 +12,9 @@
 #include "hep/mc/multi_channel.hpp"
 #include "hep/mc/multi_channel_integrand.hpp"
 
-#include "catch.hpp"
 #include "test_structures.hpp"
+
+#include <catch.hpp>
 
 #include <cstddef>
 #include <functional>

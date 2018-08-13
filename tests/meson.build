@@ -1,7 +1,12 @@
 libcatch = shared_library(
 	'catch',
-	'catch.hpp',
-	'catch.cpp'
+	'catch.cpp',
+	dependencies : catch_dep
+)
+
+libcatch_dep = declare_dependency(
+	dependencies : catch_dep,
+	link_with : libcatch
 )
 
 test_born_integrand = executable(
@@ -9,8 +14,8 @@ test_born_integrand = executable(
 	'test_born_integrand.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : [ hep_mc ],
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_cofferaa_phase_space_generator = executable(
@@ -18,16 +23,16 @@ test_cofferaa_phase_space_generator = executable(
 	'test_cofferaa_phase_space_generator.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_dipole = executable(
 	'test_dipole',
 	'test_dipole.cpp',
 	include_directories : incdir,
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_fini_integrand = executable(
@@ -35,8 +40,8 @@ test_fini_integrand = executable(
 	'test_fini_integrand.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_fortran_helper = executable(
@@ -44,14 +49,16 @@ test_fortran_helper = executable(
 	'test_fortran_helper.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
+	dependencies : [ libcatch_dep ],
 	link_with : [ libcatch, libhep_ps ]
 )
 
 test_generate_dipole = executable(
 	'test_generate_dipole',
 	'test_generate_dipole.cpp',
+	dependencies : [ libcatch_dep ],
 	include_directories : incdir,
-	link_with : [ libcatch, libhep_ps ]
+	link_with : [ libhep_ps ]
 )
 
 test_headers = executable(
@@ -59,23 +66,24 @@ test_headers = executable(
 	'test_headers.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_initial_state = executable(
 	'test_initial_state',
 	'test_initial_state.cpp',
 	include_directories : incdir,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep ],
+	link_with : [ libhep_ps ]
 )
 
 test_insertion_term = executable(
 	'test_insertion_term',
 	'test_insertion_term.cpp',
 	include_directories : incdir,
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_list_phase_space_generator = executable(
@@ -83,8 +91,8 @@ test_list_phase_space_generator = executable(
 	'test_list_phase_space_generator.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_lusifer_diagram_generator = executable(
@@ -92,7 +100,8 @@ test_lusifer_diagram_generator = executable(
 	'test_lusifer_diagram_generator.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep ],
+	link_with : [ libhep_ps ]
 )
 
 test_lusifer_phase_space_generator = executable(
@@ -100,8 +109,8 @@ test_lusifer_phase_space_generator = executable(
 	'test_lusifer_phase_space_generator.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_lusifer_phase_space_generator2 = executable(
@@ -109,8 +118,8 @@ test_lusifer_phase_space_generator2 = executable(
 	'test_lusifer_phase_space_generator2.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_lusifer_phase_space_generator3 = executable(
@@ -118,8 +127,8 @@ test_lusifer_phase_space_generator3 = executable(
 	'test_lusifer_phase_space_generator3.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_ol_born_matrix_elements = executable(
@@ -127,7 +136,8 @@ test_ol_born_matrix_elements = executable(
 	'test_ol_born_matrix_elements.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep ],
+	link_with : [ libhep_ps ]
 )
 
 test_pdg_functions = executable(
@@ -135,7 +145,8 @@ test_pdg_functions = executable(
 	'test_pdg_functions.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep ],
+	link_with : [ libhep_ps ]
 )
 
 test_permutation = executable(
@@ -143,7 +154,8 @@ test_permutation = executable(
 	'test_permutation.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep ],
+	link_with : [ libhep_ps ]
 )
 
 test_phase_space_point = executable(
@@ -151,8 +163,8 @@ test_phase_space_point = executable(
 	'test_phase_space_point.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_phase_space_quality = executable(
@@ -160,8 +172,8 @@ test_phase_space_quality = executable(
 	'test_phase_space_quality.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_rambo_phase_space_generator = executable(
@@ -169,8 +181,8 @@ test_rambo_phase_space_generator = executable(
 	'test_rambo_phase_space_generator.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_real_integrand = executable(
@@ -178,8 +190,8 @@ test_real_integrand = executable(
 	'test_real_integrand.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep, hep_mc ],
+	link_with : [ libhep_ps ]
 )
 
 test_tensor_decompose = executable(
@@ -187,16 +199,17 @@ test_tensor_decompose = executable(
 	'test_tensor_decompose.cpp',
 	include_directories : incdir,
 	cpp_args : '-DHEP_TYPE_T=double',
-	link_with : [ libcatch, libhep_ps ]
+	dependencies : [ libcatch_dep ],
+	link_with : [ libhep_ps ]
 )
 
 test_trivial_cutter_and_recombiner = executable(
 	'test_trivial_cutter_and_recombiner',
 	'test_trivial_cutter_and_recombiner.cpp',
 	cpp_args : '-DHEP_TYPE_T=double',
-	dependencies : hep_mc,
+	dependencies : [ libcatch_dep, hep_mc ],
 	include_directories : incdir,
-	link_with : [ libcatch, libhep_ps ]
+	link_with : [ libhep_ps ]
 )
 
 test('test_born_integrand', test_born_integrand)

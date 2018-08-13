@@ -19,8 +19,9 @@
 #include "hep/ps/trivial_cutter.hpp"
 #include "hep/ps/trivial_recombiner.hpp"
 
-#include "catch.hpp"
 #include "test_phase_space_generator.hpp"
+
+#include <catch.hpp>
 
 #include <array>
 #include <cstddef>

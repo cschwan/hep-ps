@@ -1,7 +1,7 @@
 #include "hep/ps/phase_space_point.hpp"
 #include "hep/ps/rambo_phase_space_generator.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <cmath>
 #include <vector>

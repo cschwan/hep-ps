@@ -1,6 +1,6 @@
 #include "hep/ps/initial_state.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <iterator>
 

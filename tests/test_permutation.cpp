@@ -1,6 +1,6 @@
 #include "hep/ps/permutation.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <array>
 

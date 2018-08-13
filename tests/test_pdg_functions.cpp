@@ -1,6 +1,6 @@
 #include "hep/ps/pdg_functions.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 TEST_CASE("test parton_to_pdg_id()", "[pdg_functions]")
 {

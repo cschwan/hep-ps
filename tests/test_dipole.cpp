@@ -3,7 +3,7 @@
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/particle_type.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 TEST_CASE("test dipole members", "[dipole]")
 {

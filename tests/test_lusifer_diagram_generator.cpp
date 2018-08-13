@@ -1,7 +1,7 @@
 #include "hep/ps/lusifer_constants.hpp"
 #include "hep/ps/lusifer_diagram_generator.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <string>
 #include <vector>

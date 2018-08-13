@@ -9,7 +9,7 @@
 
 #include "test_structures.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <cstddef>
 #include <functional>

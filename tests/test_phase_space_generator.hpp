@@ -22,6 +22,8 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/phase_space_generator.hpp"
 
+#include <catch.hpp>
+
 #include <cstddef>
 #include <vector>
 

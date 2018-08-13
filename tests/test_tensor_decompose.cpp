@@ -1,9 +1,9 @@
 #include "hep/ps/tensor_decompose.hpp"
 
+#include <catch.hpp>
+
 #include <array>
 #include <cstddef>
-
-#include "catch.hpp"
 
 using T = HEP_TYPE_T;
 

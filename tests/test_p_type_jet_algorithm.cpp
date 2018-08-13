@@ -6,7 +6,7 @@
 #include "fastjet/JetDefinition.hh"
 #include "fastjet/PseudoJet.hh"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <algorithm>
 #include <cstddef>

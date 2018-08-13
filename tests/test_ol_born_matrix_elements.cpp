@@ -1,7 +1,7 @@
 #include "hep/ps/coupling_order.hpp"
 #include "hep/ps/ol_born_matrix_elements.hpp"
 
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <string>
 #include <vector>
