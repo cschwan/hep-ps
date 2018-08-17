@@ -47,9 +47,6 @@ ol_integrated_mes<T>::ol_integrated_mes(
 
 	ol_register_mode dipole_mode = ol_register_mode::set_qcd_order;
 
-	bool has_ew_dipoles = false;
-	bool has_qcd_dipoles = false;
-
 	std::unordered_multimap<insertion_term, std::tuple<std::vector<int>, int,
 		std::size_t>> mes;
 
@@ -176,19 +173,6 @@ ol_integrated_mes<T>::ol_integrated_mes(
 				dipoles_.end())
 			{
 				dipoles_.push_back(term);
-
-				if (type == correction_type::ew)
-				{
-					has_ew_dipoles = true;
-				}
-				else if (type == correction_type::qcd)
-				{
-					has_qcd_dipoles = true;
-				}
-				else
-				{
-					assert( false );
-				}
 			}
 
 			auto range = mes.equal_range(term);
@@ -203,13 +187,96 @@ ol_integrated_mes<T>::ol_integrated_mes(
 					found = true;
 					break;
 				}
-
 			}
 
 			if (!found)
 			{
 				mes.emplace(term, std::make_tuple(dipole_ids, dipole_id,
 					charge_table_index));
+
+				if (((type == correction_type::ew) && (!pdg_id_is_gluon(dipole_ids.at(0)))) ||
+					((type == correction_type::qcd) && (!pdg_id_is_photon(dipole_ids.at(0)))))
+				{
+					auto const born = insertion_term{0, type};
+
+					if (std::find(dipoles_.begin(), dipoles_.end(), born) ==
+						dipoles_.end())
+					{
+						dipoles_.push_back(born);
+					}
+
+					auto const range = mes.equal_range(born);
+					auto const tuple = std::make_tuple(dipole_ids, dipole_id,
+						charge_table_index);
+					bool exists = false;
+
+					for (auto i = range.first; i != range.second; ++i)
+					{
+						if (std::get<1>(i->second) != std::get<1>(tuple) ||
+							(std::get<2>(i->second) != std::get<2>(tuple)))
+						{
+							continue;
+						}
+
+						if (!std::equal(std::get<0>(tuple).begin(),
+							std::get<0>(tuple).end(),
+							std::get<0>(i->second).begin()))
+						{
+							continue;
+						}
+
+						// the term that we try to add already exists
+						exists = true;
+						break;
+					}
+
+					if (!exists)
+					{
+						mes.emplace(born, tuple);
+					}
+				}
+
+				if (((type == correction_type::ew) && (!pdg_id_is_gluon(dipole_ids.at(1)))) ||
+					((type == correction_type::qcd) && (!pdg_id_is_photon(dipole_ids.at(1)))))
+				{
+					auto const born = insertion_term{1, type};
+
+					if (std::find(dipoles_.begin(), dipoles_.end(), born) ==
+						dipoles_.end())
+					{
+						dipoles_.push_back(born);
+					}
+
+					auto const range = mes.equal_range(born);
+					auto const tuple = std::make_tuple(dipole_ids, dipole_id,
+						charge_table_index);
+					bool exists = false;
+
+					for (auto i = range.first; i != range.second; ++i)
+					{
+						if (std::get<1>(i->second) != std::get<1>(tuple) ||
+							(std::get<2>(i->second) != std::get<2>(tuple)))
+						{
+							continue;
+						}
+
+						if (!std::equal(std::get<0>(tuple).begin(),
+							std::get<0>(tuple).end(),
+							std::get<0>(i->second).begin()))
+						{
+							continue;
+						}
+
+						// the term that we try to add already exists
+						exists = true;
+						break;
+					}
+
+					if (!exists)
+					{
+						mes.emplace(born, tuple);
+					}
+				}
 			}
 
 			// currently we only support one photon dipole per spectator
@@ -220,126 +287,6 @@ ol_integrated_mes<T>::ol_integrated_mes(
 		}
 		}
 		}
-		}
-	}
-
-	if (has_ew_dipoles)
-	{
-		bool has_one = false;
-		bool has_two = false;
-
-		std::unordered_multimap<insertion_term, std::tuple<std::vector<int>,
-			int, std::size_t>> add_mes;
-
-		for (auto const& me : mes)
-		{
-			if (me.first.corr_type() != correction_type::ew)
-			{
-				continue;
-			}
-
-			auto const result = std::find_if(add_mes.begin(), add_mes.end(),
-				[&](decltype (mes)::value_type const& element) {
-					return same_process(std::get<0>(me.second),
-						std::get<0>(element.second));
-			});
-
-			if (result == mes.end())
-			{
-				// if the corresponding initial state particle is a gluon there
-				// is no EW contribution
-
-				if (!pdg_id_is_gluon(std::get<0>(me.second).at(0)))
-				{
-					has_one = true;
-
-					add_mes.emplace(insertion_term{0, correction_type::ew},
-						me.second);
-				}
-
-				if (!pdg_id_is_gluon(std::get<0>(me.second).at(1)))
-				{
-					has_two = true;
-
-					add_mes.emplace(insertion_term{1, correction_type::ew},
-						me.second);
-				}
-			}
-		}
-
-		if (has_one)
-		{
-			dipoles_.emplace_back(0, correction_type::ew);
-		}
-
-		if (has_two)
-		{
-			dipoles_.emplace_back(1, correction_type::ew);
-		}
-
-		for (auto const& me : add_mes)
-		{
-			mes.emplace(me);
-		}
-	}
-
-	if (has_qcd_dipoles)
-	{
-		bool has_one = false;
-		bool has_two = false;
-
-		std::unordered_multimap<insertion_term, std::tuple<std::vector<int>,
-			int, std::size_t>> add_mes;
-
-		for (auto const& me : mes)
-		{
-			if (me.first.corr_type() != correction_type::qcd)
-			{
-				continue;
-			}
-
-			auto const result = std::find_if(add_mes.begin(), add_mes.end(),
-				[&](decltype (mes)::value_type const& element) {
-					return same_process(std::get<0>(me.second),
-						std::get<0>(element.second));
-			});
-
-			if (result == mes.end())
-			{
-				// if the corresponding initial state particle is a photon
-				// there is no QCD contribution
-
-				if (!pdg_id_is_photon(std::get<0>(me.second).at(0)))
-				{
-					has_one = true;
-
-					add_mes.emplace(insertion_term{0, correction_type::qcd},
-						me.second);
-				}
-
-				if (!pdg_id_is_photon(std::get<0>(me.second).at(1)))
-				{
-					has_two = true;
-
-					add_mes.emplace(insertion_term{1, correction_type::qcd},
-						me.second);
-				}
-			}
-		}
-
-		if (has_one)
-		{
-			dipoles_.emplace_back(0, correction_type::qcd);
-		}
-
-		if (has_two)
-		{
-			dipoles_.emplace_back(1, correction_type::qcd);
-		}
-
-		for (auto const& me : add_mes)
-		{
-			mes.emplace(me);
 		}
 	}
 
