@@ -33,10 +33,12 @@ HEP_ENUM(initial_state,
 	bq_dx, /*!< \f$ Q=0 \f$ bottom anti-down initial state. */
 	bq_sx, /*!< \f$ Q=0 \f$ bottom anti-strange initial state. */
 	bq_uq, /*!< \f$ Q=1/3 \f$ bottom up initial state. */
+	bq_gl, /*!< \f$ Q=-1/3 \f$ bottom gluon initial state. */
 	bx_cq, /*!< \f$ Q=1 \f$ anti-bottom charm initial state. */
 	bx_dx, /*!< \f$ Q=2/3 \f$ anti-bottom anti-down initial state. */
 	bx_sx, /*!< \f$ Q=2/3 \f$ anti-bottom anti-strange initial state. */
 	bx_uq, /*!< \f$ Q=1 \f$ anti-bottom up initial state. */
+	bx_gl, /*!< \f$ Q=1/3 \f$ anti-bottom gluon initial state. */
 	cq_bq, /*!< \f$ Q=1/3 \f$ charm bottom initial state. */
 	cq_bx, /*!< \f$ Q=1 \f$ charm anti-bottom initial state. */
 	cq_cq, /*!< \f$ Q=4/3 \f$ charm charm initial state. */
@@ -73,6 +75,8 @@ HEP_ENUM(initial_state,
 	dx_sx, /*!< \f$ Q=2/3 \f$ anti-strange anti-down initial state. */
 	dx_uq, /*!< \f$ Q=1 \f$ anti-down up initial state. */
 	dx_ux, /*!< \f$ Q=-1/3 \f$ anti-down anti-up initial state. */
+	gl_bq, /*!< \f$ Q=-1/3 \f$ gluon bottom initial state */
+	gl_bx, /*!< \f$ Q=1/3 \f$ gluon anti-bottom initial state */
 	gl_cq, /*!< \f$ Q=2/3 \f$ gluon charm initial state. */
 	gl_cx, /*!< \f$ Q=-2/3 \f$ gluon anti-charm initial state. */
 	gl_dq, /*!< \f$ Q=1/3 \f$ gluon down initial state. */
@@ -138,12 +142,14 @@ constexpr parton state_parton_one(initial_state state)
 	{
 	case bq_cq:
 	case bq_dx:
+	case bq_gl:
 	case bq_sx:
 	case bq_uq:
 		return parton::bottom;
 
 	case bx_cq:
 	case bx_dx:
+	case bx_gl:
 	case bx_sx:
 	case bx_uq:
 		return parton::anti_bottom;
@@ -192,6 +198,8 @@ constexpr parton state_parton_one(initial_state state)
 	case dx_ux:
 		return parton::anti_down;
 
+	case gl_bq:
+	case gl_bx:
 	case gl_cq:
 	case gl_cx:
 	case gl_dq:
@@ -269,12 +277,14 @@ constexpr parton state_parton_two(initial_state state)
 {
 	switch (state)
 	{
+	case gl_bq:
 	case cq_bq:
 	case dx_bq:
 	case sx_bq:
 	case uq_bq:
 		return parton::bottom;
 
+	case gl_bx:
 	case cq_bx:
 	case dx_bx:
 	case sx_bx:
@@ -323,6 +333,8 @@ constexpr parton state_parton_two(initial_state state)
 	case ux_dx:
 		return parton::anti_down;
 
+	case bq_gl:
+	case bx_gl:
 	case cq_gl:
 	case cx_gl:
 	case dq_gl:
