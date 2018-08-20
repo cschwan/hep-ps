@@ -104,7 +104,7 @@ public:
 			me_set_.add(state);
 
 			auto const one = state_parton_one(state);
-			auto const two = state_parton_one(state);
+			auto const two = state_parton_two(state);
 
 			switch (parton_type_of(one))
 			{
