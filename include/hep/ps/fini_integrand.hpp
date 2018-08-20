@@ -106,19 +106,59 @@ public:
 			auto const one = state_parton_one(state);
 			auto const two = state_parton_one(state);
 
-			if (parton_type_of(one) == parton_type::quark)
+			switch (parton_type_of(one))
 			{
+			case parton_type::quark:
+			case parton_type::anti_quark:
 				me_set_.add(partons_to_initial_state(parton::photon, two));
 				me_set_.add(partons_to_initial_state(parton::gluon, two));
+
+				break;
+
+			case parton_type::gluon_:
+			case parton_type::photon_:
+				for (auto p : parton_list())
+				{
+					if ((p == parton::gluon) || (p == parton::photon))
+					{
+						continue;
+					}
+
+					me_set_.add(partons_to_initial_state(p, two));
+				}
+
+				break;
+
+			default:
+				assert( false );
 			}
 
-			if (parton_type_of(two) == parton_type::quark)
+			switch (parton_type_of(two))
 			{
+			case parton_type::quark:
+			case parton_type::anti_quark:
 				me_set_.add(partons_to_initial_state(one, parton::photon));
 				me_set_.add(partons_to_initial_state(one, parton::gluon));
-			}
 
-			// FIXME: add missing cases
+				break;
+
+			case parton_type::gluon_:
+			case parton_type::photon_:
+				for (auto p : parton_list())
+				{
+					if ((p == parton::gluon) || (p == parton::photon))
+					{
+						continue;
+					}
+
+					me_set_.add(partons_to_initial_state(one, p));
+				}
+
+				break;
+
+			default:
+				assert( false );
+			}
 		}
 	}
 
