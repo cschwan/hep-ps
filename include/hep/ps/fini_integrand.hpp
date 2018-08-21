@@ -341,7 +341,7 @@ public:
 						pdfsa_[0].at(i),
 						pdfsa_[1].at(i),
 						me,
-						me_set_,
+						set_,
 						factors_.at(i) * factor * terms2_.at(i),
 						cut_result
 					);
@@ -353,7 +353,7 @@ public:
 						pdf_pdfsa_[0].at(i),
 						pdf_pdfsa_[1].at(i),
 						me,
-						me_set_,
+						set_,
 						factor * terms2_.front(),
 						cut_result
 					);
