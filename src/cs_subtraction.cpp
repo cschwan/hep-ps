@@ -420,7 +420,6 @@ void cs_subtraction<T>::insertion_terms(
 		? nc_
 		: (nc_ / (nc_ * nc_ - T(1.0))); // tf/cf
 
-	// TODO: check this term
 	T const color2 = (term.corr_type() == correction_type::ew)
 		? T(1.0)
 		: tf_ * (T(1.0) - T(1.0) / nc_ / nc_); // cf/ca
@@ -443,19 +442,17 @@ void cs_subtraction<T>::insertion_terms(
 		T const value3 = T(0.5) / pi * (T(2.0) / omx) * logomxbx;
 		T const value4 = T(0.5) / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
 			T(2.0) * dilogome + logome * logome);
-		T const value5 = T(0.5) * color2 / pi * (logomxbx * (T(1.0) - omx * omx)
-			/ x + x);
+		T const value5 = T(0.5) * color2 / pi * ((T(1.0) + omx * omx) / x *
+			logomxbx + x);
 
 		ab_terms<T> result;
 
 		result.a[bo][aq] = value1;
 		result.a[bo][qq] = value1;
-
 		result.a[aq][aq] = value2;
 		result.a[qq][qq] = value2;
 		result.b[aq][aq] = (eta - T(1.0)) * value3 + value4;
 		result.b[qq][qq] = (eta - T(1.0)) * value3 + value4;
-
 		result.a[aq][bo] = value5;
 		result.a[qq][bo] = value5;
 
@@ -484,7 +481,7 @@ void cs_subtraction<T>::insertion_terms(
 		result.b[aq][aq] = (eta - T(1.0)) * value1 + value2;
 		result.b[qq][qq] = (eta - T(1.0)) * value1 + value2;
 
-		// TODO: qg and gg are NYI
+		// TODO: gg is NYI
 
 		results.assign(scales.size(), result);
 	}
@@ -502,6 +499,7 @@ void cs_subtraction<T>::insertion_terms(
 		T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
 		T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) +
 			T(2.0) * log(T(1.0) - eta));
+		T const value4 = T(0.5) * color2 / pi * (T(1.0) + omx * omx) / x;
 
 		for (auto const& mu : scales)
 		{
@@ -511,6 +509,7 @@ void cs_subtraction<T>::insertion_terms(
 			T const result1 = logmu2bsai * value1;
 			T const result2 = logmu2bsai * value2;
 			T const result3 = logmu2bsai * ((eta - T(1.0)) * value2 + value3);
+			T const result4 = logmu2bsai * value4;
 
 			ab_terms<T> result;
 
@@ -520,8 +519,10 @@ void cs_subtraction<T>::insertion_terms(
 			result.a[qq][qq] = result2;
 			result.b[aq][aq] = result3;
 			result.b[qq][qq] = result3;
+			result.a[aq][bo] = result4;
+			result.a[qq][bo] = result4;
 
-			// TODO: qg and gg are NYI
+			// TODO: gg is NYI
 
 			results.push_back(result);
 		}
@@ -565,7 +566,6 @@ void cs_subtraction<T>::insertion_terms(
 			result.a[qq][qq] = result2;
 			result.b[aq][aq] = result3;
 			result.b[qq][qq] = result3;
-
 			result.a[aq][bo] = result4;
 			result.a[qq][bo] = result4;
 
