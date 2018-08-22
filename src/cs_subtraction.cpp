@@ -625,37 +625,61 @@ void cs_subtraction<T>::insertion_terms2(
 	{
 	case particle_type::boson:
 	{
-		// QCD case is not yet implemented
-		assert( term.corr_type() == correction_type::ew );
-
-		std::array<T, 6> const ncq2 = {
-			// up
-			nc_ * (T(0.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
-			// up, down
-			nc_ * (T(1.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
-			// up, down, strange
-			nc_ * (T(2.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
-			// up, down, strange, charm
-			nc_ * (T(2.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
-			// up, down, strange, charm, bottom
-			nc_ * (T(3.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
-			// up, down, strange, charm, bottom, top
-			nc_ * (T(3.0) * T(1.0) / T(9.0) + T(3.0) * T(4.0) / T(9.0))
-		};
-
-		T const gamma = T(-2.0) / T(3.0) * ncq2.at(nf_);
-
-		for (auto const& mu : scales)
+		if (term.corr_type() == correction_type::ew)
 		{
-			T const mu2 = mu.regularization() * mu.regularization();
-			T const logmubsij = log(mu2 / sij);
+			std::array<T, 6> const ncq2 = {
+				// up
+				nc_ * (T(0.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+				// up, down
+				nc_ * (T(1.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+				// up, down, strange
+				nc_ * (T(2.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+				// up, down, strange, charm
+				nc_ * (T(2.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
+				// up, down, strange, charm, bottom
+				nc_ * (T(3.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
+				// up, down, strange, charm, bottom, top
+				nc_ * (T(3.0) * T(1.0) / T(9.0) + T(3.0) * T(4.0) / T(9.0))
+			};
 
-			// for photons there is no 1/eps^2 pole -> BHLA/COLI are the same
-			T result = T(8.0) / T(3.0) * gamma;
-			result += gamma * logmubsij;
-			result *= T(0.5) / pi;
+			T const gamma = T(-2.0) / T(3.0) * ncq2.at(nf_);
 
-			results.push_back(result);
+			for (auto const& mu : scales)
+			{
+				T const mu2 = mu.regularization() * mu.regularization();
+				T const logmubsij = log(mu2 / sij);
+
+				// for photons there is no 1/eps^2 pole -> BHLA/COLI are equal
+				T result = T(8.0) / T(3.0) * gamma;
+				result += gamma * logmubsij;
+				// TODO: shouldn't this be -1/2?
+				result *= T(0.5) / pi;
+
+				results.push_back(result);
+			}
+		}
+		else if (term.corr_type() == correction_type::qcd)
+		{
+			T const ca = nc_;
+			T const trnfbca = tf_ * nf_ / ca;
+
+			for (auto const& mu : scales)
+			{
+				T const mu2 = mu.regularization() * mu.regularization();
+				T const logmubsij = log(mu2 / sij);
+
+				T result = T(223.0) / T(18.0) - T(16.0) / T(9.0) * trnfbca;
+				result += scheme_dep_factor * pi * pi;
+				result -= T(2.0) / T(3.0) * trnfbca * logmubsij;
+				result += T(0.5) * logmubsij * logmubsij;
+				result *= T(-0.5) / pi;
+
+				results.push_back(result);
+			}
+		}
+		else
+		{
+			assert( false );
 		}
 	}
 
