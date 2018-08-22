@@ -7,7 +7,6 @@
 
 TEST_CASE("test insertion_term members", "[insertion_term]")
 {
-	constexpr auto boson = hep::particle_type::boson;
 	constexpr auto fermion = hep::particle_type::fermion;
 
 	hep::insertion_term term0{0, hep::correction_type::qcd};

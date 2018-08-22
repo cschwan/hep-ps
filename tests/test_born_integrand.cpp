@@ -102,8 +102,6 @@ public:
 	) const {
 		using std::pow;
 
-		T const central_mur = global_scales.front().renormalization();
-
 		for (std::size_t i = 0; i != scales.size(); ++i)
 		{
 			T const mur = scales.at(i).renormalization();
