@@ -83,6 +83,7 @@ public:
 		, final_states_(matrix_elements_.final_states())
 		, insertion_terms_(matrix_elements_.insertion_terms())
 		, alphas_power_(matrix_elements_.alphas_power())
+		, pdf_parton_list_{partons_in_initial_state_set(set)}
 	{
 		std::size_t const fs = final_states_.size();
 
@@ -97,7 +98,7 @@ public:
 			corr_me_.resize(insertion_terms_.size());
 		}
 
-		pdfs_.register_partons(partons_in_initial_state_set(set));
+		pdfs_.register_partons(pdf_parton_list_);
 
 		for (auto const state : set)
 		{
@@ -249,8 +250,6 @@ public:
 					ab_neg_
 				);
 
-				assert( ab_neg_.size() == scales_.size() );
-
 				subtraction_.insertion_terms(
 					term,
 					scales_,
@@ -261,6 +260,7 @@ public:
 				);
 
 				assert( ab_neg_.size() == scales_.size() );
+				assert( ab_pos_.size() == scales_.size() );
 
 				for (std::size_t j = 0; j != scales_.size(); ++j)
 				{
@@ -385,31 +385,41 @@ protected:
 
 		for (auto const a : parton_list())
 		{
-			for (auto const ap : parton_list())
+			for (auto const ap : pdf_parton_list_)
 			{
-				// quark/anti-quark diagonality
-				if ((a != ap) && ((a != parton::gluon) && (ap != parton::gluon)
-					&& (a != parton::photon) && (ap != parton::photon)))
+				auto const at = parton_type_of(a);
+				auto const apt = parton_type_of(ap);
+
+				// only allow (up,up), ... pairs but not (up,anti-up) pairs
+				if (((at == parton_type::quark) &&
+					(apt == parton_type::anti_quark)) ||
+					((at == parton_type::anti_quark) &&
+					(apt == parton_type::quark)))
 				{
 					continue;
 				}
 
-				auto const at = parton_type_of(a);
-				auto const apt = parton_type_of(ap);
+				// do not allow (up,down), (gluon,photon), ... pairs
+				if ((at == apt) && (a != ap))
+				{
+					continue;
+				}
 
-				T q2 = T(1.0);
-
+				// multiply with the charge of the quark flavor for quark photon
+				// splittings
 				if (((apt == parton_type::anti_quark) ||
 					(apt == parton_type::quark)) &&
 					(at == parton_type::photon_))
 				{
 					T const charge = T(pdg_id_to_charge_times_three(
 						parton_to_pdg_id(ap))) / T(3.0);
-					q2 = charge * charge;
+
+					ab.a[apt][at] *= charge * charge;
+					ab.b[apt][at] *= charge * charge;
 				}
 
-				pdf[a] += pdfb[ap] * q2 * ab.a[apt][at] * (T(1.0)-eta) / xprime;
-				pdf[a] += pdfa[ap] * q2 * ab.b[apt][at];
+				pdf[a] += pdfb[ap] * ab.a[apt][at] * (T(1.0) - eta) / xprime;
+				pdf[a] += pdfa[ap] * ab.b[apt][at];
 			}
 		}
 
@@ -465,6 +475,7 @@ private:
 	std::vector<ab_terms<T>> ab_pos_;
 	std::vector<T> terms2_;
 	T alphas_power_;
+	parton_set pdf_parton_list_;
 };
 
 template <class T, class M, class S, class C, class R, class P, class U,
