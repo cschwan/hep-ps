@@ -23,7 +23,6 @@ sources = [
 	'cofferaa_interfaces.hpp',
 	'cofferaa_phase_space_generator.cpp',
 	'cs_subtraction.cpp',
-	'diagram.cpp',
 	'dipole.cpp',
 	'dipole_veto.cpp',
 	'find_hep_ps.cpp',
@@ -33,11 +32,9 @@ sources = [
 	'hadron_hadron_psg_adapter.hpp',
 	'initial_state.cpp',
 	'insertion_term.cpp',
-	'inv_idx.cpp',
 	'kaellen.cpp',
 	'list_phase_space_generator.cpp',
 	'lusifer_constants.cpp',
-	'lusifer_diagram_generator.cpp',
 	'lusifer_extra.f90',
 	'lusifer_interfaces.hpp',
 	'lusifer_phase_space_generator.cpp',
@@ -55,14 +52,11 @@ sources = [
 	'phase_space_generator.cpp',
 	'phase_space_point.cpp',
 	'phase_space_tools.cpp',
-	'propagator.cpp',
 	'rambo_phase_space_generator.cpp',
 	'static_scale_function.cpp',
 	'suppress_banners.cpp',
-	'tensor_decompose.cpp',
 	'trivial_cutter.cpp',
-	'trivial_recombiner.cpp',
-	'vertex.cpp'
+	'trivial_recombiner.cpp'
 ]
 
 deps += dependency('gsl')

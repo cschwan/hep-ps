@@ -20,7 +20,6 @@ programs = [
 	'test_initial_state',
 	'test_insertion_term',
 	'test_list_phase_space_generator',
-	'test_lusifer_diagram_generator',
 	'test_lusifer_phase_space_generator',
 	'test_lusifer_phase_space_generator2',
 	'test_lusifer_phase_space_generator3',
@@ -31,7 +30,6 @@ programs = [
 	'test_phase_space_quality',
 	'test_rambo_phase_space_generator',
 	'test_real_integrand',
-	'test_tensor_decompose',
 	'test_trivial_cutter_and_recombiner'
 ]
 

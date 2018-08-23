@@ -2,7 +2,6 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/parton_type.hpp"
 #include "hep/ps/phase_space_point.hpp"
-#include "hep/ps/tensor_decompose.hpp"
 
 #include <gsl/gsl_sf_dilog.h>
 

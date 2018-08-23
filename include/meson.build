@@ -11,7 +11,6 @@ headers1 = [
 	'hep/ps/cs_subtraction.hpp',
 	'hep/ps/coupling_order.hpp',
 	'hep/ps/cut_result.hpp',
-	'hep/ps/diagram.hpp',
 	'hep/ps/dipole.hpp',
 	'hep/ps/dipole_invariants.hpp',
 	'hep/ps/dipole_type.hpp',
@@ -26,14 +25,11 @@ headers1 = [
 	'hep/ps/generate_dipole.hpp',
 	'hep/ps/initial_state.hpp',
 	'hep/ps/insertion_term.hpp',
-	'hep/ps/insertion_term_mode.hpp',
 	'hep/ps/insertion_term_type.hpp',
-	'hep/ps/inv_idx.hpp',
 	'hep/ps/kaellen.hpp',
 	'hep/ps/list_phase_space_generator.hpp',
 	'hep/ps/luminosity_info.hpp',
 	'hep/ps/lusifer_constants.hpp',
-	'hep/ps/lusifer_diagram_generator.hpp',
 	'hep/ps/lusifer_phase_space_generator.hpp',
 	'hep/ps/neg_pos_results.hpp',
 	'hep/ps/non_zero_dipole.hpp',
@@ -56,7 +52,6 @@ headers1 = [
 	'hep/ps/phase_space_point.hpp',
 	'hep/ps/phase_space_tools.hpp',
 	'hep/ps/photon_dipole_selector.hpp',
-	'hep/ps/propagator.hpp',
 	'hep/ps/ps_integrand.hpp',
 	'hep/ps/rambo_phase_space_generator.hpp',
 	'hep/ps/real_integrand.hpp',
@@ -68,11 +63,9 @@ headers1 = [
 	'hep/ps/spin_correlation_matrix.hpp',
 	'hep/ps/static_scale_function.hpp',
 	'hep/ps/suppress_banners.hpp',
-	'hep/ps/tensor_decompose.hpp',
 	'hep/ps/trivial_cutter.hpp',
 	'hep/ps/trivial_distributions.hpp',
-	'hep/ps/trivial_recombiner.hpp',
-	'hep/ps/vertex.hpp',
+	'hep/ps/trivial_recombiner.hpp'
 ]
 
 headers2 = [
