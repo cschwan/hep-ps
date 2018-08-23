@@ -5,7 +5,7 @@
 
 #include <catch.hpp>
 
-TEST_CASE("test electroweak two jet production")
+TEST_CASE("test d d -> d d a")
 {
 	std::vector<hep::dipole> dipoles;
 
@@ -151,6 +151,147 @@ TEST_CASE("test electroweak two jet production")
 		hep::dipole{2, 4, 0, f, b, f, qcd}, {2, 4, 1, f, b, f, qcd},
 		hep::dipole{2, 4, 3, f, b, f, qcd}, {3, 4, 0, f, b, f, qcd},
 		hep::dipole{3, 4, 1, f, b, f, qcd}, {3, 4, 2, f, b, f, qcd}
+	};
+
+	REQUIRE( dipoles.size() == 36 );
+
+	for (auto const& dipole : dipoles)
+	{
+		auto const& result = hep::generate_dipole(process, order, dipole);
+
+		CHECK_THAT( result , Catch::Equals(std::vector<int>{}) );
+	}
+}
+
+TEST_CASE("test d~ d -> d d~ g")
+{
+	std::vector<hep::dipole> dipoles;
+
+	// d~ d -> d d~ g
+	std::vector<int> process = { -1, 1, 1, -1, 21 };
+
+	// strong production at O(as^3)
+	auto order = hep::coupling_order(0, 3);
+
+	constexpr auto f = hep::particle_type::fermion;
+	constexpr auto b = hep::particle_type::boson;
+	constexpr auto ew = hep::correction_type::ew;
+	constexpr auto qcd = hep::correction_type::qcd;
+
+	// all twelve dipoles where the gluon is unresolved
+	dipoles = {
+		hep::dipole{0, 4, 1, f, b, f, qcd}, hep::dipole{0, 4, 2, f, b, f, qcd},
+		hep::dipole{0, 4, 3, f, b, f, qcd}, hep::dipole{1, 4, 0, f, b, f, qcd},
+		hep::dipole{1, 4, 2, f, b, f, qcd}, hep::dipole{1, 4, 3, f, b, f, qcd},
+		hep::dipole{2, 4, 0, f, b, f, qcd}, hep::dipole{2, 4, 1, f, b, f, qcd},
+		hep::dipole{2, 4, 3, f, b, f, qcd}, hep::dipole{3, 4, 0, f, b, f, qcd},
+		hep::dipole{3, 4, 1, f, b, f, qcd}, hep::dipole{3, 4, 2, f, b, f, qcd}
+	};
+
+	REQUIRE( dipoles.size() == 12 );
+
+	for (auto const& dipole : dipoles)
+	{
+		CHECK_THAT( hep::generate_dipole(process, order, dipole) ,
+			Catch::Equals(std::vector<int>{-1, 1, 1, -1}) );
+	}
+
+	// non-existant dipoles
+	dipoles = {
+		hep::dipole{0, 2, 1, f, f, f, qcd},
+		hep::dipole{0, 2, 3, f, f, f, qcd},
+		hep::dipole{0, 2, 4, f, f, b, qcd},
+		hep::dipole{1, 3, 0, f, f, f, qcd},
+		hep::dipole{1, 3, 2, f, f, f, qcd},
+		hep::dipole{1, 3, 4, f, f, b, qcd}
+	};
+
+	REQUIRE( dipoles.size() == 6 );
+
+	for (auto const& dipole : dipoles)
+	{
+		CHECK_THAT( hep::generate_dipole(process, order, dipole) ,
+			Catch::Equals(std::vector<int>{}) );
+	}
+
+	dipoles = {
+		hep::dipole{1, 2, 0, f, f, f, qcd},
+		hep::dipole{1, 2, 3, f, f, f, qcd},
+		hep::dipole{1, 2, 4, f, f, b, qcd}
+	};
+
+	REQUIRE( dipoles.size() == 3 );
+
+	for (auto const& dipole : dipoles)
+	{
+		CHECK_THAT( hep::generate_dipole(process, order, dipole) ,
+			Catch::Equals(std::vector<int>{-1, 21, -1, 21}) );
+	}
+
+	dipoles = {
+		hep::dipole{0, 3, 1, f, f, f, qcd},
+		hep::dipole{0, 3, 2, f, f, f, qcd},
+		hep::dipole{0, 3, 4, f, f, b, qcd}
+	};
+
+	REQUIRE( dipoles.size() == 3 );
+
+	for (auto const& dipole : dipoles)
+	{
+		CHECK_THAT( hep::generate_dipole(process, order, dipole) ,
+			Catch::Equals(std::vector<int>{21, 1, 1, 21}) );
+	}
+
+	dipoles = {
+		hep::dipole{2, 3, 0, f, f, f, qcd}, hep::dipole{2, 3, 1, f, f, f, qcd},
+		hep::dipole{2, 3, 4, f, f, b, qcd}
+	};
+
+	REQUIRE( dipoles.size() == 3 );
+
+	for (auto const& dipole : dipoles)
+	{
+		CHECK_THAT( hep::generate_dipole(process, order, dipole) ,
+			Catch::Equals(std::vector<int>{-1, 1, 21, 21}) );
+	}
+
+	// non-existent dipoles
+	dipoles = {
+		hep::dipole{3, 2, 0, f, f, f, qcd}, hep::dipole{3, 2, 1, f, f, f, qcd},
+		hep::dipole{3, 2, 4, f, f, b, qcd}, hep::dipole{4, 2, 0, b, f, f, qcd},
+		hep::dipole{4, 2, 1, b, f, f, qcd}, hep::dipole{4, 2, 3, b, f, f, qcd},
+		hep::dipole{4, 3, 0, b, f, f, qcd}, hep::dipole{4, 3, 1, b, f, f, qcd},
+		hep::dipole{4, 3, 2, b, f, f, qcd}
+	};
+
+	REQUIRE( dipoles.size() == 9 );
+
+	for (auto const& dipole : dipoles)
+	{
+		CHECK_THAT( hep::generate_dipole(process, order, dipole) ,
+			Catch::Equals(std::vector<int>{}) );
+	}
+
+	// there are no EW dipoles at this order
+	dipoles = {
+		hep::dipole{0, 2, 1, f, f, f, ew}, {0, 2, 3, f, f, f, ew},
+		hep::dipole{0, 2, 4, f, f, b, ew}, {1, 2, 0, f, f, f, ew},
+		hep::dipole{1, 2, 3, f, f, f, ew}, {1, 2, 4, f, f, b, ew},
+		hep::dipole{3, 2, 0, f, f, f, ew}, {3, 2, 1, f, f, f, ew},
+		hep::dipole{3, 2, 4, f, f, b, ew}, {4, 2, 0, b, f, f, ew},
+		hep::dipole{4, 2, 1, b, f, f, ew}, {4, 2, 3, b, f, f, ew},
+		hep::dipole{0, 3, 1, f, f, f, ew}, {0, 3, 2, f, f, f, ew},
+		hep::dipole{0, 3, 4, f, f, b, ew}, {1, 3, 0, f, f, f, ew},
+		hep::dipole{1, 3, 2, f, f, f, ew}, {1, 3, 4, f, f, b, ew},
+		hep::dipole{2, 3, 0, f, f, f, ew}, {2, 3, 1, f, f, f, ew},
+		hep::dipole{2, 3, 4, f, f, b, ew}, {4, 3, 0, b, f, f, ew},
+		hep::dipole{4, 3, 1, b, f, f, ew}, {4, 3, 2, b, f, f, ew},
+		hep::dipole{0, 4, 1, f, b, f, ew}, {0, 4, 2, f, b, f, ew},
+		hep::dipole{0, 4, 3, f, b, f, ew}, {1, 4, 0, f, b, f, ew},
+		hep::dipole{1, 4, 2, f, f, f, ew}, {1, 4, 3, f, b, f, ew},
+		hep::dipole{2, 4, 0, f, b, f, ew}, {2, 4, 1, f, b, f, ew},
+		hep::dipole{2, 4, 3, f, b, f, ew}, {3, 4, 0, f, b, f, ew},
+		hep::dipole{3, 4, 1, f, b, f, ew}, {3, 4, 2, f, b, f, ew}
 	};
 
 	REQUIRE( dipoles.size() == 36 );

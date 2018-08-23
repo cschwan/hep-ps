@@ -42,7 +42,8 @@ std::vector<int> generate_dipole(
 			assert( false );
 		}
 		// photon -> fermion + antifermion
-		else if (charged_j && ((id_i + sign * id_j) == 0))
+		else if (charged_j && ((id_i + sign * id_j) == 0) &&
+			((i < 2) || (id_i > 0)))
 		{
 			result = process_pdg_ids;
 			result.at(i) = hep::pdg_id_of_photon();
@@ -60,15 +61,15 @@ std::vector<int> generate_dipole(
 				result = process_pdg_ids;
 				result.erase(result.begin() + j);
 			}
-			// fermion -> gluon + fermion
+			// quark -> gluon + quark
 			else if (hep::pdg_id_is_gluon(id_i) && (i < 2))
 			{
 				result = process_pdg_ids;
 				result.at(i) = process_pdg_ids.at(j) * sign;
 				result.erase(result.begin() + j);
 			}
-			// gluon -> fermion + antifermion
-			else if ((id_i + sign * id_j) == 0)
+			// gluon -> quark + antiquark
+			else if ((((id_i + sign * id_j) == 0) && ((i < 2) || (id_i > 0))))
 			{
 				result = process_pdg_ids;
 				result.at(i) = hep::pdg_id_of_gluon();
