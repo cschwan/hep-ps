@@ -27,17 +27,17 @@ namespace hep
 /// Enumeration listing the possible objects in a detector.
 enum class recombined_state : std::size_t
 {
-	/// Charged leptons that are possibly recombined with photons.
-	dressed_lepton,
+    /// Charged leptons that are possibly recombined with photons.
+    dressed_lepton,
 
-	/// Quarks or Gluons or recombinations thereof that form a jet.
-	jet,
+    /// Quarks or Gluons or recombinations thereof that form a jet.
+    jet,
 
-	/// An isolated photon.
-	isolated_photon,
+    /// An isolated photon.
+    isolated_photon,
 
-	/// Momenta of particle that are not detectable.
-	missing_momentum
+    /// Momenta of particle that are not detectable.
+    missing_momentum
 };
 
 }

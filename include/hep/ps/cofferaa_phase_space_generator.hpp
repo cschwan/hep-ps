@@ -36,25 +36,25 @@ namespace hep
 /// \mathrm{Coffer}\gamma\gamma \f$, see \cite Bredenstein:2005zk .
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
-	T min_energy,
-	T cmf_energy,
-	std::vector<int> const& process,
-	lusifer_constants<T> const& constants,
-	std::vector<std::tuple<int, int, int>> const& dipoles
-		= std::vector<std::tuple<int, int, int>>{},
-	std::size_t extra_random_numbers = 0
+    T min_energy,
+    T cmf_energy,
+    std::vector<int> const& process,
+    lusifer_constants<T> const& constants,
+    std::vector<std::tuple<int, int, int>> const& dipoles
+        = std::vector<std::tuple<int, int, int>>{},
+    std::size_t extra_random_numbers = 0
 );
 
 template <typename T>
 std::unique_ptr<phase_space_generator<T>>
 make_minimal_cofferaa_phase_space_generator(
-	T min_energy,
-	T cmf_energy,
-	std::vector<int> const& process,
-	lusifer_constants<T> const& constants,
-	std::vector<std::tuple<int, int, int>> const& dipoles
-		= std::vector<std::tuple<int, int, int>>{},
-	std::size_t extra_random_numbers = 0
+    T min_energy,
+    T cmf_energy,
+    std::vector<int> const& process,
+    lusifer_constants<T> const& constants,
+    std::vector<std::tuple<int, int, int>> const& dipoles
+        = std::vector<std::tuple<int, int, int>>{},
+    std::size_t extra_random_numbers = 0
 );
 
 }

@@ -25,25 +25,25 @@ namespace hep
 /// Enumeration for the finite insertion term types.
 enum class insertion_term_type
 {
-	/// Marks an finite insertion term that is proportional to the Born matrix
-	/// element.
-	born,
+    /// Marks an finite insertion term that is proportional to the Born matrix
+    /// element.
+    born,
 
-	/// Marks an initial-initial (II) finite insertion term, i.e. a term with an
-	/// initial state emitter and an initial state spectator.
-	initial_initial,
+    /// Marks an initial-initial (II) finite insertion term, i.e. a term with an
+    /// initial state emitter and an initial state spectator.
+    initial_initial,
 
-	/// Marks an initial-final (IF) finite insertion term, i.e. a term with an
-	/// initial state emitter and a final state spectator.
-	initial_final,
+    /// Marks an initial-final (IF) finite insertion term, i.e. a term with an
+    /// initial state emitter and a final state spectator.
+    initial_final,
 
-	/// Marks a final-initial (FI) finite insertion term, i.e. a term with a
-	/// final state emitter and an initial state spectator.
-	final_initial,
+    /// Marks a final-initial (FI) finite insertion term, i.e. a term with a
+    /// final state emitter and an initial state spectator.
+    final_initial,
 
-	/// Marks a final-final (FF) finite insertion term, i.e. a term with a
-	/// final state emitter and an initial state spectator.
-	final_final
+    /// Marks a final-final (FF) finite insertion term, i.e. a term with a
+    /// final state emitter and an initial state spectator.
+    final_final
 };
 
 }

@@ -67,7 +67,7 @@ bool pdg_id_is_photon(int id);
 
 ///
 std::pair<initial_state, std::vector<final_state>> pdg_ids_to_states(
-	std::vector<int> const& ids
+    std::vector<int> const& ids
 );
 
 /// Returns the symmetry factor corresponding to the final state represented by

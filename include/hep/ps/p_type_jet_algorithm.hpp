@@ -34,27 +34,27 @@ template <typename T>
 class p_type_jet_algorithm
 {
 public:
-	/// Constructor. The choice `p = 1` corresponds to the \f$ k_\mathrm{T}
-	/// \f$-algorithm, `p = 0` to the Cambridge-Aachen algorithm, and `p = -1`
-	/// to the anti-\f$ k_\mathrm{T} \f$ algorithm.
-	p_type_jet_algorithm(T p, T radius);
+    /// Constructor. The choice `p = 1` corresponds to the \f$ k_\mathrm{T}
+    /// \f$-algorithm, `p = 0` to the Cambridge-Aachen algorithm, and `p = -1`
+    /// to the anti-\f$ k_\mathrm{T} \f$ algorithm.
+    p_type_jet_algorithm(T p, T radius);
 
-	/// Uses the E-scheme recombination procedure to recombine `phase_space`
-	/// into `recombined_phase_space`. Only the momenta of the final states are
-	/// used that are either a quark or a gluon.
-	void recombine(
-		std::vector<T> const& phase_space,
-		std::vector<final_state> const& final_states,
-		std::vector<T>& recombined_phase_space,
-		std::vector<recombined_state>& recombined_states
-	);
+    /// Uses the E-scheme recombination procedure to recombine `phase_space`
+    /// into `recombined_phase_space`. Only the momenta of the final states are
+    /// used that are either a quark or a gluon.
+    void recombine(
+        std::vector<T> const& phase_space,
+        std::vector<final_state> const& final_states,
+        std::vector<T>& recombined_phase_space,
+        std::vector<recombined_state>& recombined_states
+    );
 
 private:
-	T p_;
-	T radius2_;
+    T p_;
+    T radius2_;
 
-	std::vector<std::size_t> candidates_;
-	std::vector<T> dib_;
+    std::vector<std::size_t> candidates_;
+    std::vector<T> dib_;
 };
 
 }

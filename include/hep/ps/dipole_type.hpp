@@ -25,21 +25,21 @@ namespace hep
 /// Enumeration for the dipole types.
 enum class dipole_type
 {
-	/// Marks an initial-initial (II) dipole, i.e. a dipole with an initial
-	/// state emitter and an initial state spectator.
-	initial_initial,
+    /// Marks an initial-initial (II) dipole, i.e. a dipole with an initial
+    /// state emitter and an initial state spectator.
+    initial_initial,
 
-	/// Marks an initial-final (IF) dipole, i.e. a dipole with an initial state
-	/// emitter and a final state spectator.
-	initial_final,
+    /// Marks an initial-final (IF) dipole, i.e. a dipole with an initial state
+    /// emitter and a final state spectator.
+    initial_final,
 
-	/// Marks a final-initial (FI) dipole, i.e. a dipole with a final state
-	/// emitter and an initial state spectator.
-	final_initial,
+    /// Marks a final-initial (FI) dipole, i.e. a dipole with a final state
+    /// emitter and an initial state spectator.
+    final_initial,
 
-	/// Marks a final-final (FF) dipole, i.e. a dipole with a final state
-	/// emitter and a final state spectator.
-	final_final
+    /// Marks a final-final (FF) dipole, i.e. a dipole with a final state
+    /// emitter and a final state spectator.
+    final_final
 };
 
 }

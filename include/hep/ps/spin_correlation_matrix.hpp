@@ -31,14 +31,14 @@ namespace hep
 template <typename T>
 struct spin_correlation_matrix
 {
-	/// The factor \f$ A \f$.
-	T a;
+    /// The factor \f$ A \f$.
+    T a;
 
-	/// The factor \f$ B \f$.
-	T b;
+    /// The factor \f$ B \f$.
+    T b;
 
-	/// The vector \f$ p \f$.
-	std::array<T, 4> p;
+    /// The vector \f$ p \f$.
+    std::array<T, 4> p;
 };
 
 }

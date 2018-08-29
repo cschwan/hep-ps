@@ -41,64 +41,64 @@ template <typename T>
 class cs_subtraction
 {
 public:
-	/// Constructor. Sets the number of colors `nc`, the normalization of the
-	/// trace of two generators `tf`, the number of flavors `nf`, the
-	/// factorization scheme `fscheme`, and the regularization scheme `rscheme`.
-	cs_subtraction(
-		T nc,
-		T tf,
-		std::size_t nf,
-		factorization_scheme fscheme,
-		regularization_scheme rscheme
-	);
+    /// Constructor. Sets the number of colors `nc`, the normalization of the
+    /// trace of two generators `tf`, the number of flavors `nf`, the
+    /// factorization scheme `fscheme`, and the regularization scheme `rscheme`.
+    cs_subtraction(
+        T nc,
+        T tf,
+        std::size_t nf,
+        factorization_scheme fscheme,
+        regularization_scheme rscheme
+    );
 
-	/// Maps the `real_phase_space` onto the `born_phase_space` using the maps
-	/// defined for the dipole with `dipole_info`.
-	dipole_invariants<T> map_phase_space(
-		std::vector<T> const& real_phase_space,
-		std::vector<T>& born_phase_space,
-		dipole const& dipole_info
-	);
+    /// Maps the `real_phase_space` onto the `born_phase_space` using the maps
+    /// defined for the dipole with `dipole_info`.
+    dipole_invariants<T> map_phase_space(
+        std::vector<T> const& real_phase_space,
+        std::vector<T>& born_phase_space,
+        dipole const& dipole_info
+    );
 
-	///
-	spin_correlation_matrix<T> boson_function(
-		dipole const& dipole_info,
-		dipole_invariants<T> const& invariants,
-		std::vector<T> const& phase_space
-	);
+    ///
+    spin_correlation_matrix<T> boson_function(
+        dipole const& dipole_info,
+        dipole_invariants<T> const& invariants,
+        std::vector<T> const& phase_space
+    );
 
-	///
-	T fermion_function(
-		dipole const& dipole_info,
-		dipole_invariants<T> const& invariants
-	);
+    ///
+    T fermion_function(
+        dipole const& dipole_info,
+        dipole_invariants<T> const& invariants
+    );
 
-	/// Returns the finite part of the integrated dipoles together with the
-	/// collinear counterterm.
-	void insertion_terms(
-		insertion_term const& term,
-		std::vector<scales<T>> const& scales,
-		std::vector<T> const& phase_space,
-		T x,
-		T eta,
-		std::vector<ab_terms<T>>& results
-	) const;
+    /// Returns the finite part of the integrated dipoles together with the
+    /// collinear counterterm.
+    void insertion_terms(
+        insertion_term const& term,
+        std::vector<scales<T>> const& scales,
+        std::vector<T> const& phase_space,
+        T x,
+        T eta,
+        std::vector<ab_terms<T>>& results
+    ) const;
 
-	/// Returns the finite part of the integrated dipoles not covered by the
-	/// function \ref insertion_terms.
-	void insertion_terms2(
-		insertion_term const& term,
-		std::vector<scales<T>> const& scales,
-		std::vector<T> const& phase_space,
-		std::vector<T>& results
-	) const;
+    /// Returns the finite part of the integrated dipoles not covered by the
+    /// function \ref insertion_terms.
+    void insertion_terms2(
+        insertion_term const& term,
+        std::vector<scales<T>> const& scales,
+        std::vector<T> const& phase_space,
+        std::vector<T>& results
+    ) const;
 
 private:
-	T nc_;
-	T tf_;
-	std::size_t nf_;
-	factorization_scheme fscheme_;
-	regularization_scheme rscheme_;
+    T nc_;
+    T tf_;
+    std::size_t nf_;
+    factorization_scheme fscheme_;
+    regularization_scheme rscheme_;
 };
 
 }

@@ -27,17 +27,17 @@ namespace hep
 /// Enumeration used to distinguish the final states of matrix elements.
 enum class final_state : std::size_t
 {
-	/// Charged leptons.
-	charged_lepton,
+    /// Charged leptons.
+    charged_lepton,
 
-	/// Quarks or Gluons.
-	quark_gluon,
+    /// Quarks or Gluons.
+    quark_gluon,
 
-	/// Photons.
-	photon,
+    /// Photons.
+    photon,
 
-	/// Neutrinos.
-	neutrino
+    /// Neutrinos.
+    neutrino
 };
 
 }

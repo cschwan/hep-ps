@@ -39,38 +39,38 @@ template <typename T>
 class ol_integrated_mes
 {
 public:
-	ol_integrated_mes(
-		std::vector<std::string> const& real_processes,
-		std::vector<final_state> const& dipole_final_states,
-		coupling_order order,
-		dipole_veto const& veto = default_dipole_veto(),
-		photon_dipole_selector const& selector =
-			default_photon_dipole_selector()
-	);
+    ol_integrated_mes(
+        std::vector<std::string> const& real_processes,
+        std::vector<final_state> const& dipole_final_states,
+        coupling_order order,
+        dipole_veto const& veto = default_dipole_veto(),
+        photon_dipole_selector const& selector =
+            default_photon_dipole_selector()
+    );
 
-	void alphas(T alphas);
+    void alphas(T alphas);
 
-	std::size_t alphas_power() const;
+    std::size_t alphas_power() const;
 
-	void correlated_me(
-		std::vector<T> const& phase_space,
-		initial_state_set set,
-		std::vector<initial_state_map<T>>& results
-	);
+    void correlated_me(
+        std::vector<T> const& phase_space,
+        initial_state_set set,
+        std::vector<initial_state_map<T>>& results
+    );
 
-	std::vector<final_state> const& final_states() const;
+    std::vector<final_state> const& final_states() const;
 
-	std::vector<insertion_term> const& insertion_terms() const;
+    std::vector<insertion_term> const& insertion_terms() const;
 
 private:
-	std::size_t alphas_power_;
-	std::vector<std::vector<T>> charge_table_;
-	std::unordered_multimap<insertion_term, std::tuple<initial_state, int,
-		std::size_t>> mes_;
-	std::vector<insertion_term> dipoles_;
-	std::vector<final_state> final_states_;
-	std::vector<double> ol_m2_;
-	std::vector<double> ol_phase_space_;
+    std::size_t alphas_power_;
+    std::vector<std::vector<T>> charge_table_;
+    std::unordered_multimap<insertion_term, std::tuple<initial_state, int,
+        std::size_t>> mes_;
+    std::vector<insertion_term> dipoles_;
+    std::vector<final_state> final_states_;
+    std::vector<double> ol_m2_;
+    std::vector<double> ol_phase_space_;
 };
 
 }

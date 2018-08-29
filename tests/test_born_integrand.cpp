@@ -30,272 +30,272 @@ template <typename T>
 class test_born_class
 {
 public:
-	test_born_class(
-		std::size_t alphas_power,
-		T alphas,
-		bool dynamic_scale
-	)
-		: alphas_power_{alphas_power}
-		, alphas_{alphas}
-		, dynamic_scale_{dynamic_scale}
-	{
-	}
+    test_born_class(
+        std::size_t alphas_power,
+        T alphas,
+        bool dynamic_scale
+    )
+        : alphas_power_{alphas_power}
+        , alphas_{alphas}
+        , dynamic_scale_{dynamic_scale}
+    {
+    }
 
-	// DISTRIBUTION MEMBER FUNCTIONS
+    // DISTRIBUTION MEMBER FUNCTIONS
 
-	template <typename I>
-	void operator()(
-		std::vector<T> const& /*phase_space*/,
-		T /*rapidity_shift*/,
-		hep::cut_result_with_info<I> const& /*cut_result*/,
-		std::vector<hep::neg_pos_results<T>> const& results,
-		std::vector<hep::neg_pos_results<T>> const& pdf_results,
-		hep::projector<T>&
-	) {
-		using std::pow;
+    template <typename I>
+    void operator()(
+        std::vector<T> const& /*phase_space*/,
+        T /*rapidity_shift*/,
+        hep::cut_result_with_info<I> const& /*cut_result*/,
+        std::vector<hep::neg_pos_results<T>> const& results,
+        std::vector<hep::neg_pos_results<T>> const& pdf_results,
+        hep::projector<T>&
+    ) {
+        using std::pow;
 
-		CHECK( results.size() == global_scales.size() );
+        CHECK( results.size() == global_scales.size() );
 
-		std::vector<T> alphas;
-		eval_alphas(global_scales, alphas);
+        std::vector<T> alphas;
+        eval_alphas(global_scales, alphas);
 
-		for (std::size_t i = 0; i != results.size(); ++i)
-		{
-			T const muf = global_scales.at(i).factorization();
-			T const mur = global_scales.at(i).renormalization();
-			T const couplings = pow(alphas.at(i), T(alphas_power_));
-			T const pdfa = muf;
-			T const pdfb = muf;
-			T const born = couplings;
-			T const born_scale = couplings * mur;
+        for (std::size_t i = 0; i != results.size(); ++i)
+        {
+            T const muf = global_scales.at(i).factorization();
+            T const mur = global_scales.at(i).renormalization();
+            T const couplings = pow(alphas.at(i), T(alphas_power_));
+            T const pdfa = muf;
+            T const pdfb = muf;
+            T const born = couplings;
+            T const born_scale = couplings * mur;
 
-			T const ref_result = pdfa * pdfb * (born + born_scale);
+            T const ref_result = pdfa * pdfb * (born + born_scale);
 
-			CHECK( results.at(i).neg == ref_result );
-			CHECK( results.at(i).pos == ref_result );
-		}
+            CHECK( results.at(i).neg == ref_result );
+            CHECK( results.at(i).pos == ref_result );
+        }
 
-		for (std::size_t i = 0; i != pdf_results.size(); ++i)
-		{
-			T const muf = global_scales.front().factorization();
-			T const mur = global_scales.front().renormalization();
-			T const couplings = pow(alphas.front(), T(alphas_power_));
-			T const pdfa = T(i+1) * muf;
-			T const pdfb = T(i+1) * muf;
-			T const born = couplings;
-			T const born_scale = couplings * mur;
+        for (std::size_t i = 0; i != pdf_results.size(); ++i)
+        {
+            T const muf = global_scales.front().factorization();
+            T const mur = global_scales.front().renormalization();
+            T const couplings = pow(alphas.front(), T(alphas_power_));
+            T const pdfa = T(i+1) * muf;
+            T const pdfb = T(i+1) * muf;
+            T const born = couplings;
+            T const born_scale = couplings * mur;
 
-			T const ref_result = pdfa * pdfb * (born + born_scale);
+            T const ref_result = pdfa * pdfb * (born + born_scale);
 
-			CHECK( pdf_results.at(i).neg == ref_result );
-			CHECK( pdf_results.at(i).pos == ref_result );
-		}
-	}
+            CHECK( pdf_results.at(i).neg == ref_result );
+            CHECK( pdf_results.at(i).pos == ref_result );
+        }
+    }
 
-	// MATRIX ELEMENT MEMBER FUNCTIONS
+    // MATRIX ELEMENT MEMBER FUNCTIONS
 
-	void borns(
-		std::vector<T> const&,
-		hep::initial_state_set set,
-		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::initial_state_map<T>>& results
-	) const {
-		using std::pow;
+    void borns(
+        std::vector<T> const&,
+        hep::initial_state_set set,
+        std::vector<hep::scales<T>> const& scales,
+        std::vector<hep::initial_state_map<T>>& results
+    ) const {
+        using std::pow;
 
-		for (std::size_t i = 0; i != scales.size(); ++i)
-		{
-			T const mur = scales.at(i).renormalization();
+        for (std::size_t i = 0; i != scales.size(); ++i)
+        {
+            T const mur = scales.at(i).renormalization();
 
-			for (auto const state : set)
-			{
-				results.at(i).emplace_back(state, pow(alphas_,
-					T(alphas_power_)) * (T(1.0) + mur));
-			}
-		}
-	}
+            for (auto const state : set)
+            {
+                results.at(i).emplace_back(state, pow(alphas_,
+                    T(alphas_power_)) * (T(1.0) + mur));
+            }
+        }
+    }
 
-	void alphas(T alphas)
-	{
-		if (!dynamic_scale_)
-		{
-			CHECK( alphas_ == alphas );
-		}
-	}
+    void alphas(T alphas)
+    {
+        if (!dynamic_scale_)
+        {
+            CHECK( alphas_ == alphas );
+        }
+    }
 
-	std::size_t alphas_power() const
-	{
-		return alphas_power_;
-	}
+    std::size_t alphas_power() const
+    {
+        return alphas_power_;
+    }
 
-	std::vector<hep::final_state> final_states() const
-	{
-		return {};
-	}
+    std::vector<hep::final_state> final_states() const
+    {
+        return {};
+    }
 
-	// SCALE SETTER MEMBER FUNCTIONS
+    // SCALE SETTER MEMBER FUNCTIONS
 
-	void operator()(
-		std::vector<T> const&,
-		std::vector<hep::scales<T>>& scales
-	) {
-		if (dynamic_scale_)
-		{
-			for (auto& scale : global_scales)
-			{
-				T const muf = T(2.0) * scale.factorization();
-				T const mu = scale.regularization();
-				T const mur = T(2.0) * scale.renormalization();
+    void operator()(
+        std::vector<T> const&,
+        std::vector<hep::scales<T>>& scales
+    ) {
+        if (dynamic_scale_)
+        {
+            for (auto& scale : global_scales)
+            {
+                T const muf = T(2.0) * scale.factorization();
+                T const mu = scale.regularization();
+                T const mur = T(2.0) * scale.renormalization();
 
-				scale = hep::scales<T>{muf, mu, mur};
-			}
-		}
+                scale = hep::scales<T>{muf, mu, mur};
+            }
+        }
 
-		scales.assign(global_scales.begin(), global_scales.end());
-	}
+        scales.assign(global_scales.begin(), global_scales.end());
+    }
 
-	bool dynamic() const
-	{
-		return dynamic_scale_;
-	}
+    bool dynamic() const
+    {
+        return dynamic_scale_;
+    }
 
-	// PDF MEMBER FUNCTIONS
+    // PDF MEMBER FUNCTIONS
 
-	void eval_alphas(
-		std::vector<hep::scales<T>> const& scales,
-		std::vector<T>& alphas
-	) {
-		CHECK( scales.size() == global_scales.size() );
+    void eval_alphas(
+        std::vector<hep::scales<T>> const& scales,
+        std::vector<T>& alphas
+    ) {
+        CHECK( scales.size() == global_scales.size() );
 
-		for (std::size_t i = 0; i != scales.size(); ++i)
-		{
-			CHECK( scales.at(i).factorization() ==
-				global_scales.at(i).factorization() );
-			CHECK( scales.at(i).renormalization() ==
-				global_scales.at(i).renormalization() );
+        for (std::size_t i = 0; i != scales.size(); ++i)
+        {
+            CHECK( scales.at(i).factorization() ==
+                global_scales.at(i).factorization() );
+            CHECK( scales.at(i).renormalization() ==
+                global_scales.at(i).renormalization() );
 
-			alphas.push_back(alphas_ * scales.at(i).renormalization() /
-				global_scales.front().renormalization());
-		}
-	}
+            alphas.push_back(alphas_ * scales.at(i).renormalization() /
+                global_scales.front().renormalization());
+        }
+    }
 
-	std::size_t count() const
-	{
-		return 10;
-	}
+    std::size_t count() const
+    {
+        return 10;
+    }
 
-	void eval(
-		T x,
-		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::parton_array<T>>& scale_pdfs,
-		std::vector<hep::parton_array<T>>& uncertainty_pdfs
-	) {
-		CHECK( x >= T{} );
-		CHECK( x < T(1.0) );
-		CHECK( scales.size() == global_scales.size() );
+    void eval(
+        T x,
+        std::vector<hep::scales<T>> const& scales,
+        std::vector<hep::parton_array<T>>& scale_pdfs,
+        std::vector<hep::parton_array<T>>& uncertainty_pdfs
+    ) {
+        CHECK( x >= T{} );
+        CHECK( x < T(1.0) );
+        CHECK( scales.size() == global_scales.size() );
 
-		scale_pdfs.clear();
-		uncertainty_pdfs.clear();
-		scale_pdfs.resize(scales.size());
-		uncertainty_pdfs.resize(count());
+        scale_pdfs.clear();
+        uncertainty_pdfs.clear();
+        scale_pdfs.resize(scales.size());
+        uncertainty_pdfs.resize(count());
 
-		for (std::size_t i = 0; i != scales.size(); ++i)
-		{
-			for (auto const parton : hep::parton_list())
-			{
-				scale_pdfs.at(i)[parton] = scales.at(i).factorization();
-			}
-		}
+        for (std::size_t i = 0; i != scales.size(); ++i)
+        {
+            for (auto const parton : hep::parton_list())
+            {
+                scale_pdfs.at(i)[parton] = scales.at(i).factorization();
+            }
+        }
 
-		for (std::size_t i = 0; i != count(); ++i)
-		{
-			for (auto const parton : hep::parton_list())
-			{
-				uncertainty_pdfs.at(i)[parton] =
-					scales.front().factorization() * T(i+1);
-			}
-		}
-	}
+        for (std::size_t i = 0; i != count(); ++i)
+        {
+            for (auto const parton : hep::parton_list())
+            {
+                uncertainty_pdfs.at(i)[parton] =
+                    scales.front().factorization() * T(i+1);
+            }
+        }
+    }
 
-	void register_partons(hep::parton_set)
-	{
-	}
+    void register_partons(hep::parton_set)
+    {
+    }
 
 private:
-	std::size_t alphas_power_;
-	T alphas_;
-	bool dynamic_scale_;
+    std::size_t alphas_power_;
+    T alphas_;
+    bool dynamic_scale_;
 };
 
 void test_born_integrand(
-	hep::initial_state_set set,
-	std::size_t alphas_power,
-	T alphas,
-	bool dynamic_scale
+    hep::initial_state_set set,
+    std::size_t alphas_power,
+    T alphas,
+    bool dynamic_scale
 ) {
-	CAPTURE( alphas_power );
-	CAPTURE( alphas );
-	CAPTURE( dynamic_scale );
+    CAPTURE( alphas_power );
+    CAPTURE( alphas );
+    CAPTURE( dynamic_scale );
 
-	// reset scales
-	global_scales = {
-		hep::scales<T>{         T(10.0), T(10.0),          T(10.0)},
-		hep::scales<T>{T(0.5) * T(10.0), T(10.0),          T(10.0)},
-		hep::scales<T>{         T(10.0), T(10.0), T(0.5) * T(10.0)},
-		hep::scales<T>{T(2.0) * T(10.0), T(10.0),          T(10.0)},
-		hep::scales<T>{         T(10.0), T(10.0), T(2.0) * T(10.0)},
-		hep::scales<T>{T(0.5) * T(10.0), T(10.0), T(0.5) * T(10.0)},
-		hep::scales<T>{T(2.0) * T(10.0), T(10.0), T(2.0) * T(10.0)}
-	};
+    // reset scales
+    global_scales = {
+        hep::scales<T>{         T(10.0), T(10.0),          T(10.0)},
+        hep::scales<T>{T(0.5) * T(10.0), T(10.0),          T(10.0)},
+        hep::scales<T>{         T(10.0), T(10.0), T(0.5) * T(10.0)},
+        hep::scales<T>{T(2.0) * T(10.0), T(10.0),          T(10.0)},
+        hep::scales<T>{         T(10.0), T(10.0), T(2.0) * T(10.0)},
+        hep::scales<T>{T(0.5) * T(10.0), T(10.0), T(0.5) * T(10.0)},
+        hep::scales<T>{T(2.0) * T(10.0), T(10.0), T(2.0) * T(10.0)}
+    };
 
-	// number of final states is not really interesting here
-	test_phase_space_generator<T> generator{2};
-	test_born_class<T> born{alphas_power, alphas, dynamic_scale};
+    // number of final states is not really interesting here
+    test_phase_space_generator<T> generator{2};
+    test_born_class<T> born{alphas_power, alphas, dynamic_scale};
 
-	// born gets copied, therefore `global_scales` must be global
-	auto integrand = hep::make_born_integrand<T>(
-		born,
-		hep::trivial_cutter<T>{},
-		hep::trivial_recombiner<T>{},
-		born,
-		born,
-		born,
-		set,
-		T(1.0)
-	);
+    // born gets copied, therefore `global_scales` must be global
+    auto integrand = hep::make_born_integrand<T>(
+        born,
+        hep::trivial_cutter<T>{},
+        hep::trivial_recombiner<T>{},
+        born,
+        born,
+        born,
+        set,
+        T(1.0)
+    );
 
-	hep::multi_channel(
-		hep::make_multi_channel_integrand<T>(
-			std::ref(*integrand),
-			generator.dimensions(),
-			std::ref(generator),
-			generator.map_dimensions(),
-			generator.channels(),
-			std::vector<hep::distribution_parameters<T>>{}
-		),
-		std::vector<std::size_t>{10}
-	);
+    hep::multi_channel(
+        hep::make_multi_channel_integrand<T>(
+            std::ref(*integrand),
+            generator.dimensions(),
+            std::ref(generator),
+            generator.map_dimensions(),
+            generator.channels(),
+            std::vector<hep::distribution_parameters<T>>{}
+        ),
+        std::vector<std::size_t>{10}
+    );
 }
 
 TEST_CASE("born integrand static scale", "[born_integrand]")
 {
-	// choose an initial state that doesn't have a symmetry factor
-	hep::initial_state_set set{hep::initial_state::cq_uq};
+    // choose an initial state that doesn't have a symmetry factor
+    hep::initial_state_set set{hep::initial_state::cq_uq};
 
-	test_born_integrand(set, 0, T(10.0), false);
-	test_born_integrand(set, 1, T(10.0), false);
-	test_born_integrand(set, 2, T(10.0), false);
-	test_born_integrand(set, 3, T(10.0), false);
-	test_born_integrand(set, 4, T(10.0), false);
+    test_born_integrand(set, 0, T(10.0), false);
+    test_born_integrand(set, 1, T(10.0), false);
+    test_born_integrand(set, 2, T(10.0), false);
+    test_born_integrand(set, 3, T(10.0), false);
+    test_born_integrand(set, 4, T(10.0), false);
 }
 
 TEST_CASE("born integrand dynamic scale", "[born_integrand]")
 {
-	// choose an initial state that doesn't have a symmetry factor
-	hep::initial_state_set set{hep::initial_state::cq_uq};
+    // choose an initial state that doesn't have a symmetry factor
+    hep::initial_state_set set{hep::initial_state::cq_uq};
 
-	test_born_integrand(set, 0, T(10.0), true);
-	test_born_integrand(set, 1, T(10.0), true);
-	test_born_integrand(set, 2, T(10.0), true);
-	test_born_integrand(set, 3, T(10.0), true);
-	test_born_integrand(set, 4, T(10.0), true);
+    test_born_integrand(set, 0, T(10.0), true);
+    test_born_integrand(set, 1, T(10.0), true);
+    test_born_integrand(set, 2, T(10.0), true);
+    test_born_integrand(set, 3, T(10.0), true);
+    test_born_integrand(set, 4, T(10.0), true);
 }

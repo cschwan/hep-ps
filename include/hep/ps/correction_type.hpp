@@ -26,8 +26,8 @@ namespace hep
 
 /// Enumeration used to select the type for corrections.
 HEP_ENUM(correction_type,
-	ew,  /*!< Denotes terms belonging to electroweak corrections. */
-	qcd  /*!< Denotes terms belonging to strong corrections. */
+    ew,  /*!< Denotes terms belonging to electroweak corrections. */
+    qcd  /*!< Denotes terms belonging to strong corrections. */
 );
 
 }

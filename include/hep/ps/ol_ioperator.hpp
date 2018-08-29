@@ -37,35 +37,35 @@ template <typename T>
 class ol_ioperator
 {
 public:
-	///
-	ol_ioperator(
-		std::string const& process,
-		coupling_order const& order,
-		regularization_scheme scheme
-	);
+    ///
+    ol_ioperator(
+        std::string const& process,
+        coupling_order const& order,
+        regularization_scheme scheme
+    );
 
-	///
-	void alphas(T alphas);
+    ///
+    void alphas(T alphas);
 
-	///
-	std::size_t alphas_power() const;
+    ///
+    std::size_t alphas_power() const;
 
-	///
-	void borns(
-		std::vector<T> const& phase_space,
-		initial_state_set set,
-		std::vector<scales<T>> const& scales,
-		std::vector<initial_state_map<T>>& results
-	);
+    ///
+    void borns(
+        std::vector<T> const& phase_space,
+        initial_state_set set,
+        std::vector<scales<T>> const& scales,
+        std::vector<initial_state_map<T>>& results
+    );
 
-	///
-	std::vector<final_state> const& final_states() const;
+    ///
+    std::vector<final_state> const& final_states() const;
 
 private:
-	int id_;
-	coupling_order order_;
-	std::vector<final_state> final_states_;
-	initial_state state_;
+    int id_;
+    coupling_order order_;
+    std::vector<final_state> final_states_;
+    initial_state state_;
 };
 
 }

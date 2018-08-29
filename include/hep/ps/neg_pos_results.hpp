@@ -39,30 +39,30 @@ namespace hep
 template <typename T>
 struct neg_pos_results
 {
-	/// Constructor.
-	neg_pos_results(T neg_result = T(), T pos_result = T())
-		: neg{neg_result}
-		, pos{pos_result}
-	{
-	}
+    /// Constructor.
+    neg_pos_results(T neg_result = T(), T pos_result = T())
+        : neg{neg_result}
+        , pos{pos_result}
+    {
+    }
 
-	/// Result for the negative rapidity.
-	T neg;
+    /// Result for the negative rapidity.
+    T neg;
 
-	/// Result for the positive rapidity.
-	T pos;
+    /// Result for the positive rapidity.
+    T pos;
 };
 
 /// Addition operator. Adds `other` to `result` and returns `result`.
 template <typename T>
 inline neg_pos_results<T>& operator+=(
-	neg_pos_results<T>& result,
-	neg_pos_results<T> const& other
+    neg_pos_results<T>& result,
+    neg_pos_results<T> const& other
 ) {
-	result.neg += other.neg;
-	result.pos += other.pos;
+    result.neg += other.neg;
+    result.pos += other.pos;
 
-	return result;
+    return result;
 }
 
 }

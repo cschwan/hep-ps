@@ -31,60 +31,60 @@ template <typename T>
 class test_phase_space_generator : public hep::phase_space_generator<T>
 {
 public:
-	test_phase_space_generator(
-		std::size_t final_states,
-		std::size_t extra_random_numbers = 0
-	)
-		: final_states_{final_states}
-		, extra_random_numbers_{extra_random_numbers}
-	{
-	}
+    test_phase_space_generator(
+        std::size_t final_states,
+        std::size_t extra_random_numbers = 0
+    )
+        : final_states_{final_states}
+        , extra_random_numbers_{extra_random_numbers}
+    {
+    }
 
-	std::size_t channels() const override
-	{
-		return 1;
-	}
+    std::size_t channels() const override
+    {
+        return 1;
+    }
 
-	T densities(std::vector<T>& densities) override
-	{
-		densities.front() = T(1.0);
+    T densities(std::vector<T>& densities) override
+    {
+        densities.front() = T(1.0);
 
-		return T(1.0);
-	}
+        return T(1.0);
+    }
 
-	std::size_t dimensions() const override
-	{
-		// we don't need random numbers in this generator
-		return 0;
-	}
+    std::size_t dimensions() const override
+    {
+        // we don't need random numbers in this generator
+        return 0;
+    }
 
-	void generate(
-		std::vector<T> const& random_numbers,
-		std::vector<T>& momenta,
-		std::size_t channel
-	) override {
-		REQUIRE( random_numbers.size() == 0 );
-		REQUIRE( momenta.size() == map_dimensions() );
-		REQUIRE( channel == 0 );
+    void generate(
+        std::vector<T> const& random_numbers,
+        std::vector<T>& momenta,
+        std::size_t channel
+    ) override {
+        REQUIRE( random_numbers.size() == 0 );
+        REQUIRE( momenta.size() == map_dimensions() );
+        REQUIRE( channel == 0 );
 
-		// fill with zeros
-		momenta.assign(map_dimensions(), T{});
-	}
+        // fill with zeros
+        momenta.assign(map_dimensions(), T{});
+    }
 
-	hep::luminosity_info<T> info() const override
-	{
-		// energy^2 is `0.5` to cancel the factor `2` in the integrands
-		return { T{0.5}, T{0.5}, T{0.5}, T{} };
-	}
+    hep::luminosity_info<T> info() const override
+    {
+        // energy^2 is `0.5` to cancel the factor `2` in the integrands
+        return { T{0.5}, T{0.5}, T{0.5}, T{} };
+    }
 
-	std::size_t map_dimensions() const override
-	{
-		return 4 * (final_states_ + 2) + extra_random_numbers_;
-	}
+    std::size_t map_dimensions() const override
+    {
+        return 4 * (final_states_ + 2) + extra_random_numbers_;
+    }
 
 private:
-	std::size_t final_states_;
-	std::size_t extra_random_numbers_;
+    std::size_t final_states_;
+    std::size_t extra_random_numbers_;
 };
 
 #endif

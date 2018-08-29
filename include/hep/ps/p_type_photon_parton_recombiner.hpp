@@ -33,27 +33,27 @@ template <typename T>
 class p_type_photon_parton_recombiner
 {
 public:
-	///
-	p_type_photon_parton_recombiner(T p, T photon_radius, T parton_radius);
+    ///
+    p_type_photon_parton_recombiner(T p, T photon_radius, T parton_radius);
 
-	///
-	void recombine(
-		std::vector<T> const& phase_space,
-		std::vector<final_state> const& final_states,
-		std::vector<T>& recombined_phase_space,
-		std::vector<recombined_state>& recombined_states
-	);
+    ///
+    void recombine(
+        std::vector<T> const& phase_space,
+        std::vector<final_state> const& final_states,
+        std::vector<T>& recombined_phase_space,
+        std::vector<recombined_state>& recombined_states
+    );
 
 private:
-	T p_;
-	T photon_radius2_;
+    T p_;
+    T photon_radius2_;
 
-	std::vector<std::size_t> photons_;
-	std::vector<std::size_t> fermions_;
-	std::vector<T> dib_photons_;
-	std::vector<T> dib_fermions_;
+    std::vector<std::size_t> photons_;
+    std::vector<std::size_t> fermions_;
+    std::vector<T> dib_photons_;
+    std::vector<T> dib_fermions_;
 
-	p_type_jet_algorithm<T> jet_algorithm_;
+    p_type_jet_algorithm<T> jet_algorithm_;
 };
 
 }

@@ -29,107 +29,107 @@ namespace hep
 class ol_interface
 {
 public:
-	/// Returns the singleton instance.
-	static ol_interface& instance();
+    /// Returns the singleton instance.
+    static ol_interface& instance();
 
-	/// Returns `true` if this library was compiled against OpenLoops. Otherwise
-	/// this function returns `false` and the member functions of this class
-	/// won't work.
-	static bool enabled();
+    /// Returns `true` if this library was compiled against OpenLoops. Otherwise
+    /// this function returns `false` and the member functions of this class
+    /// won't work.
+    static bool enabled();
 
-	/// Destructor.
-	~ol_interface();
+    /// Destructor.
+    ~ol_interface();
 
-	/// Set integer parameter.
-	void setparameter_int(char const* param, int val);
+    /// Set integer parameter.
+    void setparameter_int(char const* param, int val);
 
-	/// Set double parameter.
-	void setparameter_double(char const* param, double val);
+    /// Set double parameter.
+    void setparameter_double(char const* param, double val);
 
-	/// Set string parameter.
-	void setparameter_string(char const* param, char* val);
+    /// Set string parameter.
+    void setparameter_string(char const* param, char* val);
 
-	/// Return the value of an integer parameter.
-	void getparameter_int(char const* param, int* val);
+    /// Return the value of an integer parameter.
+    void getparameter_int(char const* param, int* val);
 
-	/// Return the value of a double parameter.
-	void getparameter_double(char const* param, double* val);
+    /// Return the value of a double parameter.
+    void getparameter_double(char const* param, double* val);
 
-	/// Register a partonic process.
-	int register_process(char const* process, int amptype);
+    /// Register a partonic process.
+    int register_process(char const* process, int amptype);
 
-	/// Query the number of external particle for a given process.
-	int n_external(int id);
+    /// Query the number of external particle for a given process.
+    int n_external(int id);
 
-	/// Evaluate a tree matrix element.
-	void evaluate_tree(int id, double* pp, double* m2tree);
+    /// Evaluate a tree matrix element.
+    void evaluate_tree(int id, double* pp, double* m2tree);
 
-	/// Evaluate a color-correlated matrix element.
-	void evaluate_cc(
-		int id,
-		double* pp,
-		double* m2tree,
-		double* m2cc,
-		double* m2ew
-	);
+    /// Evaluate a color-correlated matrix element.
+    void evaluate_cc(
+        int id,
+        double* pp,
+        double* m2tree,
+        double* m2cc,
+        double* m2ew
+    );
 
-	/// Evaluate a spin-correlated matrix element.
-	void evaluate_sc(
-		int id,
-		double* pp,
-		int emitter,
-		double* polvect,
-		double* m2sc
-	);
+    /// Evaluate a spin-correlated matrix element.
+    void evaluate_sc(
+        int id,
+        double* pp,
+        int emitter,
+        double* polvect,
+        double* m2sc
+    );
 
-	/// Evaluate a loop matrix element.
-	void evaluate_loop(
-		int id,
-		double* pp,
-		double* m2tree,
-		double* m2loop,
-		double* acc
-	);
+    /// Evaluate a loop matrix element.
+    void evaluate_loop(
+        int id,
+        double* pp,
+        double* m2tree,
+        double* m2loop,
+        double* acc
+    );
 
-	/// Evaluate a squared loop matrix element.
-	void evaluate_loop2(int id, double* pp, double* m2loop2, double* acc);
+    /// Evaluate a squared loop matrix element.
+    void evaluate_loop2(int id, double* pp, double* m2loop2, double* acc);
 
-	/// Evaluate counterterms.
-	void evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct);
+    /// Evaluate counterterms.
+    void evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct);
 
-	/// Evaluate everything.
-	void evaluate_full(
-		int id,
-		double* pp,
-		double* m2tree,
-		double* m2loop,
-		double* m2ir1,
-		double* m2loop2,
-		double* m2ir2,
-		double* acc
-	);
+    /// Evaluate everything.
+    void evaluate_full(
+        int id,
+        double* pp,
+        double* m2tree,
+        double* m2loop,
+        double* m2ir1,
+        double* m2loop2,
+        double* m2ir2,
+        double* acc
+    );
 
 private:
-	bool started_;
+    bool started_;
 
-	ol_interface();
+    ol_interface();
 };
 
 ///
 enum class ol_register_mode
 {
-	set_ew_order,
-	set_qcd_order
+    set_ew_order,
+    set_qcd_order
 };
 
 ///
 int register_process_try_hard(
-	ol_interface& ol,
-	char const* process,
-	int amptype,
-	int order_qcd,
-	int order_ew,
-	ol_register_mode& mode
+    ol_interface& ol,
+    char const* process,
+    int amptype,
+    int order_qcd,
+    int order_ew,
+    ol_register_mode& mode
 );
 
 }

@@ -40,65 +40,65 @@ template <typename T>
 class ol_real_matrix_elements
 {
 public:
-	ol_real_matrix_elements(
-		std::vector<std::string> const& real_processes,
-		std::vector<final_state> const& dipole_final_states,
-		coupling_order order,
-		dipole_veto const& veto = default_dipole_veto(),
-		photon_dipole_selector const& selector =
-			default_photon_dipole_selector()
-	);
+    ol_real_matrix_elements(
+        std::vector<std::string> const& real_processes,
+        std::vector<final_state> const& dipole_final_states,
+        coupling_order order,
+        dipole_veto const& veto = default_dipole_veto(),
+        photon_dipole_selector const& selector =
+            default_photon_dipole_selector()
+    );
 
-	void alphas(T alphas);
+    void alphas(T alphas);
 
-	std::size_t alphas_power() const;
+    std::size_t alphas_power() const;
 
-	void dipole_me(
-		dipole const& dipole,
-		std::vector<T> const& phase_space,
-		initial_state_set set,
-		std::vector<scales<T>> const& scales,
-		std::vector<initial_state_map<T>>& results
-	);
+    void dipole_me(
+        dipole const& dipole,
+        std::vector<T> const& phase_space,
+        initial_state_set set,
+        std::vector<scales<T>> const& scales,
+        std::vector<initial_state_map<T>>& results
+    );
 
-	void dipole_sc(
-		hep::dipole const& dipole,
-		std::vector<T> const& phase_space,
-		std::array<T, 4> const& vector,
-		hep::initial_state_set set,
-		std::vector<hep::scales<T>> const& scales,
-		std::vector<hep::initial_state_map<T>>& results_one,
-		std::vector<hep::initial_state_map<T>>& results_two
-	);
+    void dipole_sc(
+        hep::dipole const& dipole,
+        std::vector<T> const& phase_space,
+        std::array<T, 4> const& vector,
+        hep::initial_state_set set,
+        std::vector<hep::scales<T>> const& scales,
+        std::vector<hep::initial_state_map<T>>& results_one,
+        std::vector<hep::initial_state_map<T>>& results_two
+    );
 
-	std::vector<dipole> const& dipoles() const;
+    std::vector<dipole> const& dipoles() const;
 
-	std::vector<final_state> const& final_states() const;
+    std::vector<final_state> const& final_states() const;
 
-	std::vector<final_state> const& final_states_real() const;
+    std::vector<final_state> const& final_states_real() const;
 
-	void reals(
-		std::vector<T> const& phase_space,
-		initial_state_set set,
-		std::vector<scales<T>> const& scales,
-		std::vector<initial_state_map<T>>& results
-	);
+    void reals(
+        std::vector<T> const& phase_space,
+        initial_state_set set,
+        std::vector<scales<T>> const& scales,
+        std::vector<initial_state_map<T>>& results
+    );
 
 private:
-	std::size_t alphas_power_;
-	std::vector<std::vector<T>> charge_table_;
-	std::unordered_multimap<dipole, std::tuple<initial_state, int,
-		T, int>> mes_;
-	std::vector<dipole> dipoles_;
-	std::vector<final_state> final_states_;
-	std::vector<final_state> final_states_real_;
+    std::size_t alphas_power_;
+    std::vector<std::vector<T>> charge_table_;
+    std::unordered_multimap<dipole, std::tuple<initial_state, int,
+        T, int>> mes_;
+    std::vector<dipole> dipoles_;
+    std::vector<final_state> final_states_;
+    std::vector<final_state> final_states_real_;
 #if __GNUC__ > 5
-	std::unordered_multimap<initial_state, int> ids_reals_;
+    std::unordered_multimap<initial_state, int> ids_reals_;
 #else
-	std::unordered_multimap<std::size_t, int> ids_reals_;
+    std::unordered_multimap<std::size_t, int> ids_reals_;
 #endif
-	std::vector<double> ol_m2_;
-	std::vector<double> ol_phase_space_;
+    std::vector<double> ol_m2_;
+    std::vector<double> ol_phase_space_;
 };
 
 }

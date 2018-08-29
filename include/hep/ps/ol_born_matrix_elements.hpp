@@ -37,36 +37,36 @@ template <typename T>
 class ol_born_matrix_elements
 {
 public:
-	ol_born_matrix_elements(
-		std::vector<std::string> const& processes,
-		coupling_order const& order,
-		bool loop_mes = false,
-		regularization_scheme scheme = regularization_scheme::dim_reg_blha
-	);
+    ol_born_matrix_elements(
+        std::vector<std::string> const& processes,
+        coupling_order const& order,
+        bool loop_mes = false,
+        regularization_scheme scheme = regularization_scheme::dim_reg_blha
+    );
 
-	void alphas(T alphas);
+    void alphas(T alphas);
 
-	std::size_t alphas_power() const;
+    std::size_t alphas_power() const;
 
-	void borns(
-		std::vector<T> const& phase_space,
-		hep::initial_state_set set,
-		std::vector<scales<T>> const& scales,
-		std::vector<initial_state_map<T>>& results
-	);
+    void borns(
+        std::vector<T> const& phase_space,
+        hep::initial_state_set set,
+        std::vector<scales<T>> const& scales,
+        std::vector<initial_state_map<T>>& results
+    );
 
-	std::vector<final_state> const& final_states() const;
+    std::vector<final_state> const& final_states() const;
 
 private:
-	std::size_t alphas_power_;
-	bool loop_mes_;
-	std::vector<final_state> final_states_;
+    std::size_t alphas_power_;
+    bool loop_mes_;
+    std::vector<final_state> final_states_;
 #if __GNUC__ > 5
-	std::unordered_multimap<initial_state, int> ids_;
+    std::unordered_multimap<initial_state, int> ids_;
 #else
-	std::unordered_multimap<std::size_t, int> ids_;
+    std::unordered_multimap<std::size_t, int> ids_;
 #endif
-	std::vector<double> ol_phase_space_;
+    std::vector<double> ol_phase_space_;
 };
 
 }

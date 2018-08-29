@@ -14,57 +14,57 @@ extern "C"
 {
 
 void cofferaa_generation(
-	double const* random,
-	double* kbeam,
-	double* k,
-	double* g,
-	int* channel,
-	int* generator,
-	int* switch_
+    double const* random,
+    double* kbeam,
+    double* k,
+    double* g,
+    int* channel,
+    int* generator,
+    int* switch_
 );
 
 void cofferaa_density(
-	double* k,
-	double* g,
-	int* generator,
-	int* switch_
+    double* k,
+    double* g,
+    int* generator,
+    int* switch_
 );
 
 void cofferaa_initgenerator(
-	double* energy,
-	double* smin,
-	int const* hepnum,
-	int* generator,
-	int* next,
-	int* smodel,
-	int* sincludecuts,
-	int* ssub,
-	int*,
-	int*,
-	int*,
-	int*
+    double* energy,
+    double* smin,
+    int const* hepnum,
+    int* generator,
+    int* next,
+    int* smodel,
+    int* sincludecuts,
+    int* ssub,
+    int*,
+    int*,
+    int*,
+    int*
 );
 
 void cofferaa_extra_max(
-	int* maxex,
-	int* maxgen
+    int* maxex,
+    int* maxgen
 );
 
 void cofferaa_extra_data(
-	int* gen,
-	int* nch
+    int* gen,
+    int* nch
 );
 
 void cofferaa_extra_set(
-	int* gen,
-	double* mw,
-	double* gw,
-	double* mz,
-	double* gz,
-	double* mh,
-	double* gh,
-	double* mt,
-	double* gt
+    int* gen,
+    double* mw,
+    double* gw,
+    double* mz,
+    double* gz,
+    double* mh,
+    double* gh,
+    double* mt,
+    double* gt
 );
 
 }

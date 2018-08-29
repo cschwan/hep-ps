@@ -33,9 +33,9 @@ namespace hep
 /// second argument is the vector of final states for the dipole, and the third
 /// argument is the dipole.
 using dipole_veto = std::function<bool(
-	std::vector<int> const&,
-	std::vector<final_state> const&,
-	dipole const&
+    std::vector<int> const&,
+    std::vector<final_state> const&,
+    dipole const&
 )>;
 
 /// Returns the default dipole veto, which vetos all dipoles that do lead to

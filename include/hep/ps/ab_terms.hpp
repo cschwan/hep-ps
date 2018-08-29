@@ -27,8 +27,8 @@ namespace hep
 template <typename T>
 struct ab_terms
 {
-	parton_type_array<parton_type_array<T>> a;
-	parton_type_array<parton_type_array<T>> b;
+    parton_type_array<parton_type_array<T>> a;
+    parton_type_array<parton_type_array<T>> b;
 };
 
 }

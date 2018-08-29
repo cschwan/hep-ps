@@ -35,9 +35,9 @@ namespace hep
 /// identifiers of the dipole process, or an empty vector, in which case the
 /// dipole process does not exist.
 std::vector<int> generate_dipole(
-	std::vector<int> const& process_pdg_ids,
-	hep::coupling_order order,
-	dipole const& dipole_info
+    std::vector<int> const& process_pdg_ids,
+    hep::coupling_order order,
+    dipole const& dipole_info
 );
 
 }

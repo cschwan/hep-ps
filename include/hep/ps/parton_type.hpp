@@ -28,10 +28,10 @@ namespace hep
 // TODO: rename `gluon_` to `gluon` once the `enum` is an `enum class`
 
 HEP_ENUM(parton_type,
-	anti_quark, /*!< An anti-quark. */
-	gluon_,     /*!< A gluon. */
-	quark,      /*!< A quark. */
-	photon_     /*!< A photon. */
+    anti_quark, /*!< An anti-quark. */
+    gluon_,     /*!< A gluon. */
+    quark,      /*!< A quark. */
+    photon_     /*!< A photon. */
 );
 
 HEP_ENUM_ARRAY(parton_type);
@@ -39,34 +39,34 @@ HEP_ENUM_ARRAY(parton_type);
 /// Returns the \ref parton_type for a \ref parton `p`.
 constexpr parton_type parton_type_of(parton p)
 {
-	switch (p)
-	{
-	case anti_up:
-	case anti_down:
-	case anti_charm:
-	case anti_strange:
-	case anti_bottom:
-		return parton_type::anti_quark;
+    switch (p)
+    {
+    case anti_up:
+    case anti_down:
+    case anti_charm:
+    case anti_strange:
+    case anti_bottom:
+        return parton_type::anti_quark;
 
-	case gluon:
-		return parton_type::gluon_;
+    case gluon:
+        return parton_type::gluon_;
 
-	case up:
-	case down:
-	case charm:
-	case strange:
-	case bottom:
-		return parton_type::quark;
+    case up:
+    case down:
+    case charm:
+    case strange:
+    case bottom:
+        return parton_type::quark;
 
-	case photon:
-		return parton_type::photon_;
+    case photon:
+        return parton_type::photon_;
 
 #if __GNUC__ > 5
-	default:
-		// if this happens, we didn't cover all the cases
-		throw 0;
+    default:
+        // if this happens, we didn't cover all the cases
+        throw 0;
 #endif
-	}
+    }
 }
 
 }

@@ -33,14 +33,14 @@ template <typename T>
 class trivial_recombiner
 {
 public:
-	/// Copies `phase_space` to `recombined_phase_space` and converts
-	/// `final_states` to `recombined_states`.
-	void recombine(
-		std::vector<T> const& phase_space,
-		std::vector<final_state> const& final_states,
-		std::vector<T>& recombined_phase_space,
-		std::vector<recombined_state>& recombined_states
-	) const;
+    /// Copies `phase_space` to `recombined_phase_space` and converts
+    /// `final_states` to `recombined_states`.
+    void recombine(
+        std::vector<T> const& phase_space,
+        std::vector<final_state> const& final_states,
+        std::vector<T>& recombined_phase_space,
+        std::vector<recombined_state>& recombined_states
+    ) const;
 };
 
 }

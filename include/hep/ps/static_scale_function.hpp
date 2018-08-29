@@ -32,22 +32,22 @@ template <typename T>
 class static_scale_function
 {
 public:
-	/// Constructor.
-	static_scale_function(T scale, scale_variation variation);
+    /// Constructor.
+    static_scale_function(T scale, scale_variation variation);
 
-	/// Returns the static scale(s).
-	void operator()(
-		std::vector<T> const& phase_space,
-		std::vector<hep::scales<T>>& scales
-	);
+    /// Returns the static scale(s).
+    void operator()(
+        std::vector<T> const& phase_space,
+        std::vector<hep::scales<T>>& scales
+    );
 
-	/// Returns `false`, since this scale function is independent of the phase
-	/// space point (static).
-	bool dynamic() const;
+    /// Returns `false`, since this scale function is independent of the phase
+    /// space point (static).
+    bool dynamic() const;
 
 private:
-	T scale_;
-	scale_variation variation_;
+    T scale_;
+    scale_variation variation_;
 };
 
 }

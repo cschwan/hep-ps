@@ -28,16 +28,16 @@ namespace hep
 template <typename T, std::size_t N>
 inline std::array<T, N> inverse_permutation(std::array<T, N> permutation)
 {
-	// TODO: check if `permutation` is actually a permutation?
+    // TODO: check if `permutation` is actually a permutation?
 
-	std::array<T, N> inverse;
+    std::array<T, N> inverse;
 
-	for (std::size_t i = 0; i != N; ++i)
-	{
-		inverse.at(permutation[i]) = i;
-	}
+    for (std::size_t i = 0; i != N; ++i)
+    {
+        inverse.at(permutation[i]) = i;
+    }
 
-	return inverse;
+    return inverse;
 }
 
 }

@@ -30,28 +30,28 @@ namespace hep
 class coupling_order
 {
 public:
-	/// Constructor.
-	coupling_order(std::size_t alpha_power, std::size_t alphas_power)
-		: alpha_power_{alpha_power}
-		, alphas_power_{alphas_power}
-	{
-	}
+    /// Constructor.
+    coupling_order(std::size_t alpha_power, std::size_t alphas_power)
+        : alpha_power_{alpha_power}
+        , alphas_power_{alphas_power}
+    {
+    }
 
-	/// Returns the power of \f$ \alpha \f$.
-	std::size_t alpha_power() const
-	{
-		return alpha_power_;
-	}
+    /// Returns the power of \f$ \alpha \f$.
+    std::size_t alpha_power() const
+    {
+        return alpha_power_;
+    }
 
-	/// Returns the power of \f$ \alpha_\mathrm{s} \f$.
-	std::size_t alphas_power() const
-	{
-		return alphas_power_;
-	}
+    /// Returns the power of \f$ \alpha_\mathrm{s} \f$.
+    std::size_t alphas_power() const
+    {
+        return alphas_power_;
+    }
 
 private:
-	std::size_t alpha_power_;
-	std::size_t alphas_power_;
+    std::size_t alpha_power_;
+    std::size_t alphas_power_;
 };
 
 }

@@ -47,350 +47,350 @@ namespace hep
 
 ol_interface& ol_interface::instance()
 {
-	static ol_interface object;
-	return object;
+    static ol_interface object;
+    return object;
 }
 
 bool ol_interface::enabled()
 {
 #ifdef HAVE_OPENLOOPS
-	return true;
+    return true;
 #else
-	return false;
+    return false;
 #endif
 }
 
 ol_interface::ol_interface()
-	: started_(false)
+    : started_(false)
 {
 #ifdef HAVE_OPENLOOPS
-	if (suppress_banners())
-	{
-		ol_setparameter_int("nosplash", 1);
-	}
+    if (suppress_banners())
+    {
+        ol_setparameter_int("nosplash", 1);
+    }
 #endif
 }
 
 ol_interface::~ol_interface()
 {
 #ifdef HAVE_OPENLOOPS
-	if (started_)
-	{
-		ol_finish();
-	}
+    if (started_)
+    {
+        ol_finish();
+    }
 #endif
 }
 
 void ol_interface::setparameter_int(char const* param, int val)
 {
 #ifdef HAVE_OPENLOOPS
-	ol_setparameter_int(param, val);
+    ol_setparameter_int(param, val);
 #else
-	ignore(param);
-	ignore(val);
+    ignore(param);
+    ignore(val);
 #endif
 }
 
 void ol_interface::setparameter_double(char const* param, double val)
 {
 #ifdef HAVE_OPENLOOPS
-	ol_setparameter_double(param, val);
+    ol_setparameter_double(param, val);
 #else
-	ignore(param);
-	ignore(val);
+    ignore(param);
+    ignore(val);
 #endif
 }
 
 void ol_interface::setparameter_string(char const* param, char* val)
 {
 #ifdef HAVE_OPENLOOPS
-	ol_setparameter_string(param, val);
+    ol_setparameter_string(param, val);
 #else
-	ignore(param);
-	ignore(val);
+    ignore(param);
+    ignore(val);
 #endif
 }
 
 void ol_interface::getparameter_int(char const* param, int* val)
 {
 #ifdef HAVE_OPENLOOPS
-	ol_getparameter_int(param, val);
+    ol_getparameter_int(param, val);
 #else
-	ignore(param);
-	ignore(val);
+    ignore(param);
+    ignore(val);
 #endif
 }
 
 void ol_interface::getparameter_double(char const* param, double* val)
 {
 #ifdef HAVE_OPENLOOPS
-	ol_getparameter_double(param, val);
+    ol_getparameter_double(param, val);
 #else
-	ignore(param);
-	ignore(val);
+    ignore(param);
+    ignore(val);
 #endif
 }
 
 int ol_interface::register_process(char const* process, int amptype)
 {
 #ifdef HAVE_OPENLOOPS
-	return ol_register_process(process, amptype);
+    return ol_register_process(process, amptype);
 #else
-	ignore(process);
-	ignore(amptype);
+    ignore(process);
+    ignore(amptype);
 
-	return -1;
+    return -1;
 #endif
 }
 
 int ol_interface::n_external(int id)
 {
 #ifdef HAVE_OPENLOOPS
-	return ol_n_external(id);
+    return ol_n_external(id);
 #else
-	ignore(id);
+    ignore(id);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 {
 #ifdef HAVE_OPENLOOPS
-	if (!started_)
-	{
-		started_ = true;
-		ol_start();
-	}
+    if (!started_)
+    {
+        started_ = true;
+        ol_start();
+    }
 
-	ol_evaluate_tree(id, pp, m2tree);
+    ol_evaluate_tree(id, pp, m2tree);
 #else
-	ignore(id);
-	ignore(pp);
-	ignore(m2tree);
+    ignore(id);
+    ignore(pp);
+    ignore(m2tree);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 void ol_interface::evaluate_cc(
-	int id,
-	double* pp,
-	double* m2tree,
-	double* m2cc,
-	double* m2ew
+    int id,
+    double* pp,
+    double* m2tree,
+    double* m2cc,
+    double* m2ew
 ) {
 #ifdef HAVE_OPENLOOPS
-	if (!started_)
-	{
-		started_ = true;
-		ol_start();
-	}
+    if (!started_)
+    {
+        started_ = true;
+        ol_start();
+    }
 
-	ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
+    ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
 #else
-	ignore(id);
-	ignore(pp);
-	ignore(m2tree);
-	ignore(m2cc);
-	ignore(m2ew);
+    ignore(id);
+    ignore(pp);
+    ignore(m2tree);
+    ignore(m2cc);
+    ignore(m2ew);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 void ol_interface::evaluate_sc(
-	int id,
-	double* pp,
-	int emitter,
-	double* polvect,
-	double* m2sc
+    int id,
+    double* pp,
+    int emitter,
+    double* polvect,
+    double* m2sc
 ) {
 #ifdef HAVE_OPENLOOPS
-	if (!started_)
-	{
-		started_ = true;
-		ol_start();
-	}
+    if (!started_)
+    {
+        started_ = true;
+        ol_start();
+    }
 
-	ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
+    ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
 #else
-	ignore(id);
-	ignore(pp);
-	ignore(emitter);
-	ignore(polvect);
-	ignore(m2sc);
+    ignore(id);
+    ignore(pp);
+    ignore(emitter);
+    ignore(polvect);
+    ignore(m2sc);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 void ol_interface::evaluate_loop(
-	int id,
-	double* pp,
-	double* m2tree,
-	double* m2loop,
-	double* acc
+    int id,
+    double* pp,
+    double* m2tree,
+    double* m2loop,
+    double* acc
 ) {
 #ifdef HAVE_OPENLOOPS
-	if (!started_)
-	{
-		started_ = true;
-		ol_start();
-	}
+    if (!started_)
+    {
+        started_ = true;
+        ol_start();
+    }
 
-	ol_evaluate_loop(id, pp, m2tree, m2loop, acc);
+    ol_evaluate_loop(id, pp, m2tree, m2loop, acc);
 #else
-	ignore(id);
-	ignore(pp);
-	ignore(m2tree);
-	ignore(m2loop);
-	ignore(acc);
+    ignore(id);
+    ignore(pp);
+    ignore(m2tree);
+    ignore(m2loop);
+    ignore(acc);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 void ol_interface::evaluate_loop2(
-	int id,
-	double* pp,
-	double* m2loop2,
-	double* acc
+    int id,
+    double* pp,
+    double* m2loop2,
+    double* acc
 ) {
 #ifdef HAVE_OPENLOOPS
-	if (!started_)
-	{
-		started_ = true;
-		ol_start();
-	}
+    if (!started_)
+    {
+        started_ = true;
+        ol_start();
+    }
 
-	ol_evaluate_loop2(id, pp, m2loop2, acc);
+    ol_evaluate_loop2(id, pp, m2loop2, acc);
 #else
-	ignore(id);
-	ignore(pp);
-	ignore(m2loop2);
-	ignore(acc);
+    ignore(id);
+    ignore(pp);
+    ignore(m2loop2);
+    ignore(acc);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 void ol_interface::evaluate_ct(
-	int id,
-	double* pp,
-	double* m2_tree,
-	double* m2_ct
+    int id,
+    double* pp,
+    double* m2_tree,
+    double* m2_ct
 ) {
 #ifdef HAVE_OPENLOOPS
-	if (!started_)
-	{
-		started_ = true;
-		ol_start();
-	}
+    if (!started_)
+    {
+        started_ = true;
+        ol_start();
+    }
 
-	ol_evaluate_ct(id, pp, m2_tree, m2_ct);
+    ol_evaluate_ct(id, pp, m2_tree, m2_ct);
 #else
-	ignore(id);
-	ignore(pp);
-	ignore(m2_tree);
-	ignore(m2_ct);
+    ignore(id);
+    ignore(pp);
+    ignore(m2_tree);
+    ignore(m2_ct);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 void ol_interface::evaluate_full(
-	int id,
-	double* pp,
-	double* m2tree,
-	double* m2loop,
-	double* m2ir1,
-	double* m2loop2,
-	double* m2ir2,
-	double* acc
+    int id,
+    double* pp,
+    double* m2tree,
+    double* m2loop,
+    double* m2ir1,
+    double* m2loop2,
+    double* m2ir2,
+    double* acc
 ) {
 #ifdef HAVE_OPENLOOPS
-	if (!started_)
-	{
-		started_ = true;
-		ol_start();
-	}
+    if (!started_)
+    {
+        started_ = true;
+        ol_start();
+    }
 
-	ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
+    ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
 #else
-	ignore(id);
-	ignore(pp);
-	ignore(m2tree);
-	ignore(m2loop);
-	ignore(m2ir1);
-	ignore(m2loop2);
-	ignore(m2ir2);
-	ignore(acc);
+    ignore(id);
+    ignore(pp);
+    ignore(m2tree);
+    ignore(m2loop);
+    ignore(m2ir1);
+    ignore(m2loop2);
+    ignore(m2ir2);
+    ignore(acc);
 
-	throw std::runtime_error("OpenLoops support not enabled");
+    throw std::runtime_error("OpenLoops support not enabled");
 #endif
 }
 
 int register_process_try_hard(
-	ol_interface& ol,
-	char const* process,
-	int amptype,
-	int order_qcd,
-	int order_ew,
-	ol_register_mode& mode
+    ol_interface& ol,
+    char const* process,
+    int amptype,
+    int order_qcd,
+    int order_ew,
+    ol_register_mode& mode
 ) {
-	int result;
+    int result;
 
-	switch (mode)
-	{
-	case ol_register_mode::set_qcd_order:
-		ol.setparameter_int("order_qcd", order_qcd);
-		break;
+    switch (mode)
+    {
+    case ol_register_mode::set_qcd_order:
+        ol.setparameter_int("order_qcd", order_qcd);
+        break;
 
-	case ol_register_mode::set_ew_order:
-		ol.setparameter_int("order_ew", order_ew);
-		break;
+    case ol_register_mode::set_ew_order:
+        ol.setparameter_int("order_ew", order_ew);
+        break;
 
-	default:
-		assert( false );
-	}
+    default:
+        assert( false );
+    }
 
-	// silence OpenLoops until we know how to correctly set the coupling order
-	int verbose = 0;
-	ol.getparameter_int("verbose", &verbose);
-	ol.setparameter_int("verbose", -1);
+    // silence OpenLoops until we know how to correctly set the coupling order
+    int verbose = 0;
+    ol.getparameter_int("verbose", &verbose);
+    ol.setparameter_int("verbose", -1);
 
-	result = ol.register_process(process, amptype);
+    result = ol.register_process(process, amptype);
 
-	if (result == -1)
-	{
-		std::cout << "trying very hard...\n";
+    if (result == -1)
+    {
+        std::cout << "trying very hard...\n";
 
-		mode = (mode == ol_register_mode::set_ew_order) ?
-			ol_register_mode::set_qcd_order : ol_register_mode::set_ew_order;
+        mode = (mode == ol_register_mode::set_ew_order) ?
+            ol_register_mode::set_qcd_order : ol_register_mode::set_ew_order;
 
-		switch (mode)
-		{
-		case ol_register_mode::set_qcd_order:
-			ol.setparameter_int("order_qcd", order_qcd);
-			break;
+        switch (mode)
+        {
+        case ol_register_mode::set_qcd_order:
+            ol.setparameter_int("order_qcd", order_qcd);
+            break;
 
-		case ol_register_mode::set_ew_order:
-			ol.setparameter_int("order_ew", order_ew);
-			break;
+        case ol_register_mode::set_ew_order:
+            ol.setparameter_int("order_ew", order_ew);
+            break;
 
-		default:
-			assert( false );
-		}
+        default:
+            assert( false );
+        }
 
-		result = ol.register_process(process, amptype);
-	}
+        result = ol.register_process(process, amptype);
+    }
 
-	// set `verbose` to default level and potentially print messages
-	ol.setparameter_int("verbose", verbose);
-	result = ol.register_process(process, amptype);
+    // set `verbose` to default level and potentially print messages
+    ol.setparameter_int("verbose", verbose);
+    result = ol.register_process(process, amptype);
 
-	return result;
+    return result;
 }
 
 }

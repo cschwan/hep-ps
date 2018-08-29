@@ -24,8 +24,8 @@ namespace hep
 
 enum class particle_type
 {
-	boson,
-	fermion
+    boson,
+    fermion
 };
 
 }

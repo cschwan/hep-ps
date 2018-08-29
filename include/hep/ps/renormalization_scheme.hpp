@@ -25,8 +25,8 @@ namespace hep
 /// Enumeration that denotes the renormalization scheme.
 enum class renormalization_scheme
 {
-	/// Modified minimal subtraction renormalization scheme.
-	msbar
+    /// Modified minimal subtraction renormalization scheme.
+    msbar
 };
 
 }

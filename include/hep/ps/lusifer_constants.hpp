@@ -25,40 +25,40 @@ namespace hep
 template <typename T>
 struct lusifer_constants
 {
-	lusifer_constants(
-		T mass_h,
-		T width_h,
-		T mass_t,
-		T width_t,
-		T mass_w,
-		T width_w,
-		T mass_z,
-		T width_z
-	);
+    lusifer_constants(
+        T mass_h,
+        T width_h,
+        T mass_t,
+        T width_t,
+        T mass_w,
+        T width_w,
+        T mass_z,
+        T width_z
+    );
 
-	/// Mass of the Higgs boson.
-	T mass_h;
+    /// Mass of the Higgs boson.
+    T mass_h;
 
-	/// Width of the Higgs boson.
-	T width_h;
+    /// Width of the Higgs boson.
+    T width_h;
 
-	/// Mass of the top quark.
-	T mass_t;
+    /// Mass of the top quark.
+    T mass_t;
 
-	/// Width of the top quark.
-	T width_t;
+    /// Width of the top quark.
+    T width_t;
 
-	/// Mass of the W bosons.
-	T mass_w;
+    /// Mass of the W bosons.
+    T mass_w;
 
-	/// Width of the W boson.
-	T width_w;
+    /// Width of the W boson.
+    T width_w;
 
-	/// Mass of the Z boson.
-	T mass_z;
+    /// Mass of the Z boson.
+    T mass_z;
 
-	/// Width of the Z boson.
-	T width_z;
+    /// Width of the Z boson.
+    T width_z;
 };
 
 }

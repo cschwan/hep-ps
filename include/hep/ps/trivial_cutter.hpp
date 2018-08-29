@@ -33,12 +33,12 @@ template <typename T>
 class trivial_cutter
 {
 public:
-	/// Never cuts a phase space point, independently of the given parameters.
-	cut_result cut(
-		std::vector<T> const& phase_space,
-		T rapidity_shift,
-		std::vector<recombined_state> const& recombined_states
-	);
+    /// Never cuts a phase space point, independently of the given parameters.
+    cut_result cut(
+        std::vector<T> const& phase_space,
+        T rapidity_shift,
+        std::vector<recombined_state> const& recombined_states
+    );
 };
 
 }

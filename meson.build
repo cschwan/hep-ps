@@ -1,17 +1,17 @@
 project(
-	'hep-ps',
-	'cpp',
-	'fortran',
-	version : '0.0.1',
-	license : 'GPL3',
-	default_options : 'cpp_std=c++14',
-	meson_version : '>=0.47'
+    'hep-ps',
+    'cpp',
+    'fortran',
+    version : '0.0.1',
+    license : 'GPL3',
+    default_options : 'cpp_std=c++14',
+    meson_version : '>=0.47'
 )
 
 hep_mc_dep = dependency(
-	'hep-mc',
-	fallback : ['hep-mc', 'hep_mc_dep'],
-	version : '>=0.7'
+    'hep-mc',
+    fallback : ['hep-mc', 'hep_mc_dep'],
+    version : '>=0.7'
 )
 
 catch_subproj = subproject('catch')
@@ -20,23 +20,23 @@ catch_dep = catch_subproj.get_variable('catch_dep')
 subdir('include')
 
 if get_option('doxygen')
-	subdir('doc')
+    subdir('doc')
 endif
 
 subdir('src')
 
 pkg = import('pkgconfig')
 pkg.generate(
-	name : meson.project_name(),
-	description : 'A C++ Library of Phase Space Integrands for High Energy Physics',
-	libraries : libhep_ps,
-	version : meson.project_version()
+    name : meson.project_name(),
+    description : 'A C++ Library of Phase Space Integrands for High Energy Physics',
+    libraries : libhep_ps,
+    version : meson.project_version()
 )
 
 hep_ps_dep = declare_dependency(
-	dependencies : hep_mc_dep,
-	include_directories : incdir,
-	link_with : libhep_ps
+    dependencies : hep_mc_dep,
+    include_directories : incdir,
+    link_with : libhep_ps
 )
 
 # tests depend on `hep_ps_dep`

@@ -27,18 +27,18 @@ namespace hep
 /// integrated subtraction terms.
 enum class regularization_scheme
 {
-	/// Dimensional regularization using the Binoth Les Houches Accord (BLHA)
-	/// convention. This uses the insertion operator defined in the original
-	/// Catani-Seymour paper and the \f$ \overline{\mathrm{MS}} \f$ scale
-	/// replacement \f$ \mu^2 \to \mu^2 \frac{\exp (\gamma_\text{E})}{4 \pi}
-	/// \f$.
-	dim_reg_blha,
+    /// Dimensional regularization using the Binoth Les Houches Accord (BLHA)
+    /// convention. This uses the insertion operator defined in the original
+    /// Catani-Seymour paper and the \f$ \overline{\mathrm{MS}} \f$ scale
+    /// replacement \f$ \mu^2 \to \mu^2 \frac{\exp (\gamma_\text{E})}{4 \pi}
+    /// \f$.
+    dim_reg_blha,
 
-	/// Dimensional regularization using the COLI convention. This differs to
-	/// \ref regularization_scheme::dim_reg_blha by replacing the factor \f$
-	/// \frac{1}{\Gamma (1- \epsilon)} \f$ with \f$ \Gamma (1 + \epsilon) \f$
-	/// which changes also terms in the constant part of the Laurent-series.
-	dim_reg_coli
+    /// Dimensional regularization using the COLI convention. This differs to
+    /// \ref regularization_scheme::dim_reg_blha by replacing the factor \f$
+    /// \frac{1}{\Gamma (1- \epsilon)} \f$ with \f$ \Gamma (1 + \epsilon) \f$
+    /// which changes also terms in the constant part of the Laurent-series.
+    dim_reg_coli
 };
 
 }

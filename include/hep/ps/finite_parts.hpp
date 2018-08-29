@@ -24,9 +24,9 @@ namespace hep
 
 enum class finite_parts
 {
-	insertion_term,
-	insertion_term2,
-	both
+    insertion_term,
+    insertion_term2,
+    both
 };
 
 }

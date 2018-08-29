@@ -28,38 +28,38 @@ template <typename T>
 class scales
 {
 public:
-	/// Constructs a new object with \f$ \mu_\text{F} \f$ set to the value of
-	/// `factorization`, \f$ \mu \f$ set to the value of `regularization`, and
-	/// \f$ \mu_\text{R} \f$ set to the value of `renormalization`.
-	scales(T factorization, T regularization, T renormalization)
-		: factorization_{factorization}
-		, regularization_{regularization}
-		, renormalization_{renormalization}
-	{
-	}
+    /// Constructs a new object with \f$ \mu_\text{F} \f$ set to the value of
+    /// `factorization`, \f$ \mu \f$ set to the value of `regularization`, and
+    /// \f$ \mu_\text{R} \f$ set to the value of `renormalization`.
+    scales(T factorization, T regularization, T renormalization)
+        : factorization_{factorization}
+        , regularization_{regularization}
+        , renormalization_{renormalization}
+    {
+    }
 
-	/// Returns the factorization scale \f$ \mu_\text{F} \f$.
-	T factorization() const
-	{
-		return factorization_;
-	}
+    /// Returns the factorization scale \f$ \mu_\text{F} \f$.
+    T factorization() const
+    {
+        return factorization_;
+    }
 
-	/// Returns the regularization scale \f$ \mu \f$.
-	T regularization() const
-	{
-		return regularization_;
-	}
+    /// Returns the regularization scale \f$ \mu \f$.
+    T regularization() const
+    {
+        return regularization_;
+    }
 
-	/// Returns the renormalization scale \f$ \mu_\text{R} \f$.
-	T renormalization() const
-	{
-		return renormalization_;
-	}
+    /// Returns the renormalization scale \f$ \mu_\text{R} \f$.
+    T renormalization() const
+    {
+        return renormalization_;
+    }
 
 private:
-	T factorization_;
-	T regularization_;
-	T renormalization_;
+    T factorization_;
+    T regularization_;
+    T renormalization_;
 };
 
 }

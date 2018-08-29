@@ -34,14 +34,14 @@ namespace
 template <typename T, typename P>
 inline hep::luminosity_info<T> info(hep::multi_channel_point2<T, P> const& x)
 {
-	return x.map().info();
+    return x.map().info();
 }
 
 template <typename T, typename P>
 inline hep::luminosity_info<T> info(
-	hep::multi_channel_point2<T, std::reference_wrapper<P>> const& x
+    hep::multi_channel_point2<T, std::reference_wrapper<P>> const& x
 ) {
-	return x.map().get().info();
+    return x.map().get().info();
 }
 
 }
@@ -54,27 +54,27 @@ template <typename T>
 class ps_integrand
 {
 public:
-	/// Virtual destructor.
-	virtual ~ps_integrand() = default;
+    /// Virtual destructor.
+    virtual ~ps_integrand() = default;
 
-	/// Evaluates the observables this instances represents for the given
-	/// `phase_space` point and luminosity information in `info`. If the
-	/// observables need extra random numbers these will be supplied in
-	/// `extra_random_numbers`.
-	virtual T eval(
-		std::vector<T> const& phase_space,
-		luminosity_info<T> const& info,
-		hep::projector<T>& projector
-	) = 0;
+    /// Evaluates the observables this instances represents for the given
+    /// `phase_space` point and luminosity information in `info`. If the
+    /// observables need extra random numbers these will be supplied in
+    /// `extra_random_numbers`.
+    virtual T eval(
+        std::vector<T> const& phase_space,
+        luminosity_info<T> const& info,
+        hep::projector<T>& projector
+    ) = 0;
 
-	/// Interface for the `hep-mc` Monte Carlo integration routines.
-	template <typename P>
-	T operator()(
-		hep::multi_channel_point2<T, P> const& point,
-		hep::projector<T>& projector
-	) {
-		return eval(point.coordinates(), info(point), projector);
-	}
+    /// Interface for the `hep-mc` Monte Carlo integration routines.
+    template <typename P>
+    T operator()(
+        hep::multi_channel_point2<T, P> const& point,
+        hep::projector<T>& projector
+    ) {
+        return eval(point.coordinates(), info(point), projector);
+    }
 };
 
 }

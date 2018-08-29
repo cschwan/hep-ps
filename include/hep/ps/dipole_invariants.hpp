@@ -27,27 +27,27 @@ namespace hep
 template <typename T>
 struct dipole_invariants
 {
-	/// Constructor. Initializes this object
-	dipole_invariants(T one = T(), T two = T(), T sij = T(), T alpha = T())
-		: one{one}
-		, two{two}
-		, sij{sij}
-		, alpha{alpha}
-	{
-	}
+    /// Constructor. Initializes this object
+    dipole_invariants(T one = T(), T two = T(), T sij = T(), T alpha = T())
+        : one{one}
+        , two{two}
+        , sij{sij}
+        , alpha{alpha}
+    {
+    }
 
-	/// Invariant.
-	T one;
+    /// Invariant.
+    T one;
 
-	/// Other invariant.
-	T two;
+    /// Other invariant.
+    T two;
 
-	/// Propagator invariant of the dipole.
-	T sij;
+    /// Propagator invariant of the dipole.
+    T sij;
 
-	/// The value of the parameter \f$ \alpha \f$ on which a technical cut is
-	/// applied if the value is too small.
-	T alpha;
+    /// The value of the parameter \f$ \alpha \f$ on which a technical cut is
+    /// applied if the value is too small.
+    T alpha;
 };
 
 }

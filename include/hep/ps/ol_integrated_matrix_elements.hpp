@@ -37,39 +37,39 @@ template <typename T>
 class ol_integrated_matrix_elements
 {
 public:
-	ol_integrated_matrix_elements(
-		std::vector<std::string> const& processes,
-		coupling_order const& order,
-		correction_type type
-	);
+    ol_integrated_matrix_elements(
+        std::vector<std::string> const& processes,
+        coupling_order const& order,
+        correction_type type
+    );
 
-	void alphas(T alphas);
+    void alphas(T alphas);
 
-	std::size_t alphas_power() const;
+    std::size_t alphas_power() const;
 
-	void correlated_me(
-		std::vector<T> const& phase_space,
-		initial_state_set set,
-		std::vector<initial_state_map<T>>& results
-	);
+    void correlated_me(
+        std::vector<T> const& phase_space,
+        initial_state_set set,
+        std::vector<initial_state_map<T>>& results
+    );
 
-	std::vector<final_state> const& final_states() const;
+    std::vector<final_state> const& final_states() const;
 
-	std::vector<insertion_term> const& insertion_terms() const;
+    std::vector<insertion_term> const& insertion_terms() const;
 
 private:
-	std::size_t alphas_power_;
-	std::unordered_map<int, std::vector<T>> charge_table_;
-	std::vector<final_state> final_states_;
+    std::size_t alphas_power_;
+    std::unordered_map<int, std::vector<T>> charge_table_;
+    std::vector<final_state> final_states_;
 #if __GNUC__ > 5
-	std::unordered_multimap<initial_state, int> ids_;
+    std::unordered_multimap<initial_state, int> ids_;
 #else
-	std::unordered_multimap<std::size_t, int> ids_;
+    std::unordered_multimap<std::size_t, int> ids_;
 #endif
-	std::vector<double> ol_m2cc_;
-	std::vector<double> ol_phase_space_;
-	std::vector<insertion_term> terms_;
-	correction_type type_;
+    std::vector<double> ol_m2cc_;
+    std::vector<double> ol_phase_space_;
+    std::vector<insertion_term> terms_;
+    correction_type type_;
 };
 
 }

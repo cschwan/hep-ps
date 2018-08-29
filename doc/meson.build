@@ -8,20 +8,20 @@ config.set('PACKAGE_VERSION', meson.project_version())
 
 doxygen = find_program('doxygen')
 doxyfile = configure_file(
-	input : 'Doxyfile.in',
-	output : 'Doxyfile',
-	configuration : config
+    input : 'Doxyfile.in',
+    output : 'Doxyfile',
+    configuration : config
 )
 
 datadir = join_paths(get_option('datadir'), 'doc', meson.project_name())
 
 custom_target(
-	'html',
-	build_by_default : true,
-	command : [ doxygen, doxyfile ],
-	depend_files : headers,
-	input : doxyfile,
-	install : true,
-	install_dir : datadir,
-	output : 'html'
+    'html',
+    build_by_default : true,
+    command : [ doxygen, doxyfile ],
+    depend_files : headers,
+    input : doxyfile,
+    install : true,
+    install_dir : datadir,
+    output : 'html'
 )

@@ -25,9 +25,9 @@ namespace hep
 template <typename T>
 struct constants
 {
-	/// The value of \f$ ( \hbar c )^2 \f$ in \f$ \text{GeV}^2 \text{pbarn} \f$
-	/// from the 2016 edition of the PDG booklet.
-	static constexpr T hbarc2 = T(3.893793656e8);
+    /// The value of \f$ ( \hbar c )^2 \f$ in \f$ \text{GeV}^2 \text{pbarn} \f$
+    /// from the 2016 edition of the PDG booklet.
+    static constexpr T hbarc2 = T(3.893793656e8);
 };
 
 }

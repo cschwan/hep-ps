@@ -31,10 +31,10 @@ namespace hep
 /// algorithm. See \cite Kleiss:1985gy .
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_rambo_phase_space_generator(
-	T min_energy,
-	T cmf_energy,
-	std::size_t final_state_particles,
-	std::size_t extra_random_numbers = 0
+    T min_energy,
+    T cmf_energy,
+    std::size_t final_state_particles,
+    std::size_t extra_random_numbers = 0
 );
 
 }

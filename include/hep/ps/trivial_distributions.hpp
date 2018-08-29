@@ -35,20 +35,20 @@ template <typename T>
 class trivial_distributions
 {
 public:
-	/// Constructor.
-	trivial_distributions() = default;
+    /// Constructor.
+    trivial_distributions() = default;
 
-	/// Does nothing.
-	template <typename I>
-	void operator()(
-		std::vector<T> const&,
-		T,
-		cut_result_with_info<I> const&,
-		std::vector<neg_pos_results<T>> const&,
-		std::vector<neg_pos_results<T>> const&,
-		projector<T>&
-	) {
-	}
+    /// Does nothing.
+    template <typename I>
+    void operator()(
+        std::vector<T> const&,
+        T,
+        cut_result_with_info<I> const&,
+        std::vector<neg_pos_results<T>> const&,
+        std::vector<neg_pos_results<T>> const&,
+        projector<T>&
+    ) {
+    }
 };
 
 }

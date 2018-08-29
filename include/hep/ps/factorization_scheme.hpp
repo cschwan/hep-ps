@@ -25,11 +25,11 @@ namespace hep
 /// Enumeration that denotes the factorization scheme.
 enum class factorization_scheme
 {
-	/// Deep inelastic scattering factorization scheme.
-	dis,
+    /// Deep inelastic scattering factorization scheme.
+    dis,
 
-	/// Modified minimal subtraction factorization scheme.
-	msbar
+    /// Modified minimal subtraction factorization scheme.
+    msbar
 };
 
 }
