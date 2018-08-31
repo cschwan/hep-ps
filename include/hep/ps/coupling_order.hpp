@@ -24,9 +24,8 @@
 namespace hep
 {
 
-/// Class to identify different coupling orders in the electromagnetic and
-/// strong couplings: \f$ \alpha^n \alpha_\mathrm{s}^m \f$. This class saves the
-/// powers \f$ n \f$ and \f$ m \f$.
+/// Class to identify different coupling orders in the electromagnetic and strong couplings: \f$
+/// \alpha^n \alpha_\mathrm{s}^m \f$. This class saves the powers \f$ n \f$ and \f$ m \f$.
 class coupling_order
 {
 public:

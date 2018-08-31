@@ -58,10 +58,7 @@ pdf_unc<T> parton_df_unc<T>::uncertainty(std::vector<T> const& values) const
         double_values.push_back(static_cast <double> (value));
     }
 
-    auto const unc = pimpl->pdfset.uncertainty(
-        double_values,
-        static_cast <double> (pimpl->cl)
-    );
+    auto const unc = pimpl->pdfset.uncertainty(double_values, static_cast <double> (pimpl->cl));
 
     pdf_unc<T> result;
     result.sym = T(unc.errsymm);

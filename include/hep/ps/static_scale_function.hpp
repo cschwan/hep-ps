@@ -41,8 +41,7 @@ public:
         std::vector<hep::scales<T>>& scales
     );
 
-    /// Returns `false`, since this scale function is independent of the phase
-    /// space point (static).
+    /// Returns `false`, since this scale function is independent of the phase space point (static).
     bool dynamic() const;
 
 private:

@@ -29,11 +29,10 @@
 namespace hep
 {
 
-/// Tries to generate a dipole process for the real process given by
-/// `process_pdg_ids` at the given coupling `order`. The parameter
-/// `dipole_info` determines the dipole. The result is either the PDG
-/// identifiers of the dipole process, or an empty vector, in which case the
-/// dipole process does not exist.
+/// Tries to generate a dipole process for the real process given by `process_pdg_ids` at the given
+/// coupling `order`. The parameter `dipole_info` determines the dipole. The result is either the
+/// PDG identifiers of the dipole process, or an empty vector, in which case the dipole process does
+/// not exist.
 std::vector<int> generate_dipole(
     std::vector<int> const& process_pdg_ids,
     hep::coupling_order order,

@@ -26,11 +26,6 @@ void boost(T m, std::array<T, 4>& p, std::array<T, 4> const& q, bool inverse)
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
-template void boost(
-    double,
-    std::array<double, 4>&,
-    std::array<double, 4> const&,
-    bool
-);
+template void boost(double, std::array<double, 4>&, std::array<double, 4> const&, bool);
 
 }

@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,20 +28,19 @@
 namespace hep
 {
 
-/// Implements the p-type jet algorithms (\f$ k_\mathrm{T} \f$, anti-\f$
-/// k_\mathrm{T} \f$, and Cambridge-Aachen) described in \cite Cacciari:2008gp .
+/// Implements the p-type jet algorithms (\f$ k_\mathrm{T} \f$, anti-\f$ k_\mathrm{T} \f$, and
+/// Cambridge-Aachen) described in \cite Cacciari:2008gp .
 template <typename T>
 class p_type_jet_algorithm
 {
 public:
-    /// Constructor. The choice `p = 1` corresponds to the \f$ k_\mathrm{T}
-    /// \f$-algorithm, `p = 0` to the Cambridge-Aachen algorithm, and `p = -1`
-    /// to the anti-\f$ k_\mathrm{T} \f$ algorithm.
+    /// Constructor. The choice `p = 1` corresponds to the \f$ k_\mathrm{T} \f$-algorithm, `p = 0`
+    /// to the Cambridge-Aachen algorithm, and `p = -1` to the anti-\f$ k_\mathrm{T} \f$ algorithm.
     p_type_jet_algorithm(T p, T radius);
 
-    /// Uses the E-scheme recombination procedure to recombine `phase_space`
-    /// into `recombined_phase_space`. Only the momenta of the final states are
-    /// used that are either a quark or a gluon.
+    /// Uses the E-scheme recombination procedure to recombine `phase_space` into
+    /// `recombined_phase_space`. Only the momenta of the final states are used that are either a
+    /// quark or a gluon.
     void recombine(
         std::vector<T> const& phase_space,
         std::vector<final_state> const& final_states,

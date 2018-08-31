@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@
 namespace hep
 {
 
-/// Boosts the vector `p` in the direction given by `q`, whose invariant must be
-/// `m`. If `inverse` is `true` the inverse boost is applied, otherwise the
-/// (uninverted) boost, which transforms `p` to the rest frame of `q`.
+/// Boosts the vector `p` in the direction given by `q`, whose invariant must be `m`. If `inverse`
+/// is `true` the inverse boost is applied, otherwise the (uninverted) boost, which transforms `p`
+/// to the rest frame of `q`.
 template <typename T>
 void boost(T m, std::array<T, 4>& p, std::array<T, 4> const& q, bool inverse);
 

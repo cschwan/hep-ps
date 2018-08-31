@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,10 +57,9 @@ public:
     /// Virtual destructor.
     virtual ~ps_integrand() = default;
 
-    /// Evaluates the observables this instances represents for the given
-    /// `phase_space` point and luminosity information in `info`. If the
-    /// observables need extra random numbers these will be supplied in
-    /// `extra_random_numbers`.
+    /// Evaluates the observables this instances represents for the given `phase_space` point and
+    /// luminosity information in `info`. If the observables need extra random numbers these will be
+    /// supplied in `extra_random_numbers`.
     virtual T eval(
         std::vector<T> const& phase_space,
         luminosity_info<T> const& info,

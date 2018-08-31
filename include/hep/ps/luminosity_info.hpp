@@ -22,10 +22,9 @@
 namespace hep
 {
 
-/// This class captures the kinematical information that is need to convert the
-/// phase-space points, which are calculated by the phase-space generators in
-/// the center-of-mass frame of the partons, to the center-of-mass frame of the
-/// hadrons (the LAB frame).
+/// This class captures the kinematical information that is need to convert the phase-space points,
+/// which are calculated by the phase-space generators in the center-of-mass frame of the partons,
+/// to the center-of-mass frame of the hadrons (the LAB frame).
 template <typename T>
 class luminosity_info
 {
@@ -38,8 +37,8 @@ public:
     {
     }
 
-    /// Constructor. See \ref x1, \ref x2, \ref energy_squared, and \ref
-    /// rapidity_shift for a description of the arguments.
+    /// Constructor. See \ref x1, \ref x2, \ref energy_squared, and \ref rapidity_shift for a
+    /// description of the arguments.
     luminosity_info(T x1, T x2, T energy_squared, T rapidity_shift)
         : x1_{x1}
         , x2_{x2}
@@ -48,15 +47,13 @@ public:
     {
     }
 
-    /// Returns the momentum fraction of the parton coming from the first
-    /// hadron.
+    /// Returns the momentum fraction of the parton coming from the first hadron.
     T x1() const
     {
         return x1_;
     }
 
-    /// Returns the momentum fraction of the parton coming from the second
-    /// hadron.
+    /// Returns the momentum fraction of the parton coming from the second hadron.
     T x2() const
     {
         return x2_;
@@ -68,9 +65,8 @@ public:
         return energy_squared_;
     }
 
-    /// Returns the rapidity by which one has to boost the center-of-mass
-    /// phase-space point along the beam-axis to get the LAB frame phase-space
-    /// point.
+    /// Returns the rapidity by which one has to boost the center-of-mass phase-space point along
+    /// the beam-axis to get the LAB frame phase-space point.
     T rapidity_shift() const
     {
         return rapidity_shift_;

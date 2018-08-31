@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,16 @@ namespace hep
 {
 
 /**
- * Instances of this class capture the result of (parts of) perturbative
- * calculations. The result is subdivided into a positive and negative rapidity
- * part, which calculated in different reference frames, defined by the
- * transformation rapidities into the LAB frame:
+ * Instances of this class capture the result of (parts of) perturbative calculations. The result is
+ * subdivided into a positive and negative rapidity part, which calculated in different reference
+ * frames, defined by the transformation rapidities into the LAB frame:
  * \f{align}{
  *     y_\text{neg} &= - y_\text{CMS} + y_\text{PS} \\
  *     y_\text{pos} &= + y_\text{CMS} + y_\text{PS}
  * \f}
- * where \f$ y_\text{CMS} \f$ is the rapidity of any object in the partonic
- * center-of-mass frame and \f$ y_\text{PS} \f$ is the rapdity shift produced
- * by the phase space generator. The results \f$ y_\text{neg}, y_\text{pos} \f$
- * are then the rapidities in the LAB frame.
+ * where \f$ y_\text{CMS} \f$ is the rapidity of any object in the partonic center-of-mass frame and
+ * \f$ y_\text{PS} \f$ is the rapdity shift produced by the phase space generator. The results \f$
+ * y_\text{neg}, y_\text{pos} \f$ are then the rapidities in the LAB frame.
  */
 template <typename T>
 struct neg_pos_results

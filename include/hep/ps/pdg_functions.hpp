@@ -70,20 +70,19 @@ std::pair<initial_state, std::vector<final_state>> pdg_ids_to_states(
     std::vector<int> const& ids
 );
 
-/// Returns the symmetry factor corresponding to the final state represented by
-/// `ids` (all ids without the first two).
+/// Returns the symmetry factor corresponding to the final state represented by `ids` (all ids
+/// without the first two).
 std::size_t final_state_symmetry_factor(std::vector<int> const& ids);
 
-/// Converts an OpenLoops process string into a vector of PDG identifiers. This
-/// is the inverse function of \ref pdg_ids_to_ol_process_string.
+/// Converts an OpenLoops process string into a vector of PDG identifiers. This is the inverse
+/// function of \ref pdg_ids_to_ol_process_string.
 std::vector<int> ol_process_string_to_pdg_ids(std::string const& process);
 
-/// Converts a vector of PDG identifiers to an OpenLoops process string. This
-/// is the inverse function of \ref ol_process_string_to_pdg_ids.
+/// Converts a vector of PDG identifiers to an OpenLoops process string. This is the inverse
+/// function of \ref ol_process_string_to_pdg_ids.
 std::string pdg_ids_to_ol_process_string(std::vector<int> const& ids);
 
-/// Returns the electromagnetic charge of the particle with the given PDG
-/// identifier `id`.
+/// Returns the electromagnetic charge of the particle with the given PDG identifier `id`.
 int pdg_id_to_charge_times_three(int id);
 
 }

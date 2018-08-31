@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,7 @@
 namespace hep
 {
 
-/// Trivial distribution generator, i.e. this functor does not generate any
-/// distributions at all.
+/// Trivial distribution generator, i.e. this functor does not generate any distributions at all.
 template <typename T>
 class trivial_distributions
 {

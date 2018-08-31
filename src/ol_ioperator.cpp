@@ -83,8 +83,7 @@ void ol_ioperator<T>::borns(
     auto& ol = ol_interface::instance();
 
     // TODO: set also renormalization scale and loop over it
-    ol.setparameter_double("mu", static_cast <double>
-        (scales.front().regularization()));
+    ol.setparameter_double("mu", static_cast <double> (scales.front().regularization()));
 
     std::size_t n = ol.n_external(id_);
     std::vector<double> pp(5 * n);
@@ -107,8 +106,7 @@ void ol_ioperator<T>::borns(
     double m2ir2[5];
     double acc;
 
-    ol.evaluate_full(id_, pp.data(), &m2tree, m2loop, m2ir1, m2loop2, m2ir2,
-        &acc);
+    ol.evaluate_full(id_, pp.data(), &m2tree, m2loop, m2ir1, m2loop2, m2ir2, &acc);
 
     for (auto& result : results)
     {

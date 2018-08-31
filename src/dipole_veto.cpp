@@ -23,15 +23,14 @@ dipole_veto photon_in_jet()
         std::vector<final_state> const& final_states, dipole const&)
     {
         auto const& states = pdg_ids_to_states(pdg_ids).second;
-        auto const& mismatch = std::mismatch(final_states.begin(),
-            final_states.end(), states.begin());
+        auto const& mismatch = std::mismatch(final_states.begin(), final_states.end(),
+            states.begin());
 
         if (mismatch.first != final_states.end())
         {
             if ((*mismatch.first != final_state::quark_gluon) ||
                 (*mismatch.second != final_state::photon) ||
-                !std::equal(mismatch.first + 1, final_states.end(),
-                mismatch.second + 1))
+                !std::equal(mismatch.first + 1, final_states.end(), mismatch.second + 1))
             {
                 return true;
             }

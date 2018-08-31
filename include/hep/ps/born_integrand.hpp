@@ -98,12 +98,7 @@ public:
         luminosity_info<T> const& info,
         hep::projector<T>& projector
     ) override {
-        recombiner_.recombine(
-            phase_space,
-            final_states_,
-            recombined_ps_,
-            recombined_states_
-        );
+        recombiner_.recombine(phase_space, final_states_, recombined_ps_, recombined_states_);
 
         auto const cut_result = cuts_.cut(
             recombined_ps_,
@@ -217,8 +212,8 @@ private:
 };
 
 template <class T, class M, class C, class R, class P, class S, class D>
-using born_integrand_t = born_integrand<T, std::decay_t<M>, std::decay_t<C>,
-    std::decay_t<R>, std::decay_t<P>, std::decay_t<S>, std::decay_t<D>>;
+using born_integrand_t = born_integrand<T, std::decay_t<M>, std::decay_t<C>, std::decay_t<R>,
+    std::decay_t<P>, std::decay_t<S>, std::decay_t<D>>;
 
 template <class T, class M, class C, class R, class P, class S, class D>
 inline std::unique_ptr<ps_integrand<T>> make_born_integrand(

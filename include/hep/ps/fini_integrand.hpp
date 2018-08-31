@@ -45,8 +45,7 @@
 namespace hep
 {
 
-template <class T, class M, class S, class C, class R, class P, class U,
-    class D>
+template <class T, class M, class S, class C, class R, class P, class U, class D>
 class fini_integrand : public ps_integrand<T>
 {
 public:
@@ -326,12 +325,7 @@ public:
             if ((parts_ != finite_parts::insertion_term) &&
                 (term.type() != insertion_term_type::born))
             {
-                subtraction_.insertion_terms2(
-                    term,
-                    scales_,
-                    phase_space,
-                    terms2_
-                );
+                subtraction_.insertion_terms2(term, scales_, phase_space, terms2_);
 
                 assert( terms2_.size() == scales_.size() );
 
@@ -391,10 +385,8 @@ protected:
                 auto const apt = parton_type_of(ap);
 
                 // only allow (up,up), ... pairs but not (up,anti-up) pairs
-                if (((at == parton_type::quark) &&
-                    (apt == parton_type::anti_quark)) ||
-                    ((at == parton_type::anti_quark) &&
-                    (apt == parton_type::quark)))
+                if (((at == parton_type::quark) && (apt == parton_type::anti_quark)) ||
+                    ((at == parton_type::anti_quark) && (apt == parton_type::quark)))
                 {
                     continue;
                 }
@@ -407,12 +399,10 @@ protected:
 
                 // multiply with the charge of the quark flavor for quark photon
                 // splittings
-                if (((apt == parton_type::anti_quark) ||
-                    (apt == parton_type::quark)) &&
+                if (((apt == parton_type::anti_quark) || (apt == parton_type::quark)) &&
                     (at == parton_type::photon_))
                 {
-                    T const charge = T(pdg_id_to_charge_times_three(
-                        parton_to_pdg_id(ap))) / T(3.0);
+                    T const charge = T(pdg_id_to_charge_times_three(parton_to_pdg_id(ap))) / T(3.0);
 
                     ab.a[apt][at] *= charge * charge;
                     ab.b[apt][at] *= charge * charge;
@@ -478,14 +468,11 @@ private:
     parton_set pdf_parton_list_;
 };
 
-template <class T, class M, class S, class C, class R, class P, class U,
-    class D>
-using fini_integrand_t = fini_integrand<T, std::decay_t<M>, std::decay_t<S>,
-    std::decay_t<C>, std::decay_t<R>, std::decay_t<P>, std::decay_t<U>,
-    std::decay_t<D>>;
+template <class T, class M, class S, class C, class R, class P, class U, class D>
+using fini_integrand_t = fini_integrand<T, std::decay_t<M>, std::decay_t<S>, std::decay_t<C>,
+    std::decay_t<R>, std::decay_t<P>, std::decay_t<U>, std::decay_t<D>>;
 
-template <class T, class M, class S, class C, class R, class P, class U,
-    class D>
+template <class T, class M, class S, class C, class R, class P, class U, class D>
 inline std::unique_ptr<ps_integrand<T>> make_fini_integrand(
     M&& matrix_elements,
     S&& subtraction,

@@ -402,8 +402,7 @@ std::pair<initial_state, std::vector<final_state>> pdg_ids_to_states(
     std::vector<int> const& ids
 ) {
     std::vector<final_state> final_states(ids.size() - 2);
-    std::transform(ids.begin() + 2, ids.end(), final_states.begin(),
-        pdg_id_to_final_state);
+    std::transform(ids.begin() + 2, ids.end(), final_states.begin(), pdg_id_to_final_state);
 
     auto const state = partons_to_initial_state(pdg_id_to_parton(ids.at(0)),
         pdg_id_to_parton(ids.at(1)));

@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@
 namespace hep
 {
 
-/// A modified version of the phase space generator used in \f$
-/// \mathrm{Coffer}\gamma\gamma \f$, see \cite Bredenstein:2005zk .
+/// A modified version of the phase space generator used in \f$ \mathrm{Coffer}\gamma\gamma \f$, see
+/// \cite Bredenstein:2005zk .
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_cofferaa_phase_space_generator(
     T min_energy,

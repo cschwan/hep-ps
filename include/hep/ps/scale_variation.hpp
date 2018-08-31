@@ -28,11 +28,10 @@ enum class scale_variation
     /// No scale variation.
     single_scale,
 
-    /// A three point variation setting the scales \f$ (\mu_\text{F}, \mu,
-    /// \mu_\text{R}) \f$ to the three points \f$ \mu_\text{F} = \mu_\text{R} =
-    /// \mu \f$, \f$ \mu_\text{F} = \mu_\text{R} = \mu / 2 \f$, and \f$
-    /// \mu_\text{F} = \mu_\text{R} = 2 \mu \f$ while leaving the regularization
-    /// scale \f$ \mu \f$ constant.
+    /// A three point variation setting the scales \f$ (\mu_\text{F}, \mu, \mu_\text{R}) \f$ to the
+    /// three points \f$ \mu_\text{F} = \mu_\text{R} = \mu \f$, \f$ \mu_\text{F} = \mu_\text{R} =
+    /// \mu / 2 \f$, and \f$ \mu_\text{F} = \mu_\text{R} = 2 \mu \f$ while leaving the
+    /// regularization scale \f$ \mu \f$ constant.
     three_point,
 
     /// A seven point variation.

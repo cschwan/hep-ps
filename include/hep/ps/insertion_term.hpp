@@ -29,8 +29,8 @@
 namespace hep
 {
 
-/// Classifies a finite insertion term according to the emitter and spectator
-/// particle, similarly to \ref dipole.
+/// Classifies a finite insertion term according to the emitter and spectator particle, similarly to
+/// \ref dipole.
 class insertion_term
 {
 public:

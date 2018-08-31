@@ -86,18 +86,9 @@ void p_type_photon_parton_recombiner<T>::recombine(
             dib_photons_.push_back(pow(ps.pt2(photon), p_));
         }
 
-        auto const min_dib_fermion = std::min_element(
-            dib_fermions_.begin(),
-            dib_fermions_.end()
-        );
-        std::size_t const min_ib_fermion = std::distance(
-            dib_fermions_.begin(),
-            min_dib_fermion
-        );
-        auto const min_dib_photon = std::min_element(
-            dib_photons_.begin(),
-            dib_photons_.end()
-        );
+        auto const min_dib_fermion = std::min_element(dib_fermions_.begin(), dib_fermions_.end());
+        std::size_t const min_ib_fermion = std::distance(dib_fermions_.begin(), min_dib_fermion);
+        auto const min_dib_photon = std::min_element(dib_photons_.begin(), dib_photons_.end());
 
         T min_dij = std::numeric_limits<T>::max();
         std::size_t min_i = 0;

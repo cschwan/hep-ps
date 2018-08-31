@@ -38,8 +38,8 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
         std::transform(pdg_ids.begin() + 2, pdg_ids.end(), final_states.begin(),
             pdg_id_to_final_state);
 
-        auto const state = partons_to_initial_state(
-            pdg_id_to_parton(pdg_ids.at(0)), pdg_id_to_parton(pdg_ids.at(1)));
+        auto const state = partons_to_initial_state(pdg_id_to_parton(pdg_ids.at(0)),
+            pdg_id_to_parton(pdg_ids.at(1)));
 
         if (final_states_.empty())
         {
@@ -47,15 +47,14 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
         }
         else
         {
-            if (!std::equal(final_states_.begin(), final_states_.end(),
-                final_states.begin()))
+            if (!std::equal(final_states_.begin(), final_states_.end(), final_states.begin()))
             {
                 throw std::invalid_argument("processes are not compatible");
             }
         }
 
-        int const process_id = register_process_try_hard(ol, process.c_str(),
-            1, order_qcd, order_ew, mode);
+        int const process_id = register_process_try_hard(ol, process.c_str(), 1, order_qcd,
+            order_ew, mode);
         ids_.emplace(state, process_id);
 
         std::vector<std::size_t> indices;
@@ -73,8 +72,9 @@ ol_integrated_matrix_elements<T>::ol_integrated_matrix_elements(
         else if (type == correction_type::ew)
         {
             std::vector<T> charges(pdg_ids.size());
-            std::transform(pdg_ids.begin(), pdg_ids.end(), charges.begin(),
-                [](int id) { return T(pdg_id_to_charge_times_three(id)) / T(3.0);});
+            std::transform(pdg_ids.begin(), pdg_ids.end(), charges.begin(), [](int id) {
+                return T(pdg_id_to_charge_times_three(id)) / T(3.0);
+            });
 
             charges.at(0) *= T(-1.0);
             charges.at(1) *= T(-1.0);
@@ -148,14 +148,10 @@ void ol_integrated_matrix_elements<T>::correlated_me(
 
     for (std::size_t i = 0; i != n; ++i)
     {
-        ol_phase_space_.at(5 * i + 0) =
-            static_cast <double> (phase_space.at(4 * i + 0));
-        ol_phase_space_.at(5 * i + 1) =
-            static_cast <double> (phase_space.at(4 * i + 1));
-        ol_phase_space_.at(5 * i + 2) =
-            static_cast <double> (phase_space.at(4 * i + 2));
-        ol_phase_space_.at(5 * i + 3) =
-            static_cast <double> (phase_space.at(4 * i + 3));
+        ol_phase_space_.at(5 * i + 0) = static_cast <double> (phase_space.at(4 * i + 0));
+        ol_phase_space_.at(5 * i + 1) = static_cast <double> (phase_space.at(4 * i + 1));
+        ol_phase_space_.at(5 * i + 2) = static_cast <double> (phase_space.at(4 * i + 2));
+        ol_phase_space_.at(5 * i + 3) = static_cast <double> (phase_space.at(4 * i + 3));
         ol_phase_space_.at(5 * i + 4) = 0.0;
     }
 
@@ -172,8 +168,7 @@ void ol_integrated_matrix_elements<T>::correlated_me(
 
             for (auto i = range.first; i != range.second; ++i)
             {
-                ol.evaluate_cc(i->second, ol_phase_space_.data(), &m2tree,
-                    ol_m2cc_.data(), &m2ew);
+                ol.evaluate_cc(i->second, ol_phase_space_.data(), &m2tree, ol_m2cc_.data(), &m2ew);
 
                 for (std::size_t j = 0; j != terms_.size(); ++j)
                 {
@@ -181,22 +176,17 @@ void ol_integrated_matrix_elements<T>::correlated_me(
 
                     if (term.type() == insertion_term_type::born)
                     {
-                        T const casimir = casimir_operator<T>(state,
-                            term.initial_particle());
+                        T const casimir = casimir_operator<T>(state, term.initial_particle());
 
-                        results.at(j).emplace_back(state,
-                            casimir * T(alphas) * T(m2tree));
+                        results.at(j).emplace_back(state, casimir * T(alphas) * T(m2tree));
                     }
                     else
                     {
-                        std::size_t const k = std::min(term.emitter(),
-                            term.spectator());
-                        std::size_t const l = std::max(term.emitter(),
-                            term.spectator());
+                        std::size_t const k = std::min(term.emitter(), term.spectator());
+                        std::size_t const l = std::max(term.emitter(), term.spectator());
                         std::size_t const index = k + l * (l - 1) / 2;
 
-                        results.at(j).emplace_back(state,
-                            T(alphas) * T(ol_m2cc_.at(index)));
+                        results.at(j).emplace_back(state, T(alphas) * T(ol_m2cc_.at(index)));
                     }
                 }
             }
@@ -222,21 +212,15 @@ void ol_integrated_matrix_elements<T>::correlated_me(
 
                     if (term.type() == insertion_term_type::born)
                     {
-                        T const charge = charge_table_.at(i->second).at(
-                            term.initial_particle());
-                        T const    factor = (charge != T())
-                            ? charge * charge
-                            : T(-1.0);
+                        T const charge = charge_table_.at(i->second).at(term.initial_particle());
+                        T const factor = (charge != T()) ? charge * charge : T(-1.0);
 
-                        results.at(j).emplace_back(state, factor * T(alpha) *
-                            T(m2tree));
+                        results.at(j).emplace_back(state, factor * T(alpha) * T(m2tree));
                     }
                     else
                     {
-                        T const charge_em = charge_table_.at(i->second).at(
-                            term.emitter());
-                        T const charge_sp = charge_table_.at(i->second).at(
-                            term.spectator());
+                        T const charge_em = charge_table_.at(i->second).at(term.emitter());
+                        T const charge_sp = charge_table_.at(i->second).at(term.spectator());
                         T factor = charge_em * charge_sp;
 
                         if (factor == T())
@@ -244,8 +228,7 @@ void ol_integrated_matrix_elements<T>::correlated_me(
                             factor = T(-1.0);
                         }
 
-                        results.at(j).emplace_back(state, factor * T(alpha) *
-                            T(m2tree));
+                        results.at(j).emplace_back(state, factor * T(alpha) * T(m2tree));
                     }
                 }
             }

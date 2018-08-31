@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 namespace hep
 {
 
-/// Creates a new generator that generates phase space using the RAMBO
-/// algorithm. See \cite Kleiss:1985gy .
+/// Creates a new generator that generates phase space using the RAMBO algorithm. See \cite
+/// Kleiss:1985gy .
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_rambo_phase_space_generator(
     T min_energy,

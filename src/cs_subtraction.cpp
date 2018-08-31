@@ -434,15 +434,12 @@ void cs_subtraction<T>::insertion_terms(
         T const dilogome = gsl_sf_dilog(T(1.0) - eta);
         T const logome = log(T(1.0) - eta);
 
-        T const value1 = T(0.5) * color / pi * ((x * x + omx * omx) *
-            logomxbx + T(2.0) * x * omx);
-        T const value2 = T(0.5) / pi * (((T(1.0) + x * x) / omx) * logomxbx +
-            omx);
+        T const value1 = T(0.5) * color / pi * ((x * x + omx * omx) * logomxbx + T(2.0) * x * omx);
+        T const value2 = T(0.5) / pi * (((T(1.0) + x * x) / omx) * logomxbx + omx);
         T const value3 = T(0.5) / pi * (T(2.0) / omx) * logomxbx;
-        T const value4 = T(0.5) / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) +
-            T(2.0) * dilogome + logome * logome);
-        T const value5 = T(0.5) * color2 / pi * ((T(1.0) + omx * omx) / x *
-            logomxbx + x);
+        T const value4 = T(0.5) / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) + T(2.0) * dilogome +
+            logome * logome);
+        T const value5 = T(0.5) * color2 / pi * ((T(1.0) + omx * omx) / x * logomxbx + x);
 
         ab_terms<T> result;
 
@@ -496,8 +493,7 @@ void cs_subtraction<T>::insertion_terms(
 
         T const value1 = T(0.5) * color / pi * (x * x + omx * omx);
         T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
-        T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) +
-            T(2.0) * log(T(1.0) - eta));
+        T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) + T(2.0) * log(T(1.0) - eta));
         T const value4 = T(0.5) * color2 / pi * (T(1.0) + omx * omx) / x;
 
         for (auto const& mu : scales)
@@ -540,8 +536,7 @@ void cs_subtraction<T>::insertion_terms(
 
         T const value1 = T(0.5) * color / pi * (x * x + omx * omx);
         T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
-        T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) +
-            T(2.0) * logome);
+        T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) + T(2.0) * logome);
         T const value4 = T(0.5) / pi * T(2.0) * logomx / omx;
         T const value5 = T(0.5) / pi * (pi*pi / T(3.0) - logome * logome);
         T const value6 = T(0.5) * color2 / pi * (T(1.0) + omx * omx) / x;
@@ -553,8 +548,8 @@ void cs_subtraction<T>::insertion_terms(
 
             T const result1 = value1 * (logmu2bsai - logomx);
             T const result2 = value2 * (logmu2bsai - logomx);
-            T const result3 = (eta - T(1.0)) * (value2 * logmu2bsai - value4) +
-                value3 * logmu2bsai + value5;
+            T const result3 = (eta - T(1.0)) * (value2 * logmu2bsai - value4) + value3 * logmu2bsai
+                + value5;
             T const result4 = value6 * (logmu2bsai - logomx);
 
             ab_terms<T> result;

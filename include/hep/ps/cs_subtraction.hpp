@@ -35,15 +35,14 @@
 namespace hep
 {
 
-/// Class implementing the Catani-Seymour dipole subtraction for massless
-/// particles.
+/// Class implementing the Catani-Seymour dipole subtraction for massless particles.
 template <typename T>
 class cs_subtraction
 {
 public:
-    /// Constructor. Sets the number of colors `nc`, the normalization of the
-    /// trace of two generators `tf`, the number of flavors `nf`, the
-    /// factorization scheme `fscheme`, and the regularization scheme `rscheme`.
+    /// Constructor. Sets the number of colors `nc`, the normalization of the trace of two
+    /// generators `tf`, the number of flavors `nf`, the factorization scheme `fscheme`, and the
+    /// regularization scheme `rscheme`.
     cs_subtraction(
         T nc,
         T tf,
@@ -52,8 +51,8 @@ public:
         regularization_scheme rscheme
     );
 
-    /// Maps the `real_phase_space` onto the `born_phase_space` using the maps
-    /// defined for the dipole with `dipole_info`.
+    /// Maps the `real_phase_space` onto the `born_phase_space` using the maps defined for the
+    /// dipole with `dipole_info`.
     dipole_invariants<T> map_phase_space(
         std::vector<T> const& real_phase_space,
         std::vector<T>& born_phase_space,
@@ -68,13 +67,9 @@ public:
     );
 
     ///
-    T fermion_function(
-        dipole const& dipole_info,
-        dipole_invariants<T> const& invariants
-    );
+    T fermion_function(dipole const& dipole_info, dipole_invariants<T> const& invariants);
 
-    /// Returns the finite part of the integrated dipoles together with the
-    /// collinear counterterm.
+    /// Returns the finite part of the integrated dipoles together with the collinear counterterm.
     void insertion_terms(
         insertion_term const& term,
         std::vector<scales<T>> const& scales,
@@ -84,8 +79,8 @@ public:
         std::vector<ab_terms<T>>& results
     ) const;
 
-    /// Returns the finite part of the integrated dipoles not covered by the
-    /// function \ref insertion_terms.
+    /// Returns the finite part of the integrated dipoles not covered by the function \ref
+    /// insertion_terms.
     void insertion_terms2(
         insertion_term const& term,
         std::vector<scales<T>> const& scales,

@@ -22,19 +22,17 @@
 namespace hep
 {
 
-/// Singleton for accessing the OpenLoops Matrix elements. If support for
-/// OpenLoops in this library wasn't activated, some of the methods frow an
-/// exception. Currently this interface is only a thin wrapper which
-/// automatically calls `ol_start` and `ol_finish`.
+/// Singleton for accessing the OpenLoops Matrix elements. If support for OpenLoops in this library
+/// wasn't activated, some of the methods frow an exception. Currently this interface is only a thin
+/// wrapper which automatically calls `ol_start` and `ol_finish`.
 class ol_interface
 {
 public:
     /// Returns the singleton instance.
     static ol_interface& instance();
 
-    /// Returns `true` if this library was compiled against OpenLoops. Otherwise
-    /// this function returns `false` and the member functions of this class
-    /// won't work.
+    /// Returns `true` if this library was compiled against OpenLoops. Otherwise this function
+    /// returns `false` and the member functions of this class won't work.
     static bool enabled();
 
     /// Destructor.
@@ -65,31 +63,13 @@ public:
     void evaluate_tree(int id, double* pp, double* m2tree);
 
     /// Evaluate a color-correlated matrix element.
-    void evaluate_cc(
-        int id,
-        double* pp,
-        double* m2tree,
-        double* m2cc,
-        double* m2ew
-    );
+    void evaluate_cc(int id, double* pp, double* m2tree, double* m2cc, double* m2ew);
 
     /// Evaluate a spin-correlated matrix element.
-    void evaluate_sc(
-        int id,
-        double* pp,
-        int emitter,
-        double* polvect,
-        double* m2sc
-    );
+    void evaluate_sc(int id, double* pp, int emitter, double* polvect, double* m2sc);
 
     /// Evaluate a loop matrix element.
-    void evaluate_loop(
-        int id,
-        double* pp,
-        double* m2tree,
-        double* m2loop,
-        double* acc
-    );
+    void evaluate_loop(int id, double* pp, double* m2tree, double* m2loop, double* acc);
 
     /// Evaluate a squared loop matrix element.
     void evaluate_loop2(int id, double* pp, double* m2loop2, double* acc);

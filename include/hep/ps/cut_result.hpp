@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,9 @@
 namespace hep
 {
 
-/// Class whose instances are used to communicate the result of a phase space
-/// cutter back to the class generating the observables, in particular the
-/// distributions. The minimum information needed from the cuts needed is
-/// whether a given phase space point passes the cuts or not.
+/// Class whose instances are used to communicate the result of a phase space cutter back to the
+/// class generating the observables, in particular the distributions. The minimum information
+/// needed from the cuts needed is whether a given phase space point passes the cuts or not.
 template <typename I>
 class cut_result_with_info
 {
@@ -59,15 +58,13 @@ public:
     /// Type definition for the template parameter `I`.
     using info_t = I;
 
-    /// Returns `true` if a given phase space point has been cutted for negative
-    /// rapidity.
+    /// Returns `true` if a given phase space point has been cutted for negative rapidity.
     bool neg_cutted() const
     {
         return neg_cutted_;
     }
 
-    /// Returns `true` if a given phase space point has been cutted for positive
-    /// rapidity.
+    /// Returns `true` if a given phase space point has been cutted for positive rapidity.
     bool pos_cutted() const
     {
         return pos_cutted_;
@@ -92,8 +89,8 @@ private:
     I pos_info_;
 };
 
-/// If this class is used as the template parameter `I` of \ref
-/// cut_result_with_info this shows that there is no additional information.
+/// If this class is used as the template parameter `I` of \ref cut_result_with_info this shows that
+/// there is no additional information.
 class trivial_cut_info
 {
 public:

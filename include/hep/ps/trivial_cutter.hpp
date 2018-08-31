@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 namespace hep
 {
 
-/// Helper class that never cuts any phase space point. This is useful for
-/// testing and calculating total cross sections.
+/// Helper class that never cuts any phase space point. This is useful for testing and calculating
+/// total cross sections.
 template <typename T>
 class trivial_cutter
 {

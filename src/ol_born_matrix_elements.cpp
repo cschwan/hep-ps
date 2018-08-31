@@ -62,9 +62,8 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
         }
 
         int const amptype = loop_mes ? 11 : 1;
-        ids_.emplace(states.first, register_process_try_hard(ol,
-            process.c_str(), amptype, order.alphas_power(), order.alpha_power(),
-            mode));
+        ids_.emplace(states.first, register_process_try_hard(ol, process.c_str(), amptype,
+            order.alphas_power(), order.alpha_power(), mode));
     }
 
     final_states_.shrink_to_fit();
@@ -101,14 +100,10 @@ void ol_born_matrix_elements<T>::borns(
 
     for (std::size_t i = 0; i != n; ++i)
     {
-        ol_phase_space_.at(5 * i + 0) =
-            static_cast <double> (phase_space.at(4 * i + 0));
-        ol_phase_space_.at(5 * i + 1) =
-            static_cast <double> (phase_space.at(4 * i + 1));
-        ol_phase_space_.at(5 * i + 2) =
-            static_cast <double> (phase_space.at(4 * i + 2));
-        ol_phase_space_.at(5 * i + 3) =
-            static_cast <double> (phase_space.at(4 * i + 3));
+        ol_phase_space_.at(5 * i + 0) = static_cast <double> (phase_space.at(4 * i + 0));
+        ol_phase_space_.at(5 * i + 1) = static_cast <double> (phase_space.at(4 * i + 1));
+        ol_phase_space_.at(5 * i + 2) = static_cast <double> (phase_space.at(4 * i + 2));
+        ol_phase_space_.at(5 * i + 3) = static_cast <double> (phase_space.at(4 * i + 3));
         ol_phase_space_.at(5 * i + 4) = 0.0;
     }
 
@@ -118,15 +113,13 @@ void ol_born_matrix_elements<T>::borns(
         double m2loop[3];
         double acc;
 
-        double const mureg =
-            static_cast <double> (scales.front().regularization());
+        double const mureg = static_cast <double> (scales.front().regularization());
 
         ol.setparameter_double("mureg", mureg);
-        ol.setparameter_double("muren",
-            static_cast <double> (scales.front().renormalization()));
+        ol.setparameter_double("muren", static_cast <double> (scales.front().renormalization()));
 
-        // TODO: `scales` usually has more than one entry with the same
-        // renormalization scale - cache it?
+        // TODO: `scales` usually has more than one entry with the same renormalization scale -
+        // cache it?
 
         for (auto const state : set)
         {
@@ -140,12 +133,10 @@ void ol_born_matrix_elements<T>::borns(
 
             for (auto i = range.first; i != range.second; ++i)
             {
-                // TODO: this assumes that the matrix element itself does
-                // not depend directly on the renormalization scale, for
-                // example through MSBar masses
+                // TODO: this assumes that the matrix element itself does not depend directly on the
+                // renormalization scale, for example through MSBar masses
 
-                ol.evaluate_loop(i->second, ol_phase_space_.data(), &m2tree,
-                    m2loop, &acc);
+                ol.evaluate_loop(i->second, ol_phase_space_.data(), &m2tree, m2loop, &acc);
                 value += T(m2loop[0]);
             }
 
@@ -157,15 +148,12 @@ void ol_born_matrix_elements<T>::borns(
 
         for (std::size_t j = 0; j != scales.size(); ++j)
         {
-            if (scales.at(j).regularization() !=
-                scales.front().regularization())
+            if (scales.at(j).regularization() != scales.front().regularization())
             {
-                throw std::runtime_error(
-                    "regularization scales must be the same");
+                throw std::runtime_error("regularization scales must be the same");
             }
 
-            double const muren =
-                static_cast <double> (scales.at(j).renormalization());
+            double const muren = static_cast <double> (scales.at(j).renormalization());
 
             ol.setparameter_double("muren", muren);
 
@@ -178,8 +166,7 @@ void ol_born_matrix_elements<T>::borns(
 
                 for (auto i = range.first; i != range.second; ++i)
                 {
-                    ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree,
-                        m2loop);
+                    ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree, m2loop);
                     value += T(m2loop[0]);
                 }
 

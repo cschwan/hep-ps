@@ -407,8 +407,7 @@ tinv<T> calc_tinv(T s, T s1, T s2, T t1, T t2)
         if ((e1 < threshold) && (e2 < threshold))
         {
             // TODO: add order six terms?
-            tmax = ((t2 * s1 + t1 * s2) - (x * y * (e1 + e2 + (e1 - e2) *
-                (e1 - e2)))) / s;
+            tmax = ((t2 * s1 + t1 * s2) - (x * y * (e1 + e2 + (e1 - e2) * (e1 - e2)))) / s;
         }
     }
 
@@ -641,10 +640,7 @@ lusifer_psg<T>::lusifer_psg(
     }
 
     // TODO: is the following needed?
-    mcut.assign(
-        std::begin(lusifer_cinv.mcutinv[0]),
-        std::end(lusifer_cinv.mcutinv[0])
-    );
+    mcut.assign(std::begin(lusifer_cinv.mcutinv[0]), std::end(lusifer_cinv.mcutinv[0]));
 
     invariant_jacobians.reserve(invariants.size());
     process_jacobians.reserve(processes_.size());
@@ -699,8 +695,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
             p[i][3] = p[i - leading_zero][3] + p[leading_zero - 1][3];
 
             // calculate the corresponding invariant
-            s[i] = p[i][0] * p[i][0] - p[i][1] * p[i][1] -
-                p[i][2] * p[i][2] - p[i][3] * p[i][3];
+            s[i] = p[i][0] * p[i][0] - p[i][1] * p[i][1] - p[i][2] * p[i][2] - p[i][3] * p[i][3];
 
             p[index][0] = -p[i][0];
             p[index][1] = -p[i][1];
@@ -733,8 +728,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         T mmin = mcut.at(inv1);
         T mmax = mcut.at(inv2);
 
-        for (std::size_t i = 0;
-            &channels_[info.channel].invariants[i] != &invariant; ++i)
+        for (std::size_t i = 0; &channels_[info.channel].invariants[i] != &invariant; ++i)
         {
             std::size_t const virt = channels_[info.channel].invariants[i].in;
             bool const condition = s[virt] > mcut[virt] * mcut[virt];
@@ -901,8 +895,7 @@ void lusifer_psg<T>::generate(
         T mmin = mcut[inv1];
         T mmax = mcut[inv2];
 
-        for (std::size_t i = 0;
-            &channels_[channel].invariants[i] != &invariant; ++i)
+        for (std::size_t i = 0; &channels_[channel].invariants[i] != &invariant; ++i)
         {
             std::size_t const virt = channels_[channel].invariants[i].in;
             bool const condition = s[virt] > mcut[virt] * mcut[virt];
@@ -970,8 +963,7 @@ void lusifer_psg<T>::generate(
 
         T const sqrts = sqrt(s);
 
-        p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(),
-            T(0.5) * tinv.lambdas / sqrts };
+        p1 = { T(0.5) * (s + s1 - s2) / sqrts, T(), T(), T(0.5) * tinv.lambdas / sqrts };
 
         auto const& q1 = p[process.in1];
         phi = copysign(phi, q1[3]);
@@ -980,12 +972,7 @@ void lusifer_psg<T>::generate(
 
         auto const& q2 = p[process.in2];
 
-        std::array<T, 4> const q = {
-            q1[0] + q2[0],
-            q1[1] + q2[1],
-            q1[2] + q2[2],
-            q1[3] + q2[3]
-        };
+        std::array<T, 4> const q = { q1[0] + q2[0], q1[1] + q2[1], q1[2] + q2[2], q1[3] + q2[3] };
 
         std::array<T, 4> k1 = { q1[0], q1[1], q1[2], q1[3] };
 

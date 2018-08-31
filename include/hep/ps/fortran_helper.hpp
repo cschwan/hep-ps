@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,9 @@
 namespace hep
 {
 
-/// Assumes `momenta` contains a phase space point in FORTRAN ordering, i.e.
-/// first all the energies, then all x-components, and so on. Reorders `momenta`
-/// to C++ ordering, i.e. where the momenta are in `0 1 2 3`, `0 1 2 3`, ...
-/// ordering.
+/// Assumes `momenta` contains a phase space point in FORTRAN ordering, i.e. first all the energies,
+/// then all x-components, and so on. Reorders `momenta` to C++ ordering, i.e. where the momenta are
+/// in `0 1 2 3`, `0 1 2 3`, ... ordering.
 template <typename T>
 void fortran_ordering_to_cpp(std::vector<T>& momenta);
 

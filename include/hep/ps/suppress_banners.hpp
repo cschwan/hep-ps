@@ -22,9 +22,8 @@
 namespace hep
 {
 
-/// Prevents all third-party libraries used by `hep-ps` from printing their
-/// banners. This is useful if many processes are started and only one of them
-/// should print banners.
+/// Prevents all third-party libraries used by `hep-ps` from printing their banners. This is useful
+/// if many processes are started and only one of them should print banners.
 void suppress_banners(bool suppress);
 
 /// Returns `true` if third-party libraries should be silenced.

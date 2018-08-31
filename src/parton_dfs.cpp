@@ -108,24 +108,17 @@ void parton_dfs<T>::eval(
     {
         // check if we already calculated the PDF
         auto const end = std::next(scales.begin(), i);
-        auto const result = std::find_if(scales.begin(), end,
-            [&](hep::scales<T> const& s) {
-                return s.factorization() == scales.at(i).factorization();
+        auto const result = std::find_if(scales.begin(), end, [&](hep::scales<T> const& s) {
+            return s.factorization() == scales.at(i).factorization();
         });
 
         if (result == end)
         {
-            auto const muf =
-                static_cast <double> (scales.at(i).factorization());
+            auto const muf = static_cast <double> (scales.at(i).factorization());
 
             for (auto const& ids : pimpl->pdg_ids)
             {
-                auto const xfx = pimpl->pdfs.front()->xfxQ(
-                    ids.first,
-                    xval,
-                    muf
-                );
-
+                auto const xfx = pimpl->pdfs.front()->xfxQ(ids.first, xval, muf);
                 scale_pdfs.at(i)[ids.second] = T(xfx) / x;
             }
         }

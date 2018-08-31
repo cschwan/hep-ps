@@ -45,8 +45,7 @@
 namespace hep
 {
 
-template <class T, class M, class S, class C, class R, class P, class U,
-    class D>
+template <class T, class M, class S, class C, class R, class P, class U, class D>
 class real_integrand : public ps_integrand<T>
 {
 public:
@@ -147,18 +146,12 @@ public:
                 recombined_dipole_states_
             );
 
-            if (dipole_cut_result.neg_cutted() &&
-                dipole_cut_result.pos_cutted())
+            if (dipole_cut_result.neg_cutted() && dipole_cut_result.pos_cutted())
             {
                 continue;
             }
 
-            non_zero_dipoles_.emplace_back(
-                index++,
-                invariants,
-                dipole,
-                dipole_cut_result
-            );
+            non_zero_dipoles_.emplace_back(index++, invariants, dipole, dipole_cut_result);
         }
 
         recombiner_.recombine(
@@ -206,8 +199,7 @@ public:
             auto const& dipole = non_zero_dipole.dipole();
             auto const& dipole_cut_result = non_zero_dipole.cut_result();
             auto const& invariants = non_zero_dipole.invariants();
-            auto const& phase_space =
-                dipole_phase_spaces_.at(non_zero_dipole.index());
+            auto const& phase_space = dipole_phase_spaces_.at(non_zero_dipole.index());
 
             for (auto& me : me_)
             {
@@ -219,20 +211,13 @@ public:
             if ((dipole.emitter_type() == particle_type::fermion) !=
                 (dipole.unresolved_type() == particle_type::fermion))
             {
-                matrix_elements_.dipole_me(
-                    dipole,
-                    phase_space,
-                    set_,
-                    scales_,
-                    me_
-                );
-
+                matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
                 function = -subtraction_.fermion_function(dipole, invariants);
             }
             else
             {
-                auto const correlator = subtraction_.boson_function(dipole,
-                    invariants, real_phase_space);
+                auto const correlator = subtraction_.boson_function(dipole, invariants,
+                    real_phase_space);
 
                 for (auto& me : me_tmp_)
                 {
@@ -381,14 +366,11 @@ private:
     T alphas_power_;
 };
 
-template <class T, class M, class S, class C, class R, class P, class U,
-    class D>
-using real_integrand_type = real_integrand<T, std::decay_t<M>, std::decay_t<S>,
-    std::decay_t<C>, std::decay_t<R>, std::decay_t<P>, std::decay_t<U>,
-    std::decay_t<D>>;
+template <class T, class M, class S, class C, class R, class P, class U, class D>
+using real_integrand_type = real_integrand<T, std::decay_t<M>, std::decay_t<S>, std::decay_t<C>,
+    std::decay_t<R>, std::decay_t<P>, std::decay_t<U>, std::decay_t<D>>;
 
-template <class T, class M, class S, class C, class R, class P, class U,
-    class D>
+template <class T, class M, class S, class C, class R, class P, class U, class D>
 inline std::unique_ptr<ps_integrand<T>> make_real_integrand(
     M&& matrix_elements,
     S&& subtraction,

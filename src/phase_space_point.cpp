@@ -114,14 +114,14 @@ T phase_space_point<T>::m2(std::size_t i, std::size_t j) const
 
     return p0 * p0 - p1 * p1 - p2 * p2 - p3 * p3;
 }
-    
+
 template <typename T>
 T phase_space_point<T>::m2(std::size_t i, std::size_t j, std::size_t k, std::size_t l) const
 {
     T const p0 = p_[4*i+0] + p_[4*j+0] + p_[4*k+0] + p_[4*l+0];
     T const p1 = p_[4*i+1] + p_[4*j+1] + p_[4*k+1] + p_[4*l+1];
-        T const p2 = p_[4*i+2] + p_[4*j+2] + p_[4*k+2] + p_[4*l+2];
-        T const p3 = p_[4*i+3] + p_[4*j+3] + p_[4*k+3] + p_[4*l+3];
+    T const p2 = p_[4*i+2] + p_[4*j+2] + p_[4*k+2] + p_[4*l+2];
+    T const p3 = p_[4*i+3] + p_[4*j+3] + p_[4*k+3] + p_[4*l+3];
 
     return p0 * p0 - p1 * p1 - p2 * p2 - p3 * p3;
 }

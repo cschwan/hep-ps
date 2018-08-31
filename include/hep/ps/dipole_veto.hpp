@@ -28,22 +28,20 @@
 namespace hep
 {
 
-/// Type for dipole vetos. The first argument is a vector with the PDG
-/// identifiers of the matrix element that the dipole is proportional to, the
-/// second argument is the vector of final states for the dipole, and the third
-/// argument is the dipole.
+/// Type for dipole vetos. The first argument is a vector with the PDG identifiers of the matrix
+/// element that the dipole is proportional to, the second argument is the vector of final states
+/// for the dipole, and the third argument is the dipole.
 using dipole_veto = std::function<bool(
     std::vector<int> const&,
     std::vector<final_state> const&,
     dipole const&
 )>;
 
-/// Returns the default dipole veto, which vetos all dipoles that do lead to
-/// different final states.
+/// Returns the default dipole veto, which vetos all dipoles that do lead to different final states.
 dipole_veto default_dipole_veto();
 
-/// Behaves as \ref default_dipole_veto, but doesn't veto if the process has a
-/// \ref final_state::photon instead of a \ref final_state::quark_gluon.
+/// Behaves as \ref default_dipole_veto, but doesn't veto if the process has a \ref
+/// final_state::photon instead of a \ref final_state::quark_gluon.
 dipole_veto photon_in_jet();
 
 }

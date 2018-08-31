@@ -56,9 +56,8 @@ public:
     /// Destructor.
     ~parton_df_unc();
 
-    /// Calculates the PDF uncertainty for the given `values`. The first element
-    /// of `values` must be the central prediction, all other values the ones
-    /// from the Error PDF set.
+    /// Calculates the PDF uncertainty for the given `values`. The first element of `values` must be
+    /// the central prediction, all other values the ones from the Error PDF set.
     pdf_unc<T> uncertainty(std::vector<T> const& values) const;
 
 private:

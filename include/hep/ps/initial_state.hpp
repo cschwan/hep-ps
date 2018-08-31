@@ -415,8 +415,8 @@ parton_set partons_in_initial_state_set(initial_state_set set);
 /// Returns an `initial_state` constructed from two \ref parton instances.
 initial_state partons_to_initial_state(parton one, parton two);
 
-/// Returns the value of the Casimir operator for the particle in the \ref
-/// initial_state `state` with the given `index`.
+/// Returns the value of the Casimir operator for the particle in the \ref initial_state `state`
+/// with the given `index`.
 template <typename T>
 T casimir_operator(initial_state state, std::size_t index);
 

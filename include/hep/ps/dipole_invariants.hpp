@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,11 @@
 namespace hep
 {
 
-/// Structure capturing the invariants for a dipole for a specific phase space
-/// point.
+/// Structure capturing the invariants for a dipole for a specific phase space point.
 template <typename T>
 struct dipole_invariants
 {
-    /// Constructor. Initializes this object
+    /// Constructor. Initializes this object.
     dipole_invariants(T one = T(), T two = T(), T sij = T(), T alpha = T())
         : one{one}
         , two{two}
@@ -45,8 +44,8 @@ struct dipole_invariants
     /// Propagator invariant of the dipole.
     T sij;
 
-    /// The value of the parameter \f$ \alpha \f$ on which a technical cut is
-    /// applied if the value is too small.
+    /// The value of the parameter \f$ \alpha \f$ on which a technical cut is applied if the value
+    /// is too small.
     T alpha;
 };
 

@@ -25,24 +25,15 @@ bool operator<(insertion_term const& a, insertion_term const& b)
         return false;
     }
 
-    return std::make_tuple(
-        a.emitter(),
-        a.emitter_type(),
-        a.spectator()
-    ) < std::make_tuple(
-        b.emitter(),
-        b.emitter_type(),
-        b.spectator()
-    );
+    return std::make_tuple(a.emitter(), a.emitter_type(), a.spectator()) <
+        std::make_tuple(b.emitter(), b.emitter_type(), b.spectator());
 }
 
 bool operator==(insertion_term const& a, insertion_term const& b)
 {
     return (a.corr_type() == b.corr_type()) && (a.type() == b.type()) &&
-        ((a.type() == insertion_term_type::born)
-        ? (a.initial_particle() == b.initial_particle())
-        : ((a.emitter() == b.emitter()) &&
-            (a.emitter_type() == b.emitter_type()) &&
+        ((a.type() == insertion_term_type::born) ? (a.initial_particle() == b.initial_particle())
+        : ((a.emitter() == b.emitter()) && (a.emitter_type() == b.emitter_type()) &&
             (a.spectator() == b.spectator())));
 }
 

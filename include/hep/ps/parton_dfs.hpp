@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,16 +30,15 @@
 namespace hep
 {
 
-/// Class that gives access to parton distribution functions (PDFs); depending
-/// on how they are constructed, this class gives access to either the central
-/// PDF or the entire PDF set for calculating a central prediction and its
-/// uncertainty.
+/// Class that gives access to parton distribution functions (PDFs); depending on how they are
+/// constructed, this class gives access to either the central PDF or the entire PDF set for
+/// calculating a central prediction and its uncertainty.
 template <typename T>
 class parton_dfs
 {
 public:
-    /// Constructor. This creates a single PDF with index `pdf_member` from the
-    /// set of PDFs called `name`.
+    /// Constructor. This creates a single PDF with index `pdf_member` from the set of PDFs called
+    /// `name`.
     parton_dfs(std::string const& name, std::size_t pdf_member);
 
     /// Constructor. This creates all PDFs from the set of PDFs called `name`.
@@ -51,21 +50,19 @@ public:
     /// Destructor.
     ~parton_dfs();
 
-    /// Evaluates the strong coupling for the renormalization scales in `scales`
-    /// and writes the results into `alphas`
+    /// Evaluates the strong coupling for the renormalization scales in `scales` and writes the
+    /// results into `alphas`
     void eval_alphas(
         std::vector<hep::scales<T>> const& scales,
         std::vector<T>& alphas
     );
 
-    /// This function returns the number of PDFs represented with by this
-    /// object.
+    /// This function returns the number of PDFs represented with by this object.
     std::size_t count() const;
 
-    /// Evaluates the central PDFs for all partons for the momentum fraction `x`
-    /// at the given `scales`, writes the results into `scale_pdfs`, and also
-    /// evaluates, for the central scale, the uncertainty PDFs and writes the
-    /// results into `uncertainty_pdfs`.
+    /// Evaluates the central PDFs for all partons for the momentum fraction `x` at the given
+    /// `scales`, writes the results into `scale_pdfs`, and also evaluates, for the central scale,
+    /// the uncertainty PDFs and writes the results into `uncertainty_pdfs`.
     void eval(
         T x,
         std::vector<scales<T>> const& scales,
@@ -73,8 +70,8 @@ public:
         std::vector<parton_array<T>>& uncertainty_pdfs
     );
 
-    /// Registers all the partons contained in `set`. For performance reasons
-    /// the values for the PDFs of unregistered partons may be zero.
+    /// Registers all the partons contained in `set`. For performance reasons the values for the
+    /// PDFs of unregistered partons may be zero.
     void register_partons(parton_set set);
 
 private:

@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,20 +25,20 @@ namespace hep
 /// Enumeration for the dipole types.
 enum class dipole_type
 {
-    /// Marks an initial-initial (II) dipole, i.e. a dipole with an initial
-    /// state emitter and an initial state spectator.
+    /// Marks an initial-initial (II) dipole, i.e. a dipole with an initial state emitter and an
+    /// initial state spectator.
     initial_initial,
 
-    /// Marks an initial-final (IF) dipole, i.e. a dipole with an initial state
-    /// emitter and a final state spectator.
+    /// Marks an initial-final (IF) dipole, i.e. a dipole with an initial state emitter and a final
+    /// state spectator.
     initial_final,
 
-    /// Marks a final-initial (FI) dipole, i.e. a dipole with a final state
-    /// emitter and an initial state spectator.
+    /// Marks a final-initial (FI) dipole, i.e. a dipole with a final state emitter and an initial
+    /// state spectator.
     final_initial,
 
-    /// Marks a final-final (FF) dipole, i.e. a dipole with a final state
-    /// emitter and a final state spectator.
+    /// Marks a final-final (FF) dipole, i.e. a dipole with a final state emitter and a final state
+    /// spectator.
     final_final
 };
 

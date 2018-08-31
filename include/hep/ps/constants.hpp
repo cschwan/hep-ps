@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ namespace hep
 template <typename T>
 struct constants
 {
-    /// The value of \f$ ( \hbar c )^2 \f$ in \f$ \text{GeV}^2 \text{pbarn} \f$
-    /// from the 2016 edition of the PDG booklet.
+    /// The value of \f$ ( \hbar c )^2 \f$ in \f$ \text{GeV}^2 \text{pbarn} \f$ from the 2016
+    /// edition of the PDG booklet.
     static constexpr T hbarc2 = T(3.893793656e8);
 };
 

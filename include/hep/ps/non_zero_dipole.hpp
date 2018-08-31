@@ -29,8 +29,8 @@
 namespace hep
 {
 
-/// Class for storing information for the evaluation of a dipole that
-/// successfully passed the phase space recombination and cuts.
+/// Class for storing information for the evaluation of a dipole that successfully passed the phase
+/// space recombination and cuts.
 template <typename T, typename I>
 class non_zero_dipole
 {

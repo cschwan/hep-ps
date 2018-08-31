@@ -26,21 +26,18 @@
 namespace hep
 {
 
-/// Callback function that allows to select or deselect dipoles used in photon
-/// splittings. The first argument is a vector with the PDG ids representing
-/// the matrix element that the dipole is proportional to, and the remaining
-/// indices are the emitter, unresolved, and spectator index. If the return
-/// type is `true`, the corresponding dipole will be included, otherwise it
-/// will be discarded.
+/// Callback function that allows to select or deselect dipoles used in photon splittings. The first
+/// argument is a vector with the PDG ids representing the matrix element that the dipole is
+/// proportional to, and the remaining indices are the emitter, unresolved, and spectator index. If
+/// the return type is `true`, the corresponding dipole will be included, otherwise it will be
+/// discarded.
 using photon_dipole_selector = std::function<
     bool(std::vector<int>, std::size_t, std::size_t, std::size_t)>;
 
 /// Selects the first photon dipole which is encountered.
 inline photon_dipole_selector default_photon_dipole_selector()
 {
-    return [](std::vector<int>, std::size_t, std::size_t, std::size_t) {
-        return true;
-    };
+    return [](std::vector<int>, std::size_t, std::size_t, std::size_t) { return true; };
 }
 
 }

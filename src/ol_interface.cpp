@@ -173,13 +173,8 @@ void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 #endif
 }
 
-void ol_interface::evaluate_cc(
-    int id,
-    double* pp,
-    double* m2tree,
-    double* m2cc,
-    double* m2ew
-) {
+void ol_interface::evaluate_cc(int id, double* pp, double* m2tree, double* m2cc, double* m2ew)
+{
 #ifdef HAVE_OPENLOOPS
     if (!started_)
     {
@@ -199,13 +194,8 @@ void ol_interface::evaluate_cc(
 #endif
 }
 
-void ol_interface::evaluate_sc(
-    int id,
-    double* pp,
-    int emitter,
-    double* polvect,
-    double* m2sc
-) {
+void ol_interface::evaluate_sc(int id, double* pp, int emitter, double* polvect, double* m2sc)
+{
 #ifdef HAVE_OPENLOOPS
     if (!started_)
     {
@@ -225,13 +215,8 @@ void ol_interface::evaluate_sc(
 #endif
 }
 
-void ol_interface::evaluate_loop(
-    int id,
-    double* pp,
-    double* m2tree,
-    double* m2loop,
-    double* acc
-) {
+void ol_interface::evaluate_loop(int id, double* pp, double* m2tree, double* m2loop, double* acc)
+{
 #ifdef HAVE_OPENLOOPS
     if (!started_)
     {
@@ -251,12 +236,8 @@ void ol_interface::evaluate_loop(
 #endif
 }
 
-void ol_interface::evaluate_loop2(
-    int id,
-    double* pp,
-    double* m2loop2,
-    double* acc
-) {
+void ol_interface::evaluate_loop2(int id, double* pp, double* m2loop2, double* acc)
+{
 #ifdef HAVE_OPENLOOPS
     if (!started_)
     {
@@ -275,12 +256,8 @@ void ol_interface::evaluate_loop2(
 #endif
 }
 
-void ol_interface::evaluate_ct(
-    int id,
-    double* pp,
-    double* m2_tree,
-    double* m2_ct
-) {
+void ol_interface::evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct)
+{
 #ifdef HAVE_OPENLOOPS
     if (!started_)
     {

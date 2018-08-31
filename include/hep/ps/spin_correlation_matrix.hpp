@@ -26,8 +26,8 @@ namespace hep
 /// \f[
 ///     -g^{\mu \nu} A + \frac{p^\mu p^\nu}{p^2} B
 /// \f]
-/// and instances of this class represent the factors \f$ A \f$, \f$ B \f$, and
-/// the vector \f$ p \f$.
+/// and instances of this class represent the factors \f$ A \f$, \f$ B \f$, and the vector \f$ p
+/// \f$.
 template <typename T>
 struct spin_correlation_matrix
 {

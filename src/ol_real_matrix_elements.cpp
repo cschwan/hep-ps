@@ -116,12 +116,12 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
             }
 
             auto const process = pdg_ids_to_ol_process_string(dipole_ids);
-            int const order_ew = (type == correction_type::qcd)
-                ? order.alpha_power() : (order.alpha_power() - 1);
-            int const order_qcd = (type == correction_type::qcd)
-                ? (order.alphas_power() - 1) : order.alphas_power();
-            int const dipole_id = register_process_try_hard(ol, process.c_str(),
-                1, order_qcd, order_ew, dipole_mode);
+            int const order_ew = (type == correction_type::qcd) ? order.alpha_power() :
+                (order.alpha_power() - 1);
+            int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
+                order.alphas_power();
+            int const dipole_id = register_process_try_hard(ol, process.c_str(), 1, order_qcd,
+                order_ew, dipole_mode);
 
             int charge_table_index = -1;
 
@@ -143,10 +143,9 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
                 charges.at(1) *= T(-1.0);
 
                 // check if this charge table does already exist
-                auto const result = std::find_if(charge_table_.begin(),
-                    charge_table_.end(), [&](std::vector<T> const& table) {
-                        return std::equal(table.begin(), table.end(),
-                            charges.begin());
+                auto const result = std::find_if(charge_table_.begin(), charge_table_.end(),
+                    [&](std::vector<T> const& table) {
+                        return std::equal(table.begin(), table.end(), charges.begin());
                 });
 
                 if (result == charge_table_.end())
@@ -156,14 +155,12 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
                 }
                 else
                 {
-                    charge_table_index = std::distance(charge_table_.begin(),
-                        result);
+                    charge_table_index = std::distance(charge_table_.begin(), result);
                 }
             }
 
             // add a dipole if it doesn't exist yet
-            if (std::find(dipoles_.begin(), dipoles_.end(), dip) ==
-                dipoles_.end())
+            if (std::find(dipoles_.begin(), dipoles_.end(), dip) == dipoles_.end())
             {
                 dipoles_.push_back(dip);
             }
@@ -188,8 +185,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
             if (!found)
             {
-                mes_.emplace(dip, std::make_tuple(states.first, dipole_id,
-                    factor, charge_table_index));
+                mes_.emplace(dip, std::make_tuple(states.first, dipole_id, factor,
+                    charge_table_index));
             }
 
             // currently we only support one photon dipole per spectator
@@ -244,14 +241,10 @@ void ol_real_matrix_elements<T>::dipole_me(
 
     for (std::size_t i = 0; i != n; ++i)
     {
-        ol_phase_space_.at(5 * i + 0) =
-            static_cast <double> (phase_space.at(4 * i + 0));
-        ol_phase_space_.at(5 * i + 1) =
-            static_cast <double> (phase_space.at(4 * i + 1));
-        ol_phase_space_.at(5 * i + 2) =
-            static_cast <double> (phase_space.at(4 * i + 2));
-        ol_phase_space_.at(5 * i + 3) =
-            static_cast <double> (phase_space.at(4 * i + 3));
+        ol_phase_space_.at(5 * i + 0) = static_cast <double> (phase_space.at(4 * i + 0));
+        ol_phase_space_.at(5 * i + 1) = static_cast <double> (phase_space.at(4 * i + 1));
+        ol_phase_space_.at(5 * i + 2) = static_cast <double> (phase_space.at(4 * i + 2));
+        ol_phase_space_.at(5 * i + 3) = static_cast <double> (phase_space.at(4 * i + 3));
         ol_phase_space_.at(5 * i + 4) = 0.0;
     }
 
@@ -281,15 +274,13 @@ void ol_real_matrix_elements<T>::dipole_me(
             {
                 double m2tree;
                 double m2ew;
-                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
-                    ol_m2_.data(), &m2ew);
+                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree, ol_m2_.data(), &m2ew);
 
                 auto const k = std::min(em_born, sp_born);
                 auto const l = std::max(em_born, sp_born);
                 auto const index = k + l * (l - 1) / 2;
 
-                T const result = final_state_factor * alphas *
-                    T(ol_m2_.at(index));
+                T const result = final_state_factor * alphas * T(ol_m2_.at(index));
 
                 results.front().emplace_back(state, result);
             }
@@ -315,8 +306,7 @@ void ol_real_matrix_elements<T>::dipole_me(
 
                 T const charge_em = charge_table_.at(index).at(em_real);
                 T const charge_sp = charge_table_.at(index).at(sp_real);
-                T const result = final_state_factor * charge_em * charge_sp *
-                    alpha * T(m2tree);
+                T const result = final_state_factor * charge_em * charge_sp * alpha * T(m2tree);
 
                 results.front().emplace_back(state, result);
             }
@@ -352,14 +342,10 @@ void ol_real_matrix_elements<T>::dipole_sc(
 
     for (std::size_t i = 0; i != n; ++i)
     {
-        ol_phase_space_.at(5 * i + 0) =
-            static_cast <double> (phase_space.at(4 * i + 0));
-        ol_phase_space_.at(5 * i + 1) =
-            static_cast <double> (phase_space.at(4 * i + 1));
-        ol_phase_space_.at(5 * i + 2) =
-            static_cast <double> (phase_space.at(4 * i + 2));
-        ol_phase_space_.at(5 * i + 3) =
-            static_cast <double> (phase_space.at(4 * i + 3));
+        ol_phase_space_.at(5 * i + 0) = static_cast <double> (phase_space.at(4 * i + 0));
+        ol_phase_space_.at(5 * i + 1) = static_cast <double> (phase_space.at(4 * i + 1));
+        ol_phase_space_.at(5 * i + 2) = static_cast <double> (phase_space.at(4 * i + 2));
+        ol_phase_space_.at(5 * i + 3) = static_cast <double> (phase_space.at(4 * i + 3));
         ol_phase_space_.at(5 * i + 4) = 0.0;
     }
 
@@ -396,23 +382,20 @@ void ol_real_matrix_elements<T>::dipole_sc(
             {
                 double m2tree;
                 double m2ew;
-                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree,
-                    ol_m2_.data(), &m2ew);
+                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree, ol_m2_.data(), &m2ew);
 
                 auto const k = std::min(em_born, sp_born);
                 auto const l = std::max(em_born, sp_born);
                 auto const index = k + l * (l - 1) / 2;
 
-                T const result_one = final_state_factor * alphas *
-                    T(ol_m2_.at(index));
+                T const result_one = final_state_factor * alphas * T(ol_m2_.at(index));
 
                 results_one.front().emplace_back(state, result_one);
 
-                ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1,
-                    double_vector.data(), ol_m2_.data());
+                ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1, double_vector.data(),
+                    ol_m2_.data());
 
-                T const result_two = final_state_factor * alphas *
-                    T(ol_m2_.at(sp_born));
+                T const result_two = final_state_factor * alphas * T(ol_m2_.at(sp_born));
 
                 results_two.front().emplace_back(state, result_two);
             }
@@ -444,17 +427,16 @@ void ol_real_matrix_elements<T>::dipole_sc(
                 double m2tree;
                 ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
 
-                T const result_one = -final_state_factor *
-                    initial_state_factor * alpha * T(m2tree);
+                T const result_one = -final_state_factor * initial_state_factor * alpha * T(m2tree);
 
                 results_one.front().emplace_back(state, result_one);
 
                 // OpenLoops returns the spin-correlator with an additonal sign
-                ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1,
-                    double_vector.data(), ol_m2_.data());
+                ol.evaluate_sc(id, ol_phase_space_.data(), em_born + 1, double_vector.data(),
+                    ol_m2_.data());
 
-                T const result_two = -final_state_factor *
-                    initial_state_factor * alpha * T(-ol_m2_.at(sp_born));
+                T const result_two = -final_state_factor * initial_state_factor * alpha *
+                    T(-ol_m2_.at(sp_born));
 
                 results_two.front().emplace_back(state, result_two);
             }
@@ -508,14 +490,10 @@ void ol_real_matrix_elements<T>::reals(
 
     for (std::size_t i = 0; i != n; ++i)
     {
-        ol_phase_space_.at(5 * i + 0) =
-            static_cast <double> (phase_space.at(4 * i + 0));
-        ol_phase_space_.at(5 * i + 1) =
-            static_cast <double> (phase_space.at(4 * i + 1));
-        ol_phase_space_.at(5 * i + 2) =
-            static_cast <double> (phase_space.at(4 * i + 2));
-        ol_phase_space_.at(5 * i + 3) =
-            static_cast <double> (phase_space.at(4 * i + 3));
+        ol_phase_space_.at(5 * i + 0) = static_cast <double> (phase_space.at(4 * i + 0));
+        ol_phase_space_.at(5 * i + 1) = static_cast <double> (phase_space.at(4 * i + 1));
+        ol_phase_space_.at(5 * i + 2) = static_cast <double> (phase_space.at(4 * i + 2));
+        ol_phase_space_.at(5 * i + 3) = static_cast <double> (phase_space.at(4 * i + 3));
         ol_phase_space_.at(5 * i + 4) = 0.0;
     }
 

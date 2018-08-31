@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2017  Christopher Schwan
+ * Copyright (C) 2016-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,15 @@
 namespace hep
 {
 
-/// Class that captures all important scales that matrix elements and other
-/// parts of perturbative calculations depend on.
+/// Class that captures all important scales that matrix elements and other parts of perturbative
+/// calculations depend on.
 template <typename T>
 class scales
 {
 public:
-    /// Constructs a new object with \f$ \mu_\text{F} \f$ set to the value of
-    /// `factorization`, \f$ \mu \f$ set to the value of `regularization`, and
-    /// \f$ \mu_\text{R} \f$ set to the value of `renormalization`.
+    /// Constructs a new object with \f$ \mu_\text{F} \f$ set to the value of `factorization`, \f$
+    /// \mu \f$ set to the value of `regularization`, and \f$ \mu_\text{R} \f$ set to the value of
+    /// `renormalization`.
     scales(T factorization, T regularization, T renormalization)
         : factorization_{factorization}
         , regularization_{regularization}

@@ -44,22 +44,19 @@ public:
         correction_type corr_type
     );
 
-    /// Returns the index of the particle of the real process that is the
-    /// emitter in this dipole.
+    /// Returns the index of the particle of the real process that is the emitter in this dipole.
     std::size_t emitter() const
     {
         return emitter_;
     }
 
-    /// Returns the index of the particle of the real process that is recombined
-    /// in the dipole.
+    /// Returns the index of the particle of the real process that is recombined in the dipole.
     std::size_t unresolved() const
     {
         return unresolved_;
     }
 
-    /// Returns the index of the particle of the real process that is the
-    /// spectator of this dipole.
+    /// Returns the index of the particle of the real process that is the spectator of this dipole.
     std::size_t spectator() const
     {
         return spectator_;
@@ -83,8 +80,8 @@ public:
         return spectator_type_;
     }
 
-    /// Returns whether this is an initial-initial, initial-final,
-    /// final-initial, or final-final dipole.
+    /// Returns whether this is an initial-initial, initial-final, final-initial, or final-final
+    /// dipole.
     dipole_type type() const
     {
         return type_;
