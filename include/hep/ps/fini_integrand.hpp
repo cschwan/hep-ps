@@ -397,19 +397,19 @@ protected:
                     continue;
                 }
 
+                T q2 = T(1.0);
+
                 // multiply with the charge of the quark flavor for quark photon
                 // splittings
                 if (((apt == parton_type::anti_quark) || (apt == parton_type::quark)) &&
                     (at == parton_type::photon_))
                 {
                     T const charge = T(pdg_id_to_charge_times_three(parton_to_pdg_id(ap))) / T(3.0);
-
-                    ab.a[apt][at] *= charge * charge;
-                    ab.b[apt][at] *= charge * charge;
+                    q2 = charge * charge;
                 }
 
-                pdf[a] += pdfb[ap] * ab.a[apt][at] * (T(1.0) - eta) / xprime;
-                pdf[a] += pdfa[ap] * ab.b[apt][at];
+                pdf[a] += pdfb[ap] * q2 * ab.a[apt][at] * (T(1.0) - eta) / xprime;
+                pdf[a] += pdfa[ap] * q2 * ab.b[apt][at];
             }
         }
 
