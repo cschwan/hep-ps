@@ -93,7 +93,7 @@ inline std::size_t lsb_position(std::bitset<128> x)
         }                                                                                          \
                                                                                                    \
         /** Uses `index` to access the corresponding element. */                                   \
-        T operator[](name index) const                                                             \
+        T const operator[](name index) const                                                       \
         {                                                                                          \
             return array_[static_cast <std::size_t> (index)];                                      \
         }                                                                                          \
