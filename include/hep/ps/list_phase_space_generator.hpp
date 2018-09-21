@@ -22,6 +22,7 @@
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/phase_space_generator.hpp"
 
+#include <iosfwd>
 #include <memory>
 #include <vector>
 
@@ -36,7 +37,8 @@ public:
     /// Constructor.
     list_phase_space_point(
         luminosity_info<T> const& info,
-        std::vector<T> const& phase_space
+        std::vector<T> const& phase_space,
+        T weight = T(1.0)
     );
 
     /// Returns the luminosity information.
@@ -45,9 +47,13 @@ public:
     /// Returns the phase space point.
     std::vector<T> const& phase_space() const;
 
+    /// Returns the phase space weight for this point.
+    T weight() const;
+
 private:
     luminosity_info<T> info_;
     std::vector<T> phase_space_;
+    T weight_;
 };
 
 /// Creates a phase space generator which generates the points given in the list, in the same
@@ -57,6 +63,10 @@ template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(
     std::vector<list_phase_space_point<T>> const& list_of_phase_space_points
 );
+
+/// Reads a list of phase space points from `stream`.
+template <typename T>
+std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(std::istream& stream);
 
 }
 
