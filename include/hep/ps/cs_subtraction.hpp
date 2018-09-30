@@ -51,6 +51,10 @@ public:
         regularization_scheme rscheme
     );
 
+    /// Returns `true` if \ref map_phase_space returns the same phase space for both dipoles `a` and
+    /// `b` (but not neccesarily the same invariants), `false` otherwise.
+    bool same_mapping(dipole const& a, dipole const& b) const;
+
     /// Maps the `real_phase_space` onto the `born_phase_space` using the maps defined for the
     /// dipole with `dipole_info`.
     dipole_invariants<T> map_phase_space(

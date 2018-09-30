@@ -79,6 +79,8 @@ public:
         , set_(set)
         , hbarc2_(hbarc2)
         , alpha_min_(alpha_min)
+        , phase_space_indices_()
+        , phase_space_sizes_{1}
         , final_states_real_(matrix_elements_.final_states_real())
         , final_states_dipole_(matrix_elements_.final_states())
         , dipoles_(matrix_elements_.dipoles())
@@ -92,12 +94,6 @@ public:
         pdf_results_.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());
 
         non_zero_dipoles_.reserve(dipoles_.size());
-        dipole_phase_spaces_.resize(dipoles_.size());
-
-        for (auto& phase_space : dipole_phase_spaces_)
-        {
-            phase_space.resize(4 * (fs + 1));
-        }
 
         if (!scale_setter_.dynamic())
         {
@@ -108,6 +104,50 @@ public:
         }
 
         pdfs_.register_partons(partons_in_initial_state_set(set));
+
+        for (std::size_t i = 0; i != dipoles_.size() - 1; ++i)
+        {
+            auto const& a = dipoles_.at(i);
+
+            for (std::size_t j = i + 1; j != dipoles_.size(); ++j)
+            {
+                auto const& b = dipoles_.at(j);
+
+                if (subtraction_.same_mapping(a, b))
+                {
+                    std::rotate(
+                        std::next(dipoles_.begin(), i + 1),
+                        std::next(dipoles_.begin(), j),
+                        std::next(dipoles_.begin(), j + 1)
+                    );
+
+                    break;
+                }
+            }
+        }
+
+        for (std::size_t i = 1; i != dipoles_.size(); ++i)
+        {
+            auto const& a = dipoles_.at(i - 1);
+            auto const& b = dipoles_.at(i);
+
+            if (subtraction_.same_mapping(a, b))
+            {
+                ++phase_space_sizes_.back();
+            }
+            else
+            {
+                phase_space_sizes_.push_back(1);
+            }
+        }
+
+        phase_space_indices_.reserve(phase_space_sizes_.size());
+        dipole_phase_spaces_.resize(phase_space_sizes_.size());
+
+        for (auto& phase_space : dipole_phase_spaces_)
+        {
+            phase_space.resize(4 * (fs + 1));
+        }
     }
 
     T eval(
@@ -116,42 +156,54 @@ public:
         hep::projector<T>& projector
     ) override {
         non_zero_dipoles_.clear();
+        phase_space_indices_.clear();
 
-        std::size_t index = 0;
+        std::size_t dipole_index = 0;
+        std::size_t phase_space_index = 0;
 
-        for (auto const& dipole : dipoles_)
+        for (std::size_t phase_space_size : phase_space_sizes_)
         {
-            auto& phase_space = dipole_phase_spaces_.at(index);
+            auto& phase_space = dipole_phase_spaces_.at(phase_space_index);
+            cut_result_with_info<info_type> cut_result;
 
-            // map the real phase space on the dipole phase space
-            auto const invariants = subtraction_.map_phase_space(
-                real_phase_space, phase_space, dipole);
-
-            if (invariants.alpha < alpha_min_)
+            for (std::size_t i = 0; i != phase_space_size; ++i)
             {
-                // if we apply a technical cut, completely throw away the point
-                return T();
+                auto const& dipole = dipoles_.at(dipole_index++);
+
+                // map the real phase space on the dipole phase space
+                auto const invariants = subtraction_.map_phase_space(real_phase_space, phase_space,
+                    dipole);
+
+                if (invariants.alpha < alpha_min_)
+                {
+                    // if we apply a technical cut, completely throw away the point
+                    return T();
+                }
+
+                if (i == 0)
+                {
+                    recombiner_.recombine(phase_space, final_states_dipole_, phase_space,
+                        recombined_dipole_states_);
+
+                    cut_result = cuts_.cut(
+                        phase_space,
+                        info.rapidity_shift(),
+                        recombined_dipole_states_
+                    );
+
+                    ++phase_space_index;
+
+                    if (cut_result.neg_cutted() && cut_result.pos_cutted())
+                    {
+                        dipole_index += phase_space_size - 1;
+                        break;
+                    }
+
+                    phase_space_indices_.push_back(phase_space_index - 1);
+                }
+
+                non_zero_dipoles_.emplace_back(invariants, dipole, cut_result);
             }
-
-            recombiner_.recombine(
-                phase_space,
-                final_states_dipole_,
-                phase_space,
-                recombined_dipole_states_
-            );
-
-            auto const dipole_cut_result = cuts_.cut(
-                phase_space,
-                info.rapidity_shift(),
-                recombined_dipole_states_
-            );
-
-            if (dipole_cut_result.neg_cutted() && dipole_cut_result.pos_cutted())
-            {
-                continue;
-            }
-
-            non_zero_dipoles_.emplace_back(index++, invariants, dipole, dipole_cut_result);
         }
 
         recombiner_.recombine(
@@ -194,82 +246,89 @@ public:
 
         neg_pos_results<T> result;
 
-        for (auto const non_zero_dipole : non_zero_dipoles_)
+        std::size_t non_zero_dipole_index = 0;
+
+        for (std::size_t const phase_space_index : phase_space_indices_)
         {
-            auto const& dipole = non_zero_dipole.dipole();
-            auto const& dipole_cut_result = non_zero_dipole.cut_result();
-            auto const& invariants = non_zero_dipole.invariants();
-            auto const& phase_space = dipole_phase_spaces_.at(non_zero_dipole.index());
+            auto const& phase_space = dipole_phase_spaces_.at(phase_space_index);
 
-            for (auto& me : me_)
+            for (std::size_t i = 0; i != phase_space_sizes_.at(phase_space_index); ++i)
             {
-                me.clear();
-            }
+                auto const& non_zero_dipole = non_zero_dipoles_.at(non_zero_dipole_index++);
+                auto const& dipole_cut_result = non_zero_dipole.cut_result();
+                auto const& invariants = non_zero_dipole.invariants();
+                auto const& dipole = non_zero_dipole.dipole();
 
-            T function = T(1.0);
-
-            if ((dipole.emitter_type() == particle_type::fermion) !=
-                (dipole.unresolved_type() == particle_type::fermion))
-            {
-                matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
-                function = -subtraction_.fermion_function(dipole, invariants);
-            }
-            else
-            {
-                auto const correlator = subtraction_.boson_function(dipole, invariants,
-                    real_phase_space);
-
-                for (auto& me : me_tmp_)
+                for (auto& me : me_)
                 {
                     me.clear();
                 }
 
-                matrix_elements_.dipole_sc(
-                    dipole,
-                    phase_space,
-                    correlator.p,
-                    set_,
-                    scales_,
-                    me_,
-                    me_tmp_
-                );
+                T function = T(1.0);
 
-                for (std::size_t j = 0; j != me_.size(); ++j)
+                if ((dipole.emitter_type() == particle_type::fermion) !=
+                    (dipole.unresolved_type() == particle_type::fermion))
                 {
-                    for (std::size_t k = 0; k != me_[j].size(); ++k)
-                    {
-                        assert( me_[j][k].first == me_tmp_[j][k].first );
+                    matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
+                    function = -subtraction_.fermion_function(dipole, invariants);
+                }
+                else
+                {
+                    auto const correlator = subtraction_.boson_function(dipole, invariants,
+                        real_phase_space);
 
-                        me_[j][k].second *= -correlator.a;
-                        me_[j][k].second -= me_tmp_[j][k].second * correlator.b;
+                    for (auto& me : me_tmp_)
+                    {
+                        me.clear();
+                    }
+
+                    matrix_elements_.dipole_sc(
+                        dipole,
+                        phase_space,
+                        correlator.p,
+                        set_,
+                        scales_,
+                        me_,
+                        me_tmp_
+                    );
+
+                    for (std::size_t j = 0; j != me_.size(); ++j)
+                    {
+                        for (std::size_t k = 0; k != me_[j].size(); ++k)
+                        {
+                            assert( me_[j][k].first == me_tmp_[j][k].first );
+
+                            me_[j][k].second *= -correlator.a;
+                            me_[j][k].second -= me_tmp_[j][k].second * correlator.b;
+                        }
                     }
                 }
+
+                convolute_mes_with_pdfs(
+                    results_,
+                    pdf_results_,
+                    pdfsx1_,
+                    pdfsx2_,
+                    pdf_pdfsx1_,
+                    pdf_pdfsx2_,
+                    me_,
+                    set_,
+                    factors_,
+                    function * factor,
+                    dipole_cut_result
+                );
+
+                distributions_(
+                    phase_space,
+                    info.rapidity_shift(),
+                    dipole_cut_result,
+                    results_,
+                    pdf_results_,
+                    projector
+                );
+
+                result += results_.front();
             }
-
-            convolute_mes_with_pdfs(
-                results_,
-                pdf_results_,
-                pdfsx1_,
-                pdfsx2_,
-                pdf_pdfsx1_,
-                pdf_pdfsx2_,
-                me_,
-                set_,
-                factors_,
-                function * factor,
-                dipole_cut_result
-            );
-
-            distributions_(
-                phase_space,
-                info.rapidity_shift(),
-                dipole_cut_result,
-                results_,
-                pdf_results_,
-                projector
-            );
-
-            result += results_.front();
         }
 
         if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
@@ -347,6 +406,8 @@ private:
 
     std::vector<T> recombined_ps_;
     std::vector<std::vector<T>> dipole_phase_spaces_;
+    std::vector<std::size_t> phase_space_indices_;
+    std::vector<std::size_t> phase_space_sizes_;
     std::vector<recombined_state> recombined_states_;
     std::vector<recombined_state> recombined_dipole_states_;
     std::vector<final_state> final_states_real_;

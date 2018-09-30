@@ -49,6 +49,11 @@ public:
 
     // SUBTRACTION MEMBER FUNCTIONS
 
+    bool same_mapping(hep::dipole const&, hep::dipole const&)
+    {
+        return false;
+    }
+
     hep::dipole_invariants<T> map_phase_space(
         std::vector<T> const& /*real_phase_space*/,
         std::vector<T>& /*born_phase_space*/,

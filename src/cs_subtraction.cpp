@@ -29,6 +29,28 @@ cs_subtraction<T>::cs_subtraction(
 }
 
 template <typename T>
+bool cs_subtraction<T>::same_mapping(dipole const& a, dipole const& b) const
+{
+    if (a == b)
+    {
+        return true;
+    }
+
+    if ((a.type() == b.type()) && (a.type() != dipole_type::initial_initial))
+    {
+        return (a.emitter() == b.unresolved()) && (a.unresolved() == b.emitter());
+    }
+    else if (((a.type() == dipole_type::final_initial) && (b.type() == dipole_type::initial_final))
+          || ((a.type() == dipole_type::initial_final) && (b.type() == dipole_type::final_initial)))
+    {
+        return (a.emitter() == b.spectator()) && (a.spectator() == b.emitter()) &&
+            (a.unresolved() == b.unresolved());
+    }
+
+    return false;
+}
+
+template <typename T>
 dipole_invariants<T> cs_subtraction<T>::map_phase_space(
     std::vector<T> const& real_phase_space,
     std::vector<T>& born_phase_space,

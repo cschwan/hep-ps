@@ -36,21 +36,14 @@ class non_zero_dipole
 {
 public:
     non_zero_dipole(
-        std::size_t index,
         dipole_invariants<T> const& invariants,
         dipole const& dipole,
         cut_result_with_info<I> const& cut_result
     )
-        : index_(index)
-        , invariants_(invariants)
+        : invariants_(invariants)
         , dipole_(dipole)
         , cut_result_(cut_result)
     {
-    }
-
-    std::size_t index() const
-    {
-        return index_;
     }
 
     dipole_invariants<T> const& invariants() const
@@ -69,7 +62,6 @@ public:
     }
 
 private:
-    std::size_t index_;
     dipole_invariants<T> invariants_;
     hep::dipole dipole_;
     cut_result_with_info<I> cut_result_;
