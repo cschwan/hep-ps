@@ -236,28 +236,28 @@ public:
         {
             auto const& phase_space = dipole_phase_spaces_.at(phase_space_index);
 
+            if (scale_setter_.dynamic())
+            {
+                set_scales(phase_space, recombined_dipole_states_);
+                results_.reserve(scales_.size());
+                me_.resize(scales_.size());
+                me_tmp_.resize(scales_.size());
+            }
+
+            pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
+            pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
+
+            assert( pdfsx1_.size() == scales_.size() );
+            assert( pdfsx2_.size() == scales_.size() );
+            assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
+            assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
+
             for (std::size_t i = 0; i != phase_space_sizes_.at(phase_space_index); ++i)
             {
                 auto const& non_zero_dipole = non_zero_dipoles_.at(non_zero_dipole_index++);
                 auto const& dipole_cut_result = non_zero_dipole.cut_result();
                 auto const& invariants = non_zero_dipole.invariants();
                 auto const& dipole = non_zero_dipole.dipole();
-
-                if (scale_setter_.dynamic())
-                {
-                    set_scales(phase_space, recombined_dipole_states_);
-                    results_.reserve(scales_.size());
-                    me_.resize(scales_.size());
-                    me_tmp_.resize(scales_.size());
-                }
-
-                pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
-                pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
-
-                assert( pdfsx1_.size() == scales_.size() );
-                assert( pdfsx2_.size() == scales_.size() );
-                assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
-                assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
 
                 for (auto& me : me_)
                 {
