@@ -226,22 +226,6 @@ public:
             return T();
         }
 
-        if (scale_setter_.dynamic())
-        {
-            set_scales(recombined_ps_);
-            results_.reserve(scales_.size());
-            me_.resize(scales_.size());
-            me_tmp_.resize(scales_.size());
-        }
-
-        pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
-        pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
-
-        assert( pdfsx1_.size() == scales_.size() );
-        assert( pdfsx2_.size() == scales_.size() );
-        assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
-        assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
-
         T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
         neg_pos_results<T> result;
@@ -258,6 +242,22 @@ public:
                 auto const& dipole_cut_result = non_zero_dipole.cut_result();
                 auto const& invariants = non_zero_dipole.invariants();
                 auto const& dipole = non_zero_dipole.dipole();
+
+                if (scale_setter_.dynamic())
+                {
+                    set_scales(phase_space, recombined_dipole_states_);
+                    results_.reserve(scales_.size());
+                    me_.resize(scales_.size());
+                    me_tmp_.resize(scales_.size());
+                }
+
+                pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
+                pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
+
+                assert( pdfsx1_.size() == scales_.size() );
+                assert( pdfsx2_.size() == scales_.size() );
+                assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
+                assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
 
                 for (auto& me : me_)
                 {
@@ -333,6 +333,22 @@ public:
 
         if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
         {
+            if (scale_setter_.dynamic())
+            {
+                set_scales(recombined_ps_, recombined_states_);
+                results_.reserve(scales_.size());
+                me_.resize(scales_.size());
+                me_tmp_.resize(scales_.size());
+            }
+
+            pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
+            pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
+
+            assert( pdfsx1_.size() == scales_.size() );
+            assert( pdfsx2_.size() == scales_.size() );
+            assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
+            assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
+
             for (auto& me : me_)
             {
                 me.clear();
