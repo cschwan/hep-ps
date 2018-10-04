@@ -18,7 +18,8 @@ static_scale_function<T>::static_scale_function(
 template <typename T>
 void static_scale_function<T>::operator()(
     std::vector<T> const&,
-    std::vector<hep::scales<T>>& scales
+    std::vector<hep::scales<T>>& scales,
+    std::vector<recombined_state> const&
 ) {
     switch (variation_)
     {

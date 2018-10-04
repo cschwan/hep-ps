@@ -175,7 +175,8 @@ public:
 
     void operator()(
         std::vector<T> const&,
-        std::vector<hep::scales<T>>& scales
+        std::vector<hep::scales<T>>& scales,
+        std::vector<hep::recombined_state> const&
     ) {
         scales.emplace_back(scale, scale, scale);
     }

@@ -92,7 +92,7 @@ public:
 
         if (!scale_setter_.dynamic())
         {
-            set_scales(std::vector<T>());
+            set_scales(std::vector<T>(), std::vector<recombined_state>());
             results_.reserve(scales_.size());
             corr_me_.resize(insertion_terms_.size());
         }
@@ -187,7 +187,7 @@ public:
 
         if (scale_setter_.dynamic())
         {
-            set_scales(recombined_ps_);
+            set_scales(recombined_ps_, recombined_states_);
             results_.reserve(scales_.size());
             corr_me_.resize(insertion_terms_.size());
         }
@@ -416,13 +416,13 @@ protected:
         return pdf;
     }
 
-    void set_scales(std::vector<T> const& phase_space)
+    void set_scales(std::vector<T> const& phase_space, std::vector<recombined_state> const& states)
     {
         using std::pow;
 
         scales_.clear();
         factors_.clear();
-        scale_setter_(phase_space, scales_);
+        scale_setter_(phase_space, scales_, states);
         pdfs_.eval_alphas(scales_, factors_);
 
         T const central_alphas = factors_.front();

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scale_variation.hpp"
 #include "hep/ps/scales.hpp"
 
@@ -38,7 +39,8 @@ public:
     /// Returns the static scale(s).
     void operator()(
         std::vector<T> const& phase_space,
-        std::vector<hep::scales<T>>& scales
+        std::vector<hep::scales<T>>& scales,
+        std::vector<recombined_state> const& states
     );
 
     /// Returns `false`, since this scale function is independent of the phase space point (static).

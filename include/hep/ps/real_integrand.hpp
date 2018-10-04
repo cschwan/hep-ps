@@ -97,7 +97,7 @@ public:
 
         if (!scale_setter_.dynamic())
         {
-            set_scales(std::vector<T>());
+            set_scales(std::vector<T>(), std::vector<recombined_state>());
             results_.reserve(scales_.size());
             me_.resize(scales_.size());
             me_tmp_.resize(scales_.size());
@@ -199,6 +199,8 @@ public:
                         break;
                     }
 
+                    dipole_recombined_states_ = recombined_dipole_states_;
+
                     phase_space_indices_.push_back(phase_space_index - 1);
                 }
 
@@ -238,7 +240,7 @@ public:
 
             if (scale_setter_.dynamic())
             {
-                set_scales(phase_space, recombined_dipole_states_);
+                set_scales(phase_space, dipole_recombined_states_);
                 results_.reserve(scales_.size());
                 me_.resize(scales_.size());
                 me_tmp_.resize(scales_.size());
@@ -386,13 +388,13 @@ public:
     }
 
 protected:
-    void set_scales(std::vector<T> const& phase_space)
+    void set_scales(std::vector<T> const& phase_space, std::vector<recombined_state> const& states)
     {
         using std::pow;
 
         scales_.clear();
         factors_.clear();
-        scale_setter_(phase_space, scales_);
+        scale_setter_(phase_space, scales_, states);
         pdfs_.eval_alphas(scales_, factors_);
 
         T const central_alphas = factors_.front();
@@ -426,6 +428,7 @@ private:
     std::vector<std::size_t> phase_space_sizes_;
     std::vector<recombined_state> recombined_states_;
     std::vector<recombined_state> recombined_dipole_states_;
+    std::vector<recombined_state> dipole_recombined_states_;
     std::vector<final_state> final_states_real_;
     std::vector<final_state> final_states_dipole_;
     std::vector<parton_array<T>> pdfsx1_;
