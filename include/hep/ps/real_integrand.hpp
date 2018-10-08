@@ -208,26 +208,6 @@ public:
             }
         }
 
-        recombiner_.recombine(
-            real_phase_space,
-            final_states_real_,
-            recombined_ps_,
-            recombined_states_
-        );
-
-        auto const real_cut_result = cuts_.cut(
-            recombined_ps_,
-            info.rapidity_shift(),
-            recombined_states_
-        );
-
-        // if there are neither dipoles nor real matrix elements stop here
-        if (non_zero_dipoles_.empty() && real_cut_result.neg_cutted() &&
-            real_cut_result.pos_cutted())
-        {
-            return T();
-        }
-
         T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
         neg_pos_results<T> result;
@@ -332,6 +312,19 @@ public:
                 result += results_.front();
             }
         }
+
+        recombiner_.recombine(
+            real_phase_space,
+            final_states_real_,
+            recombined_ps_,
+            recombined_states_
+        );
+
+        auto const real_cut_result = cuts_.cut(
+            recombined_ps_,
+            info.rapidity_shift(),
+            recombined_states_
+        );
 
         if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
         {
