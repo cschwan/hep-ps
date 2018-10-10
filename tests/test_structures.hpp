@@ -6,6 +6,7 @@
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/psp.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
@@ -174,9 +175,8 @@ public:
     }
 
     void operator()(
-        std::vector<T> const&,
-        std::vector<hep::scales<T>>& scales,
-        std::vector<hep::recombined_state> const&
+        hep::psp<T> const&,
+        std::vector<hep::scales<T>>& scales
     ) {
         scales.emplace_back(scale, scale, scale);
     }

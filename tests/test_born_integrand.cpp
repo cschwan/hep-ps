@@ -9,6 +9,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/psp.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/trivial_cutter.hpp"
@@ -43,13 +44,10 @@ public:
 
     // DISTRIBUTION MEMBER FUNCTIONS
 
-    template <typename I>
     void operator()(
-        std::vector<T> const& /*phase_space*/,
-        T /*rapidity_shift*/,
-        hep::cut_result_with_info<I> const& /*cut_result*/,
-        std::vector<hep::neg_pos_results<T>> const& results,
-        std::vector<hep::neg_pos_results<T>> const& pdf_results,
+        hep::psp<T> const& /*point*/,
+        std::vector<T> const& results,
+        std::vector<T> const& pdf_results,
         hep::projector<T>&
     ) {
         using std::pow;
@@ -71,8 +69,7 @@ public:
 
             T const ref_result = pdfa * pdfb * (born + born_scale);
 
-            CHECK( results.at(i).neg == ref_result );
-            CHECK( results.at(i).pos == ref_result );
+            CHECK( results.at(i) == ref_result );
         }
 
         for (std::size_t i = 0; i != pdf_results.size(); ++i)
@@ -87,8 +84,7 @@ public:
 
             T const ref_result = pdfa * pdfb * (born + born_scale);
 
-            CHECK( pdf_results.at(i).neg == ref_result );
-            CHECK( pdf_results.at(i).pos == ref_result );
+            CHECK( pdf_results.at(i) == ref_result );
         }
     }
 
@@ -135,9 +131,8 @@ public:
     // SCALE SETTER MEMBER FUNCTIONS
 
     void operator()(
-        std::vector<T> const&,
-        std::vector<hep::scales<T>>& scales,
-        std::vector<hep::recombined_state> const&
+        hep::psp<T> const&,
+        std::vector<hep::scales<T>>& scales
     ) {
         if (dynamic_scale_)
         {

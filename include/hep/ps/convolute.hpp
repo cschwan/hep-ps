@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017  Christopher Schwan
+ * Copyright (C) 2017-2018  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,35 @@
 
 namespace hep
 {
+
+template <typename T>
+inline T convolute(
+    parton_array<T> const& pdf_x1,
+    parton_array<T> const& pdf_x2,
+    initial_state_map<T> const& matrix_elements,
+    initial_state_set set
+) {
+    T result = T();
+
+    for (auto const& keyvals : matrix_elements)
+    {
+        auto const state = keyvals.first;
+
+        if (!set.includes(state))
+        {
+            continue;
+        }
+
+        auto const one = state_parton_one(state);
+        auto const two = state_parton_two(state);
+        auto const sym = (one == two) ? T(0.5) : T(1.0);
+        auto const me = keyvals.second;
+
+        result += sym * pdf_x1[one] * pdf_x2[two] * me;
+    }
+
+    return result;
+}
 
 template <typename T, typename I>
 inline neg_pos_results<T> convolute(
@@ -109,6 +138,54 @@ inline neg_pos_results<T> convolute(
     }
 
     return { factor * neg , factor * pos };
+}
+
+template <typename T>
+inline void convolute_mes_with_pdfs(
+    std::vector<T>& scale_results,
+    std::vector<T>& pdf_results,
+    std::vector<parton_array<T>> const& scale_uncertainty_pdfs_one,
+    std::vector<parton_array<T>> const& scale_uncertainty_pdfs_two,
+    std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_one,
+    std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_two,
+    std::vector<initial_state_map<T>> const& matrix_elements,
+    initial_state_set set,
+    std::vector<T> const& alphas_factors,
+    T global_factor
+) {
+    std::size_t const scales = scale_uncertainty_pdfs_one.size();
+    std::size_t const pdfs = pdf_uncertainty_pdfs_one.size();
+
+    assert( scale_uncertainty_pdfs_one.size() == scales );
+    assert( scale_uncertainty_pdfs_two.size() == scales );
+    assert( matrix_elements.size() == scales );
+    assert( alphas_factors.size() == scales );
+    assert( pdf_uncertainty_pdfs_one.size() == pdfs );
+    assert( pdf_uncertainty_pdfs_two.size() == pdfs );
+
+    scale_results.clear();
+
+    for (std::size_t i = 0; i != scales; ++i)
+    {
+        scale_results.push_back(global_factor * alphas_factors.at(i) * convolute(
+            scale_uncertainty_pdfs_one.at(i),
+            scale_uncertainty_pdfs_two.at(i),
+            matrix_elements.at(i),
+            set
+        ));
+    }
+
+    pdf_results.clear();
+
+    for (std::size_t i = 0; pdfs; ++i)
+    {
+        pdf_results.push_back(global_factor * alphas_factors.front() * convolute(
+            pdf_uncertainty_pdfs_one.at(i),
+            pdf_uncertainty_pdfs_two.at(i),
+            matrix_elements.front(),
+            set
+        ));
+    }
 }
 
 template <typename T, typename I>

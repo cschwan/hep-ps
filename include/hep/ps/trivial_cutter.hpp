@@ -20,6 +20,7 @@
  */
 
 #include "hep/ps/cut_result.hpp"
+#include "hep/ps/psp.hpp"
 #include "hep/ps/recombined_state.hpp"
 
 #include <vector>
@@ -39,6 +40,9 @@ public:
         T rapidity_shift,
         std::vector<recombined_state> const& recombined_states
     );
+
+    /// Always returns `false`.
+    bool cut(psp<T> const& point) const;
 };
 
 }

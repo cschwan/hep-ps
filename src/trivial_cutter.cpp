@@ -1,5 +1,7 @@
 #include "hep/ps/trivial_cutter.hpp"
 
+#include <algorithm>
+
 namespace hep
 {
 
@@ -8,6 +10,12 @@ cut_result trivial_cutter<T>::cut(std::vector<T> const&, T, std::vector<recombin
 {
     // cut nothing
     return cut_result(false, false);
+}
+
+template <typename T>
+bool trivial_cutter<T>::cut(psp<T> const&) const
+{
+    return false;
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

@@ -23,6 +23,7 @@
 
 #include "hep/ps/cut_result.hpp"
 #include "hep/ps/neg_pos_results.hpp"
+#include "hep/ps/psp.hpp"
 
 #include <vector>
 
@@ -46,6 +47,15 @@ public:
         std::vector<neg_pos_results<T>> const&,
         std::vector<neg_pos_results<T>> const&,
         projector<T>&
+    ) {
+    }
+
+    /// Does nothing.
+    void operator()(
+        psp<T> const& /*point*/,
+        std::vector<T> const& /*scale_results*/,
+        std::vector<T> const& /*pdf_results*/,
+        projector<T>& /*projector*/
     ) {
     }
 };
