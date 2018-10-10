@@ -54,6 +54,7 @@ sources = [
     'phase_space_point.cpp',
     'phase_space_tools.cpp',
     'rambo_phase_space_generator.cpp',
+    'recombined_state.cpp',
     'static_scale_function.cpp',
     'suppress_banners.cpp',
     'trivial_cutter.cpp',

@@ -1,5 +1,7 @@
 #include "hep/ps/trivial_recombiner.hpp"
 
+#include <algorithm>
+
 namespace hep
 {
 
@@ -11,29 +13,10 @@ void trivial_recombiner<T>::recombine(
     std::vector<recombined_state>& recombined_states
 ) const {
     recombined_phase_space = phase_space;
-    recombined_states.clear();
+    recombined_states.resize(final_states.size());
 
-    for (auto const state : final_states)
-    {
-        switch (state)
-        {
-        case final_state::charged_lepton:
-            recombined_states.push_back(recombined_state::dressed_lepton);
-            break;
-
-        case final_state::quark_gluon:
-            recombined_states.push_back(recombined_state::jet);
-            break;
-
-        case final_state::photon:
-            recombined_states.push_back(recombined_state::isolated_photon);
-            break;
-
-        case final_state::neutrino:
-            recombined_states.push_back(recombined_state::missing_momentum);
-            break;
-        }
-    }
+    std::transform(final_states.begin(), final_states.end(), recombined_states.begin(),
+        trivially_recombine);
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

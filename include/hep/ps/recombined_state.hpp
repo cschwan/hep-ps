@@ -19,6 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/final_state.hpp"
+
 #include <cstddef>
 
 namespace hep
@@ -39,6 +41,9 @@ enum class recombined_state : std::size_t
     /// Momenta of particle that are not detectable.
     missing_momentum
 };
+
+/// Trivially recombines the \ref final_state `state` into a \ref recombined_state.
+recombined_state trivially_recombine(final_state state);
 
 }
 
