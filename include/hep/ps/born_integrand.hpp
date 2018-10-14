@@ -28,6 +28,8 @@
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/ps_integrand.hpp"
+#include "psp.hpp"
+#include "psp_type.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 

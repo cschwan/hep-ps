@@ -58,6 +58,8 @@ headers1 = [
     'hep/ps/ps_integrand.hpp',
     'hep/ps/ps_invariant.hpp',
     'hep/ps/ps_tchannel.hpp',
+    'hep/ps/psp.hpp',
+    'hep/ps/psp_type.hpp',
     'hep/ps/rambo_phase_space_generator.hpp',
     'hep/ps/real_integrand.hpp',
     'hep/ps/recombined_state.hpp',
