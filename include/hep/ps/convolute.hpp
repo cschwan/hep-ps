@@ -23,6 +23,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/psp_type.hpp"
 
 #include <cassert>
 
@@ -142,6 +143,7 @@ inline neg_pos_results<T> convolute(
 
 template <typename T>
 inline void convolute_mes_with_pdfs(
+    psp_type type,
     std::vector<T>& scale_results,
     std::vector<T>& pdf_results,
     std::vector<parton_array<T>> const& scale_uncertainty_pdfs_one,
@@ -153,19 +155,23 @@ inline void convolute_mes_with_pdfs(
     std::vector<T> const& alphas_factors,
     T global_factor
 ) {
-    std::size_t const scales = scale_uncertainty_pdfs_one.size();
-    std::size_t const pdfs = pdf_uncertainty_pdfs_one.size();
+    std::size_t const scale_index = (type == psp_type::pos_rap) ? 0 :
+        scale_uncertainty_pdfs_one.size() / 2;
+    std::size_t const scales = scale_uncertainty_pdfs_one.size() / 2;
+    std::size_t const pdf_index = (type == psp_type::pos_rap) ? 0 :
+        pdf_uncertainty_pdfs_one.size() / 2;
+    std::size_t const pdfs = pdf_uncertainty_pdfs_one.size() / 2;
 
-    assert( scale_uncertainty_pdfs_one.size() == scales );
-    assert( scale_uncertainty_pdfs_two.size() == scales );
-    assert( matrix_elements.size() == scales );
-    assert( alphas_factors.size() == scales );
-    assert( pdf_uncertainty_pdfs_one.size() == pdfs );
-    assert( pdf_uncertainty_pdfs_two.size() == pdfs );
+    assert( scale_uncertainty_pdfs_one.size() == 2 * scales );
+    assert( scale_uncertainty_pdfs_two.size() == 2 * scales );
+    assert( matrix_elements.size() == 2 * scales );
+    assert( alphas_factors.size() == 2 * scales );
+    assert( pdf_uncertainty_pdfs_one.size() == 2 * pdfs );
+    assert( pdf_uncertainty_pdfs_two.size() == 2 * pdfs );
 
     scale_results.clear();
 
-    for (std::size_t i = 0; i != scales; ++i)
+    for (std::size_t i = scale_index; i != scale_index + scales; ++i)
     {
         scale_results.push_back(global_factor * alphas_factors.at(i) * convolute(
             scale_uncertainty_pdfs_one.at(i),
@@ -177,7 +183,7 @@ inline void convolute_mes_with_pdfs(
 
     pdf_results.clear();
 
-    for (std::size_t i = 0; pdfs; ++i)
+    for (std::size_t i = pdf_index; i != pdf_index + pdfs; ++i)
     {
         pdf_results.push_back(global_factor * alphas_factors.front() * convolute(
             pdf_uncertainty_pdfs_one.at(i),

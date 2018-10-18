@@ -96,9 +96,8 @@ public:
             // a static scale must not depend on any phase or state information
             set_scales(no_psp, no_psp);
 
-            results_.reserve(pos_.scales_.size());
-            pos_.borns.resize(pos_.scales_.size());
-            neg_.borns.resize(neg_.scales_.size());
+            results_.reserve(scales_.size() / 2);
+            borns_.resize(scales_.size());
         }
 
         pdfs_.register_partons(partons_in_initial_state_set(set));
@@ -109,10 +108,11 @@ public:
         luminosity_info<T> const& info,
         hep::projector<T>& projector
     ) override {
-        // assumes that the reombination is independent of the frame
         recombiner_.recombine(phase_space, final_states_, pos_.ps, pos_.states);
-        neg_.ps.assign(pos_.ps.begin(), pos_.ps.end());
-        neg_.states.assign(pos_.states.begin(), pos_.states.end());
+
+        // assumes that the reombination is independent of the frame
+        neg_.ps = pos_.ps;
+        neg_.states = pos_.states;
 
         psp<T> neg_psp{neg_.ps, neg_.states, info.rapidity_shift(), psp_type::neg_rap};
         psp<T> pos_psp{pos_.ps, pos_.states, info.rapidity_shift(), psp_type::pos_rap};
@@ -128,71 +128,45 @@ public:
         if (dynamic_scales_)
         {
             set_scales(neg_psp, pos_psp);
-            results_.reserve(pos_.scales_.size());
-            pos_.borns.resize(pos_.scales_.size());
-            neg_.borns.resize(neg_.scales_.size());
+
+            results_.reserve(scales_.size() / 2);
+            borns_.resize(scales_.size());
         }
 
         T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-        pdfs_.eval(info.x1(), neg_.scales_, neg_.scale_pdf_x1, neg_.pdf_pdf_x1);
-        pdfs_.eval(info.x2(), neg_.scales_, neg_.scale_pdf_x2, neg_.pdf_pdf_x2);
-        pdfs_.eval(info.x1(), pos_.scales_, pos_.scale_pdf_x1, pos_.pdf_pdf_x1);
-        pdfs_.eval(info.x2(), pos_.scales_, pos_.scale_pdf_x2, pos_.pdf_pdf_x2);
+        pdfs_.eval(info.x1(), scales_, scale_pdf_x1_, pdf_pdf_x1_);
+        pdfs_.eval(info.x2(), scales_, scale_pdf_x2_, pdf_pdf_x2_);
 
-        assert( neg_.scale_pdf_x1.size() == neg_.scales_.size() );
-        assert( neg_.scale_pdf_x2.size() == neg_.scales_.size() );
-        assert( (pdfs_.count() == 1) || (neg_.pdf_pdf_x1.size() == pdfs_.count()) );
-        assert( (pdfs_.count() == 1) || (neg_.pdf_pdf_x2.size() == pdfs_.count()) );
-        assert( pos_.scale_pdf_x1.size() == pos_.scales_.size() );
-        assert( pos_.scale_pdf_x2.size() == pos_.scales_.size() );
-        assert( (pdfs_.count() == 1) || (pos_.pdf_pdf_x1.size() == pdfs_.count()) );
-        assert( (pdfs_.count() == 1) || (pos_.pdf_pdf_x2.size() == pdfs_.count()) );
+        assert( scale_pdf_x1_.size() == scales_.size() );
+        assert( scale_pdf_x2_.size() == scales_.size() );
+        assert( (pdfs_.count() == 1) || (pdf_pdf_x1_.size() == pdfs_.count()) );
+        assert( (pdfs_.count() == 1) || (pdf_pdf_x2_.size() == pdfs_.count()) );
 
-        for (auto& born : pos_.borns)
+        for (auto& born : borns_)
         {
             born.clear();
         }
 
-        bool neg_pos_scales_different = true;
-        std::size_t size;
+        matrix_elements_.borns(phase_space, set_, scales_, borns_);
 
-        if (neg_pos_scales_different)
-        {
-            size = pos_.scales_.size();
-            pos_.borns.resize(2 * size);
-            pos_.scales_.insert(pos_.scales_.end(), neg_.scales_.begin(), neg_.scales_.end());
-        }
-
-        matrix_elements_.borns(phase_space, set_, pos_.scales_, pos_.borns);
-
-        assert( pos_.borns.size() == pos_.scales_.size() );
-
-        if (neg_pos_scales_different)
-        {
-            pos_.scales_.erase(std::prev(pos_.scales_.end(), size), pos_.scales_.end());
-            neg_.borns.assign(std::prev(pos_.borns.end(), size), pos_.borns.end());
-            pos_.borns.erase(std::prev(pos_.borns.end(), size), pos_.borns.end());
-        }
-        else
-        {
-            neg_.borns = pos_.borns;
-        }
+        assert( borns_.size() == scales_.size() );
 
         T result = T();
 
         if (!pos_cutted)
         {
             convolute_mes_with_pdfs(
+                psp_type::pos_rap,
                 results_,
                 pdf_results_,
-                pos_.scale_pdf_x1,
-                pos_.scale_pdf_x2,
-                pos_.pdf_pdf_x1,
-                pos_.pdf_pdf_x2,
-                pos_.borns,
+                scale_pdf_x1_,
+                scale_pdf_x2_,
+                pdf_pdf_x1_,
+                pdf_pdf_x2_,
+                borns_,
                 set_,
-                pos_.factors,
+                factors_,
                 factor
             );
 
@@ -204,15 +178,16 @@ public:
         if (!neg_cutted)
         {
             convolute_mes_with_pdfs(
+                psp_type::neg_rap,
                 results_,
                 pdf_results_,
-                neg_.scale_pdf_x2,
-                neg_.scale_pdf_x1,
-                neg_.pdf_pdf_x2,
-                neg_.pdf_pdf_x1,
-                neg_.borns,
+                scale_pdf_x2_,
+                scale_pdf_x1_,
+                pdf_pdf_x2_,
+                pdf_pdf_x1_,
+                borns_,
                 set_,
-                neg_.factors,
+                factors_,
                 factor
             );
 
@@ -230,23 +205,21 @@ protected:
         using std::pow;
 
         neg_.scales_.clear();
-        neg_.factors.clear();
         pos_.scales_.clear();
-        pos_.factors.clear();
-        scale_setter_(neg_psp, neg_.scales_);
-        scale_setter_(pos_psp, pos_.scales_);
-        pdfs_.eval_alphas(neg_.scales_, neg_.factors);
-        pdfs_.eval_alphas(pos_.scales_, pos_.factors);
+        scales_.clear();
+        factors_.clear();
 
-        T const central_alphas = pos_.factors.front();
+        scale_setter_(neg_psp, neg_.scales_);
+        scales_.insert(scales_.end(), neg_.scales_.begin(), neg_.scales_.end());
+        scale_setter_(pos_psp, pos_.scales_);
+        scales_.insert(scales_.end(), pos_.scales_.begin(), pos_.scales_.end());
+
+        pdfs_.eval_alphas(scales_, factors_);
+
+        T const central_alphas = factors_.front();
         matrix_elements_.alphas(central_alphas);
 
-        for (T& factor : neg_.factors)
-        {
-            T const alphas = factor;
-            factor = pow(alphas / central_alphas, alphas_power_);
-        }
-        for (T& factor : pos_.factors)
+        for (T& factor : factors_)
         {
             T const alphas = factor;
             factor = pow(alphas / central_alphas, alphas_power_);
@@ -267,15 +240,16 @@ private:
     {
         std::vector<T> ps;
         std::vector<recombined_state> states;
-        std::vector<parton_array<T>> scale_pdf_x1;
-        std::vector<parton_array<T>> scale_pdf_x2;
-        std::vector<parton_array<T>> pdf_pdf_x1;
-        std::vector<parton_array<T>> pdf_pdf_x2;
         std::vector<scales<T>> scales_;
-        std::vector<T> factors;
-        std::vector<initial_state_map<T>> borns;
     } neg_, pos_;
 
+    std::vector<parton_array<T>> scale_pdf_x1_;
+    std::vector<parton_array<T>> scale_pdf_x2_;
+    std::vector<parton_array<T>> pdf_pdf_x1_;
+    std::vector<parton_array<T>> pdf_pdf_x2_;
+    std::vector<scales<T>> scales_;
+    std::vector<T> factors_;
+    std::vector<initial_state_map<T>> borns_;
     std::vector<final_state> final_states_;
     std::vector<T> pdf_results_;
     std::vector<T> results_;
