@@ -72,22 +72,25 @@ public:
     ) {
         CHECK( x >= T() );
         CHECK( x < T(1.0) );
-        CHECK( scales.size() == 1 );
+        CHECK( scales.size() >= 1 );
         CHECK( scales.front().factorization() > T() );
+        CHECK( uncertainty_pdfs.empty() );
 
         scale_pdfs.clear();
-        uncertainty_pdfs.clear();
-        scale_pdfs.resize(1);
+        scale_pdfs.resize(scales.size());
 
-        scale_pdfs.front()[hep::parton::anti_up]      = T(1.0);
-        scale_pdfs.front()[hep::parton::anti_down]    = T(1.0);
-        scale_pdfs.front()[hep::parton::anti_charm]   = T(1.0);
-        scale_pdfs.front()[hep::parton::anti_strange] = T(1.0);
-        scale_pdfs.front()[hep::parton::gluon]        = T(1.0);
-        scale_pdfs.front()[hep::parton::up]           = T(1.0);
-        scale_pdfs.front()[hep::parton::down]         = T(1.0);
-        scale_pdfs.front()[hep::parton::charm]        = T(1.0);
-        scale_pdfs.front()[hep::parton::strange]      = T(1.0);
+        for (std::size_t i = 0; i != scales.size(); ++i)
+        {
+            scale_pdfs.at(i)[hep::parton::anti_up]      = T(1.0);
+            scale_pdfs.at(i)[hep::parton::anti_down]    = T(1.0);
+            scale_pdfs.at(i)[hep::parton::anti_charm]   = T(1.0);
+            scale_pdfs.at(i)[hep::parton::anti_strange] = T(1.0);
+            scale_pdfs.at(i)[hep::parton::gluon]        = T(1.0);
+            scale_pdfs.at(i)[hep::parton::up]           = T(1.0);
+            scale_pdfs.at(i)[hep::parton::down]         = T(1.0);
+            scale_pdfs.at(i)[hep::parton::charm]        = T(1.0);
+            scale_pdfs.at(i)[hep::parton::strange]      = T(1.0);
+        }
     }
 
     T eval_alphas(T scale)
@@ -101,10 +104,10 @@ public:
         std::vector<hep::scales<T>> const& scales,
         std::vector<T>& alphas
     ) {
-        CHECK( scales.size() == 1 );
+        CHECK( scales.size() >= 1 );
         CHECK( scales.front().renormalization() > T() );
 
-        alphas.push_back(T(1.0));
+        alphas.assign(scales.size(), T(1.0));
     }
 
     std::size_t count() const
@@ -135,12 +138,14 @@ public:
     ) const {
         CHECK( phase_space.size() == 4 * (final_states_ + 2) );
         CHECK( set == set_ );
-        CHECK( scales.size() == 1 );
-        CHECK( me.size() == 1 );
+        CHECK( scales.size() == me.size() );
 
         for (auto const process : set)
         {
-            me.front().emplace_back(process, T(1.0));
+            for (std::size_t i = 0; i != scales.size(); ++i)
+            {
+                me.at(i).emplace_back(process, T(1.0));
+            }
         }
     }
 
