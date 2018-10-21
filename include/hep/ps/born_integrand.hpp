@@ -33,6 +33,8 @@
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -85,7 +87,14 @@ public:
         pos_.ps.reserve(4 * (fs + 2));
         neg_.states.reserve(fs);
         pos_.states.reserve(fs);
-        pdf_results_.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());
+
+        std::size_t const scale_count = scale_setter_.count();
+        std::size_t const pdf_count = pdfs_.count();
+
+        results_.reserve(scale_count);
+        pdf_results_.reserve((pdf_count == 1) ? 0 : pdf_count);
+        borns_.resize(2 * scale_count);
+        scales_.resize(2 * scale_count);
 
         if (!dynamic_scales_)
         {
@@ -93,11 +102,8 @@ public:
             std::vector<recombined_state> no_states;
             psp<T> no_psp{no_point, no_states, T(), psp_type::pos_rap};
 
-            // a static scale must not depend on any phase or state information
+            // static scales must not depend on any phase space or state information
             set_scales(no_psp, no_psp);
-
-            results_.reserve(scales_.size() / 2);
-            borns_.resize(scales_.size());
         }
 
         pdfs_.register_partons(partons_in_initial_state_set(set));
@@ -128,20 +134,24 @@ public:
         if (dynamic_scales_)
         {
             set_scales(neg_psp, pos_psp);
-
-            results_.reserve(scales_.size() / 2);
-            borns_.resize(scales_.size());
         }
+
+        std::size_t const scales = scale_setter_.count();
+        std::size_t const pdfs = (pdfs_.count() == 1) ? 0 : pdfs_.count();
 
         T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-        pdfs_.eval(info.x1(), scales_, scale_pdf_x1_, pdf_pdf_x1_);
-        pdfs_.eval(info.x2(), scales_, scale_pdf_x2_, pdf_pdf_x2_);
+        pdfs_.eval(info.x1(), scales, scales_, scale_pdf_x1_, pdf_pdf_x1_);
+        pdfs_.eval(info.x2(), scales, scales_, scale_pdf_x2_, pdf_pdf_x2_);
 
-        assert( scale_pdf_x1_.size() == scales_.size() );
-        assert( scale_pdf_x2_.size() == scales_.size() );
-        assert( (pdfs_.count() == 1) || (pdf_pdf_x1_.size() == pdfs_.count()) );
-        assert( (pdfs_.count() == 1) || (pdf_pdf_x2_.size() == pdfs_.count()) );
+        // for each of the two phase space point the must be a set of scales and PDFs
+        assert( scales_.size() == 2 * scales );
+        assert( scale_pdf_x1_.size() == 2 * scales );
+        assert( scale_pdf_x2_.size() == 2 * scales );
+
+        // for each CENTRAL scale there must be a set of uncertainty PDFs
+        assert( pdf_pdf_x1_.size() == 2 * pdfs );
+        assert( pdf_pdf_x2_.size() == 2 * pdfs );
 
         for (auto& born : borns_)
         {
@@ -150,23 +160,27 @@ public:
 
         matrix_elements_.borns(phase_space, set_, scales_, borns_);
 
-        assert( borns_.size() == scales_.size() );
+        // for each scale there must be a matrix element
+        assert( borns_.size() == 2 * scales );
 
         T result = T();
+
+        using span0 = nonstd::span<parton_array<T> const>;
+        using span1 = nonstd::span<initial_state_map<T> const>;
+        using span2 = nonstd::span<T const>;
 
         if (!pos_cutted)
         {
             convolute_mes_with_pdfs(
-                psp_type::pos_rap,
                 results_,
                 pdf_results_,
-                scale_pdf_x1_,
-                scale_pdf_x2_,
-                pdf_pdf_x1_,
-                pdf_pdf_x2_,
-                borns_,
+                span0{scale_pdf_x1_}.first(scales),
+                span0{scale_pdf_x2_}.first(scales),
+                span0{pdf_pdf_x1_}.first(pdfs),
+                span0{pdf_pdf_x2_}.first(pdfs),
+                span1{borns_}.first(scales),
                 set_,
-                factors_,
+                span2{factors_}.first(scales),
                 factor
             );
 
@@ -178,16 +192,15 @@ public:
         if (!neg_cutted)
         {
             convolute_mes_with_pdfs(
-                psp_type::neg_rap,
                 results_,
                 pdf_results_,
-                scale_pdf_x2_,
-                scale_pdf_x1_,
-                pdf_pdf_x2_,
-                pdf_pdf_x1_,
-                borns_,
+                span0{scale_pdf_x2_}.last(scales),
+                span0{scale_pdf_x1_}.last(scales),
+                span0{pdf_pdf_x2_}.last(pdfs),
+                span0{pdf_pdf_x1_}.last(pdfs),
+                span1{borns_}.last(scales),
                 set_,
-                factors_,
+                span2{factors_}.last(scales),
                 factor
             );
 
@@ -203,16 +216,14 @@ protected:
     void set_scales(psp<T> const& neg_psp, psp<T> const& pos_psp)
     {
         using std::pow;
+        using span = nonstd::span<scales<T>>;
 
-        neg_.scales_.clear();
-        pos_.scales_.clear();
-        scales_.clear();
+        std::size_t const scales = scale_setter_.count();
+
         factors_.clear();
 
-        scale_setter_(neg_psp, neg_.scales_);
-        scales_.insert(scales_.end(), neg_.scales_.begin(), neg_.scales_.end());
-        scale_setter_(pos_psp, pos_.scales_);
-        scales_.insert(scales_.end(), pos_.scales_.begin(), pos_.scales_.end());
+        scale_setter_.eval(neg_psp, span{scales_}.first(scales));
+        scale_setter_.eval(pos_psp, span{scales_}.last(scales));
 
         pdfs_.eval_alphas(scales_, factors_);
 
@@ -240,7 +251,6 @@ private:
     {
         std::vector<T> ps;
         std::vector<recombined_state> states;
-        std::vector<scales<T>> scales_;
     } neg_, pos_;
 
     std::vector<parton_array<T>> scale_pdf_x1_;

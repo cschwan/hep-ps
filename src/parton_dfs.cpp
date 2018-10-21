@@ -153,6 +153,82 @@ void parton_dfs<T>::eval(
 }
 
 template <typename T>
+void parton_dfs<T>::eval(
+    T x,
+    std::size_t scale_count,
+    std::vector<scales<T>> const& scales,
+    std::vector<parton_array<T>>& scale_pdfs,
+    std::vector<parton_array<T>>& uncertainty_pdfs
+) {
+    scale_pdfs.clear();
+    scale_pdfs.resize(scales.size());
+
+    auto const xval = static_cast <double> (x);
+    std::size_t const pdf_count = count();
+    std::size_t const central_scales = scales.size() / scale_count;
+
+    if (pdf_count > 1)
+    {
+        uncertainty_pdfs.clear();
+        uncertainty_pdfs.resize(central_scales * pdf_count);
+    }
+
+    for (std::size_t i = 0; i != scales.size(); ++i)
+    {
+        // check if we already calculated the central PDF for the current factorization scale
+        auto const end = std::next(scales.begin(), i);
+        auto const result = std::find_if(scales.begin(), end, [&](hep::scales<T> const& s) {
+            return s.factorization() == scales.at(i).factorization();
+        });
+        std::size_t const index = std::distance(scales.begin(), result);
+
+        auto const muf = static_cast <double> (scales.at(i).factorization());
+
+        if (result == end)
+        {
+            for (auto const& ids : pimpl->pdg_ids)
+            {
+                auto const xfx = pimpl->pdfs.front()->xfxQ(ids.first, xval, muf);
+                scale_pdfs.at(i)[ids.second] = T(xfx) / x;
+            }
+        }
+        else
+        {
+            scale_pdfs.at(i) = scale_pdfs.at(index);
+        }
+
+        // check if we are evaluating PDFs for the central scale
+        if ((pdf_count > 1) && (i % central_scales == 0))
+        {
+            std::size_t const j = i / scale_count;
+
+            // we already calculated the central PDFs
+            uncertainty_pdfs.at(j * pdf_count) = scale_pdfs.at(i);
+
+            if (result == end)
+            {
+                for (std::size_t k = 1; k != pdf_count; ++k)
+                {
+                    for (auto const& ids : pimpl->pdg_ids)
+                    {
+                        auto const xfx = pimpl->pdfs.front()->xfxQ(ids.first, xval, muf);
+                        uncertainty_pdfs.at(j * pdf_count + k)[ids.second] = T(xfx) / x;
+                    }
+                }
+            }
+            else
+            {
+                uncertainty_pdfs.insert(
+                    uncertainty_pdfs.end(),
+                    std::next(uncertainty_pdfs.begin(), pdf_count * index),
+                    std::next(uncertainty_pdfs.begin(), pdf_count * (index + 1))
+                );
+            }
+        }
+    }
+}
+
+template <typename T>
 void parton_dfs<T>::register_partons(parton_set set)
 {
     for (auto const p : set)

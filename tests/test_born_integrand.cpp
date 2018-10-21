@@ -17,8 +17,11 @@
 
 #include "test_phase_space_generator.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <catch.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <vector>
@@ -31,14 +34,9 @@ template <typename T>
 class test_born_class
 {
 public:
-    test_born_class(
-        std::size_t alphas_power,
-        T alphas,
-        bool dynamic_scale
-    )
+    test_born_class(std::size_t alphas_power, T alphas)
         : alphas_power_{alphas_power}
         , alphas_{alphas}
-        , dynamic_scale_{dynamic_scale}
     {
     }
 
@@ -77,8 +75,8 @@ public:
             T const muf = global_scales.front().factorization();
             T const mur = global_scales.front().renormalization();
             T const couplings = pow(alphas.front(), T(alphas_power_));
-            T const pdfa = T(i+1) * muf;
-            T const pdfb = T(i+1) * muf;
+            T const pdfa = T((i % count()) + 1) * muf;
+            T const pdfb = T((i % count()) + 1) * muf;
             T const born = couplings;
             T const born_scale = couplings * mur;
 
@@ -128,47 +126,14 @@ public:
         return {};
     }
 
-    // SCALE SETTER MEMBER FUNCTIONS
-
-    void operator()(
-        hep::psp<T> const&,
-        std::vector<hep::scales<T>>& scales
-    ) {
-        if (dynamic_scale_)
-        {
-            for (auto& scale : global_scales)
-            {
-                T const muf = T(2.0) * scale.factorization();
-                T const mu = scale.regularization();
-                T const mur = T(2.0) * scale.renormalization();
-
-                scale = hep::scales<T>{muf, mu, mur};
-            }
-        }
-
-        scales.assign(global_scales.begin(), global_scales.end());
-    }
-
-    bool dynamic() const
-    {
-        return dynamic_scale_;
-    }
-
     // PDF MEMBER FUNCTIONS
 
     void eval_alphas(
         std::vector<hep::scales<T>> const& scales,
         std::vector<T>& alphas
     ) {
-        CHECK( scales.size() == global_scales.size() );
-
         for (std::size_t i = 0; i != scales.size(); ++i)
         {
-            CHECK( scales.at(i).factorization() ==
-                global_scales.at(i).factorization() );
-            CHECK( scales.at(i).renormalization() ==
-                global_scales.at(i).renormalization() );
-
             alphas.push_back(alphas_ * scales.at(i).renormalization() /
                 global_scales.front().renormalization());
         }
@@ -181,18 +146,20 @@ public:
 
     void eval(
         T x,
+        std::size_t scale_count,
         std::vector<hep::scales<T>> const& scales,
         std::vector<hep::parton_array<T>>& scale_pdfs,
         std::vector<hep::parton_array<T>>& uncertainty_pdfs
     ) {
         CHECK( x >= T{} );
         CHECK( x < T(1.0) );
-        CHECK( scales.size() == global_scales.size() );
+
+        std::size_t const central_scales = scales.size() / scale_count;
 
         scale_pdfs.clear();
         uncertainty_pdfs.clear();
         scale_pdfs.resize(scales.size());
-        uncertainty_pdfs.resize(count());
+        uncertainty_pdfs.resize(central_scales * count());
 
         for (std::size_t i = 0; i != scales.size(); ++i)
         {
@@ -202,12 +169,12 @@ public:
             }
         }
 
-        for (std::size_t i = 0; i != count(); ++i)
+        for (std::size_t i = 0; i != uncertainty_pdfs.size(); ++i)
         {
             for (auto const parton : hep::parton_list())
             {
                 uncertainty_pdfs.at(i)[parton] =
-                    scales.front().factorization() * T(i+1);
+                    scales.front().factorization() * T((i % count()) + 1);
             }
         }
     }
@@ -219,6 +186,53 @@ public:
 private:
     std::size_t alphas_power_;
     T alphas_;
+    bool dynamic_scale_;
+};
+
+template <typename T>
+class test_born_scale_setter
+{
+public:
+    test_born_scale_setter(bool dynamic_scale)
+        : dynamic_scale_{dynamic_scale}
+    {
+    }
+
+    void eval(hep::psp<T> const&, nonstd::span<hep::scales<T>> scales)
+    {
+        if (dynamic_scale_)
+        {
+            static std::size_t index = 0;
+
+            index = (index + 1) % 2;
+
+            if (index == 1)
+            {
+                for (auto& scale : global_scales)
+                {
+                    T const muf = T(2.0) * scale.factorization();
+                    T const mu = scale.regularization();
+                    T const mur = T(2.0) * scale.renormalization();
+
+                    scale = hep::scales<T>{muf, mu, mur};
+                }
+            }
+        }
+
+        std::copy(global_scales.begin(), global_scales.end(), scales.begin());
+    }
+
+    bool dynamic() const
+    {
+        return dynamic_scale_;
+    }
+
+    std::size_t count() const
+    {
+        return global_scales.size();
+    }
+
+private:
     bool dynamic_scale_;
 };
 
@@ -245,7 +259,8 @@ void test_born_integrand(
 
     // number of final states is not really interesting here
     test_phase_space_generator<T> generator{2};
-    test_born_class<T> born{alphas_power, alphas, dynamic_scale};
+    test_born_class<T> born{alphas_power, alphas};
+    test_born_scale_setter<T> scale_setter{dynamic_scale};
 
     // born gets copied, therefore `global_scales` must be global
     auto integrand = hep::make_born_integrand<T>(
@@ -253,7 +268,7 @@ void test_born_integrand(
         hep::trivial_cutter<T>{},
         hep::trivial_recombiner<T>{},
         born,
-        born,
+        scale_setter,
         born,
         set,
         T(1.0)

@@ -31,7 +31,7 @@ public:
     /// Constructs a new object with \f$ \mu_\text{F} \f$ set to the value of `factorization`, \f$
     /// \mu \f$ set to the value of `regularization`, and \f$ \mu_\text{R} \f$ set to the value of
     /// `renormalization`.
-    scales(T factorization, T regularization, T renormalization)
+    scales(T factorization = T(), T regularization = T(), T renormalization = T())
         : factorization_{factorization}
         , regularization_{regularization}
         , renormalization_{renormalization}

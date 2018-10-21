@@ -25,6 +25,8 @@
 #include "hep/ps/parton.hpp"
 #include "hep/ps/psp_type.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <cassert>
 
 namespace hep
@@ -143,52 +145,47 @@ inline neg_pos_results<T> convolute(
 
 template <typename T>
 inline void convolute_mes_with_pdfs(
-    psp_type type,
     std::vector<T>& scale_results,
     std::vector<T>& pdf_results,
-    std::vector<parton_array<T>> const& scale_uncertainty_pdfs_one,
-    std::vector<parton_array<T>> const& scale_uncertainty_pdfs_two,
-    std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_one,
-    std::vector<parton_array<T>> const& pdf_uncertainty_pdfs_two,
-    std::vector<initial_state_map<T>> const& matrix_elements,
+    nonstd::span<parton_array<T> const> scale_uncertainty_pdfs_one,
+    nonstd::span<parton_array<T> const> scale_uncertainty_pdfs_two,
+    nonstd::span<parton_array<T> const> pdf_uncertainty_pdfs_one,
+    nonstd::span<parton_array<T> const> pdf_uncertainty_pdfs_two,
+    nonstd::span<initial_state_map<T> const> matrix_elements,
     initial_state_set set,
-    std::vector<T> const& alphas_factors,
+    nonstd::span<T const> alphas_factors,
     T global_factor
 ) {
-    std::size_t const scale_index = (type == psp_type::pos_rap) ? 0 :
-        scale_uncertainty_pdfs_one.size() / 2;
-    std::size_t const scales = scale_uncertainty_pdfs_one.size() / 2;
-    std::size_t const pdf_index = (type == psp_type::pos_rap) ? 0 :
-        pdf_uncertainty_pdfs_one.size() / 2;
-    std::size_t const pdfs = pdf_uncertainty_pdfs_one.size() / 2;
+    std::ptrdiff_t const scales = scale_uncertainty_pdfs_one.size();
+    std::ptrdiff_t const pdfs = pdf_uncertainty_pdfs_one.size();
 
-    assert( scale_uncertainty_pdfs_one.size() == 2 * scales );
-    assert( scale_uncertainty_pdfs_two.size() == 2 * scales );
-    assert( matrix_elements.size() == 2 * scales );
-    assert( alphas_factors.size() == 2 * scales );
-    assert( pdf_uncertainty_pdfs_one.size() == 2 * pdfs );
-    assert( pdf_uncertainty_pdfs_two.size() == 2 * pdfs );
+    assert( scale_uncertainty_pdfs_one.size() == scales );
+    assert( scale_uncertainty_pdfs_two.size() == scales );
+    assert( matrix_elements.size() == scales );
+    assert( alphas_factors.size() == scales );
+    assert( pdf_uncertainty_pdfs_one.size() == pdfs );
+    assert( pdf_uncertainty_pdfs_two.size() == pdfs );
 
     scale_results.clear();
 
-    for (std::size_t i = scale_index; i != scale_index + scales; ++i)
+    for (std::ptrdiff_t i = 0; i != scales; ++i)
     {
-        scale_results.push_back(global_factor * alphas_factors.at(i) * convolute(
-            scale_uncertainty_pdfs_one.at(i),
-            scale_uncertainty_pdfs_two.at(i),
-            matrix_elements.at(i),
+        scale_results.push_back(global_factor * alphas_factors[i] * convolute(
+            scale_uncertainty_pdfs_one[i],
+            scale_uncertainty_pdfs_two[i],
+            matrix_elements[i],
             set
         ));
     }
 
     pdf_results.clear();
 
-    for (std::size_t i = pdf_index; i != pdf_index + pdfs; ++i)
+    for (std::ptrdiff_t i = 0; i != pdfs; ++i)
     {
-        pdf_results.push_back(global_factor * alphas_factors.front() * convolute(
-            pdf_uncertainty_pdfs_one.at(i),
-            pdf_uncertainty_pdfs_two.at(i),
-            matrix_elements.front(),
+        pdf_results.push_back(global_factor * alphas_factors[0] * convolute(
+            pdf_uncertainty_pdfs_one[i],
+            pdf_uncertainty_pdfs_two[i],
+            matrix_elements[0],
             set
         ));
     }

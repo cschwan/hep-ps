@@ -24,6 +24,8 @@
 #include "hep/ps/scale_variation.hpp"
 #include "hep/ps/scales.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <vector>
 
 namespace hep
@@ -47,8 +49,14 @@ public:
     /// Returns the static scale(s).
     void operator()(psp<T> const& point, std::vector<hep::scales<T>>& scales);
 
+    /// Evaluates the static scale(s).
+    void eval(psp<T> const& point, nonstd::span<hep::scales<T>> scales);
+
     /// Returns `false`, since this scale function is independent of the phase space point (static).
     bool dynamic() const;
+
+    /// Returns the number of scales which should be evaluated.
+    std::size_t count() const;
 
 private:
     T scale_;

@@ -12,6 +12,8 @@
 
 #include <catch.hpp>
 
+#include "nonstd/span.hpp"
+
 #include <array>
 #include <cstddef>
 #include <numeric>
@@ -66,6 +68,7 @@ public:
 
     void eval(
         T x,
+        std::size_t /*scale_count*/,
         std::vector<hep::scales<T>> const& scales,
         std::vector<hep::parton_array<T>>& scale_pdfs,
         std::vector<hep::parton_array<T>>& uncertainty_pdfs
@@ -179,16 +182,19 @@ public:
     {
     }
 
-    void operator()(
-        hep::psp<T> const&,
-        std::vector<hep::scales<T>>& scales
-    ) {
-        scales.emplace_back(scale, scale, scale);
+    void eval(hep::psp<T> const&, nonstd::span<hep::scales<T>> scales)
+    {
+        scales[0] = hep::scales<T>{scale, scale, scale};
     }
 
     bool dynamic() const
     {
         return dynamic_;
+    }
+
+    std::size_t count() const
+    {
+        return 1;
     }
 
 private:
