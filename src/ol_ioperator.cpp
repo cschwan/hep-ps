@@ -77,13 +77,13 @@ template <typename T>
 void ol_ioperator<T>::borns(
     std::vector<T> const& phase_space,
     initial_state_set /*set*/,
-    std::vector<scales<T>> const& scales,
+    nonstd::span<scales<T> const> scales,
     std::vector<initial_state_map<T>>& results
 ) {
     auto& ol = ol_interface::instance();
 
     // TODO: set also renormalization scale and loop over it
-    ol.setparameter_double("mu", static_cast <double> (scales.front().regularization()));
+    ol.setparameter_double("mu", static_cast <double> (scales[0].regularization()));
 
     std::size_t n = ol.n_external(id_);
     std::vector<double> pp(5 * n);

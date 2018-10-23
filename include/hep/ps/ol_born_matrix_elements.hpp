@@ -25,6 +25,8 @@
 #include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <cstddef>
 #include <string>
 #include <unordered_map>
@@ -51,7 +53,7 @@ public:
     void borns(
         std::vector<T> const& phase_space,
         hep::initial_state_set set,
-        std::vector<scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<initial_state_map<T>>& results
     );
 

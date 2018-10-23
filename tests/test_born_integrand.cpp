@@ -91,19 +91,18 @@ public:
     void borns(
         std::vector<T> const&,
         hep::initial_state_set set,
-        std::vector<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T>> const& scales,
         std::vector<hep::initial_state_map<T>>& results
     ) const {
         using std::pow;
 
         for (std::size_t i = 0; i != scales.size(); ++i)
         {
-            T const mur = scales.at(i).renormalization();
+            T const mur = scales[i].renormalization();
 
             for (auto const state : set)
             {
-                results.at(i).emplace_back(state, pow(alphas_,
-                    T(alphas_power_)) * (T(1.0) + mur));
+                results.at(i).emplace_back(state, pow(alphas_, T(alphas_power_)) * (T(1.0) + mur));
             }
         }
     }

@@ -87,7 +87,7 @@ template <typename T>
 void ol_born_matrix_elements<T>::borns(
     std::vector<T> const& phase_space,
     hep::initial_state_set set,
-    std::vector<scales<T>> const& scales,
+    nonstd::span<hep::scales<T> const> scales,
     std::vector<initial_state_map<T>>& results
 ) {
     auto& ol = hep::ol_interface::instance();
@@ -113,10 +113,10 @@ void ol_born_matrix_elements<T>::borns(
         double m2loop[3];
         double acc;
 
-        double const mureg = static_cast <double> (scales.front().regularization());
+        double const mureg = static_cast <double> (scales[0].regularization());
 
         ol.setparameter_double("mureg", mureg);
-        ol.setparameter_double("muren", static_cast <double> (scales.front().renormalization()));
+        ol.setparameter_double("muren", static_cast <double> (scales[0].renormalization()));
 
         // TODO: `scales` usually has more than one entry with the same renormalization scale -
         // cache it?
@@ -148,12 +148,12 @@ void ol_born_matrix_elements<T>::borns(
 
         for (std::size_t j = 0; j != scales.size(); ++j)
         {
-            if (scales.at(j).regularization() != scales.front().regularization())
+            if (scales[j].regularization() != scales[0].regularization())
             {
                 throw std::runtime_error("regularization scales must be the same");
             }
 
-            double const muren = static_cast <double> (scales.at(j).renormalization());
+            double const muren = static_cast <double> (scales[j].renormalization());
 
             ol.setparameter_double("muren", muren);
 
@@ -197,6 +197,7 @@ void ol_born_matrix_elements<T>::borns(
             results.at(i) = results.front();
         }
     }
+
 }
 
 template <typename T>

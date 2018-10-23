@@ -136,7 +136,7 @@ public:
     void borns(
         std::vector<T> const& phase_space,
         hep::initial_state_set set,
-        std::vector<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T>> const& scales,
         std::vector<hep::initial_state_map<T>>& me
     ) const {
         CHECK( phase_space.size() == 4 * (final_states_ + 2) );

@@ -158,7 +158,7 @@ public:
             born.clear();
         }
 
-        matrix_elements_.borns(phase_space, set_, scales_, borns_);
+        matrix_elements_.borns(phase_space, set_, nonstd::span<hep::scales<T>>{scales_}, borns_);
 
         // for each scale there must be a matrix element
         assert( borns_.size() == 2 * scales );
