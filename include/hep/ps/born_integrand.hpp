@@ -169,44 +169,44 @@ public:
         using span1 = nonstd::span<initial_state_map<T> const>;
         using span2 = nonstd::span<T const>;
 
-        if (!pos_cutted)
+        if (!neg_cutted)
         {
             convolute_mes_with_pdfs(
                 results_,
                 pdf_results_,
-                span0{scale_pdf_x1_}.first(scales),
                 span0{scale_pdf_x2_}.first(scales),
-                span0{pdf_pdf_x1_}.first(pdfs),
+                span0{scale_pdf_x1_}.first(scales),
                 span0{pdf_pdf_x2_}.first(pdfs),
+                span0{pdf_pdf_x1_}.first(pdfs),
                 span1{borns_}.first(scales),
                 set_,
                 span2{factors_}.first(scales),
                 factor
             );
 
-            distributions_(pos_psp, results_, pdf_results_, projector);
-
             result += results_.front();
+
+            distributions_(neg_psp, results_, pdf_results_, projector);
         }
 
-        if (!neg_cutted)
+        if (!pos_cutted)
         {
             convolute_mes_with_pdfs(
                 results_,
                 pdf_results_,
-                span0{scale_pdf_x2_}.last(scales),
                 span0{scale_pdf_x1_}.last(scales),
-                span0{pdf_pdf_x2_}.last(pdfs),
+                span0{scale_pdf_x2_}.last(scales),
                 span0{pdf_pdf_x1_}.last(pdfs),
+                span0{pdf_pdf_x2_}.last(pdfs),
                 span1{borns_}.last(scales),
                 set_,
                 span2{factors_}.last(scales),
                 factor
             );
 
-            result += results_.front();
-
             distributions_(pos_psp, results_, pdf_results_, projector);
+
+            result += results_.front();
         }
 
         return result;
