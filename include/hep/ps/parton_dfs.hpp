@@ -22,6 +22,8 @@
 #include "hep/ps/parton.hpp"
 #include "hep/ps/scales.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -54,6 +56,10 @@ public:
     /// results into `alphas`
     void eval_alphas(std::vector<hep::scales<T>> const& scales, std::vector<T>& alphas);
 
+    /// Evaluates the strong coupling for the renormalization scales in `scales` and writes the
+    /// results into `alphas`
+    void eval_alphas(nonstd::span<hep::scales<T> const> scales, std::vector<T>& alphas);
+
     /// This function returns the number of PDFs represented with by this object.
     std::size_t count() const;
 
@@ -72,7 +78,7 @@ public:
     void eval(
         T x,
         std::size_t scale_count,
-        std::vector<scales<T>> const& scales,
+        nonstd::span<scales<T> const> scales,
         std::vector<parton_array<T>>& scale_pdfs,
         std::vector<parton_array<T>>& uncertainty_pdfs
     );

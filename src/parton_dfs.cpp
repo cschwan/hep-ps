@@ -87,6 +87,20 @@ void parton_dfs<T>::eval_alphas(
 }
 
 template <typename T>
+void parton_dfs<T>::eval_alphas(
+    nonstd::span<hep::scales<T> const> scales,
+    std::vector<T>& alphas
+) {
+    auto& pdf = pimpl->pdfs.front();
+
+    // TODO: implement a cache?
+    for (auto const& scale : scales)
+    {
+        alphas.push_back(pdf->alphasQ(scale.renormalization()));
+    }
+}
+
+template <typename T>
 std::size_t parton_dfs<T>::count() const
 {
     return pimpl->pdfs.size();
@@ -156,7 +170,7 @@ template <typename T>
 void parton_dfs<T>::eval(
     T x,
     std::size_t scale_count,
-    std::vector<scales<T>> const& scales,
+    nonstd::span<scales<T> const> scales,
     std::vector<parton_array<T>>& scale_pdfs,
     std::vector<parton_array<T>>& uncertainty_pdfs
 ) {
@@ -178,11 +192,11 @@ void parton_dfs<T>::eval(
         // check if we already calculated the central PDF for the current factorization scale
         auto const end = std::next(scales.begin(), i);
         auto const result = std::find_if(scales.begin(), end, [&](hep::scales<T> const& s) {
-            return s.factorization() == scales.at(i).factorization();
+            return s.factorization() == scales[i].factorization();
         });
         std::size_t const index = std::distance(scales.begin(), result);
 
-        auto const muf = static_cast <double> (scales.at(i).factorization());
+        auto const muf = static_cast <double> (scales[i].factorization());
 
         if (result == end)
         {
