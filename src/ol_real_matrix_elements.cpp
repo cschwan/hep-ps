@@ -229,7 +229,7 @@ void ol_real_matrix_elements<T>::dipole_me(
     dipole const& dipole,
     std::vector<T> const& phase_space,
     initial_state_set set,
-    std::vector<scales<T>> const& scales,
+    nonstd::span<scales<T> const> scales,
     std::vector<initial_state_map<T>>& results
 ) {
     auto& ol = hep::ol_interface::instance();
@@ -329,7 +329,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
     std::vector<T> const& phase_space,
     std::array<T, 4> const& vector,
     hep::initial_state_set set,
-    std::vector<hep::scales<T>> const& scales,
+    nonstd::span<hep::scales<T> const> scales,
     std::vector<hep::initial_state_map<T>>& results_one,
     std::vector<hep::initial_state_map<T>>& results_two
 ) {
@@ -478,7 +478,7 @@ template <typename T>
 void ol_real_matrix_elements<T>::reals(
     std::vector<T> const& phase_space,
     initial_state_set set,
-    std::vector<scales<T>> const& scales,
+    nonstd::span<scales<T> const> scales,
     std::vector<initial_state_map<T>>& results
 ) {
     auto& ol = hep::ol_interface::instance();

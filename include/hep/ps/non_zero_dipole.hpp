@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 
@@ -31,18 +30,20 @@ namespace hep
 
 /// Class for storing information for the evaluation of a dipole that successfully passed the phase
 /// space recombination and cuts.
-template <typename T, typename I>
+template <typename T>
 class non_zero_dipole
 {
 public:
     non_zero_dipole(
         dipole_invariants<T> const& invariants,
         dipole const& dipole,
-        cut_result_with_info<I> const& cut_result
+        bool neg_cutted,
+        bool pos_cutted
     )
         : invariants_(invariants)
         , dipole_(dipole)
-        , cut_result_(cut_result)
+        , neg_cutted_{neg_cutted}
+        , pos_cutted_{pos_cutted}
     {
     }
 
@@ -56,15 +57,21 @@ public:
         return dipole_;
     }
 
-    cut_result_with_info<I> const& cut_result() const
+    bool neg_cutted() const
     {
-        return cut_result_;
+        return neg_cutted_;
+    }
+
+    bool pos_cutted() const
+    {
+        return pos_cutted_;
     }
 
 private:
     dipole_invariants<T> invariants_;
     hep::dipole dipole_;
-    cut_result_with_info<I> cut_result_;
+    bool neg_cutted_;
+    bool pos_cutted_;
 };
 
 }

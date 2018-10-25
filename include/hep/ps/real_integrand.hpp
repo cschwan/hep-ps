@@ -30,8 +30,11 @@
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/ps_integrand.hpp"
+#include "hep/ps/psp.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
+
+#include "nonstd/span.hpp"
 
 #include <algorithm>
 #include <array>
@@ -95,14 +98,6 @@ public:
 
         non_zero_dipoles_.reserve(dipoles_.size());
 
-        if (!scale_setter_.dynamic())
-        {
-            set_scales(std::vector<T>(), std::vector<recombined_state>());
-            results_.reserve(scales_.size());
-            me_.resize(scales_.size());
-            me_tmp_.resize(scales_.size());
-        }
-
         pdfs_.register_partons(partons_in_initial_state_set(set));
 
         for (std::size_t i = 0; i != dipoles_.size() - 1; ++i)
@@ -141,12 +136,79 @@ public:
             }
         }
 
+        std::size_t const scales = scale_setter_.count();
+        scales_.resize(2 * scales * (phase_space_sizes_.size() + 1));
+        factors_.reserve(scales_.size());
+
+        if (!scale_setter_.dynamic())
+        {
+            std::vector<T> no_point;
+            std::vector<recombined_state> no_states;
+            psp<T> no_psp{no_point, no_states, T(), psp_type::pos_rap};
+
+            // static scales must not depend on any phase space or state information
+            using span0 = nonstd::span<hep::scales<T>>;
+
+            scale_setter_.eval(no_psp, span0{scales_}.first(scales));
+
+            for (std::size_t i = 1; i != scales_.size() / scales; ++i)
+            {
+                std::copy(scales_.begin(), std::next(scales_.begin(), scales),
+                    std::next(scales_.begin(), i * scales));
+            }
+
+            pdfs_.eval_alphas(scales_, factors_);
+
+            T const central_alphas = factors_.front();
+            matrix_elements_.alphas(central_alphas);
+
+            using std::pow;
+
+            for (T& factor : factors_)
+            {
+                T const alphas = factor;
+                factor = pow(alphas / central_alphas, alphas_power_);
+            }
+        }
+
+        results_.reserve(scales);
+        me_.resize(2 * scales);
+        me_tmp_.resize(2 * scales);
+
         phase_space_indices_.reserve(phase_space_sizes_.size());
         dipole_phase_spaces_.resize(phase_space_sizes_.size());
+        neg_.ps.resize(phase_space_sizes_.size());
+        pos_.ps.resize(phase_space_sizes_.size());
+        neg_.states.resize(phase_space_sizes_.size());
+        pos_.states.resize(phase_space_sizes_.size());
+        neg_.real_ps.resize(4 * (fs + 2));
+        neg_.real_states.resize(fs);
+        pos_.real_ps.resize(4 * (fs + 2));
+        pos_.real_states.resize(fs);
 
-        for (auto& phase_space : dipole_phase_spaces_)
+        for (auto& ps : dipole_phase_spaces_)
         {
-            phase_space.resize(4 * (fs + 1));
+            ps.resize(4 * (fs + 1));
+        }
+
+        for (auto& ps : neg_.ps)
+        {
+            ps.resize(4 * (fs + 1));
+        }
+
+        for (auto& ps : pos_.ps)
+        {
+            ps.resize(4 * (fs + 1));
+        }
+
+        for (auto& states : neg_.states)
+        {
+            states.reserve(fs - 1);
+        }
+
+        for (auto& states : pos_.states)
+        {
+            states.reserve(fs - 1);
         }
     }
 
@@ -161,20 +223,28 @@ public:
         std::size_t dipole_index = 0;
         std::size_t phase_space_index = 0;
 
+        // STEP 1: generate the different phase spaces for all dipoles and check whether the dipoles
+        // are cut away, the whole point is tech-cutted, or whether we have to evaluate it
+
         for (std::size_t phase_space_size : phase_space_sizes_)
         {
-            auto& phase_space = dipole_phase_spaces_.at(phase_space_index);
-            cut_result_with_info<info_type> cut_result;
+            auto& cms_ps = dipole_phase_spaces_.at(phase_space_index);
+            auto& neg_ps = neg_.ps.at(phase_space_index);
+            auto& pos_ps = pos_.ps.at(phase_space_index);
+            auto& neg_states = neg_.states.at(phase_space_index);
+            auto& pos_states = pos_.states.at(phase_space_index);
+
+            bool neg_cutted = true;
+            bool pos_cutted = true;
 
             for (std::size_t i = 0; i != phase_space_size; ++i)
             {
                 auto const& dipole = dipoles_.at(dipole_index++);
 
                 // map the real phase space on the dipole phase space
-                auto const invariants = subtraction_.map_phase_space(real_phase_space, phase_space,
-                    dipole);
+                auto const inv = subtraction_.map_phase_space(real_phase_space, cms_ps, dipole);
 
-                if (invariants.alpha < alpha_min_)
+                if (inv.alpha < alpha_min_)
                 {
                     // if we apply a technical cut, completely throw away the point
                     return T();
@@ -182,65 +252,149 @@ public:
 
                 if (i == 0)
                 {
-                    recombiner_.recombine(phase_space, final_states_dipole_, phase_space,
-                        recombined_dipole_states_);
+                    recombiner_.recombine(cms_ps, final_states_dipole_, pos_ps, pos_states);
 
-                    cut_result = cuts_.cut(
-                        phase_space,
-                        info.rapidity_shift(),
-                        recombined_dipole_states_
-                    );
+                    // assumes that the recombination is independent of the frame
+                    neg_ps = pos_ps;
+                    neg_states = pos_states;
+
+                    psp<T> neg_psp{neg_ps, neg_states, info.rapidity_shift(), psp_type::neg_rap};
+                    psp<T> pos_psp{pos_ps, pos_states, info.rapidity_shift(), psp_type::pos_rap};
+
+                    neg_cutted = cuts_.cut(neg_psp);
+                    pos_cutted = cuts_.cut(pos_psp);
 
                     ++phase_space_index;
 
-                    if (cut_result.neg_cutted() && cut_result.pos_cutted())
+                    if (neg_cutted && pos_cutted)
                     {
                         // if the dipole is cutted, we still have to check the technical cuts
                         continue;
                     }
 
-                    dipole_recombined_states_ = recombined_dipole_states_;
-
                     phase_space_indices_.push_back(phase_space_index - 1);
                 }
 
-                if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
+                if (!neg_cutted || !pos_cutted)
                 {
-                    non_zero_dipoles_.emplace_back(invariants, dipole, cut_result);
+                    non_zero_dipoles_.emplace_back(inv, dipole, neg_cutted, pos_cutted);
                 }
             }
         }
 
+        // STEP 2: Check if the real matrix element has to evaluated and check if this event is
+        // nonzero
+
+        recombiner_.recombine(real_phase_space, final_states_real_, pos_.real_ps, pos_.real_states);
+
+        // assumes that the recombination is independent of the frame
+        neg_.real_ps = pos_.real_ps;
+        neg_.real_states = pos_.real_states;
+
+        psp<T> neg_psp{neg_.real_ps, neg_.real_states, info.rapidity_shift(), psp_type::neg_rap};
+        psp<T> pos_psp{pos_.real_ps, pos_.real_states, info.rapidity_shift(), psp_type::pos_rap};
+
+        bool const neg_cutted = cuts_.cut(neg_psp);
+        bool const pos_cutted = cuts_.cut(pos_psp);
+
+        if (phase_space_indices_.empty() && neg_cutted && pos_cutted)
+        {
+            return T();
+        }
+
+        // STEP 3: Calculate the scales, alphas, and PDFs for all dipoles
+
+        std::size_t const scales = scale_setter_.count();
+        std::size_t const pdfs = (pdfs_.count() == 1) ? 0 : pdfs_.count();
+
+        using span4 = nonstd::span<hep::scales<T> const>;
+        auto scale_span = span4{scales_}.first(2 * scales * (phase_space_indices_.size() + 1));
+
+        if (scale_setter_.dynamic())
+        {
+            factors_.clear();
+
+            using span0 = nonstd::span<hep::scales<T>>;
+
+            // evaluate scales for the dipoles
+            for (std::size_t i = 0; i != phase_space_indices_.size(); ++i)
+            {
+                auto const phase_space_index = phase_space_indices_.at(i);
+                auto& neg_ps = neg_.ps.at(phase_space_index);
+                auto& pos_ps = pos_.ps.at(phase_space_index);
+                auto& neg_states = neg_.states.at(phase_space_index);
+                auto& pos_states = pos_.states.at(phase_space_index);
+
+                psp<T> const neg_psp{neg_ps, neg_states, info.rapidity_shift(), psp_type::neg_rap};
+                psp<T> const pos_psp{pos_ps, pos_states, info.rapidity_shift(), psp_type::pos_rap};
+
+                std::size_t const index = 2 * scales * i;
+
+                scale_setter_.eval(neg_psp, span0{scales_}.subspan(index, scales));
+                scale_setter_.eval(pos_psp, span0{scales_}.subspan(index + scales, scales));
+            }
+
+            // evaluate scales for the real matrix element
+            auto& neg_ps = neg_.real_ps;
+            auto& pos_ps = pos_.real_ps;
+            auto& neg_states = neg_.real_states;
+            auto& pos_states = pos_.real_states;
+
+            psp<T> const neg_psp{neg_ps, neg_states, info.rapidity_shift(), psp_type::neg_rap};
+            psp<T> const pos_psp{pos_ps, pos_states, info.rapidity_shift(), psp_type::pos_rap};
+
+            std::size_t const index = 2 * scales * phase_space_indices_.size();
+
+            scale_setter_.eval(neg_psp, span0{scales_}.subspan(index, scales));
+            scale_setter_.eval(pos_psp, span0{scales_}.subspan(index + scales, scales));
+
+            pdfs_.eval_alphas(scale_span, factors_);
+
+            T const central_alphas = factors_.front();
+            matrix_elements_.alphas(central_alphas);
+
+            using std::pow;
+
+            for (T& factor : factors_)
+            {
+                T const alphas = factor;
+                factor = pow(alphas / central_alphas, alphas_power_);
+            }
+        }
+
+        pdfs_.eval(info.x1(), scales, scale_span, pdfsx1_, pdf_pdfsx1_);
+        pdfs_.eval(info.x2(), scales, scale_span, pdfsx2_, pdf_pdfsx2_);
+
+        assert( pdfsx1_.size() == 2 * (phase_space_indices_.size() + 1) * scales );
+        assert( pdfsx2_.size() == 2 * (phase_space_indices_.size() + 1) * scales );
+        assert( pdf_pdfsx1_.size() == 2 * (phase_space_indices_.size() + 1) * pdfs );
+        assert( pdf_pdfsx2_.size() == 2 * (phase_space_indices_.size() + 1) * pdfs );
+
         T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-        neg_pos_results<T> result;
+        T result = T();
 
         std::size_t non_zero_dipole_index = 0;
 
-        for (std::size_t const phase_space_index : phase_space_indices_)
+        using span1 = nonstd::span<parton_array<T> const>;
+        using span2 = nonstd::span<initial_state_map<T> const>;
+        using span3 = nonstd::span<T const>;
+
+        for (std::size_t i = 0; i != phase_space_indices_.size(); ++i)
         {
-            auto const& phase_space = dipole_phase_spaces_.at(phase_space_index);
+            auto const phase_space_index = phase_space_indices_.at(i);
+            auto const& cms_ps = dipole_phase_spaces_.at(phase_space_index);
+            auto& neg_ps = neg_.ps.at(phase_space_index);
+            auto& pos_ps = pos_.ps.at(phase_space_index);
+            auto& neg_states = neg_.states.at(phase_space_index);
+            auto& pos_states = pos_.states.at(phase_space_index);
 
-            if (scale_setter_.dynamic())
-            {
-                set_scales(phase_space, dipole_recombined_states_);
-                results_.reserve(scales_.size());
-                me_.resize(scales_.size());
-                me_tmp_.resize(scales_.size());
-            }
+            psp<T> const neg_psp{neg_ps, neg_states, info.rapidity_shift(), psp_type::neg_rap};
+            psp<T> const pos_psp{pos_ps, pos_states, info.rapidity_shift(), psp_type::pos_rap};
 
-            pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
-            pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
-
-            assert( pdfsx1_.size() == scales_.size() );
-            assert( pdfsx2_.size() == scales_.size() );
-            assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
-            assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
-
-            for (std::size_t i = 0; i != phase_space_sizes_.at(phase_space_index); ++i)
+            for (std::size_t j = 0; j != phase_space_sizes_.at(phase_space_index); ++j)
             {
                 auto const& non_zero_dipole = non_zero_dipoles_.at(non_zero_dipole_index++);
-                auto const& dipole_cut_result = non_zero_dipole.cut_result();
                 auto const& invariants = non_zero_dipole.invariants();
                 auto const& dipole = non_zero_dipole.dipole();
 
@@ -249,12 +403,16 @@ public:
                     me.clear();
                 }
 
+                std::size_t const scale_index = scales * 2 * i;
+                std::size_t const pdf_index = pdfs * 2 * i;
+
                 T function = T(1.0);
 
                 if ((dipole.emitter_type() == particle_type::fermion) !=
                     (dipole.unresolved_type() == particle_type::fermion))
                 {
-                    matrix_elements_.dipole_me(dipole, phase_space, set_, scales_, me_);
+                    matrix_elements_.dipole_me(dipole, cms_ps, set_,
+                        span4{scales_}.subspan(scale_index, 2 * scales), me_);
                     function = -subtraction_.fermion_function(dipole, invariants);
                 }
                 else
@@ -269,138 +427,127 @@ public:
 
                     matrix_elements_.dipole_sc(
                         dipole,
-                        phase_space,
+                        cms_ps,
                         correlator.p,
                         set_,
-                        scales_,
+                        span4{scales_}.subspan(scale_index, 2 * scales),
                         me_,
                         me_tmp_
                     );
 
-                    for (std::size_t j = 0; j != me_.size(); ++j)
+                    for (std::size_t k = 0; k != me_.size(); ++k)
                     {
-                        for (std::size_t k = 0; k != me_[j].size(); ++k)
+                        for (std::size_t l = 0; l != me_[k].size(); ++l)
                         {
-                            assert( me_[j][k].first == me_tmp_[j][k].first );
+                            assert( me_[k][l].first == me_tmp_[k][l].first );
 
-                            me_[j][k].second *= -correlator.a;
-                            me_[j][k].second -= me_tmp_[j][k].second * correlator.b;
+                            me_[k][l].second *= -correlator.a;
+                            me_[k][l].second -= me_tmp_[k][l].second * correlator.b;
                         }
                     }
                 }
 
-                convolute_mes_with_pdfs(
-                    results_,
-                    pdf_results_,
-                    pdfsx1_,
-                    pdfsx2_,
-                    pdf_pdfsx1_,
-                    pdf_pdfsx2_,
-                    me_,
-                    set_,
-                    factors_,
-                    function * factor,
-                    dipole_cut_result
-                );
+                if (!non_zero_dipole.neg_cutted())
+                {
+                    convolute_mes_with_pdfs(
+                        results_,
+                        pdf_results_,
+                        span1{pdfsx2_}.subspan(2 * scales * i, scales),
+                        span1{pdfsx1_}.subspan(2 * scales * i, scales),
+                        span1{pdf_pdfsx2_}.subspan(pdf_index, pdfs),
+                        span1{pdf_pdfsx1_}.subspan(pdf_index, pdfs),
+                        span2{me_}.first(scales),
+                        set_,
+                        span3{factors_}.subspan(2 * scales * i, scales),
+                        function * factor
+                    );
 
-                distributions_(
-                    phase_space,
-                    info.rapidity_shift(),
-                    dipole_cut_result,
-                    results_,
-                    pdf_results_,
-                    projector
-                );
+                    distributions_(neg_psp, results_, pdf_results_, projector);
 
-                result += results_.front();
+                    result += results_.front();
+                }
+
+                if (!non_zero_dipole.pos_cutted())
+                {
+                    convolute_mes_with_pdfs(
+                        results_,
+                        pdf_results_,
+                        span1{pdfsx1_}.subspan(2 * scales * i + scales, scales),
+                        span1{pdfsx2_}.subspan(2 * scales * i + scales, scales),
+                        span1{pdf_pdfsx1_}.subspan(pdf_index + pdfs, pdfs),
+                        span1{pdf_pdfsx2_}.subspan(pdf_index + pdfs, pdfs),
+                        span2{me_}.last(scales),
+                        set_,
+                        span3{factors_}.subspan(2 * scales * i + scales, scales),
+                        function * factor
+                    );
+
+                    distributions_(pos_psp, results_, pdf_results_, projector);
+
+                    result += results_.front();
+                }
             }
         }
 
-        recombiner_.recombine(
-            real_phase_space,
-            final_states_real_,
-            recombined_ps_,
-            recombined_states_
-        );
-
-        auto const real_cut_result = cuts_.cut(
-            recombined_ps_,
-            info.rapidity_shift(),
-            recombined_states_
-        );
-
-        if (!real_cut_result.neg_cutted() || !real_cut_result.pos_cutted())
+        if (!neg_cutted || !pos_cutted)
         {
-            if (scale_setter_.dynamic())
-            {
-                set_scales(recombined_ps_, recombined_states_);
-                results_.reserve(scales_.size());
-                me_.resize(scales_.size());
-                me_tmp_.resize(scales_.size());
-            }
-
-            pdfs_.eval(info.x1(), scales_, pdfsx1_, pdf_pdfsx1_);
-            pdfs_.eval(info.x2(), scales_, pdfsx2_, pdf_pdfsx2_);
-
-            assert( pdfsx1_.size() == scales_.size() );
-            assert( pdfsx2_.size() == scales_.size() );
-            assert( (pdfs_.count() == 1) || (pdf_pdfsx1_.size() == pdfs_.count()) );
-            assert( (pdfs_.count() == 1) || (pdf_pdfsx2_.size() == pdfs_.count()) );
-
             for (auto& me : me_)
             {
                 me.clear();
             }
 
-            matrix_elements_.reals(real_phase_space, set_, scales_, me_);
+            std::size_t const scale_index = scales * 2 * phase_space_indices_.size();
+            std::size_t const pdf_index = pdfs * 2 * phase_space_indices_.size();
 
-            convolute_mes_with_pdfs(
-                results_,
-                pdf_results_,
-                pdfsx1_,
-                pdfsx2_,
-                pdf_pdfsx1_,
-                pdf_pdfsx2_,
-                me_,
+            matrix_elements_.reals(
+                real_phase_space,
                 set_,
-                factors_,
-                factor,
-                real_cut_result
+                span4{scales_}.subspan(scale_index, 2 * scales),
+                me_
             );
 
-            distributions_(
-                recombined_ps_,
-                info.rapidity_shift(),
-                real_cut_result,
-                results_,
-                pdf_results_,
-                projector
-            );
+            if (!neg_cutted)
+            {
+                convolute_mes_with_pdfs(
+                    results_,
+                    pdf_results_,
+                    span1{pdfsx2_}.subspan(scale_index, scales),
+                    span1{pdfsx1_}.subspan(scale_index, scales),
+                    span1{pdf_pdfsx2_}.subspan(pdf_index, pdfs),
+                    span1{pdf_pdfsx1_}.subspan(pdf_index, pdfs),
+                    span2{me_}.first(scales),
+                    set_,
+                    span3{factors_}.subspan(scale_index, scales),
+                    factor
+                );
 
-            result += results_.front();
+                distributions_(neg_psp, results_, pdf_results_, projector);
+
+                result += results_.front();
+            }
+
+            if (!pos_cutted)
+            {
+                convolute_mes_with_pdfs(
+                    results_,
+                    pdf_results_,
+                    span1{pdfsx1_}.subspan(scale_index + scales, scales),
+                    span1{pdfsx2_}.subspan(scale_index + scales, scales),
+                    span1{pdf_pdfsx1_}.subspan(pdf_index + pdfs, pdfs),
+                    span1{pdf_pdfsx2_}.subspan(pdf_index + pdfs, pdfs),
+                    span2{me_}.last(scales),
+                    set_,
+                    span3{factors_}.subspan(scale_index + scales, scales),
+                    factor
+                );
+
+                distributions_(pos_psp, results_, pdf_results_, projector);
+
+                result += results_.front();
+            }
         }
 
-        return result.neg + result.pos;
-    }
-
-protected:
-    void set_scales(std::vector<T> const& phase_space, std::vector<recombined_state> const& states)
-    {
-        using std::pow;
-
-        scales_.clear();
-        factors_.clear();
-        scale_setter_(phase_space, scales_, states);
-        pdfs_.eval_alphas(scales_, factors_);
-
-        T const central_alphas = factors_.front();
-        matrix_elements_.alphas(central_alphas);
-
-        for (T& factor : factors_)
-        {
-            T const alphas = factor;
-            factor = pow(alphas / central_alphas, alphas_power_);
-        }
+        return result;
     }
 
 private:
@@ -415,8 +562,15 @@ private:
     T hbarc2_;
     T alpha_min_;
 
-    using info_type = typename decltype (cuts_.cut(std::vector<T>(), T{},
-        std::vector<recombined_state>{}))::info_t;
+    struct
+    {
+        std::vector<std::vector<T>> ps;
+        std::vector<T> real_ps;
+        std::vector<recombined_state> real_states;
+        std::vector<std::vector<recombined_state>> states;
+        std::vector<std::vector<scales<T>>> scales_;
+        std::vector<scales<T>> real_scales;
+    } neg_, pos_;
 
     std::vector<T> recombined_ps_;
     std::vector<std::vector<T>> dipole_phase_spaces_;
@@ -431,13 +585,13 @@ private:
     std::vector<parton_array<T>> pdfsx2_;
     std::vector<parton_array<T>> pdf_pdfsx1_;
     std::vector<parton_array<T>> pdf_pdfsx2_;
-    std::vector<neg_pos_results<T>> pdf_results_;
-    std::vector<neg_pos_results<T>> results_;
+    std::vector<T> pdf_results_;
+    std::vector<T> results_;
     std::vector<scales<T>> scales_;
     std::vector<T> factors_;
     std::vector<initial_state_map<T>> me_;
     std::vector<initial_state_map<T>> me_tmp_;
-    std::vector<non_zero_dipole<T, info_type>> non_zero_dipoles_;
+    std::vector<non_zero_dipole<T>> non_zero_dipoles_;
     std::vector<dipole> dipoles_;
     T alphas_power_;
 };

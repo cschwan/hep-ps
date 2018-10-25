@@ -12,6 +12,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
+#include "hep/ps/psp.hpp"
 #include "hep/ps/real_integrand.hpp"
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
@@ -21,8 +22,11 @@
 
 #include "test_phase_space_generator.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <catch.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <functional>
@@ -79,13 +83,10 @@ public:
 
     // DISTRIBUTION MEMBER FUNCTIONS
 
-    template <typename I>
     void operator()(
-        std::vector<T> const& phase_space,
-        T /*rapidity_shift*/,
-        hep::cut_result_with_info<I> const& /*cut_result*/,
-        std::vector<hep::neg_pos_results<T>> const& results,
-        std::vector<hep::neg_pos_results<T>> const& pdf_results,
+        hep::psp<T> const& psp,
+        std::vector<T> const& results,
+        std::vector<T> const& pdf_results,
         hep::projector<T>&
     ) {
         using std::pow;
@@ -93,11 +94,12 @@ public:
         CHECK( results.size() == global_scales.size() );
 
         std::vector<T> alphas;
+        alphas.reserve(global_scales.size());
         eval_alphas(global_scales, alphas);
 
         T factor;
 
-        switch (phase_space.size())
+        switch (psp.cms_psp().size())
         {
         case 20:
             // real matrix element
@@ -123,8 +125,7 @@ public:
 
             T const ref_result = pdfa * pdfb * real;
 
-            CHECK( results.at(i).neg == ref_result );
-            CHECK( results.at(i).pos == ref_result );
+            CHECK( results.at(i) == ref_result );
         }
 
         for (std::size_t i = 0; i != pdf_results.size(); ++i)
@@ -137,8 +138,7 @@ public:
 
             T const ref_result = pdfa * pdfb * real;
 
-            CHECK( pdf_results.at(i).neg == ref_result );
-            CHECK( pdf_results.at(i).pos == ref_result );
+            CHECK( pdf_results.at(i) == ref_result );
         }
     }
 
@@ -147,7 +147,7 @@ public:
     void reals(
         std::vector<T> const&,
         hep::initial_state_set set,
-        std::vector<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<hep::initial_state_map<T>>& results
     ) const {
         using std::pow;
@@ -166,7 +166,7 @@ public:
         hep::dipole const& /*dipole*/,
         std::vector<T> const& /*phase_space*/,
         hep::initial_state_set set,
-        std::vector<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<hep::initial_state_map<T>>& results
     ) {
         hep::initial_state_map<T> result;
@@ -184,7 +184,7 @@ public:
         std::vector<T> const& /*phase_space*/,
         std::array<T, 4> const& /*correlation_vector*/,
         hep::initial_state_set /*set*/,
-        std::vector<hep::scales<T>> const& /*scales*/,
+        nonstd::span<hep::scales<T> const> /*scales*/,
         std::vector<hep::initial_state_map<T>>& /*results*/,
         std::vector<hep::initial_state_map<T>>& /*results*/
     ) {
@@ -227,49 +227,20 @@ public:
         };
     }
 
-    // SCALE SETTER MEMBER FUNCTIONS
-
-    void operator()(
-        std::vector<T> const&,
-        std::vector<hep::scales<T>>& scales,
-        std::vector<hep::recombined_state> const&
-    ) {
-        if (dynamic_scale_)
-        {
-            for (auto& scale : global_scales)
-            {
-                T const muf = T(2.0) * scale.factorization();
-                T const mu = scale.regularization();
-                T const mur = T(2.0) * scale.renormalization();
-
-                scale = hep::scales<T>{muf, mu, mur};
-            }
-        }
-
-        scales.assign(global_scales.begin(), global_scales.end());
-    }
-
-    bool dynamic() const
-    {
-        return dynamic_scale_;
-    }
-
     // PDF MEMBER FUNCTIONS
 
-    void eval_alphas(
-        std::vector<hep::scales<T>> const& scales,
-        std::vector<T>& alphas
-    ) {
-        CHECK( scales.size() == global_scales.size() );
+    void eval_alphas(nonstd::span<hep::scales<T> const> scales, std::vector<T>& alphas)
+    {
+        CHECK( alphas.capacity() == scales.size() );
 
         for (std::size_t i = 0; i != scales.size(); ++i)
         {
-            CHECK( scales.at(i).factorization() ==
-                global_scales.at(i).factorization() );
-            CHECK( scales.at(i).renormalization() ==
-                global_scales.at(i).renormalization() );
+            std::size_t const index = i % global_scales.size();
 
-            alphas.push_back(alphas_ * scales.at(i).renormalization() /
+            CHECK( scales[i].factorization()   == global_scales.at(index).factorization() );
+            CHECK( scales[i].renormalization() == global_scales.at(index).renormalization() );
+
+            alphas.push_back(alphas_ * scales[i].renormalization() /
                 global_scales.front().renormalization());
         }
     }
@@ -281,33 +252,35 @@ public:
 
     void eval(
         T x,
-        std::vector<hep::scales<T>> const& scales,
+        std::size_t scale_count,
+        nonstd::span<hep::scales<T> const> const& scales,
         std::vector<hep::parton_array<T>>& scale_pdfs,
         std::vector<hep::parton_array<T>>& uncertainty_pdfs
     ) {
         CHECK( x >= T{} );
         CHECK( x < T(1.0) );
-        CHECK( scales.size() == global_scales.size() );
+        CHECK( scales.size() % global_scales.size() == 0 );
+
+        std::size_t const central_scales = scales.size() / scale_count;
 
         scale_pdfs.clear();
         uncertainty_pdfs.clear();
         scale_pdfs.resize(scales.size());
-        uncertainty_pdfs.resize(count());
+        uncertainty_pdfs.resize(central_scales * count());
 
         for (std::size_t i = 0; i != scales.size(); ++i)
         {
             for (auto const parton : hep::parton_list())
             {
-                scale_pdfs.at(i)[parton] = scales.at(i).factorization();
+                scale_pdfs.at(i)[parton] = scales[i].factorization();
             }
         }
 
-        for (std::size_t i = 0; i != count(); ++i)
+        for (std::size_t i = 0; i != uncertainty_pdfs.size(); ++i)
         {
             for (auto const parton : hep::parton_list())
             {
-                uncertainty_pdfs.at(i)[parton] =
-                    scales.front().factorization() * T(i+1);
+                uncertainty_pdfs.at(i)[parton] = scales[0].factorization() * T((i % count()) + 1);
             }
         }
     }
@@ -319,6 +292,55 @@ public:
 private:
     std::size_t alphas_power_;
     T alphas_;
+    bool dynamic_scale_;
+};
+
+template <typename T>
+class test_real_scale_setter
+{
+public:
+    test_real_scale_setter(bool dynamic_scale)
+        : dynamic_scale_{dynamic_scale}
+    {
+    }
+
+    void eval(hep::psp<T> const&, nonstd::span<hep::scales<T>> scales)
+    {
+        if (dynamic_scale_)
+        {
+            static std::size_t counter = 0;
+
+            counter = (counter + 1) % 4;
+
+            if (counter == 1)
+            {
+                for (auto& scale : global_scales)
+                {
+                    T const muf = T(2.0) * scale.factorization();
+                    T const mu = scale.regularization();
+                    T const mur = T(2.0) * scale.renormalization();
+
+                    scale = hep::scales<T>{muf, mu, mur};
+                }
+            }
+        }
+
+        REQUIRE( scales.size() == global_scales.size() );
+
+        std::copy(global_scales.begin(), global_scales.end(), scales.begin());
+    }
+
+    bool dynamic() const
+    {
+        return dynamic_scale_;
+    }
+
+    std::size_t count() const
+    {
+        return global_scales.size();
+    }
+
+private:
     bool dynamic_scale_;
 };
 
@@ -346,6 +368,7 @@ void test_real_integrand(
     // number of final states is not really interesting here
     test_phase_space_generator<T> generator{2 + 1};
     test_real_class<T> real{alphas_power, alphas, dynamic_scale};
+    test_real_scale_setter<T> scale_setter{dynamic_scale};
 
     // born gets copied, therefore `global_scales` must be global
     auto integrand = hep::make_real_integrand<T>(
@@ -354,7 +377,7 @@ void test_real_integrand(
         hep::trivial_cutter<T>{},
         hep::trivial_recombiner<T>{},
         real,
-        real,
+        scale_setter,
         real,
         set,
         T(1.0)

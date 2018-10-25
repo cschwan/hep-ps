@@ -23,7 +23,6 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
-#include "hep/ps/psp_type.hpp"
 
 #include "nonstd/span.hpp"
 

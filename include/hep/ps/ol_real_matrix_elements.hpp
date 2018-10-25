@@ -27,6 +27,8 @@
 #include "hep/ps/photon_dipole_selector.hpp"
 #include "hep/ps/scales.hpp"
 
+#include "nonstd/span.hpp"
+
 #include <cstddef>
 #include <string>
 #include <tuple>
@@ -57,7 +59,7 @@ public:
         dipole const& dipole,
         std::vector<T> const& phase_space,
         initial_state_set set,
-        std::vector<scales<T>> const& scales,
+        nonstd::span<scales<T> const> scales,
         std::vector<initial_state_map<T>>& results
     );
 
@@ -66,7 +68,7 @@ public:
         std::vector<T> const& phase_space,
         std::array<T, 4> const& vector,
         hep::initial_state_set set,
-        std::vector<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<hep::initial_state_map<T>>& results_one,
         std::vector<hep::initial_state_map<T>>& results_two
     );
@@ -80,7 +82,7 @@ public:
     void reals(
         std::vector<T> const& phase_space,
         initial_state_set set,
-        std::vector<scales<T>> const& scales,
+        nonstd::span<scales<T> const> scales,
         std::vector<initial_state_map<T>>& results
     );
 
