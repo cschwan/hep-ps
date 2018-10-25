@@ -195,8 +195,8 @@ public:
 
                     if (cut_result.neg_cutted() && cut_result.pos_cutted())
                     {
-                        dipole_index += phase_space_size - 1;
-                        break;
+                        // if the dipole is cutted, we still have to check the technical cuts
+                        continue;
                     }
 
                     dipole_recombined_states_ = recombined_dipole_states_;
@@ -204,7 +204,10 @@ public:
                     phase_space_indices_.push_back(phase_space_index - 1);
                 }
 
-                non_zero_dipoles_.emplace_back(invariants, dipole, cut_result);
+                if (!cut_result.neg_cutted() || !cut_result.pos_cutted())
+                {
+                    non_zero_dipoles_.emplace_back(invariants, dipole, cut_result);
+                }
             }
         }
 
