@@ -327,37 +327,89 @@ public:
 
             using span0 = nonstd::span<hep::scales<T>>;
 
-            // evaluate scales for the dipoles
+            // evaluate scales for the dipoles, but only if they passed the cuts
             for (std::size_t i = 0; i != phase_space_indices_.size(); ++i)
             {
                 auto const phase_space_index = phase_space_indices_.at(i);
-                auto& neg_ps = neg_.ps.at(phase_space_index);
-                auto& pos_ps = pos_.ps.at(phase_space_index);
-                auto& neg_states = neg_.states.at(phase_space_index);
-                auto& pos_states = pos_.states.at(phase_space_index);
+                auto neg_span = span0{scales_}.subspan(scales * (2 * i + 0), scales);
+                auto pos_span = span0{scales_}.subspan(scales * (2 * i + 1), scales);
 
-                psp<T> const neg_psp{neg_ps, neg_states, info.rapidity_shift(), psp_type::neg_rap};
-                psp<T> const pos_psp{pos_ps, pos_states, info.rapidity_shift(), psp_type::pos_rap};
+                if (neg_.pass_cut.test(phase_space_index))
+                {
+                    auto& neg_ps = neg_.ps.at(phase_space_index);
+                    auto& neg_states = neg_.states.at(phase_space_index);
+                    psp<T> const neg_psp{neg_ps, neg_states, info.rapidity_shift(),
+                        psp_type::neg_rap};
 
-                std::size_t const index = 2 * scales * i;
+                    scale_setter_.eval(neg_psp, neg_span);
+                }
 
-                scale_setter_.eval(neg_psp, span0{scales_}.subspan(index, scales));
-                scale_setter_.eval(pos_psp, span0{scales_}.subspan(index + scales, scales));
+                if (pos_.pass_cut.test(phase_space_index))
+                {
+                    auto& pos_ps = pos_.ps.at(phase_space_index);
+                    auto& pos_states = pos_.states.at(phase_space_index);
+                    psp<T> const pos_psp{pos_ps, pos_states, info.rapidity_shift(),
+                        psp_type::pos_rap};
+
+                    scale_setter_.eval(pos_psp, pos_span);
+
+                    if (!neg_.pass_cut.test(phase_space_index))
+                    {
+                        std::copy(pos_span.begin(), pos_span.end(), neg_span.begin());
+                    }
+                }
+                else
+                {
+                    std::copy(neg_span.begin(), neg_span.end(), pos_span.begin());
+                }
             }
 
+            auto neg_span = span0{scales_}.subspan(scales * (2 * phase_space_indices_.size() + 0),
+                scales);
+            auto pos_span = span0{scales_}.subspan(scales * (2 * phase_space_indices_.size() + 1),
+                scales);
+
             // evaluate scales for the real matrix element
-            auto& neg_ps = neg_.real_ps;
-            auto& pos_ps = pos_.real_ps;
-            auto& neg_states = neg_.real_states;
-            auto& pos_states = pos_.real_states;
 
-            psp<T> const neg_psp{neg_ps, neg_states, info.rapidity_shift(), psp_type::neg_rap};
-            psp<T> const pos_psp{pos_ps, pos_states, info.rapidity_shift(), psp_type::pos_rap};
+            if (!neg_cutted || !pos_cutted)
+            {
+                if (!neg_cutted)
+                {
+                    auto& neg_ps = neg_.real_ps;
+                    auto& neg_states = neg_.real_states;
+                    psp<T> const neg_psp{neg_ps, neg_states, info.rapidity_shift(),
+                        psp_type::neg_rap};
 
-            std::size_t const index = 2 * scales * phase_space_indices_.size();
+                    scale_setter_.eval(neg_psp, neg_span);
+                }
 
-            scale_setter_.eval(neg_psp, span0{scales_}.subspan(index, scales));
-            scale_setter_.eval(pos_psp, span0{scales_}.subspan(index + scales, scales));
+                if (!pos_cutted)
+                {
+                    auto& pos_ps = pos_.real_ps;
+                    auto& pos_states = pos_.real_states;
+                    psp<T> const pos_psp{pos_ps, pos_states, info.rapidity_shift(),
+                        psp_type::pos_rap};
+
+                    scale_setter_.eval(pos_psp, pos_span);
+
+                    if (neg_cutted)
+                    {
+                        std::copy(pos_span.begin(), pos_span.end(), neg_span.begin());
+                    }
+                }
+                else
+                {
+                    std::copy(neg_span.begin(), neg_span.end(), pos_span.begin());
+                }
+            }
+            else
+            {
+                auto span = span0{scales_}.subspan(scales * 2 * (phase_space_indices_.size() - 1),
+                    scales);
+
+                std::copy(span.begin(), span.end(), neg_span.begin());
+                std::copy(span.begin(), span.end(), pos_span.begin());
+            }
 
             pdfs_.eval_alphas(scale_span, factors_);
 
