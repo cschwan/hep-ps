@@ -38,6 +38,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cassert>
 #include <cstddef>
 #include <iterator>
@@ -136,6 +137,10 @@ public:
             }
         }
 
+        // check if `cuts` can hold the cut results for dipole phase space
+        assert( neg_.pass_cut.size() >= phase_space_sizes_.size() );
+        assert( neg_.pass_cut.size() >= phase_space_sizes_.size() );
+
         std::size_t const scales = scale_setter_.count();
         scales_.resize(2 * scales * (phase_space_sizes_.size() + 1));
         factors_.reserve(scales_.size());
@@ -220,6 +225,9 @@ public:
         non_zero_dipoles_.clear();
         phase_space_indices_.clear();
 
+        neg_.pass_cut.reset();
+        pos_.pass_cut.reset();
+
         std::size_t dipole_index = 0;
         std::size_t phase_space_index = 0;
 
@@ -272,12 +280,15 @@ public:
                         continue;
                     }
 
+                    neg_.pass_cut.set(phase_space_index - 1, !neg_cutted);
+                    pos_.pass_cut.set(phase_space_index - 1, !pos_cutted);
+
                     phase_space_indices_.push_back(phase_space_index - 1);
                 }
 
                 if (!neg_cutted || !pos_cutted)
                 {
-                    non_zero_dipoles_.emplace_back(inv, dipole, neg_cutted, pos_cutted);
+                    non_zero_dipoles_.emplace_back(inv, dipole);
                 }
             }
         }
@@ -447,7 +458,7 @@ public:
                     }
                 }
 
-                if (!non_zero_dipole.neg_cutted())
+                if (neg_.pass_cut.test(phase_space_index))
                 {
                     convolute_mes_with_pdfs(
                         results_,
@@ -467,7 +478,7 @@ public:
                     result += results_.front();
                 }
 
-                if (!non_zero_dipole.pos_cutted())
+                if (pos_.pass_cut.test(phase_space_index))
                 {
                     convolute_mes_with_pdfs(
                         results_,
@@ -570,6 +581,7 @@ private:
         std::vector<std::vector<recombined_state>> states;
         std::vector<std::vector<scales<T>>> scales_;
         std::vector<scales<T>> real_scales;
+        std::bitset<64> pass_cut;
     } neg_, pos_;
 
     std::vector<T> recombined_ps_;

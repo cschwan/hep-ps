@@ -34,16 +34,9 @@ template <typename T>
 class non_zero_dipole
 {
 public:
-    non_zero_dipole(
-        dipole_invariants<T> const& invariants,
-        dipole const& dipole,
-        bool neg_cutted,
-        bool pos_cutted
-    )
+    non_zero_dipole(dipole_invariants<T> const& invariants, dipole const& dipole)
         : invariants_(invariants)
         , dipole_(dipole)
-        , neg_cutted_{neg_cutted}
-        , pos_cutted_{pos_cutted}
     {
     }
 
@@ -57,21 +50,9 @@ public:
         return dipole_;
     }
 
-    bool neg_cutted() const
-    {
-        return neg_cutted_;
-    }
-
-    bool pos_cutted() const
-    {
-        return pos_cutted_;
-    }
-
 private:
     dipole_invariants<T> invariants_;
     hep::dipole dipole_;
-    bool neg_cutted_;
-    bool pos_cutted_;
 };
 
 }
