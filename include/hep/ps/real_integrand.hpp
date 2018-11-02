@@ -435,7 +435,7 @@ public:
 
         T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-        T result = T();
+        T dipoles = T();
 
         std::size_t non_zero_dipole_index = 0;
 
@@ -527,7 +527,7 @@ public:
 
                     distributions_(neg_psp, results_, pdf_results_, projector);
 
-                    result += results_.front();
+                    dipoles += results_.front();
                 }
 
                 if (pos_.pass_cut.test(phase_space_index))
@@ -547,10 +547,12 @@ public:
 
                     distributions_(pos_psp, results_, pdf_results_, projector);
 
-                    result += results_.front();
+                    dipoles += results_.front();
                 }
             }
         }
+
+        T real = T();
 
         if (!neg_cutted || !pos_cutted)
         {
@@ -586,7 +588,7 @@ public:
 
                 distributions_(neg_psp, results_, pdf_results_, projector);
 
-                result += results_.front();
+                real += results_.front();
             }
 
             if (!pos_cutted)
@@ -606,11 +608,11 @@ public:
 
                 distributions_(pos_psp, results_, pdf_results_, projector);
 
-                result += results_.front();
+                real += results_.front();
             }
         }
 
-        return result;
+        return real + dipoles;
     }
 
 private:
