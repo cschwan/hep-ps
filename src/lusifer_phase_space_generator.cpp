@@ -73,13 +73,11 @@ struct decay
     decay(
         std::size_t in,
         std::size_t out1,
-        std::size_t out2,
-        std::size_t index
+        std::size_t out2
     )
         : in(in)
         , out1(out1)
         , out2(out2)
-        , index(index)
     {
     }
 
@@ -88,6 +86,21 @@ struct decay
     std::size_t out2;
     std::size_t index;
 };
+
+bool operator==(decay const& a, decay const& b)
+{
+    if (a.in != b.in)
+    {
+        return false;
+    }
+
+    if ((a.out1 != b.out1) && (a.out1 != b.out2))
+    {
+        return false;
+    }
+
+    return true;
+}
 
 struct channel
 {
@@ -787,20 +800,9 @@ lusifer_psg<T>::lusifer_psg(
             channel.decays.emplace_back(
                 lusifer_cdecay.indecay[0][i][j] - 1,
                 lusifer_cdecay.out1decay[0][i][j] - 1,
-                lusifer_cdecay.out2decay[0][i][j] - 1,
-                lusifer_cdensity.numdecay[0][i][j] - 1
+                lusifer_cdecay.out2decay[0][i][j] - 1
             );
         }
-    }
-
-    decays.reserve(lusifer_cdensity.maxdecay[0]);
-
-    for (std::size_t i = 0; i != decays.capacity(); ++i)
-    {
-        decays.emplace_back(
-            lusifer_cdensity.nsdecay[0][i] - 1,
-            lusifer_cdensity.chdecay[0][i] - 1
-        );
     }
 
     particle_infos.reserve(maxv + 1);
@@ -903,6 +905,48 @@ lusifer_psg<T>::lusifer_psg(
     }
 
     processes_.shrink_to_fit();
+
+    counter = 0;
+
+    for (std::size_t a = 0; a != channels_.size(); ++a)
+    {
+        for (std::size_t b = 0; b != channels_.at(a).decays.size(); ++b)
+        {
+            std::size_t index = 0;
+
+            for (std::size_t c = 0; c != a; ++c)
+            {
+                for (std::size_t d = 0; d != channels_.at(c).decays.size(); ++d)
+                {
+                    if (channels_.at(a).decays.at(b) == channels_.at(c).decays.at(d))
+                    {
+                        index = channels_.at(c).decays.at(d).index + 1;
+
+                        // break out of two loops
+                        c = a - 1;
+                        break;
+                    }
+                }
+            }
+
+            if (index == 0)
+            {
+                ++counter;
+                index = counter;
+
+                assert( a == (lusifer_cdensity.chdecay[0][decays.size()] - 1) );
+                assert( b == (lusifer_cdensity.nsdecay[0][decays.size()] - 1) );
+
+                decays.emplace_back(b, a);
+            }
+
+            assert( index == lusifer_cdensity.numdecay[0][a][b] );
+
+            channels_.at(a).decays.at(b).index = index - 1;
+        }
+    }
+
+    decays.shrink_to_fit();
 
     // TODO: is the following needed?
     mcut.assign(std::begin(lusifer_cinv.mcutinv[0]), std::end(lusifer_cinv.mcutinv[0]));
