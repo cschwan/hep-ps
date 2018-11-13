@@ -38,6 +38,7 @@ sources = [
     'lusifer_extra.f90',
     'lusifer_interfaces.hpp',
     'lusifer_phase_space_generator.cpp',
+    'lusifer_ps_channels.cpp',
     'ol_born_matrix_elements.cpp',
     'ol_integrated_matrix_elements.cpp',
     'ol_integrated_mes.cpp',
