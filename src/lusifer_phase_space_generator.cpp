@@ -17,19 +17,16 @@
 namespace
 {
 
+constexpr bool included(int binary1, int binary2)
+{
+    return (binary1 & binary2) == binary2;
+}
+
 struct invariant
 {
-    invariant(
-        std::size_t in,
-        std::size_t idhep,
-        std::bitset<std::numeric_limits<std::size_t>::digits> lmin,
-        std::bitset<std::numeric_limits<std::size_t>::digits> lmax,
-        std::size_t index
-    )
+    invariant(std::size_t in, std::size_t idhep, std::size_t index)
         : in(in)
         , idhep(idhep)
-        , lmin(lmin)
-        , lmax(lmax)
         , index(index)
     {
     }
@@ -549,22 +546,73 @@ lusifer_psg<T>::lusifer_psg(
 
         for (std::size_t j = 0; j != channel.invariants.capacity(); ++j)
         {
-            decltype (invariant::lmin) lmin;
-            decltype (invariant::lmax) lmax;
-
-            for (std::size_t k = 0; k != maxe; ++k)
-            {
-                lmin.set(k, lusifer_cinv.lmin[0][i][j][k]);
-                lmax.set(k, lusifer_cinv.lmax[0][i][j][k]);
-            }
-
             channel.invariants.emplace_back(
                 lusifer_cinv.ininv[0][i][j] - 1,
                 lusifer_cinv.idhepinv[0][i][j],
-                lmin,
-                lmax,
                 lusifer_cdensity.numinv[0][i][j] - 1
             );
+        }
+
+        for (std::size_t a = 0; a != channel.invariants.size(); ++a)
+        {
+            for (std::size_t b = 0; b != a; ++b)
+            {
+                std::size_t const binary1 = channel.invariants.at(a).in + 1;
+                std::size_t const binary2 = channel.invariants.at(b).in + 1;
+
+                bool bit = false;
+
+                if (included(binary1, binary2))
+                {
+                    bit = true;
+
+                    for (std::size_t c = 0; c != a; ++c)
+                    {
+                        std::size_t const binary3 = channel.invariants.at(c).in + 1;
+
+                        if (included(binary3, binary2) && (b != c))
+                        {
+                            bit = false;
+                        }
+                    }
+                }
+
+                assert( bit == lusifer_cinv.lmin[0][i][a][b] );
+
+                channel.invariants.at(a).lmin.set(b, bit);
+            }
+        }
+
+        std::size_t const allbinary = (1 << nex) - 1;
+
+        for (std::size_t a = 0; a != channel.invariants.size(); ++a)
+        {
+            for (std::size_t b = 0; b != a; ++b)
+            {
+                std::size_t const binary1 = allbinary - 3 - channel.invariants.at(a).in - 1;
+                std::size_t const binary2 = channel.invariants.at(b).in + 1;
+
+                bool bit = false;
+
+                if (included(binary1, binary2))
+                {
+                    bit = true;
+
+                    for (std::size_t c = 0; c != a; ++c)
+                    {
+                        std::size_t binary3 = channel.invariants.at(c).in + 1;
+
+                        if (included(binary3, binary2) && (b != c))
+                        {
+                            bit = false;
+                        }
+                    }
+                }
+
+                assert( bit == lusifer_cinv.lmax[0][i][a][b] );
+
+                channel.invariants.at(a).lmax.set(b, bit);
+            }
         }
 
         for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
