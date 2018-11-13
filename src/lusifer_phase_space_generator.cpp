@@ -24,10 +24,9 @@ constexpr bool included(int binary1, int binary2)
 
 struct invariant
 {
-    invariant(std::size_t in, std::size_t idhep, std::size_t index)
+    invariant(std::size_t in, std::size_t idhep)
         : in(in)
         , idhep(idhep)
-        , index(index)
     {
     }
 
@@ -439,6 +438,8 @@ public:
     std::size_t map_dimensions() const;
 
 private:
+    bool invariants_equal(int ch1, int ns1, int ch2, int ns2, int nex);
+
     std::vector<channel> channels_;
     std::vector<invariant_info> invariants;
     std::vector<process_info> processes_;
@@ -455,6 +456,123 @@ private:
     std::size_t extra_random_numbers;
     T cmf_energy_;
 };
+
+template <typename T>
+bool lusifer_psg<T>::invariants_equal(int ch1, int ns1, int ch2, int ns2, int nex)
+{
+    auto const& a = channels_.at(ch1).invariants.at(ns1);
+    auto const& b = channels_.at(ch2).invariants.at(ns2);
+
+    if (a.in != b.in)
+    {
+        return false;
+    }
+
+    auto const i = particle_infos.at(a.idhep);
+    auto const j = particle_infos.at(b.idhep);
+
+    if (i.power != j.power)
+    {
+        return false;
+    }
+
+    if (i.mass != j.mass)
+    {
+        return false;
+    }
+
+    // TODO: the following statement is probably unnecessary
+    if (i.width != j.width)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < (nex - 5); ++i)
+    {
+        if (a.lmin.test(i))
+        {
+            bool result = false;
+
+            for (int j = 0; j < (nex - 5); ++j)
+            {
+                if (b.lmin.test(j) && (channels_.at(ch1).invariants.at(i).in ==
+                    channels_.at(ch2).invariants.at(j).in))
+                {
+                    result = true;
+                }
+            }
+
+            if (!result)
+            {
+                return false;
+            }
+        }
+
+        if (a.lmax.test(i))
+        {
+            bool result = false;
+
+            for (int j = 0; j < (nex - 5); ++j)
+            {
+                if (b.lmax.test(j) && (channels_.at(ch1).invariants.at(i).in ==
+                    channels_.at(ch2).invariants.at(j).in))
+                {
+                    result = true;
+                }
+            }
+
+            if (!result)
+            {
+                return false;
+            }
+        }
+    }
+
+    for (int j = 0; j < (nex - 5); ++j)
+    {
+        if (b.lmin.test(j))
+        {
+            bool result = false;
+
+            for (int i = 0; i < (nex - 5); ++i)
+            {
+                if (a.lmin.test(i) && (channels_.at(ch1).invariants.at(i).in ==
+                    channels_.at(ch2).invariants.at(j).in))
+                {
+                    result = true;
+                }
+            }
+
+            if (!result)
+            {
+                return false;
+            }
+        }
+
+        if (b.lmax.test(j))
+        {
+            bool result = false;
+
+            for (int i = 0; i < (nex - 5); ++i)
+            {
+                if (a.lmax.test(i) && (channels_.at(ch1).invariants.at(i).in ==
+                    channels_.at(ch2).invariants.at(j).in))
+                {
+                    result = true;
+                }
+            }
+
+            if (!result)
+            {
+                return false;
+            }
+        }
+    }
+
+    // ignore member `index`, since it is calculated using this function
+
+    return true;
+}
 
 template <typename T>
 lusifer_psg<T>::lusifer_psg(
@@ -548,8 +666,7 @@ lusifer_psg<T>::lusifer_psg(
         {
             channel.invariants.emplace_back(
                 lusifer_cinv.ininv[0][i][j] - 1,
-                lusifer_cinv.idhepinv[0][i][j],
-                lusifer_cdensity.numinv[0][i][j] - 1
+                lusifer_cinv.idhepinv[0][i][j]
             );
         }
 
@@ -640,16 +757,6 @@ lusifer_psg<T>::lusifer_psg(
         }
     }
 
-    invariants.reserve(lusifer_cdensity.maxinv[0]);
-
-    for (std::size_t i = 0; i != invariants.capacity(); ++i)
-    {
-        invariants.emplace_back(
-            lusifer_cdensity.nsinv[0][i] - 1,
-            lusifer_cdensity.chinv[0][i] - 1
-        );
-    }
-
     processes_.reserve(lusifer_cdensity.maxprocess[0]);
 
     for (std::size_t i = 0; i != processes_.capacity(); ++i)
@@ -686,6 +793,48 @@ lusifer_psg<T>::lusifer_psg(
 
         particle_infos.emplace_back(power, mass, width);
     }
+
+    std::size_t counter = 0;
+
+    for (std::size_t a = 0; a != channels_.size(); ++a)
+    {
+        for (std::size_t b = 0; b != channels_.at(a).invariants.size(); ++b)
+        {
+            std::size_t index = 0;
+
+            for (std::size_t c = 0; c != a; ++c)
+            {
+                for (std::size_t d = 0; d != channels_.at(c).invariants.size(); ++d)
+                {
+                    if (invariants_equal(a, b, c, d, nex))
+                    {
+                        index = channels_.at(c).invariants.at(d).index + 1;
+
+                        // break out of two loops
+                        c = a - 1;
+                        break;
+                    }
+                }
+            }
+
+            if (index == 0)
+            {
+                ++counter;
+                index = counter;
+
+                assert( a == (lusifer_cdensity.chinv[0][invariants.size()] - 1) );
+                assert( b == (lusifer_cdensity.nsinv[0][invariants.size()] - 1) );
+
+                invariants.emplace_back(b, a);
+            }
+
+            assert( index == lusifer_cdensity.numinv[0][a][b] );
+
+            channels_.at(a).invariants.at(b).index = index - 1;
+        }
+    }
+
+    invariants.shrink_to_fit();
 
     // TODO: is the following needed?
     mcut.assign(std::begin(lusifer_cinv.mcutinv[0]), std::end(lusifer_cinv.mcutinv[0]));
