@@ -2,6 +2,7 @@
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/kaellen.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
+#include "hep/ps/lusifer_ps_channels.hpp"
 
 #include "hadron_hadron_psg_adapter.hpp"
 #include "lusifer_interfaces.hpp"
@@ -464,7 +465,6 @@ private:
     std::vector<T> s;
     std::vector<std::array<T, 4>> p;
     std::size_t particles;
-    std::size_t max_particles;
     std::size_t extra_random_numbers;
     T cmf_energy_;
 };
@@ -630,93 +630,29 @@ lusifer_psg<T>::lusifer_psg(
     hep::lusifer_constants<T> const& constants,
     std::size_t extra_random_numbers
 ) {
-    int maxex;
-    int maxgen;
-    lusifer_extra_max(&maxex, &maxgen);
-
-    int nex = 0;
-
-    // FORTRAN counting: use the first generator
-    int g = 1;
-
-    for (auto const& process : processes)
-    {
-        // each particle must be specified with three characters
-        assert( process.size() % 3 == 0 );
-
-        if (nex == 0)
-        {
-            // there must be at least four particles
-            assert( process.size() >= 4 * 3 );
-
-            nex = process.size() / 3;
-
-            double mw = static_cast <double> (constants.mass_w);
-            double gw = static_cast <double> (constants.width_w);
-            double mz = static_cast <double> (constants.mass_z);
-            double gz = static_cast <double> (constants.width_z);
-            double mh = static_cast <double> (constants.mass_h);
-            double gh = static_cast <double> (constants.width_h);
-            double mt = static_cast <double> (constants.mass_t);
-            double gt = static_cast <double> (constants.width_t);
-
-            // set constants and the number of particles
-            lusifer_extra_set(g, nex, mw, gw, mz, gz, mh, gh, mt, gt);
-
-            // the number of particles must be supported by the generator
-            assert( nex <= maxex );
-        }
-
-        // all processes must have the same number of particles
-        assert( nex == static_cast <int> (process.size() / 3) );
-
-        // fill up the string with three spaces for particle not used
-        std::string process0 = process;
-        process0.append(3 * (maxex - nex), ' ');
-
-        // TODO: what is the meaning of this parameter?
-        int lightfermions = 0;
-        // do not include cuts in the phase space generation
-        int includecuts = 0;
-        // do not print channel information
-        int sout = 0;
-
-        lusifer_initphasespace(
-            process0.c_str(),
-            g,
-            lightfermions,
-            includecuts,
-            sout
-        );
-    }
-
-    int channels;
-    lusifer_extra_data(g, &channels);
-
-    // there must be at least one channel, otherwise something went wrong
-    assert( channels > 0 );
+    auto const result = hep::lusifer_ps_channels(processes, constants);
+    auto const nex = processes.at(0).size() / 3;
 
     s.resize(1 << nex);
     p.resize(1 << nex);
 
     this->particles = nex;
-    this->max_particles = maxe;
     this->extra_random_numbers = extra_random_numbers;
-    this->channels_.resize(channels);
+    this->channels_.resize(result.size());
 
-    for (std::size_t i = 0; i != static_cast <std::size_t> (channels); ++i)
+    for (std::size_t i = 0; i != result.size(); ++i)
     {
         auto& channel = this->channels_.at(i);
 
-        channel.invariants.reserve(lusifer_cinv.ninv[0][i]);
-        channel.processes.reserve(lusifer_cprocess.nprocess[0][i]);
-        channel.decays.reserve(lusifer_cdecay.ndecay[0][i]);
+        channel.invariants.reserve(result.at(i).invariants().size());
+        channel.processes.reserve(result.at(i).tchannels().size());
+        channel.decays.reserve(result.at(i).decays().size());
 
         for (std::size_t j = 0; j != channel.invariants.capacity(); ++j)
         {
             channel.invariants.emplace_back(
-                lusifer_cinv.ininv[0][i][j] - 1,
-                lusifer_cinv.idhepinv[0][i][j]
+                result.at(i).invariants().at(j).mom_id(),
+                result.at(i).invariants().at(j).pdg_id()
             );
         }
 
@@ -785,22 +721,22 @@ lusifer_psg<T>::lusifer_psg(
         for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
         {
             channel.processes.emplace_back(
-                lusifer_cprocess.in1process[0][i][j] - 1,
-                lusifer_cprocess.in2process[0][i][j] - 1,
-                lusifer_cprocess.out1process[0][i][j] - 1,
-                lusifer_cprocess.out2process[0][i][j] - 1,
-                lusifer_cprocess.inprocess[0][i][j] - 1,
-                lusifer_cprocess.virtprocess[0][i][j] - 1,
-                lusifer_cprocess.idhepprocess[0][i][j]
+                result.at(i).tchannels().at(j).in1_mom_id(),
+                result.at(i).tchannels().at(j).in2_mom_id(),
+                result.at(i).tchannels().at(j).out1_mom_id(),
+                result.at(i).tchannels().at(j).out2_mom_id(),
+                result.at(i).tchannels().at(j).in_mom_id(),
+                result.at(i).tchannels().at(j).virt_id(),
+                result.at(i).tchannels().at(j).pdg_id()
             );
         }
 
         for (std::size_t j = 0; j != channel.decays.capacity(); ++j)
         {
             channel.decays.emplace_back(
-                lusifer_cdecay.indecay[0][i][j] - 1,
-                lusifer_cdecay.out1decay[0][i][j] - 1,
-                lusifer_cdecay.out2decay[0][i][j] - 1
+                result.at(i).decays().at(j).in_mom_id(),
+                result.at(i).decays().at(j).out1_mom_id(),
+                result.at(i).decays().at(j).out2_mom_id()
             );
         }
     }
