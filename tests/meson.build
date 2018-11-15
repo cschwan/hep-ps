@@ -10,6 +10,8 @@ libcatch_dep = declare_dependency(
 )
 
 programs = [
+    'regression_test_lusifer_psg_densities',
+    'regression_test_lusifer_psg_momenta',
     'test_born_integrand',
     'test_cofferaa_phase_space_generator',
     'test_dipole',
@@ -21,8 +23,6 @@ programs = [
     'test_insertion_term',
     'test_list_phase_space_generator',
     'test_lusifer_phase_space_generator',
-    'test_lusifer_phase_space_generator2',
-    'test_lusifer_phase_space_generator3',
     'test_ol_born_matrix_elements',
     'test_pdg_functions',
     'test_permutation',
