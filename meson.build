@@ -14,9 +14,6 @@ hep_mc_dep = dependency(
     version : '>=0.7'
 )
 
-catch_subproj = subproject('catch')
-catch_dep = catch_subproj.get_variable('catch_dep')
-
 subdir('include')
 
 if get_option('doxygen')

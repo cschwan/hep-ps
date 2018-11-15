@@ -4,7 +4,7 @@
 
 #include <vector>
 
-using T = double;
+using T = HEP_TYPE_T;
 
 TEST_CASE("FORTRAN -> C++", "[fortran_helper]")
 {

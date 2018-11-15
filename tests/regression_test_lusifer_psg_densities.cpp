@@ -9,7 +9,7 @@
 #include <random>
 #include <vector>
 
-using T = double;
+using T = HEP_TYPE_T;
 
 hep::lusifer_constants<T> constants(
     T(125.09), T(4.0e-3),

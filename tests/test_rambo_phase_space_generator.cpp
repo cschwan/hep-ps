@@ -8,7 +8,7 @@
 #include <random>
 #include <vector>
 
-using T = double;
+using T = HEP_TYPE_T;
 
 std::array<T, 32> momenta = {
     T( 7.97063578206315810e+01), T( 0.00000000000000000e+00),

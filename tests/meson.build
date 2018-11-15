@@ -1,13 +1,10 @@
-libcatch = shared_library(
-    'catch',
-    'catch.cpp',
-    dependencies : catch_dep
-)
+catch_subproj = subproject('catch')
+catch_dep = catch_subproj.get_variable('catch_dep')
 
-libcatch_dep = declare_dependency(
-    dependencies : catch_dep,
-    link_with : libcatch
-)
+# make it a static library because `catch.cpp` contains `main`
+libcatch = static_library('catch', 'catch.cpp', dependencies : catch_dep)
+
+libcatch_dep = declare_dependency(dependencies : catch_dep, link_with : libcatch)
 
 programs = [
     'regression_test_lusifer_psg_densities',

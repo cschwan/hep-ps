@@ -8,7 +8,7 @@
 #include <random>
 #include <vector>
 
-using T = double;
+using T = HEP_TYPE_T;
 
 // TODO: reference implementation does not pass the test when massive particles
 // have zero width
