@@ -884,7 +884,6 @@ lusifer_psg<T>::lusifer_psg(
 
     decays.shrink_to_fit();
 
-    // TODO: is the following needed?
     mcut.assign(std::begin(lusifer_cinv.mcutinv[0]), std::end(lusifer_cinv.mcutinv[0]));
 
     invariant_jacobians.reserve(invariants.size());
@@ -970,20 +969,20 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         // `inv1 + inv2 = allbinary - 3`
         std::size_t inv2 = (allbinary - 3 - inv1) - 2;
 
-        T mmin = mcut.at(inv1);
-        T mmax = mcut.at(inv2);
+        T mmin = mcut.at(inv1 + 1);
+        T mmax = mcut.at(inv2 + 1);
 
         for (std::size_t i = 0; &channels_[info.channel].invariants[i] != &invariant; ++i)
         {
             std::size_t const virt = channels_[info.channel].invariants[i].in;
-            bool const condition = s[virt] > mcut[virt] * mcut[virt];
+            bool const condition = s[virt] > mcut.at(virt + 1) * mcut.at(virt + 1);
 
             // is there a minimum limit on this invariant?
             if (invariant.lmin.test(i) && condition)
             {
                 // TODO: is `>` the right condition here?
                 std::size_t const inv3 = inv1 - virt;
-                mmin += sqrt(s[virt]) - mcut.at(inv1) + mcut.at(inv3);
+                mmin += sqrt(s[virt]) - mcut.at(inv1 + 1) + mcut.at(inv3 + 1);
                 inv1 = inv3;
             }
 
@@ -991,7 +990,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
             if (invariant.lmax.test(i) && condition)
             {
                 std::size_t const inv3 = inv2 - virt;
-                mmax += sqrt(s[virt]) - mcut.at(inv2) + mcut.at(inv3);
+                mmax += sqrt(s[virt]) - mcut.at(inv2 + 1) + mcut.at(inv3 + 1);
                 inv2 = inv3;
             }
         }
@@ -1137,19 +1136,19 @@ void lusifer_psg<T>::generate(
         // `inv1 + inv2 = allbinary - 3`
         std::size_t inv2 = (allbinary - 3 - inv1) - 2;
 
-        T mmin = mcut[inv1];
-        T mmax = mcut[inv2];
+        T mmin = mcut.at(inv1 + 1);
+        T mmax = mcut.at(inv2 + 1);
 
         for (std::size_t i = 0; &channels_[channel].invariants[i] != &invariant; ++i)
         {
             std::size_t const virt = channels_[channel].invariants[i].in;
-            bool const condition = s[virt] > mcut[virt] * mcut[virt];
+            bool const condition = s[virt] > mcut.at(virt + 1) * mcut.at(virt + 1);
 
             // is there a minimum limit on this invariant?
             if (invariant.lmin.test(i) && condition)
             {
                 std::size_t const inv3 = inv1 - virt;
-                mmin += sqrt(s[virt]) - mcut[inv1] + mcut[inv3];
+                mmin += sqrt(s[virt]) - mcut.at(inv1 + 1) + mcut.at(inv3 + 1);
                 inv1 = inv3;
             }
 
@@ -1157,7 +1156,7 @@ void lusifer_psg<T>::generate(
             if (invariant.lmax.test(i) && condition)
             {
                 std::size_t const inv3 = inv2 - virt;
-                mmax += sqrt(s[virt]) - mcut[inv2] + mcut[inv3];
+                mmax += sqrt(s[virt]) - mcut.at(inv2 + 1) + mcut.at(inv3 + 1);
                 inv2 = inv3;
             }
         }
