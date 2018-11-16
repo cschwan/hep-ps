@@ -7,8 +7,7 @@ libcatch = static_library('catch', 'catch.cpp', dependencies : catch_dep)
 libcatch_dep = declare_dependency(dependencies : catch_dep, link_with : libcatch)
 
 programs = [
-    'regression_test_lusifer_psg_densities',
-    'regression_test_lusifer_psg_momenta',
+    'regression_test_lusifer_psg_ww_scattering',
     'regression_test_lusifer_psg_wwzph_production',
     'regression_test_lusifer_psg_wzj_production',
     'test_born_integrand',
