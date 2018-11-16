@@ -964,9 +964,9 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
     {
         auto const& invariant = channels_.at(info.channel).invariants.at(info.index);
 
-        // index corresponding to the ns'th invariant
+        // index of the current invariant
         std::size_t inv1 = invariant.in;
-        // `inv1 + inv2 = allbinary - 3`
+        // index of the invariant including every *final* state not included in `inv1`
         std::size_t inv2 = (allbinary - 3 - inv1) - 2;
 
         T mmin = mcut.at(inv1 + 1);
@@ -977,10 +977,14 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
             std::size_t const virt = channels_[info.channel].invariants[i].in;
             bool const condition = s[virt] > mcut.at(virt + 1) * mcut.at(virt + 1);
 
+            // TODO: apparently `condition` is not needed for the massless case, but is it needed
+            // for the massive case? It seems that when `condition` is false, we've found an
+            // unsatisfiable constraint
+            assert( condition );
+
             // is there a minimum limit on this invariant?
             if (invariant.lmin.test(i) && condition)
             {
-                // TODO: is `>` the right condition here?
                 std::size_t const inv3 = inv1 - virt;
                 mmin += sqrt(s[virt]) - mcut.at(inv1 + 1) + mcut.at(inv3 + 1);
                 inv1 = inv3;
@@ -1131,9 +1135,9 @@ void lusifer_psg<T>::generate(
     // iteratively construct the time-like invariants
     for (auto const& invariant : channels_[channel].invariants)
     {
-        // index corresponding to the ns'th invariant
+        // index of the current invariant
         std::size_t inv1 = invariant.in;
-        // `inv1 + inv2 = allbinary - 3`
+        // index of the invariant including every *final* state not included in `inv1`
         std::size_t inv2 = (allbinary - 3 - inv1) - 2;
 
         T mmin = mcut.at(inv1 + 1);
@@ -1143,6 +1147,11 @@ void lusifer_psg<T>::generate(
         {
             std::size_t const virt = channels_[channel].invariants[i].in;
             bool const condition = s[virt] > mcut.at(virt + 1) * mcut.at(virt + 1);
+
+            // TODO: apparently `condition` is not needed for the massless case, but is it needed
+            // for the massive case? It seems that when `condition` is false, we've found an
+            // unsatisfiable constraint
+            assert( condition );
 
             // is there a minimum limit on this invariant?
             if (invariant.lmin.test(i) && condition)
