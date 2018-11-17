@@ -42,7 +42,7 @@ foreach p : programs
         dependencies : [ libcatch_dep, hep_mc_dep, hep_ps_dep ]
     )
 
-    test(p, exe)
+    test(p, exe, timeout : 60)
 endforeach
 
 if get_option('additional-tests')
