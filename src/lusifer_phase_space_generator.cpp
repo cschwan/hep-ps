@@ -975,15 +975,9 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         for (std::size_t i = 0; &channels_[info.channel].invariants[i] != &invariant; ++i)
         {
             std::size_t const virt = channels_[info.channel].invariants[i].in;
-            bool const condition = s[virt] > mcut.at(virt + 1) * mcut.at(virt + 1);
-
-            // TODO: apparently `condition` is not needed for the massless case, but is it needed
-            // for the massive case? It seems that when `condition` is false, we've found an
-            // unsatisfiable constraint
-            assert( condition );
 
             // is there a minimum limit on this invariant?
-            if (invariant.lmin.test(i) && condition)
+            if (invariant.lmin.test(i))
             {
                 std::size_t const inv3 = inv1 - virt;
                 mmin += sqrt(s[virt]) - mcut.at(inv1 + 1) + mcut.at(inv3 + 1);
@@ -991,7 +985,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
             }
 
             // is there a maximum limit on this invariant?
-            if (invariant.lmax.test(i) && condition)
+            if (invariant.lmax.test(i))
             {
                 std::size_t const inv3 = inv2 - virt;
                 mmax += sqrt(s[virt]) - mcut.at(inv2 + 1) + mcut.at(inv3 + 1);
@@ -1146,15 +1140,9 @@ void lusifer_psg<T>::generate(
         for (std::size_t i = 0; &channels_[channel].invariants[i] != &invariant; ++i)
         {
             std::size_t const virt = channels_[channel].invariants[i].in;
-            bool const condition = s[virt] > mcut.at(virt + 1) * mcut.at(virt + 1);
-
-            // TODO: apparently `condition` is not needed for the massless case, but is it needed
-            // for the massive case? It seems that when `condition` is false, we've found an
-            // unsatisfiable constraint
-            assert( condition );
 
             // is there a minimum limit on this invariant?
-            if (invariant.lmin.test(i) && condition)
+            if (invariant.lmin.test(i))
             {
                 std::size_t const inv3 = inv1 - virt;
                 mmin += sqrt(s[virt]) - mcut.at(inv1 + 1) + mcut.at(inv3 + 1);
@@ -1162,7 +1150,7 @@ void lusifer_psg<T>::generate(
             }
 
             // is there a maximum limit on this invariant?
-            if (invariant.lmax.test(i) && condition)
+            if (invariant.lmax.test(i))
             {
                 std::size_t const inv3 = inv2 - virt;
                 mmax += sqrt(s[virt]) - mcut.at(inv2 + 1) + mcut.at(inv3 + 1);
