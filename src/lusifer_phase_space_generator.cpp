@@ -656,6 +656,8 @@ lusifer_psg<T>::lusifer_psg(
             );
         }
 
+        std::size_t const allbinary = (1 << nex) - 1;
+
         for (std::size_t a = 0; a != channel.invariants.size(); ++a)
         {
             for (std::size_t b = 0; b != a; ++b)
@@ -669,11 +671,11 @@ lusifer_psg<T>::lusifer_psg(
                 {
                     bit = true;
 
-                    for (std::size_t c = 0; c != a; ++c)
+                    for (std::size_t c = b + 1; c != a; ++c)
                     {
                         std::size_t const binary3 = channel.invariants.at(c).in + 1;
 
-                        if (included(binary3, binary2) && (b != c))
+                        if (included(binary3, binary2))
                         {
                             bit = false;
                         }
@@ -684,12 +686,7 @@ lusifer_psg<T>::lusifer_psg(
 
                 channel.invariants.at(a).lmin.set(b, bit);
             }
-        }
 
-        std::size_t const allbinary = (1 << nex) - 1;
-
-        for (std::size_t a = 0; a != channel.invariants.size(); ++a)
-        {
             for (std::size_t b = 0; b != a; ++b)
             {
                 std::size_t const binary1 = allbinary - 3 - channel.invariants.at(a).in - 1;
@@ -701,11 +698,11 @@ lusifer_psg<T>::lusifer_psg(
                 {
                     bit = true;
 
-                    for (std::size_t c = 0; c != a; ++c)
+                    for (std::size_t c = b + 1; c != a; ++c)
                     {
                         std::size_t binary3 = channel.invariants.at(c).in + 1;
 
-                        if (included(binary3, binary2) && (b != c))
+                        if (included(binary3, binary2))
                         {
                             bit = false;
                         }
