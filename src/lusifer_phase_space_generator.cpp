@@ -33,6 +33,8 @@ struct invariant
 
     std::size_t in;
     std::size_t idhep;
+    std::bitset<16 * 8> upper_bound;
+    std::bitset<16 * 8> lower_bound;
     std::bitset<std::numeric_limits<std::size_t>::digits> lmin;
     std::bitset<std::numeric_limits<std::size_t>::digits> lmax;
     std::size_t index;
@@ -499,86 +501,14 @@ bool lusifer_psg<T>::invariants_equal(int ch1, int ns1, int ch2, int ns2, int ne
         return false;
     }
 
-    for (int i = 0; i < (nex - 5); ++i)
+    if (a.lower_bound != b.lower_bound)
     {
-        if (a.lmin.test(i))
-        {
-            bool result = false;
-
-            for (int j = 0; j < (nex - 5); ++j)
-            {
-                if (b.lmin.test(j) && (channels_.at(ch1).invariants.at(i).in ==
-                    channels_.at(ch2).invariants.at(j).in))
-                {
-                    result = true;
-                }
-            }
-
-            if (!result)
-            {
-                return false;
-            }
-        }
-
-        if (a.lmax.test(i))
-        {
-            bool result = false;
-
-            for (int j = 0; j < (nex - 5); ++j)
-            {
-                if (b.lmax.test(j) && (channels_.at(ch1).invariants.at(i).in ==
-                    channels_.at(ch2).invariants.at(j).in))
-                {
-                    result = true;
-                }
-            }
-
-            if (!result)
-            {
-                return false;
-            }
-        }
+        return false;
     }
 
-    for (int j = 0; j < (nex - 5); ++j)
+    if (a.upper_bound != b.upper_bound)
     {
-        if (b.lmin.test(j))
-        {
-            bool result = false;
-
-            for (int i = 0; i < (nex - 5); ++i)
-            {
-                if (a.lmin.test(i) && (channels_.at(ch1).invariants.at(i).in ==
-                    channels_.at(ch2).invariants.at(j).in))
-                {
-                    result = true;
-                }
-            }
-
-            if (!result)
-            {
-                return false;
-            }
-        }
-
-        if (b.lmax.test(j))
-        {
-            bool result = false;
-
-            for (int i = 0; i < (nex - 5); ++i)
-            {
-                if (a.lmax.test(i) && (channels_.at(ch1).invariants.at(i).in ==
-                    channels_.at(ch2).invariants.at(j).in))
-                {
-                    result = true;
-                }
-            }
-
-            if (!result)
-            {
-                return false;
-            }
-        }
+        return false;
     }
 
     // ignore member `index`, since it is calculated using this function
@@ -639,6 +569,18 @@ lusifer_psg<T>::lusifer_psg(
     this->particles = nex;
     this->extra_random_numbers = extra_random_numbers;
     this->channels_.resize(result.size());
+
+    mcut.assign(std::begin(lusifer_cinv.mcutinv[0]), std::end(lusifer_cinv.mcutinv[0]));
+
+    // TODO: assign external masses to `s` vector
+    for (std::size_t i = 0; i != particles; ++i)
+    {
+        T const m = lusifer_cinv.mcutinv[0][1 << i];
+        s[(1 << i) - 1] = m * m;
+    }
+
+    std::vector<std::size_t> inv_lo;
+    std::vector<std::size_t> inv_hi;
 
     for (std::size_t i = 0; i != result.size(); ++i)
     {
@@ -713,6 +655,86 @@ lusifer_psg<T>::lusifer_psg(
 
                 channel.invariants.at(a).lmax.set(b, bit);
             }
+        }
+
+        for (auto& invariant : channel.invariants)
+        {
+            inv_lo.clear();
+            inv_hi.clear();
+
+            std::size_t lower_bound_ext = invariant.in;
+            std::size_t upper_bound_ext = (allbinary - 3 - lower_bound_ext) - 2;
+
+            for (std::size_t i = 0; &channel.invariants.at(i) != &invariant; ++i)
+            {
+                std::size_t const virt = channel.invariants[i].in;
+
+                // is there a minimum limit on this invariant?
+                if (invariant.lmin.test(i))
+                {
+                    inv_lo.emplace_back(virt);
+                    std::size_t const new_lower_bound_ext = lower_bound_ext - virt;
+                    lower_bound_ext = new_lower_bound_ext;
+                }
+
+                // is there a maximum limit on this invariant?
+                if (invariant.lmax.test(i))
+                {
+                    inv_hi.emplace_back(virt);
+                    std::size_t const new_upper_bound_ext = upper_bound_ext - virt;
+                    upper_bound_ext = new_upper_bound_ext;
+                }
+            }
+
+            auto lower_ext = lower_bound_ext + 1;
+            auto upper_ext = upper_bound_ext + 1;
+
+            while (lower_ext != 0)
+            {
+                // extract least significant bit
+                auto const index = lower_ext & -lower_ext;
+
+                // only add mass to the bound if it's actually nonzero
+                if (mcut[index] != T())
+                {
+                    inv_lo.emplace_back(index - 1);
+                }
+
+                // delete least significant bit
+                lower_ext ^= index;
+            }
+
+            while (upper_ext != 0)
+            {
+                auto const index = upper_ext & -upper_ext;
+
+                // only add mass to the bound if it's actually nonzero
+                if (mcut[index] != T())
+                {
+                    inv_hi.emplace_back(index - 1);
+                }
+
+                upper_ext ^= index;
+            }
+
+            std::sort(inv_lo.begin(), inv_lo.end());
+            std::sort(inv_hi.begin(), inv_hi.end());
+
+            std::bitset<8 * 16> lower_bound;
+            std::bitset<8 * 16> upper_bound;
+
+            for (std::size_t i = 0; i != inv_lo.size(); ++i)
+            {
+                lower_bound |= std::bitset<8 * 16>(inv_lo.at(i)) << (16 * i);
+            }
+
+            for (std::size_t i = 0; i != inv_hi.size(); ++i)
+            {
+                upper_bound |= std::bitset<8 * 16>(inv_hi.at(i)) << (16 * i);
+            }
+
+            invariant.lower_bound = lower_bound;
+            invariant.upper_bound = upper_bound;
         }
 
         for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
@@ -881,7 +903,6 @@ lusifer_psg<T>::lusifer_psg(
 
     decays.shrink_to_fit();
 
-    mcut.assign(std::begin(lusifer_cinv.mcutinv[0]), std::end(lusifer_cinv.mcutinv[0]));
 
     invariant_jacobians.reserve(invariants.size());
     process_jacobians.reserve(processes_.size());
@@ -989,6 +1010,29 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
                 inv2 = inv3;
             }
         }
+
+        T min = T();
+        T max = T();
+
+        auto lower = invariant.lower_bound;
+        auto upper = invariant.upper_bound;
+
+        while (lower.any())
+        {
+            auto const index = (lower & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
+            lower >>= 16;
+            min += sqrt(s.at(index));
+        }
+
+        while (upper.any())
+        {
+            auto const index = (upper & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
+            upper >>= 16;
+            max += sqrt(s.at(index));
+        }
+
+        assert( mmin == min );
+        assert( mmax == max );
 
         T const smin = mmin * mmin;
         T const smax = (cmf_energy_ - mmax) * (cmf_energy_ - mmax);
@@ -1154,6 +1198,29 @@ void lusifer_psg<T>::generate(
                 inv2 = inv3;
             }
         }
+
+        T min = T();
+        T max = T();
+
+        auto lower = invariant.lower_bound;
+        auto upper = invariant.upper_bound;
+
+        while (lower.any())
+        {
+            auto const index = (lower & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
+            lower >>= 16;
+            min += sqrt(s.at(index));
+        }
+
+        while (upper.any())
+        {
+            auto const index = (upper & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
+            upper >>= 16;
+            max += sqrt(s.at(index));
+        }
+
+        assert( mmin == min );
+        assert( mmax == max );
 
         T const smin = mmin * mmin;
         T const smax = (cmf_energy - mmax) * (cmf_energy - mmax);
