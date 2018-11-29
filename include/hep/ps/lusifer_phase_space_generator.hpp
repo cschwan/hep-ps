@@ -21,6 +21,7 @@
 
 #include "hep/ps/lusifer_constants.hpp"
 #include "hep/ps/phase_space_generator.hpp"
+#include "hep/ps/ps_channel.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -29,6 +30,15 @@
 
 namespace hep
 {
+
+template <typename T>
+std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
+    T min_energy,
+    T cmf_energy,
+    std::vector<ps_channel> const& channels,
+    lusifer_constants<T> const& constants,
+    std::size_t extra_random_numbers = 0
+);
 
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(

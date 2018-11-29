@@ -5,6 +5,7 @@
 #include "hep/ps/lusifer_ps_channels.hpp"
 
 #include "hadron_hadron_psg_adapter.hpp"
+// FIXME: this header should not be needed
 #include "lusifer_interfaces.hpp"
 
 #include <algorithm>
@@ -39,6 +40,136 @@ struct invariant
     std::bitset<std::numeric_limits<std::size_t>::digits> lmax;
     std::size_t index;
 };
+
+struct inequality
+{
+    inequality(std::size_t lhs, std::size_t rhs1, std::size_t rhs2)
+        : lhs(lhs)
+        , rhs1(rhs1)
+        , rhs2(rhs2)
+    {
+    }
+
+    std::size_t lhs;
+    std::size_t rhs1;
+    std::size_t rhs2;
+};
+
+inequality get_inequality_for_invariant(
+    std::vector<invariant> const& invariants,
+    std::size_t inv_index
+) {
+    auto const in = inv_index + 1;
+
+    // for invariants containing two momenta, the invariants are the external momenta squared
+    if (std::bitset<32>(in).count() == 2)
+    {
+        auto const out1 = in & -in;
+        auto const out2 = (in ^ out1) & -(in ^ out1);
+
+        return { in - 1, out1 - 1, out2 - 1 };
+    }
+
+    assert( !invariants.empty() );
+
+    for (auto i = invariants.begin(); i != invariants.end(); ++i)
+    {
+        auto const in1 = i->in + 1;
+
+        if (std::bitset<32>(in ^ in1).count() == 1)
+        {
+            return { in - 1, in1 - 1, (in ^ in1) - 1 };
+        }
+
+        for (auto j = std::next(i); j != invariants.end(); ++j)
+        {
+            auto const in2 = j->in + 1;
+
+            if (((in1 | in2) == in) && ((in1 & in2) == 0))
+            {
+                return { in - 1, in1 - 1, in2 - 1 };
+            }
+        }
+    }
+
+    assert( false );
+}
+
+std::vector<inequality> build_inequalities(
+    std::vector<invariant> const& invariants,
+    std::size_t cmf_inv
+) {
+    std::vector<inequality> result;
+    result.reserve(invariants.size() + 1);
+
+    // first inequality from the center-of-mass energy
+    result.push_back(get_inequality_for_invariant(invariants, cmf_inv));
+
+    for (auto const& inv : invariants)
+    {
+        result.push_back(get_inequality_for_invariant(invariants, inv.in));
+    }
+
+    return result;
+}
+
+template <typename T>
+std::bitset<8 * 16> integral_bound(
+    std::vector<inequality>::const_iterator inv,
+    std::vector<T> const& mcut,
+    std::vector<std::size_t>& stack,
+    std::vector<inequality> const& inequalities
+) {
+    std::vector<std::size_t> invs;
+    invs.reserve(inequalities.size());
+
+    while (!stack.empty())
+    {
+        std::size_t const index = stack.back();
+
+        // remove invariant
+        stack.pop_back();
+
+        // if there is one single bit, it's an external mass
+        if (std::bitset<64>(index + 1).count() == 1)
+        {
+            // only add the invariant if it's nonzero
+            if (mcut.at(index + 1) != T())
+            {
+                invs.push_back(index);
+            }
+        }
+        else // if it's not an external mass, it is an invariant
+        {
+            auto const result = std::find_if(inequalities.begin(), inequalities.end(),
+                [=](inequality const& ineq) { return ineq.lhs == index; });
+
+            assert( result != inequalities.end() );
+
+            // is the invariant not generated yet?
+            if (std::distance(inv, result) >= 0)
+            {
+                stack.push_back(result->rhs1);
+                stack.push_back(result->rhs2);
+            }
+            else
+            {
+                invs.push_back(index);
+            }
+        }
+    }
+
+    // sort invariants to optimize access pattern in later calculations
+    std::sort(invs.begin(), invs.end());
+    std::bitset<8 * 16> bound;
+
+    for (std::size_t i = 0; i != invs.size(); ++i)
+    {
+        bound |= std::bitset<8 * 16>(invs.at(i)) << (16 * i);
+    }
+
+    return bound;
+}
 
 struct process
 {
@@ -431,7 +562,7 @@ public:
     using numeric_type = T;
 
     lusifer_psg(
-        std::vector<std::string> const& processes,
+        std::vector<hep::ps_channel> const& channels,
         hep::lusifer_constants<T> const& constants,
         std::size_t extra_random_numbers = 0
     );
@@ -556,45 +687,47 @@ bool lusifer_psg<T>::processes_equal(int ch1, int ns1, int ch2, int ns2, int nex
 
 template <typename T>
 lusifer_psg<T>::lusifer_psg(
-    std::vector<std::string> const& processes,
+    std::vector<hep::ps_channel> const& channels,
     hep::lusifer_constants<T> const& constants,
     std::size_t extra_random_numbers
 ) {
-    auto const result = hep::lusifer_ps_channels(processes, constants);
-    auto const nex = processes.at(0).size() / 3;
+    auto const nex = channels.front().invariants().size() + 4;
 
     s.resize(1 << nex);
     p.resize(1 << nex);
 
     this->particles = nex;
     this->extra_random_numbers = extra_random_numbers;
-    this->channels_.resize(result.size());
+    this->channels_.resize(channels.size());
 
+    // FIXME: access to FORTRAN common block
     mcut.assign(std::begin(lusifer_cinv.mcutinv[0]), std::end(lusifer_cinv.mcutinv[0]));
 
     // TODO: assign external masses to `s` vector
     for (std::size_t i = 0; i != particles; ++i)
     {
+        // FIXME: access to FORTRAN common block
         T const m = lusifer_cinv.mcutinv[0][1 << i];
         s[(1 << i) - 1] = m * m;
     }
 
     std::vector<std::size_t> inv_lo;
     std::vector<std::size_t> inv_hi;
+    std::vector<std::size_t> stack;
 
-    for (std::size_t i = 0; i != result.size(); ++i)
+    for (std::size_t i = 0; i != channels.size(); ++i)
     {
         auto& channel = this->channels_.at(i);
 
-        channel.invariants.reserve(result.at(i).invariants().size());
-        channel.processes.reserve(result.at(i).tchannels().size());
-        channel.decays.reserve(result.at(i).decays().size());
+        channel.invariants.reserve(channels.at(i).invariants().size());
+        channel.processes.reserve(channels.at(i).tchannels().size());
+        channel.decays.reserve(channels.at(i).decays().size());
 
         for (std::size_t j = 0; j != channel.invariants.capacity(); ++j)
         {
             channel.invariants.emplace_back(
-                result.at(i).invariants().at(j).mom_id(),
-                result.at(i).invariants().at(j).pdg_id()
+                channels.at(i).invariants().at(j).mom_id(),
+                channels.at(i).invariants().at(j).pdg_id()
             );
         }
 
@@ -737,25 +870,67 @@ lusifer_psg<T>::lusifer_psg(
             invariant.upper_bound = upper_bound;
         }
 
+        auto const& inequalities = build_inequalities(channel.invariants, allbinary - 4);
+
+        // skip first inequality, because it is already generated elsewhere
+        for (auto i = std::next(inequalities.cbegin()); i != inequalities.cend(); ++i)
+        {
+            stack.clear();
+            stack.push_back(i->lhs);
+
+            auto const lower_bound = integral_bound(i, mcut, stack, inequalities);
+
+            std::size_t const index = std::distance(inequalities.cbegin(), i) - 1;
+            assert( channel.invariants.at(index).lower_bound == lower_bound );
+        }
+
+        // skip first inequality, because it is already generated elsewhere
+        for (auto i = std::next(inequalities.cbegin()); i != inequalities.cend(); ++i)
+        {
+            stack.clear();
+
+            std::size_t positive = i->lhs;
+            std::vector<inequality>::const_iterator next;
+
+            do
+            {
+                next = std::find_if(inequalities.begin(), inequalities.end(),
+                    [=](inequality const& ineq) {
+                        return (ineq.rhs1 == positive) || (ineq.rhs2 == positive);
+                });
+
+                stack.push_back((positive == next->rhs1) ? next->rhs2 : next->rhs1);
+                positive = next->lhs;
+            }
+            while (std::distance(i, next) >= 0);
+
+            assert( positive == (allbinary - 4) );
+
+            auto const upper_bound = integral_bound(i, mcut, stack, inequalities);
+
+            std::size_t const index = std::distance(inequalities.cbegin(), i) - 1;
+            assert( channel.invariants.at(index).upper_bound == upper_bound );
+        }
+
         for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
         {
             channel.processes.emplace_back(
-                result.at(i).tchannels().at(j).in1_mom_id(),
-                result.at(i).tchannels().at(j).in2_mom_id(),
-                result.at(i).tchannels().at(j).out1_mom_id(),
-                result.at(i).tchannels().at(j).out2_mom_id(),
-                result.at(i).tchannels().at(j).in_mom_id(),
-                result.at(i).tchannels().at(j).virt_id(),
-                result.at(i).tchannels().at(j).pdg_id()
+                channels.at(i).tchannels().at(j).in1_mom_id(),
+                channels.at(i).tchannels().at(j).in2_mom_id(),
+                channels.at(i).tchannels().at(j).out1_mom_id(),
+                channels.at(i).tchannels().at(j).out2_mom_id(),
+                channels.at(i).tchannels().at(j).in_mom_id(),
+                channels.at(i).tchannels().at(j).virt_id(),
+                channels.at(i).tchannels().at(j).pdg_id()
             );
         }
 
         for (std::size_t j = 0; j != channel.decays.capacity(); ++j)
         {
             channel.decays.emplace_back(
-                result.at(i).decays().at(j).in_mom_id(),
-                result.at(i).decays().at(j).out1_mom_id(),
-                result.at(i).decays().at(j).out2_mom_id()
+                channels.at(i).decays().at(j).in_mom_id(),
+                channels.at(i).decays().at(j).out1_mom_id(),
+                channels.at(i).decays().at(j).out2_mom_id()
             );
         }
     }
@@ -766,7 +941,9 @@ lusifer_psg<T>::lusifer_psg(
     {
         // TODO: make this parameter available from outside
         T power = T(0.9);
+        // FIXME: access to FORTRAN common block
         T mass  = lusifer_general.mass[i];
+        // FIXME: access to FORTRAN common block
         T width = lusifer_general.width[i];
 
         if ((width > T()) || (i == 0) || ((i >= 30) && (i < 33)))
@@ -1034,8 +1211,8 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         assert( mmin == min );
         assert( mmax == max );
 
-        T const smin = mmin * mmin;
-        T const smax = (cmf_energy_ - mmax) * (cmf_energy_ - mmax);
+        T const smin = min * min;
+        T const smax = (cmf_energy_ - max) * (cmf_energy_ - max);
 
         invariant_jacobians.push_back(jacobian(
             particle_infos.at(invariant.idhep).power,
@@ -1222,8 +1399,8 @@ void lusifer_psg<T>::generate(
         assert( mmin == min );
         assert( mmax == max );
 
-        T const smin = mmin * mmin;
-        T const smax = (cmf_energy - mmax) * (cmf_energy - mmax);
+        T const smin = min * min;
+        T const smax = (cmf_energy - max) * (cmf_energy - max);
 
         // TODO: replace particle_infos calls with model
 
@@ -1361,14 +1538,31 @@ template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
     T min_energy,
     T cmf_energy,
-    std::vector<std::string> const& processes,
+    std::vector<ps_channel> const& channels,
     lusifer_constants<T> const& constants,
     std::size_t extra_random_numbers
 ) {
     return std::make_unique<hadron_hadron_psg_adapter<lusifer_psg<T>>>(
         min_energy,
         cmf_energy,
-        processes,
+        channels,
+        constants,
+        extra_random_numbers
+    );
+}
+
+template <typename T>
+std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
+    T min_energy,
+    T cmf_energy,
+    std::vector<std::string> const& processes,
+    lusifer_constants<T> const& constants,
+    std::size_t extra_random_numbers
+) {
+    return make_lusifer_phase_space_generator(
+        min_energy,
+        cmf_energy,
+        lusifer_ps_channels(processes, constants),
         constants,
         extra_random_numbers
     );
@@ -1392,6 +1586,15 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
+
+template std::unique_ptr<phase_space_generator<double>>
+make_lusifer_phase_space_generator(
+    double,
+    double,
+    std::vector<ps_channel> const&,
+    lusifer_constants<double> const&,
+    std::size_t
+);
 
 template std::unique_ptr<phase_space_generator<double>>
 make_lusifer_phase_space_generator(
