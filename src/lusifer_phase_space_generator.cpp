@@ -853,6 +853,9 @@ lusifer_psg<T>::lusifer_psg(
             std::sort(inv_lo.begin(), inv_lo.end());
             std::sort(inv_hi.begin(), inv_hi.end());
 
+            // insert upper bound positive element
+            inv_hi.insert(inv_hi.begin(), allbinary - 4);
+
             std::bitset<8 * 16> lower_bound;
             std::bitset<8 * 16> upper_bound;
 
@@ -906,7 +909,9 @@ lusifer_psg<T>::lusifer_psg(
 
             assert( positive == (allbinary - 4) );
 
-            auto const upper_bound = integral_bound(i, mcut, stack, inequalities);
+            auto upper_bound = integral_bound(i, mcut, stack, inequalities);
+
+            upper_bound = (upper_bound << 16) | std::bitset<8 * 16>(positive);
 
             std::size_t const index = std::distance(inequalities.cbegin(), i) - 1;
             assert( channel.invariants.at(index).upper_bound == upper_bound );
@@ -1189,7 +1194,6 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         }
 
         T min = T();
-        T max = T();
 
         auto lower = invariant.lower_bound;
         auto upper = invariant.upper_bound;
@@ -1201,18 +1205,27 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
             min += sqrt(s.at(index));
         }
 
+        assert( upper.any() );
+
+        auto const index = (upper & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
+        upper >>= 16;
+        T max_pos = (index == allbinary - 4) ? cmf_energy_ : sqrt(s.at(index));
+        T max_neg = T();
+
         while (upper.any())
         {
             auto const index = (upper & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
             upper >>= 16;
-            max += sqrt(s.at(index));
+            max_neg += sqrt(s.at(index));
         }
 
+        T const max = max_pos - max_neg;
+
         assert( mmin == min );
-        assert( mmax == max );
+        assert( (cmf_energy_ - mmax) == max );
 
         T const smin = min * min;
-        T const smax = (cmf_energy_ - max) * (cmf_energy_ - max);
+        T const smax = max * max;
 
         invariant_jacobians.push_back(jacobian(
             particle_infos.at(invariant.idhep).power,
@@ -1377,7 +1390,6 @@ void lusifer_psg<T>::generate(
         }
 
         T min = T();
-        T max = T();
 
         auto lower = invariant.lower_bound;
         auto upper = invariant.upper_bound;
@@ -1389,18 +1401,27 @@ void lusifer_psg<T>::generate(
             min += sqrt(s.at(index));
         }
 
+        assert( upper.any() );
+
+        auto const index = (upper & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
+        upper >>= 16;
+        T max_pos = (index == allbinary - 4) ? cmf_energy : sqrt(s.at(index));
+        T max_neg = T();
+
         while (upper.any())
         {
             auto const index = (upper & std::bitset<8 * 16>((1 << 16) - 1)).to_ulong();
             upper >>= 16;
-            max += sqrt(s.at(index));
+            max_neg += sqrt(s.at(index));
         }
 
+        T const max = max_pos - max_neg;
+
         assert( mmin == min );
-        assert( mmax == max );
+        assert( (cmf_energy - mmax) == max );
 
         T const smin = min * min;
-        T const smax = (cmf_energy - max) * (cmf_energy - max);
+        T const smax = max * max;
 
         // TODO: replace particle_infos calls with model
 
