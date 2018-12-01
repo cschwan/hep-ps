@@ -733,146 +733,6 @@ lusifer_psg<T>::lusifer_psg(
 
         std::size_t const allbinary = (1 << nex) - 1;
 
-        for (std::size_t a = 0; a != channel.invariants.size(); ++a)
-        {
-            for (std::size_t b = 0; b != a; ++b)
-            {
-                std::size_t const binary1 = channel.invariants.at(a).in + 1;
-                std::size_t const binary2 = channel.invariants.at(b).in + 1;
-
-                bool bit = false;
-
-                if (included(binary1, binary2))
-                {
-                    bit = true;
-
-                    for (std::size_t c = b + 1; c != a; ++c)
-                    {
-                        std::size_t const binary3 = channel.invariants.at(c).in + 1;
-
-                        if (included(binary3, binary2))
-                        {
-                            bit = false;
-                        }
-                    }
-                }
-
-                assert( bit == lusifer_cinv.lmin[0][i][a][b] );
-
-                channel.invariants.at(a).lmin.set(b, bit);
-            }
-
-            for (std::size_t b = 0; b != a; ++b)
-            {
-                std::size_t const binary1 = allbinary - 3 - channel.invariants.at(a).in - 1;
-                std::size_t const binary2 = channel.invariants.at(b).in + 1;
-
-                bool bit = false;
-
-                if (included(binary1, binary2))
-                {
-                    bit = true;
-
-                    for (std::size_t c = b + 1; c != a; ++c)
-                    {
-                        std::size_t binary3 = channel.invariants.at(c).in + 1;
-
-                        if (included(binary3, binary2))
-                        {
-                            bit = false;
-                        }
-                    }
-                }
-
-                assert( bit == lusifer_cinv.lmax[0][i][a][b] );
-
-                channel.invariants.at(a).lmax.set(b, bit);
-            }
-        }
-
-        for (auto& invariant : channel.invariants)
-        {
-            inv_lo.clear();
-            inv_hi.clear();
-
-            std::size_t lower_bound_ext = invariant.in;
-            std::size_t upper_bound_ext = (allbinary - 3 - lower_bound_ext) - 2;
-
-            for (std::size_t i = 0; &channel.invariants.at(i) != &invariant; ++i)
-            {
-                std::size_t const virt = channel.invariants[i].in;
-
-                // is there a minimum limit on this invariant?
-                if (invariant.lmin.test(i))
-                {
-                    inv_lo.emplace_back(virt);
-                    std::size_t const new_lower_bound_ext = lower_bound_ext - virt;
-                    lower_bound_ext = new_lower_bound_ext;
-                }
-
-                // is there a maximum limit on this invariant?
-                if (invariant.lmax.test(i))
-                {
-                    inv_hi.emplace_back(virt);
-                    std::size_t const new_upper_bound_ext = upper_bound_ext - virt;
-                    upper_bound_ext = new_upper_bound_ext;
-                }
-            }
-
-            auto lower_ext = lower_bound_ext + 1;
-            auto upper_ext = upper_bound_ext + 1;
-
-            while (lower_ext != 0)
-            {
-                // extract least significant bit
-                auto const index = lower_ext & -lower_ext;
-
-                // only add mass to the bound if it's actually nonzero
-                if (mcut[index] != T())
-                {
-                    inv_lo.emplace_back(index - 1);
-                }
-
-                // delete least significant bit
-                lower_ext ^= index;
-            }
-
-            while (upper_ext != 0)
-            {
-                auto const index = upper_ext & -upper_ext;
-
-                // only add mass to the bound if it's actually nonzero
-                if (mcut[index] != T())
-                {
-                    inv_hi.emplace_back(index - 1);
-                }
-
-                upper_ext ^= index;
-            }
-
-            std::sort(inv_lo.begin(), inv_lo.end());
-            std::sort(inv_hi.begin(), inv_hi.end());
-
-            // insert upper bound positive element
-            inv_hi.insert(inv_hi.begin(), allbinary - 4);
-
-            std::bitset<8 * 16> lower_bound;
-            std::bitset<8 * 16> upper_bound;
-
-            for (std::size_t i = 0; i != inv_lo.size(); ++i)
-            {
-                lower_bound |= std::bitset<8 * 16>(inv_lo.at(i)) << (16 * i);
-            }
-
-            for (std::size_t i = 0; i != inv_hi.size(); ++i)
-            {
-                upper_bound |= std::bitset<8 * 16>(inv_hi.at(i)) << (16 * i);
-            }
-
-            invariant.lower_bound = lower_bound;
-            invariant.upper_bound = upper_bound;
-        }
-
         auto const& inequalities = build_inequalities(channel.invariants, allbinary - 4);
 
         // skip first inequality, because it is already generated elsewhere
@@ -881,10 +741,8 @@ lusifer_psg<T>::lusifer_psg(
             stack.clear();
             stack.push_back(i->lhs);
 
-            auto const lower_bound = integral_bound(i, mcut, stack, inequalities);
-
             std::size_t const index = std::distance(inequalities.cbegin(), i) - 1;
-            assert( channel.invariants.at(index).lower_bound == lower_bound );
+            channel.invariants.at(index).lower_bound = integral_bound(i, mcut, stack, inequalities);
         }
 
         // skip first inequality, because it is already generated elsewhere
@@ -907,14 +765,11 @@ lusifer_psg<T>::lusifer_psg(
             }
             while (std::distance(i, next) >= 0);
 
-            assert( positive == (allbinary - 4) );
-
-            auto upper_bound = integral_bound(i, mcut, stack, inequalities);
-
-            upper_bound = (upper_bound << 16) | std::bitset<8 * 16>(positive);
-
+            auto upper_bound_neg = integral_bound(i, mcut, stack, inequalities);
             std::size_t const index = std::distance(inequalities.cbegin(), i) - 1;
-            assert( channel.invariants.at(index).upper_bound == upper_bound );
+
+            channel.invariants.at(index).upper_bound =
+                (upper_bound_neg << 16) | std::bitset<8 * 16>(positive);
         }
 
         for (std::size_t j = 0; j != channel.processes.capacity(); ++j)
@@ -987,13 +842,8 @@ lusifer_psg<T>::lusifer_psg(
                 ++counter;
                 index = counter;
 
-                assert( a == (lusifer_cdensity.chinv[0][invariants.size()] - 1) );
-                assert( b == (lusifer_cdensity.nsinv[0][invariants.size()] - 1) );
-
                 invariants.emplace_back(b, a);
             }
-
-            assert( index == lusifer_cdensity.numinv[0][a][b] );
 
             channels_.at(a).invariants.at(b).index = index - 1;
         }
@@ -1029,13 +879,8 @@ lusifer_psg<T>::lusifer_psg(
                 ++counter;
                 index = counter;
 
-                assert( a == (lusifer_cdensity.chprocess[0][processes_.size()] - 1) );
-                assert( b == (lusifer_cdensity.ntprocess[0][processes_.size()] - 1) );
-
                 processes_.emplace_back(b, a);
             }
-
-            assert( index == lusifer_cdensity.numprocess[0][a][b] );
 
             channels_.at(a).processes.at(b).index = index - 1;
         }
@@ -1071,13 +916,8 @@ lusifer_psg<T>::lusifer_psg(
                 ++counter;
                 index = counter;
 
-                assert( a == (lusifer_cdensity.chdecay[0][decays.size()] - 1) );
-                assert( b == (lusifer_cdensity.nsdecay[0][decays.size()] - 1) );
-
                 decays.emplace_back(b, a);
             }
-
-            assert( index == lusifer_cdensity.numdecay[0][a][b] );
 
             channels_.at(a).decays.at(b).index = index - 1;
         }
@@ -1164,35 +1004,6 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
     {
         auto const& invariant = channels_.at(info.channel).invariants.at(info.index);
 
-        // index of the current invariant
-        std::size_t inv1 = invariant.in;
-        // index of the invariant including every *final* state not included in `inv1`
-        std::size_t inv2 = (allbinary - 3 - inv1) - 2;
-
-        T mmin = mcut.at(inv1 + 1);
-        T mmax = mcut.at(inv2 + 1);
-
-        for (std::size_t i = 0; &channels_[info.channel].invariants[i] != &invariant; ++i)
-        {
-            std::size_t const virt = channels_[info.channel].invariants[i].in;
-
-            // is there a minimum limit on this invariant?
-            if (invariant.lmin.test(i))
-            {
-                std::size_t const inv3 = inv1 - virt;
-                mmin += sqrt(s[virt]) - mcut.at(inv1 + 1) + mcut.at(inv3 + 1);
-                inv1 = inv3;
-            }
-
-            // is there a maximum limit on this invariant?
-            if (invariant.lmax.test(i))
-            {
-                std::size_t const inv3 = inv2 - virt;
-                mmax += sqrt(s[virt]) - mcut.at(inv2 + 1) + mcut.at(inv3 + 1);
-                inv2 = inv3;
-            }
-        }
-
         T min = T();
 
         auto lower = invariant.lower_bound;
@@ -1220,10 +1031,6 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         }
 
         T const max = max_pos - max_neg;
-
-        assert( mmin == min );
-        assert( (cmf_energy_ - mmax) == max );
-
         T const smin = min * min;
         T const smax = max * max;
 
@@ -1360,35 +1167,6 @@ void lusifer_psg<T>::generate(
     // iteratively construct the time-like invariants
     for (auto const& invariant : channels_[channel].invariants)
     {
-        // index of the current invariant
-        std::size_t inv1 = invariant.in;
-        // index of the invariant including every *final* state not included in `inv1`
-        std::size_t inv2 = (allbinary - 3 - inv1) - 2;
-
-        T mmin = mcut.at(inv1 + 1);
-        T mmax = mcut.at(inv2 + 1);
-
-        for (std::size_t i = 0; &channels_[channel].invariants[i] != &invariant; ++i)
-        {
-            std::size_t const virt = channels_[channel].invariants[i].in;
-
-            // is there a minimum limit on this invariant?
-            if (invariant.lmin.test(i))
-            {
-                std::size_t const inv3 = inv1 - virt;
-                mmin += sqrt(s[virt]) - mcut.at(inv1 + 1) + mcut.at(inv3 + 1);
-                inv1 = inv3;
-            }
-
-            // is there a maximum limit on this invariant?
-            if (invariant.lmax.test(i))
-            {
-                std::size_t const inv3 = inv2 - virt;
-                mmax += sqrt(s[virt]) - mcut.at(inv2 + 1) + mcut.at(inv3 + 1);
-                inv2 = inv3;
-            }
-        }
-
         T min = T();
 
         auto lower = invariant.lower_bound;
@@ -1416,10 +1194,6 @@ void lusifer_psg<T>::generate(
         }
 
         T const max = max_pos - max_neg;
-
-        assert( mmin == min );
-        assert( (cmf_energy - mmax) == max );
-
         T const smin = min * min;
         T const smax = max * max;
 
