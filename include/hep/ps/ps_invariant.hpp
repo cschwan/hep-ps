@@ -48,6 +48,11 @@ private:
     std::size_t pdg_id_;
 };
 
+inline bool operator==(ps_invariant const& a, ps_invariant const& b)
+{
+    return (a.mom_id() == b.mom_id()) && (a.pdg_id() == b.pdg_id());
+}
+
 }
 
 #endif

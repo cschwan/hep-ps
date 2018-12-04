@@ -66,6 +66,12 @@ public:
         return invariants_;
     }
 
+    /// Returns all timelike invariants of this phase space channel.
+    std::vector<ps_invariant>& invariants()
+    {
+        return invariants_;
+    }
+
     /// Returns the spacelike invariants of this phase space channel.
     std::vector<ps_tchannel> const& tchannels() const
     {

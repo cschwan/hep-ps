@@ -36,8 +36,6 @@ struct invariant
     std::size_t idhep;
     std::bitset<16 * 8> upper_bound;
     std::bitset<16 * 8> lower_bound;
-    std::bitset<std::numeric_limits<std::size_t>::digits> lmin;
-    std::bitset<std::numeric_limits<std::size_t>::digits> lmax;
     std::size_t index;
 };
 

@@ -12,6 +12,7 @@ programs = [
     'regression_test_lusifer_psg_www_production',
     'regression_test_lusifer_psg_wwzph_production',
     'regression_test_lusifer_psg_wzj_production',
+    'test_ps_invariant_commutation',
     'test_born_integrand',
     'test_cofferaa_phase_space_generator',
     'test_dipole',
