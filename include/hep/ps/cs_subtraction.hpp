@@ -28,6 +28,8 @@
 #include "hep/ps/scales.hpp"
 #include "hep/ps/spin_correlation_matrix.hpp"
 
+#include <nonstd/span.hpp>
+
 #include <array>
 #include <cstddef>
 #include <vector>
@@ -76,7 +78,7 @@ public:
     /// Returns the finite part of the integrated dipoles together with the collinear counterterm.
     void insertion_terms(
         insertion_term const& term,
-        std::vector<scales<T>> const& scales,
+        nonstd::span<scales<T> const> scales,
         std::vector<T> const& phase_space,
         T x,
         T eta,
@@ -87,7 +89,7 @@ public:
     /// insertion_terms.
     void insertion_terms2(
         insertion_term const& term,
-        std::vector<scales<T>> const& scales,
+        nonstd::span<scales<T> const> scales,
         std::vector<T> const& phase_space,
         std::vector<T>& results
     ) const;

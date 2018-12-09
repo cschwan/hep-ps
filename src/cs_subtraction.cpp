@@ -417,7 +417,7 @@ T cs_subtraction<T>::fermion_function(
 template <typename T>
 void cs_subtraction<T>::insertion_terms(
     insertion_term const& term,
-    std::vector<scales<T>> const& scales,
+    nonstd::span<scales<T> const> scales,
     std::vector<T> const& phase_space,
     T x,
     T eta,
@@ -602,7 +602,7 @@ void cs_subtraction<T>::insertion_terms(
 template <typename T>
 void cs_subtraction<T>::insertion_terms2(
     insertion_term const& term,
-    std::vector<scales<T>> const& scales,
+    nonstd::span<scales<T> const> scales,
     std::vector<T> const& phase_space,
     std::vector<T>& results
 ) const {

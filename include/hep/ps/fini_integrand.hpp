@@ -92,14 +92,15 @@ public:
         neg_.states.reserve(fs);
         pos_.states.reserve(fs);
 
-        std::size_t const scale_count = scale_setter_.count();
-        std::size_t const pdf_count = pdfs_.count();
+        std::size_t const scales = scale_setter_.count();
 
-        neg_.results.reserve(scale_count);
-        pos_.results.reserve(scale_count);
-        neg_.pdf_results.reserve((pdf_count == 1) ? 0 : pdf_count);
-        pos_.pdf_results.reserve((pdf_count == 1) ? 0 : pdf_count);
-        scales_.resize(2 * scale_count);
+        neg_.results.reserve(scales);
+        pos_.results.reserve(scales);
+        neg_.pdf_results.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());
+        pos_.pdf_results.reserve((pdfs_.count() == 1) ? 0 : pdfs_.count());
+        scales_.resize(2 * scales);
+        ab_terms_.reserve(scales);
+        terms2_.reserve(scales);
         corr_me_.resize(insertion_terms_.size());
 
         if (!scale_setter_.dynamic())
@@ -109,7 +110,7 @@ public:
             psp<T> no_psp{no_point, no_states, T(), psp_type::pos_rap};
 
             // static scales must not depend on any phase space or state information
-            set_scales(no_psp, no_psp);
+            set_scales(no_psp, false, no_psp, false);
         }
 
         pdfs_.register_partons(pdf_parton_list_);
@@ -201,7 +202,7 @@ public:
 
         if (scale_setter_.dynamic())
         {
-            set_scales(neg_psp, pos_psp);
+            set_scales(neg_psp, neg_cutted, pos_psp, pos_cutted);
         }
 
         std::size_t const scales = scale_setter_.count();
@@ -220,19 +221,17 @@ public:
         T const x1p = info.x1() / (info.x1() * (T(1.0) - x) + x);
         T const x2p = info.x2() / (info.x2() * (T(1.0) - x) + x);
 
-        pdfs_.eval(info.x1(), scales, scales_, pdfsa_[0], pdf_pdfsa_[0]);
-        pdfs_.eval(info.x2(), scales, scales_, pdfsa_[1], pdf_pdfsa_[1]);
-        pdfs_.eval(x1p, scales, scales_, pdfsb_[0], pdf_pdfsb_[0]);
-        pdfs_.eval(x2p, scales, scales_, pdfsb_[1], pdf_pdfsb_[1]);
+        using span0 = nonstd::span<hep::scales<T> const>;
 
-        assert( pdfsa_[0].size() == 2 * scales );
-        assert( pdfsa_[1].size() == 2 * scales );
-        assert( pdfsb_[0].size() == 2 * scales );
-        assert( pdfsb_[1].size() == 2 * scales );
-        assert( pdf_pdfsa_[0].size() == 2 * pdfs );
-        assert( pdf_pdfsa_[1].size() == 2 * pdfs );
-        assert( pdf_pdfsb_[0].size() == 2 * pdfs );
-        assert( pdf_pdfsb_[1].size() == 2 * pdfs );
+        auto const all_scales = span0{scales_}.subspan(
+            scales * (neg_cutted ? 1 : 0),
+            scales * ((!neg_cutted && !pos_cutted) ? 2 : 1)
+        );
+
+        pdfs_.eval(info.x1(), scales, all_scales, pdfsa_[0], pdf_pdfsa_[0]);
+        pdfs_.eval(info.x2(), scales, all_scales, pdfsa_[1], pdf_pdfsa_[1]);
+        pdfs_.eval(x1p, scales, all_scales, pdfsb_[0], pdf_pdfsb_[0]);
+        pdfs_.eval(x2p, scales, all_scales, pdfsb_[1], pdf_pdfsb_[1]);
 
         for (auto& me : corr_me_)
         {
@@ -249,6 +248,11 @@ public:
             eta[1] * (T(1.0) - x) + x
         };
 
+        auto const neg_off_s = 0;
+        auto const pos_off_s = neg_cutted ? 0 : scales;
+        auto const neg_off_p = 0;
+        auto const pos_off_p = neg_cutted ? 0 : pdfs;
+
         // loop over all Born, FI, IF, II, and FF
         for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
         {
@@ -262,24 +266,24 @@ public:
 
                 if (!neg_cutted)
                 {
-                    subtraction_.insertion_terms(term, scales_, phase_space, xprime[1 - i],
-                        eta[1 - i], ab_neg_);
+                    subtraction_.insertion_terms(term, span0{scales_}.first(scales), phase_space,
+                        xprime[1 - i], eta[1 - i], ab_terms_);
 
-                    assert( ab_neg_.size() == scales_.size() );
+                    assert( ab_terms_.size() == scales );
 
                     for (std::size_t j = 0; j != scales; ++j)
                     {
-                        auto const pdf_neg = effective_pdf(
-                            ab_neg_.at(j),
+                        auto const eff_pdf = effective_pdf(
+                            ab_terms_.at(j),
                             xprime[1 - i],
                             eta[1 - i],
-                            pdfsa_[1 - i].at(j),
-                            pdfsb_[1 - i].at(j)
+                            pdfsa_[1 - i].at(j + neg_off_s),
+                            pdfsb_[1 - i].at(j + neg_off_s)
                         );
 
                         neg_.results.at(j) += factors_.at(j) * factor * convolute(
-                            (i == 0) ? pdf_neg         : pdfsa_[1].at(j),
-                            (i == 0) ? pdfsa_[0].at(j) : pdf_neg,
+                            (i == 0) ? eff_pdf                     : pdfsa_[1].at(j + neg_off_s),
+                            (i == 0) ? pdfsa_[0].at(j + neg_off_s) : eff_pdf,
                             me,
                             me_set_
                         );
@@ -287,17 +291,17 @@ public:
 
                     for (std::size_t j = 0; j != pdfs; ++j)
                     {
-                        auto const pdf_neg = effective_pdf(
-                            ab_neg_.front(),
+                        auto const eff_pdf = effective_pdf(
+                            ab_terms_.front(),
                             xprime[1 - i],
                             eta[1 - i],
-                            pdf_pdfsa_[1 - i].at(j),
-                            pdf_pdfsb_[1 - i].at(j)
+                            pdf_pdfsa_[1 - i].at(j + neg_off_p),
+                            pdf_pdfsb_[1 - i].at(j + neg_off_p)
                         );
 
-                        neg_.pdf_results.at(j) += factor * convolute(
-                            (i == 0) ? pdf_neg             : pdf_pdfsa_[1].at(j),
-                            (i == 0) ? pdf_pdfsa_[0].at(j) : pdf_neg,
+                        neg_.pdf_results.at(j) += factors_.at(0) * factor * convolute(
+                            (i == 0) ? eff_pdf                         : pdf_pdfsa_[1].at(j + neg_off_p),
+                            (i == 0) ? pdf_pdfsa_[0].at(j + neg_off_p) : eff_pdf,
                             me,
                             me_set_
                         );
@@ -306,24 +310,24 @@ public:
 
                 if (!pos_cutted)
                 {
-                    subtraction_.insertion_terms(term, scales_, phase_space, xprime[i], eta[i],
-                        ab_pos_);
+                    subtraction_.insertion_terms(term, span0{scales_}.last(scales), phase_space,
+                        xprime[i], eta[i], ab_terms_);
 
-                    assert( ab_pos_.size() == scales_.size() );
+                    assert( ab_terms_.size() == scales );
 
                     for (std::size_t j = 0; j != scales; ++j)
                     {
-                        auto const pdf_pos = effective_pdf(
-                            ab_pos_.at(j + scales),
+                        auto const eff_pdf = effective_pdf(
+                            ab_terms_.at(j),
                             xprime[i],
                             eta[i],
-                            pdfsa_[i].at(j + scales),
-                            pdfsb_[i].at(j + scales)
+                            pdfsa_[i].at(j + pos_off_s),
+                            pdfsb_[i].at(j + pos_off_s)
                         );
 
-                        pos_.results.at(j) += factors_.at(j + scales) * factor * convolute(
-                            (i == 0) ? pdf_pos                  : pdfsa_[0].at(j + scales),
-                            (i == 0) ? pdfsa_[1].at(j + scales) : pdf_pos,
+                        pos_.results.at(j) += factors_.at(j + neg_off_s) * factor * convolute(
+                            (i == 0) ? eff_pdf                     : pdfsa_[0].at(j + pos_off_s),
+                            (i == 0) ? pdfsa_[1].at(j + pos_off_s) : eff_pdf,
                             me,
                             me_set_
                         );
@@ -331,17 +335,17 @@ public:
 
                     for (std::size_t j = 0; j != pdfs; ++j)
                     {
-                        auto const pdf_pos = effective_pdf(
-                            ab_pos_.front(),
+                        auto const eff_pdf = effective_pdf(
+                            ab_terms_.front(),
                             xprime[i],
                             eta[i],
-                            pdf_pdfsa_[i].at(j + pdfs),
-                            pdf_pdfsb_[i].at(j + pdfs)
+                            pdf_pdfsa_[i].at(j + pos_off_p),
+                            pdf_pdfsb_[i].at(j + pos_off_p)
                         );
 
-                        pos_.pdf_results.at(j) += factor * convolute(
-                            (i == 0) ? pdf_pos                    : pdf_pdfsa_[0].at(j + pdfs),
-                            (i == 0) ? pdf_pdfsa_[1].at(j + pdfs) : pdf_pos,
+                        pos_.pdf_results.at(j) += factors_.at(0 + neg_off_s) * factor * convolute(
+                            (i == 0) ? eff_pdf                         : pdf_pdfsa_[0].at(j + pos_off_p),
+                            (i == 0) ? pdf_pdfsa_[1].at(j + pos_off_p) : eff_pdf,
                             me,
                             me_set_
                         );
@@ -352,17 +356,17 @@ public:
             if ((parts_ != finite_parts::insertion_term) &&
                 (term.type() != insertion_term_type::born))
             {
-                subtraction_.insertion_terms2(term, scales_, phase_space, terms2_);
-
-                assert( terms2_.size() == scales_.size() );
+                subtraction_.insertion_terms2(term, all_scales, phase_space, terms2_);
 
                 if (!neg_cutted)
                 {
                     for (std::size_t i = 0; i != scales; ++i)
                     {
-                        neg_.results.at(i) += factors_.at(i) * factor * terms2_.at(i) * convolute(
-                            pdfsa_[1].at(i),
-                            pdfsa_[0].at(i),
+                        auto const f = factors_.at(i + neg_off_s) * factor * terms2_.at(i + neg_off_s);
+
+                        neg_.results.at(i) += f * convolute(
+                            pdfsa_[1].at(i + neg_off_s),
+                            pdfsa_[0].at(i + neg_off_s),
                             me,
                             set_
                         );
@@ -370,9 +374,11 @@ public:
 
                     for (std::size_t i = 0; i != pdfs; ++i)
                     {
-                        neg_.pdf_results.at(i) += factor * terms2_.front() * convolute(
-                            pdf_pdfsa_[1].at(i),
-                            pdf_pdfsa_[0].at(i),
+                        auto const f = factors_.at(0 + neg_off_s) * factor * terms2_.at(0 + neg_off_s);
+
+                        neg_.pdf_results.at(i) += f * convolute(
+                            pdf_pdfsa_[1].at(i + neg_off_p),
+                            pdf_pdfsa_[0].at(i + neg_off_p),
                             me,
                             set_
                         );
@@ -383,9 +389,11 @@ public:
                 {
                     for (std::size_t i = 0; i != scales; ++i)
                     {
-                        pos_.results.at(i) += factors_.at(i + scales) * factor * terms2_.at(i + scales) * convolute(
-                            pdfsa_[0].at(i + scales),
-                            pdfsa_[1].at(i + scales),
+                        auto const f = factors_.at(i + pos_off_s) * factor * terms2_.at(i + pos_off_s);
+
+                        pos_.results.at(i) += f * convolute(
+                            pdfsa_[0].at(i + pos_off_s),
+                            pdfsa_[1].at(i + pos_off_s),
                             me,
                             set_
                         );
@@ -393,9 +401,11 @@ public:
 
                     for (std::size_t i = 0; i != pdfs; ++i)
                     {
-                        pos_.pdf_results.at(i) += factor * terms2_.front() * convolute(
-                            pdf_pdfsa_[0].at(i + pdfs),
-                            pdf_pdfsa_[1].at(i + pdfs),
+                        auto const f = factors_.at(0 + pos_off_s) * factor * terms2_.at(0 + pos_off_s);
+
+                        pos_.pdf_results.at(i) += f * convolute(
+                            pdf_pdfsa_[0].at(i + pos_off_p),
+                            pdf_pdfsa_[1].at(i + pos_off_p),
                             me,
                             set_
                         );
@@ -404,17 +414,21 @@ public:
             }
         }
 
+        T result = T();
+
         if (!neg_cutted)
         {
+            result += neg_.results.front();
             distributions_(neg_psp, neg_.results, neg_.pdf_results, projector);
         }
 
         if (!pos_cutted)
         {
+            result += pos_.results.front();
             distributions_(pos_psp, pos_.results, pos_.pdf_results, projector);
         }
 
-        return neg_.results.front() + pos_.results.front();
+        return result;
     }
 
 protected:
@@ -466,7 +480,7 @@ protected:
         return pdf;
     }
 
-    void set_scales(psp<T> const& neg_psp, psp<T> const& pos_psp)
+    void set_scales(psp<T> const& neg_psp, bool neg_cutted, psp<T> const& pos_psp, bool pos_cutted)
     {
         using std::pow;
         using span = nonstd::span<scales<T>>;
@@ -475,10 +489,20 @@ protected:
 
         factors_.clear();
 
-        scale_setter_.eval(neg_psp, span{scales_}.first(scales));
-        scale_setter_.eval(pos_psp, span{scales_}.last(scales));
+        if (!neg_cutted)
+        {
+            scale_setter_.eval(neg_psp, span{scales_}.first(scales));
+        }
 
-        pdfs_.eval_alphas(scales_, factors_);
+        if (!pos_cutted)
+        {
+            scale_setter_.eval(pos_psp, span{scales_}.last(scales));
+        }
+
+        auto const offset = neg_cutted ? scales : 0;
+        auto const size = (!neg_cutted && !pos_cutted) ? 2 * scales : scales;
+
+        pdfs_.eval_alphas(span{scales_}.subspan(offset, size), factors_);
 
         T const central_alphas = factors_.front();
         matrix_elements_.alphas(central_alphas);
@@ -520,8 +544,7 @@ private:
     std::vector<T> factors_;
     std::vector<initial_state_map<T>> corr_me_;
     std::vector<insertion_term> insertion_terms_;
-    std::vector<ab_terms<T>> ab_neg_;
-    std::vector<ab_terms<T>> ab_pos_;
+    std::vector<ab_terms<T>> ab_terms_;
     std::vector<T> terms2_;
     T alphas_power_;
     parton_set pdf_parton_list_;
