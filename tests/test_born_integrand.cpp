@@ -91,7 +91,7 @@ public:
     void borns(
         std::vector<T> const&,
         hep::initial_state_set set,
-        nonstd::span<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<hep::initial_state_map<T>>& results
     ) const {
         using std::pow;
@@ -127,13 +127,11 @@ public:
 
     // PDF MEMBER FUNCTIONS
 
-    void eval_alphas(
-        std::vector<hep::scales<T>> const& scales,
-        std::vector<T>& alphas
-    ) {
-        for (std::size_t i = 0; i != scales.size(); ++i)
+    void eval_alphas(nonstd::span<hep::scales<T> const> scales, std::vector<T>& alphas)
+    {
+        for (auto const& scale : scales)
         {
-            alphas.push_back(alphas_ * scales.at(i).renormalization() /
+            alphas.push_back(alphas_ * scale.renormalization() /
                 global_scales.front().renormalization());
         }
     }
@@ -146,7 +144,7 @@ public:
     void eval(
         T x,
         std::size_t scale_count,
-        std::vector<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<hep::parton_array<T>>& scale_pdfs,
         std::vector<hep::parton_array<T>>& uncertainty_pdfs
     ) {
@@ -164,7 +162,7 @@ public:
         {
             for (auto const parton : hep::parton_list())
             {
-                scale_pdfs.at(i)[parton] = scales.at(i).factorization();
+                scale_pdfs.at(i)[parton] = scales[i].factorization();
             }
         }
 
@@ -172,8 +170,7 @@ public:
         {
             for (auto const parton : hep::parton_list())
             {
-                uncertainty_pdfs.at(i)[parton] =
-                    scales.front().factorization() * T((i % count()) + 1);
+                uncertainty_pdfs.at(i)[parton] = scales[0].factorization() * T((i % count()) + 1);
             }
         }
     }

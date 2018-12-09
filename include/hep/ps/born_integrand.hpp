@@ -103,7 +103,7 @@ public:
             psp<T> no_psp{no_point, no_states, T(), psp_type::pos_rap};
 
             // static scales must not depend on any phase space or state information
-            set_scales(no_psp, no_psp);
+            set_scales(no_psp, false, no_psp, false);
         }
 
         pdfs_.register_partons(partons_in_initial_state_set(set));
@@ -133,7 +133,7 @@ public:
 
         if (dynamic_scales_)
         {
-            set_scales(neg_psp, pos_psp);
+            set_scales(neg_psp, neg_cutted, pos_psp, pos_cutted);
         }
 
         std::size_t const scales = scale_setter_.count();
@@ -141,27 +141,22 @@ public:
 
         T const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
-        pdfs_.eval(info.x1(), scales, scales_, scale_pdf_x1_, pdf_pdf_x1_);
-        pdfs_.eval(info.x2(), scales, scales_, scale_pdf_x2_, pdf_pdf_x2_);
+        using span3 = nonstd::span<hep::scales<T> const>;
 
-        // for each of the two phase space point the must be a set of scales and PDFs
-        assert( scales_.size() == 2 * scales );
-        assert( scale_pdf_x1_.size() == 2 * scales );
-        assert( scale_pdf_x2_.size() == 2 * scales );
+        auto const all_scales = span3{scales_}.subspan(
+            scales * (neg_cutted ? 1 : 0),
+            scales * ((!neg_cutted && !pos_cutted) ? 2 : 1)
+        );
 
-        // for each CENTRAL scale there must be a set of uncertainty PDFs
-        assert( pdf_pdf_x1_.size() == 2 * pdfs );
-        assert( pdf_pdf_x2_.size() == 2 * pdfs );
+        pdfs_.eval(info.x1(), scales, all_scales, scale_pdf_x1_, pdf_pdf_x1_);
+        pdfs_.eval(info.x2(), scales, all_scales, scale_pdf_x2_, pdf_pdf_x2_);
 
         for (auto& born : borns_)
         {
             born.clear();
         }
 
-        matrix_elements_.borns(phase_space, set_, nonstd::span<hep::scales<T>>{scales_}, borns_);
-
-        // for each scale there must be a matrix element
-        assert( borns_.size() == 2 * scales );
+        matrix_elements_.borns(phase_space, set_, all_scales, borns_);
 
         T result = T();
 
@@ -171,6 +166,8 @@ public:
 
         if (!neg_cutted)
         {
+            auto const neg_offset = 0;
+
             convolute_mes_with_pdfs(
                 results_,
                 pdf_results_,
@@ -178,7 +175,7 @@ public:
                 span0{scale_pdf_x1_}.first(scales),
                 span0{pdf_pdf_x2_}.first(pdfs),
                 span0{pdf_pdf_x1_}.first(pdfs),
-                span1{borns_}.first(scales),
+                span1{borns_}.subspan(neg_offset, scales),
                 set_,
                 span2{factors_}.first(scales),
                 factor
@@ -191,6 +188,8 @@ public:
 
         if (!pos_cutted)
         {
+            auto const pos_offset = neg_cutted ? 0 : scales;
+
             convolute_mes_with_pdfs(
                 results_,
                 pdf_results_,
@@ -198,7 +197,7 @@ public:
                 span0{scale_pdf_x2_}.last(scales),
                 span0{pdf_pdf_x1_}.last(pdfs),
                 span0{pdf_pdf_x2_}.last(pdfs),
-                span1{borns_}.last(scales),
+                span1{borns_}.subspan(pos_offset, scales),
                 set_,
                 span2{factors_}.last(scales),
                 factor
@@ -213,7 +212,7 @@ public:
     }
 
 protected:
-    void set_scales(psp<T> const& neg_psp, psp<T> const& pos_psp)
+    void set_scales(psp<T> const& neg_psp, bool neg_cutted, psp<T> const& pos_psp, bool pos_cutted)
     {
         using std::pow;
         using span = nonstd::span<scales<T>>;
@@ -222,10 +221,20 @@ protected:
 
         factors_.clear();
 
-        scale_setter_.eval(neg_psp, span{scales_}.first(scales));
-        scale_setter_.eval(pos_psp, span{scales_}.last(scales));
+        if (!neg_cutted)
+        {
+            scale_setter_.eval(neg_psp, span{scales_}.first(scales));
+        }
 
-        pdfs_.eval_alphas(scales_, factors_);
+        if (!pos_cutted)
+        {
+            scale_setter_.eval(pos_psp, span{scales_}.last(scales));
+        }
+
+        auto const offset = neg_cutted ? scales : 0;
+        auto const size = (!neg_cutted && !pos_cutted) ? 2 * scales : scales;
+
+        pdfs_.eval_alphas(span{scales_}.subspan(offset, size), factors_);
 
         T const central_alphas = factors_.front();
         matrix_elements_.alphas(central_alphas);

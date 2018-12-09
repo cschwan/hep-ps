@@ -69,14 +69,14 @@ public:
     void eval(
         T x,
         std::size_t /*scale_count*/,
-        std::vector<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<hep::parton_array<T>>& scale_pdfs,
         std::vector<hep::parton_array<T>>& uncertainty_pdfs
     ) {
         CHECK( x >= T() );
         CHECK( x < T(1.0) );
         CHECK( scales.size() >= 1 );
-        CHECK( scales.front().factorization() > T() );
+        CHECK( scales[0].factorization() > T() );
         CHECK( uncertainty_pdfs.empty() );
 
         scale_pdfs.clear();
@@ -103,12 +103,10 @@ public:
         return T(1.0);
     }
 
-    void eval_alphas(
-        std::vector<hep::scales<T>> const& scales,
-        std::vector<T>& alphas
-    ) {
+    void eval_alphas(nonstd::span<hep::scales<T> const> scales, std::vector<T>& alphas)
+    {
         CHECK( scales.size() >= 1 );
-        CHECK( scales.front().renormalization() > T() );
+        CHECK( scales[0].renormalization() > T() );
 
         alphas.assign(scales.size(), T(1.0));
     }
@@ -136,7 +134,7 @@ public:
     void borns(
         std::vector<T> const& phase_space,
         hep::initial_state_set set,
-        nonstd::span<hep::scales<T>> const& scales,
+        nonstd::span<hep::scales<T> const> scales,
         std::vector<hep::initial_state_map<T>>& me
     ) const {
         CHECK( phase_space.size() == 4 * (final_states_ + 2) );
