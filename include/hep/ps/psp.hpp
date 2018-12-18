@@ -94,6 +94,9 @@ public:
     /// Calculates the squared transverse momentum of the particles with indices `i` and `j`.
     T pt2(std::size_t i, std::size_t j) const;
 
+    /// Calculates the squared transverse momentum of the particles with indices `i`, `j`, and `k`.
+    T pt2(std::size_t i, std::size_t j, std::size_t k) const;
+
     /// Returns the difference of rapidities of the particles with indices `i` and `j`.
     T rap_diff(std::size_t i, std::size_t j) const;
 

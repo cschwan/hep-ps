@@ -176,6 +176,15 @@ T psp<T>::pt2(std::size_t i, std::size_t j) const
 }
 
 template <typename T>
+T psp<T>::pt2(std::size_t i, std::size_t j, std::size_t k) const
+{
+    T const p1 = p_[4*i+1] + p_[4*j+1] + p_[4*k+1];
+    T const p2 = p_[4*i+2] + p_[4*j+2] + p_[4*k+2];
+
+    return p1 * p1 + p2 * p2;
+}
+
+template <typename T>
 T psp<T>::rap_diff(std::size_t i, std::size_t j) const
 {
     using std::atanh;
