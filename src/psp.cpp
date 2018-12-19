@@ -192,7 +192,7 @@ T psp<T>::rap_diff(std::size_t i, std::size_t j) const
     T const x = p_[4*i+3] / p_[4*i+0];
     T const y = p_[4*j+3] / p_[4*j+0];
 
-    return atanh((x - y) / (T(1.0) - x * y));
+    return sign_ * atanh((x - y) / (T(1.0) - x * y));
 }
 
 template <typename T>
