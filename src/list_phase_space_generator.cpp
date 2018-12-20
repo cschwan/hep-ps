@@ -1,6 +1,7 @@
 #include "hep/ps/list_phase_space_generator.hpp"
 
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <istream>
 #include <sstream>
@@ -136,6 +137,8 @@ std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(
 template <typename T>
 std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(std::istream& stream)
 {
+    using std::log;
+
     std::string line;
     std::vector<T> numbers;
     std::vector<T> phase_space_point;
@@ -197,9 +200,10 @@ std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(std::i
             T const x2 = numbers.at(1);
             T const energy = numbers.at(2);
             T const weight = numbers.at(3);
+            T const rapidity_shift = T(0.5) * log(x1 / x2);
 
-            list.emplace_back(luminosity_info<T>{x1, x2, energy * energy, T()}, phase_space_point,
-                weight);
+            list.emplace_back(luminosity_info<T>{x1, x2, energy * energy, rapidity_shift},
+                phase_space_point, weight);
             phase_space_point.clear();
             numbers.clear();
 
