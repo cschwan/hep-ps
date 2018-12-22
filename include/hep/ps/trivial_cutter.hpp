@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/cut_result.hpp"
 #include "hep/ps/psp.hpp"
 #include "hep/ps/recombined_state.hpp"
 
@@ -34,13 +33,6 @@ template <typename T>
 class trivial_cutter
 {
 public:
-    /// Never cuts a phase space point, independently of the given parameters.
-    cut_result cut(
-        std::vector<T> const& phase_space,
-        T rapidity_shift,
-        std::vector<recombined_state> const& recombined_states
-    );
-
     /// Always returns `false`.
     bool cut(psp<T> const& point) const;
 };

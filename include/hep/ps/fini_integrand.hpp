@@ -28,7 +28,6 @@
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/pdg_functions.hpp"
 #include "hep/ps/ps_integrand.hpp"
 #include "hep/ps/psp.hpp"

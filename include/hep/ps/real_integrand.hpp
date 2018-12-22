@@ -25,7 +25,6 @@
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/luminosity_info.hpp"
-#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/particle_type.hpp"
 #include "hep/ps/parton.hpp"

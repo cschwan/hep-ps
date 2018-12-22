@@ -20,9 +20,6 @@
  */
 
 #include "hep/mc/projector.hpp"
-
-#include "hep/ps/cut_result.hpp"
-#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/psp.hpp"
 
 #include <vector>
@@ -37,18 +34,6 @@ class trivial_distributions
 public:
     /// Constructor.
     trivial_distributions() = default;
-
-    /// Does nothing.
-    template <typename I>
-    void operator()(
-        std::vector<T> const&,
-        T,
-        cut_result_with_info<I> const&,
-        std::vector<neg_pos_results<T>> const&,
-        std::vector<neg_pos_results<T>> const&,
-        projector<T>&
-    ) {
-    }
 
     /// Does nothing.
     void operator()(

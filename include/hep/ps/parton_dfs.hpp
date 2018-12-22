@@ -54,24 +54,10 @@ public:
 
     /// Evaluates the strong coupling for the renormalization scales in `scales` and writes the
     /// results into `alphas`
-    void eval_alphas(std::vector<hep::scales<T>> const& scales, std::vector<T>& alphas);
-
-    /// Evaluates the strong coupling for the renormalization scales in `scales` and writes the
-    /// results into `alphas`
     void eval_alphas(nonstd::span<hep::scales<T> const> scales, std::vector<T>& alphas);
 
     /// This function returns the number of PDFs represented with by this object.
     std::size_t count() const;
-
-    /// Evaluates the central PDFs for all partons for the momentum fraction `x` at the given
-    /// `scales`, writes the results into `scale_pdfs`, and also evaluates, for the central scale,
-    /// the uncertainty PDFs and writes the results into `uncertainty_pdfs`.
-    void eval(
-        T x,
-        std::vector<scales<T>> const& scales,
-        std::vector<parton_array<T>>& scale_pdfs,
-        std::vector<parton_array<T>>& uncertainty_pdfs
-    );
 
     /// Evaluates the central PDFs for all registered partons at the given momentum fraction `x` for
     /// the given `scales` and writes the result into `scale_pdfs`.

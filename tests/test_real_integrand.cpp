@@ -4,13 +4,11 @@
 #include "hep/mc/projector.hpp"
 
 #include "hep/ps/correction_type.hpp"
-#include "hep/ps/cut_result.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"
 #include "hep/ps/final_state.hpp"
 #include "hep/ps/initial_state.hpp"
-#include "hep/ps/neg_pos_results.hpp"
 #include "hep/ps/parton.hpp"
 #include "hep/ps/psp.hpp"
 #include "hep/ps/real_integrand.hpp"
