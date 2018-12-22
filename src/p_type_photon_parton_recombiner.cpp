@@ -1,5 +1,6 @@
 #include "hep/ps/p_type_photon_parton_recombiner.hpp"
-#include "hep/ps/phase_space_point.hpp"
+#include "hep/ps/psp.hpp"
+#include "hep/ps/psp_type.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -75,7 +76,7 @@ void p_type_photon_parton_recombiner<T>::recombine(
         dib_photons_.clear();
         dib_fermions_.clear();
 
-        phase_space_point<T> ps{recombined_phase_space};
+        psp<T> ps{recombined_phase_space, recombined_states, T(), psp_type::pos_rap};
 
         for (auto const fermion : fermions_)
         {

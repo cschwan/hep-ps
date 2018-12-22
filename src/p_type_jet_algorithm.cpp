@@ -1,5 +1,6 @@
 #include "hep/ps/p_type_jet_algorithm.hpp"
-#include "hep/ps/phase_space_point.hpp"
+#include "hep/ps/psp.hpp"
+#include "hep/ps/psp_type.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -62,7 +63,7 @@ void p_type_jet_algorithm<T>::recombine(
 
         dib_.clear();
 
-        phase_space_point<T> ps{recombined_phase_space};
+        psp<T> ps{recombined_phase_space, recombined_states, T(), psp_type::pos_rap};
 
         for (std::size_t i = 0; i != n; ++i)
         {
