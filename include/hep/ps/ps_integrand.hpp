@@ -28,7 +28,7 @@
 #include <functional>
 #include <vector>
 
-namespace
+namespace hep
 {
 
 template <typename T, typename P>
@@ -43,11 +43,6 @@ inline hep::luminosity_info<T> info(
 ) {
     return x.map().get().info();
 }
-
-}
-
-namespace hep
-{
 
 /// Abstract base class for all phase space integrands.
 template <typename T>

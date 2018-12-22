@@ -32,7 +32,7 @@
 #include <utility>
 #include <vector>
 
-namespace
+namespace hep
 {
 
 inline std::size_t lsb_position(std::bitset<128> x)
