@@ -1,8 +1,8 @@
-#include "hep/ps/boost.hpp"
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/kaellen.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/lusifer_ps_channels.hpp"
+#include "hep/ps/ps_functions.hpp"
 
 #include "hadron_hadron_psg_adapter.hpp"
 // FIXME: this header should not be needed
@@ -422,27 +422,6 @@ T map(T power, T mass, T width, T x, T xmin, T xmax)
 }
 
 template <typename T>
-void rotate(std::array<T, 4>& p, T phi, T cos_theta)
-{
-    using std::cos;
-    using std::fabs;
-    using std::sin;
-    using std::sqrt;
-
-    T const sin_phi = sin(phi);
-    T const cos_phi = cos(phi);
-    T const sin_theta = sqrt(fabs((T(1.0) - cos_theta) * (T(1.0) + cos_theta)));
-
-    T const px = p[1];
-    T const py = p[2];
-    T const pz = p[3];
-
-    p[1] =  px * cos_theta * cos_phi + py * sin_phi + pz * sin_theta * cos_phi;
-    p[2] = -px * cos_theta * sin_phi + py * cos_phi - pz * sin_theta * sin_phi;
-    p[3] = -px * sin_theta                          + pz * cos_theta;
-}
-
-template <typename T>
 void decay_momenta(
     T m,
     std::array<T, 4> const& q,
@@ -451,7 +430,7 @@ void decay_momenta(
     std::array<T, 4>& p1,
     std::array<T, 4>& p2
 ) {
-    rotate(p1, phi, cos_theta);
+    hep::rotate(p1, phi, cos_theta);
     hep::boost(m, p1, q, true);
 
     p2[0] = q[0] - p1[0];
@@ -1243,7 +1222,7 @@ void lusifer_psg<T>::generate(
         auto const& q1 = p[process.in1];
         phi = copysign(phi, q1[3]);
 
-        rotate(p1, phi, cos_theta);
+        hep::rotate(p1, phi, cos_theta);
 
         auto const& q2 = p[process.in2];
 

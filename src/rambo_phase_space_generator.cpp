@@ -1,4 +1,4 @@
-#include "hep/ps/boost.hpp"
+#include "hep/ps/ps_functions.hpp"
 #include "hep/ps/rambo_phase_space_generator.hpp"
 
 #include "hadron_hadron_psg_adapter.hpp"

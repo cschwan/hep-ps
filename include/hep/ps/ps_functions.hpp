@@ -1,5 +1,5 @@
-#ifndef HEP_PS_BOOST_HPP
-#define HEP_PS_BOOST_HPP
+#ifndef HEP_PS_PS_FUNCTIONS_HPP
+#define HEP_PS_PS_FUNCTIONS_HPP
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
@@ -25,10 +25,14 @@ namespace hep
 {
 
 /// Boosts the vector `p` in the direction given by `q`, whose invariant must be `m`. If `inverse`
-/// is `true` the inverse boost is applied, otherwise the (uninverted) boost, which transforms `p`
+/// is `true` the inverse boost is applied, otherwise the (uninverted) boost, which t ransforms `p`
 /// to the rest frame of `q`.
 template <typename T>
 void boost(T m, std::array<T, 4>& p, std::array<T, 4> const& q, bool inverse);
+
+/// Rotates the vector `p` first around the 3-axis by `theta` and then around the 2-axis by `phi`.
+template <typename T>
+void rotate(std::array<T, 4>& p, T phi, T cos_theta);
 
 }
 

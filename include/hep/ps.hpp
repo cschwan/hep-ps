@@ -20,7 +20,6 @@
  */
 
 #include "hep/ps/ab_terms.hpp"
-#include "hep/ps/boost.hpp"
 #include "hep/ps/born_integrand.hpp"
 #include "hep/ps/cofferaa_phase_space_generator.hpp"
 #include "hep/ps/constants.hpp"
@@ -72,6 +71,7 @@
 #include "hep/ps/ps_decay.hpp"
 #include "hep/ps/ps_integrand.hpp"
 #include "hep/ps/ps_invariant.hpp"
+#include "hep/ps/ps_functions.hpp"
 #include "hep/ps/ps_tchannel.hpp"
 #include "hep/ps/psp.hpp"
 #include "hep/ps/psp_type.hpp"

@@ -2,7 +2,6 @@ incdir = include_directories('.')
 
 headers1 = [
     'hep/ps/ab_terms.hpp',
-    'hep/ps/boost.hpp',
     'hep/ps/born_integrand.hpp',
     'hep/ps/cofferaa_phase_space_generator.hpp',
     'hep/ps/constants.hpp',
@@ -53,6 +52,7 @@ headers1 = [
     'hep/ps/photon_dipole_selector.hpp',
     'hep/ps/ps_channel.hpp',
     'hep/ps/ps_decay.hpp',
+    'hep/ps/ps_functions.hpp',
     'hep/ps/ps_integrand.hpp',
     'hep/ps/ps_invariant.hpp',
     'hep/ps/ps_tchannel.hpp',

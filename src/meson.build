@@ -17,7 +17,6 @@ if get_option('openloops')
 endif
 
 sources = [
-    'boost.cpp',
     'cofferaa_generator.f90',
     'cofferaa_extra.f90',
     'cofferaa_interfaces.hpp',
@@ -53,6 +52,7 @@ sources = [
     'phase_space_generator.cpp',
     'phase_space_point.cpp',
     'phase_space_tools.cpp',
+    'ps_functions.cpp',
     'psp.cpp',
     'rambo_phase_space_generator.cpp',
     'recombined_state.cpp',
