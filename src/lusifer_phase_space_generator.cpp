@@ -1,6 +1,7 @@
 #include "hep/ps/fortran_helper.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/lusifer_ps_channels.hpp"
+#include "hep/ps/lusifer_ps_functions.hpp"
 #include "hep/ps/ps_functions.hpp"
 
 #include "hadron_hadron_psg_adapter.hpp"
@@ -290,135 +291,6 @@ struct particle_info
     T mass;
     T width;
 };
-
-template <typename T>
-T jacobian(T power, T mass, T width, T x, T xmin, T xmax)
-{
-    using std::atan;
-    using std::copysign;
-    using std::fabs;
-    using std::log;
-    using std::pow;
-
-    T m2 = copysign(mass * mass, mass);
-    mass = fabs(mass);
-
-    if (width > T())
-    {
-        T const mg = mass * width;
-        T const min = (xmin - m2) / mg;
-        T const max = (xmax - m2) / mg;
-
-        // formula for the difference of two arctans
-        T max_min = atan((xmax - xmin) / mg / (T(1.0) + max * min));
-        if (min * max < T(-1.0))
-        {
-            max_min += (max > T()) ? acos(T(-1.0)) : -acos(T(-1.0));
-        }
-
-        T const xprime = x - m2;
-
-        return mg / (max_min * (xprime * xprime + mg * mg));
-    }
-
-    if (power == T())
-    {
-        return T(1.0) / (xmax - xmin);
-    }
-
-    if (mass == T())
-    {
-        m2 -= T(1e-6);
-    }
-
-    if (power == T(1.0))
-    {
-        // TODO: WARNING this branch is untested!
-        return T(1.0) / (log((xmax - m2) / (xmin - m2)) * (x - m2));
-    }
-
-    T const omp = T(1.0) - power;
-
-    return omp / ((pow(fabs(xmax - m2), omp) - pow(fabs(xmin - m2), omp)) *
-        pow(fabs(x - m2), power));
-}
-
-template <typename T>
-T map(T power, T mass, T width, T x, T xmin, T xmax)
-{
-    using std::atan;
-    using std::copysign;
-    using std::exp;
-    using std::fabs;
-    using std::log;
-    using std::pow;
-    using std::tan;
-
-    T m2 = copysign(mass * mass, mass);
-    mass = fabs(mass);
-    T result;
-
-    if (width > T())
-    {
-        T const mg = mass * width;
-        T const min = (xmin - m2) / mg;
-        T const max = (xmax - m2) / mg;
-
-        // formula for the difference of two arctans
-        T max_min = atan((xmax - xmin) / mg / (T(1.0) + max * min));
-
-        if (min * max < T(-1.0))
-        {
-            max_min += (max > T()) ? acos(T(-1.0)) : -acos(T(-1.0));
-        }
-
-        result = m2 + mg * tan(x * max_min + atan(min));
-    }
-    else if (power == T())
-    {
-        result = x * xmax + (T(1.0) - x) * xmin;
-
-        // capture this case and return to avoid infinite recursion
-        if ((result < xmin) || (result > xmax))
-        {
-            // returning the upper bound produces the least problems
-            return xmax;
-        }
-    }
-    else
-    {
-        if (mass == T())
-        {
-            // this reduces the number of extremely small invariants which
-            // introduce numerical problems in the matrix elements
-            m2 -= T(1e-6);
-        }
-
-        if (power == T(1.0))
-        {
-            // TODO: WARNING this branch is untested!
-            result = m2 + exp(x * log(xmax - m2) + (T(1.0) - x) *
-                log(xmin - m2));
-        }
-        else
-        {
-            T const omp = T(1.0) - power;
-
-            result = m2 + pow(x * pow(fabs(xmax - m2), omp) + (T(1.0) - x) *
-                pow(fabs(xmin - m2), omp), T(1.0) / omp);
-        }
-    }
-
-    // if the result is outside of the expected interval, calculate it linearly;
-    // this will only happen if `xmax` is ridiculously small or if `xmin` is
-    // close to `xmax`, in which case it is a valid approximation
-    if ((result < xmin) || (result > xmax))
-    {
-        return map(T{}, T{}, T{}, x, xmin, xmax);
-    }
-
-    return result;
-}
 
 template <typename T>
 void decay_momenta(
@@ -917,7 +789,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         T const smin = min * min;
         T const smax = max * max;
 
-        invariant_jacobians.push_back(jacobian(
+        invariant_jacobians.push_back(hep::lusifer_invariant_jacobian(
             particle_infos.at(invariant.idhep).power,
             particle_infos.at(invariant.idhep).mass,
             particle_infos.at(invariant.idhep).width,
@@ -941,7 +813,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         auto const& tinv = hep::calculate_space_like_invariant_bounds(s, s1, s2, t1, t2);
         T const factor = T(2.0) * tinv.lambdat / acos(T(-1.0));
 
-        process_jacobians.push_back(factor * jacobian(
+        process_jacobians.push_back(factor * hep::lusifer_invariant_jacobian(
              particle_infos.at(process.idhep).power,
             -particle_infos.at(process.idhep).mass,
              particle_infos.at(process.idhep).width,
@@ -1082,7 +954,7 @@ void lusifer_psg<T>::generate(
 
         // TODO: replace particle_infos calls with model
 
-        s[invariant.in] = fabs(map(
+        s[invariant.in] = fabs(hep::lusifer_invariant_map(
             particle_infos.at(invariant.idhep).power,
             particle_infos.at(invariant.idhep).mass,
             particle_infos.at(invariant.idhep).width,
@@ -1104,7 +976,7 @@ void lusifer_psg<T>::generate(
         auto const& tinv = hep::calculate_space_like_invariant_bounds(s, s1, s2, t1, t2);
         T phi = T(2.0) * acos(T(-1.0)) * *r++;
 
-        t = -map(
+        t = -hep::lusifer_invariant_map(
              particle_infos.at(process.idhep).power,
             -particle_infos.at(process.idhep).mass,
              particle_infos.at(process.idhep).width,

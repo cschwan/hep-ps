@@ -29,6 +29,7 @@ headers1 = [
     'hep/ps/lusifer_constants.hpp',
     'hep/ps/lusifer_phase_space_generator.hpp',
     'hep/ps/lusifer_ps_channels.hpp',
+    'hep/ps/lusifer_ps_functions.hpp',
     'hep/ps/non_zero_dipole.hpp',
     'hep/ps/ol_born_matrix_elements.hpp',
     'hep/ps/ol_integrated_matrix_elements.hpp',

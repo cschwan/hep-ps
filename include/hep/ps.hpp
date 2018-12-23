@@ -47,6 +47,7 @@
 #include "hep/ps/lusifer_constants.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/lusifer_ps_channels.hpp"
+#include "hep/ps/lusifer_ps_functions.hpp"
 #include "hep/ps/non_zero_dipole.hpp"
 #include "hep/ps/ol_born_matrix_elements.hpp"
 #include "hep/ps/ol_integrated_matrix_elements.hpp"
