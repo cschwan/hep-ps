@@ -1,5 +1,4 @@
 #include "hep/ps/fortran_helper.hpp"
-#include "hep/ps/kaellen.hpp"
 #include "hep/ps/lusifer_phase_space_generator.hpp"
 #include "hep/ps/lusifer_ps_channels.hpp"
 #include "hep/ps/ps_functions.hpp"
@@ -437,99 +436,6 @@ void decay_momenta(
     p2[1] = q[1] - p1[1];
     p2[2] = q[2] - p1[2];
     p2[3] = q[3] - p1[3];
-}
-
-template <typename T>
-struct tinv
-{
-    T tmin;
-    T tmax;
-    T lambdas;
-    T lambdat;
-};
-
-template <typename T>
-tinv<T> calc_tinv(T s, T s1, T s2, T t1, T t2)
-{
-    using std::fabs;
-    using std::sqrt;
-
-    T const threshold = T(1e-5);
-
-    std::size_t const non_zero_invariants =
-        ((s1 == T{}) ? 0 : 1) | ((s2 == T{}) ? 0 : 2) |
-        ((t1 == T{}) ? 0 : 4) | ((t2 == T{}) ? 0 : 8);
-
-    T const lambdas = hep::sqrt_kaellen(s, s1, s2);
-    T const lambdat = hep::sqrt_kaellen(s, t1, t2);
-
-    T tmin = T{};
-    T tmax = T{};
-
-    T const x = s - s1 - s2;
-    T const y = s - t1 - t2;
-    T const e1 = s1 * s2 / (x * x);
-    T const e2 = t1 * t2 / (y * y);
-
-    switch (non_zero_invariants)
-    {
-    case 1: // s2 = t1 = t2 = 0
-    case 2: // s1 = t1 = t2 = 0
-        tmin = -lambdas;
-        // tmax is zero
-        break;
-
-    case 3: // t1 = t2 = 0
-        tmin = T(-0.5) * x * (T(1.0) + sqrt(fabs(T(1.0) - T(4.0) * e1)));
-        tmax = T(-0.5) * x * (T(1.0) - sqrt(fabs(T(1.0) - T(4.0) * e1)));
-        // TODO: separate code path for small e1
-        break;
-
-    case 4: // s1 = s2 = t2 = 0
-    case 8: // s1 = s2 = t1 = 0
-        tmin = -lambdat;
-        // tmax is zero
-        break;
-
-    case 5: // s2 = t2 = 0
-        tmin = -s + s1 + t1 - s1 * t1 / s;
-        // tmax is zero
-        break;
-
-    case 6: // s1 = t2 = 0
-        tmin = -s + s2 + t1;
-        tmax = s2 * t1 / s;
-        break;
-
-    case 9: // s2 = t1 = 0
-        tmin = -s + s1 + t2;
-        tmax = s1 * t2 / s;
-        break;
-
-    case 10: // s1 = t1 = 0
-        tmin = -s + s2 + t2 - s2 * t2 / s;
-        // tmax is zero
-        break;
-
-    case 12: // s1 = s2 = 0
-        tmin = T(-0.5) * y * (T(1.0) + sqrt(fabs(T(1.0) - T(4.0) * e2)));
-        tmax = T(-0.5) * y * (T(1.0) - sqrt(fabs(T(1.0) - T(4.0) * e2)));
-        // TODO: separate code path for small e2
-        break;
-
-    default:
-        T tmp = (s + s1 - s2) * (s + t1 - t2);
-        tmin = s1 + t1 - T(0.5) * (tmp + lambdas * lambdat) / s;
-        tmax = s1 + t1 - T(0.5) * (tmp - lambdas * lambdat) / s;
-
-        if ((e1 < threshold) && (e2 < threshold))
-        {
-            // TODO: add order six terms?
-            tmax = ((t2 * s1 + t1 * s2) - (x * y * (e1 + e2 + (e1 - e2) * (e1 - e2)))) / s;
-        }
-    }
-
-    return { tmin, tmax, lambdas, lambdat };
 }
 
 template <typename T>
@@ -1032,7 +938,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         T const t1 = this->s[process.in1];
         T const t2 = this->s[process.in2];
 
-        auto const& tinv = calc_tinv(s, s1, s2, t1, t2);
+        auto const& tinv = hep::calculate_space_like_invariant_bounds(s, s1, s2, t1, t2);
         T const factor = T(2.0) * tinv.lambdat / acos(T(-1.0));
 
         process_jacobians.push_back(factor * jacobian(
@@ -1040,8 +946,8 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
             -particle_infos.at(process.idhep).mass,
              particle_infos.at(process.idhep).width,
             -t,
-            -tinv.tmax,
-            -tinv.tmin
+            -tinv.max,
+            -tinv.min
         ));
     }
 
@@ -1195,7 +1101,7 @@ void lusifer_psg<T>::generate(
         T const t2 = this->s[process.in2];
         T& t = this->s[process.virt];
 
-        auto const& tinv = calc_tinv(s, s1, s2, t1, t2);
+        auto const& tinv = hep::calculate_space_like_invariant_bounds(s, s1, s2, t1, t2);
         T phi = T(2.0) * acos(T(-1.0)) * *r++;
 
         t = -map(
@@ -1203,8 +1109,8 @@ void lusifer_psg<T>::generate(
             -particle_infos.at(process.idhep).mass,
              particle_infos.at(process.idhep).width,
             *r++,
-            -tinv.tmax,
-            -tinv.tmin
+            -tinv.max,
+            -tinv.min
         );
 
         T cos_theta = ((s + s1 - s2) * (s + t1 - t2) - T(2.0) * s *
