@@ -39,7 +39,6 @@ sources = [
     'lusifer_ps_channels.cpp',
     'lusifer_ps_functions.cpp',
     'ol_born_matrix_elements.cpp',
-    'ol_integrated_matrix_elements.cpp',
     'ol_integrated_mes.cpp',
     'ol_interface.cpp',
     'ol_ioperator.cpp',
