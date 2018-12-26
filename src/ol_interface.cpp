@@ -165,6 +165,7 @@ void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 
     ol_evaluate_tree(id, pp, m2tree);
 #else
+    ignore(started_);
     ignore(id);
     ignore(pp);
     ignore(m2tree);
@@ -184,6 +185,7 @@ void ol_interface::evaluate_cc(int id, double* pp, double* m2tree, double* m2cc,
 
     ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
 #else
+    ignore(started_);
     ignore(id);
     ignore(pp);
     ignore(m2tree);
@@ -205,6 +207,7 @@ void ol_interface::evaluate_sc(int id, double* pp, int emitter, double* polvect,
 
     ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
 #else
+    ignore(started_);
     ignore(id);
     ignore(pp);
     ignore(emitter);
@@ -226,6 +229,7 @@ void ol_interface::evaluate_loop(int id, double* pp, double* m2tree, double* m2l
 
     ol_evaluate_loop(id, pp, m2tree, m2loop, acc);
 #else
+    ignore(started_);
     ignore(id);
     ignore(pp);
     ignore(m2tree);
@@ -247,6 +251,7 @@ void ol_interface::evaluate_loop2(int id, double* pp, double* m2loop2, double* a
 
     ol_evaluate_loop2(id, pp, m2loop2, acc);
 #else
+    ignore(started_);
     ignore(id);
     ignore(pp);
     ignore(m2loop2);
@@ -267,6 +272,7 @@ void ol_interface::evaluate_ct(int id, double* pp, double* m2_tree, double* m2_c
 
     ol_evaluate_ct(id, pp, m2_tree, m2_ct);
 #else
+    ignore(started_);
     ignore(id);
     ignore(pp);
     ignore(m2_tree);
@@ -295,6 +301,7 @@ void ol_interface::evaluate_full(
 
     ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
 #else
+    ignore(started_);
     ignore(id);
     ignore(pp);
     ignore(m2tree);

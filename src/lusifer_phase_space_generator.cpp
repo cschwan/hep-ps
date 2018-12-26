@@ -19,11 +19,6 @@
 namespace
 {
 
-constexpr bool included(int binary1, int binary2)
-{
-    return (binary1 & binary2) == binary2;
-}
-
 struct invariant
 {
     invariant(std::size_t in, std::size_t idhep)
@@ -338,7 +333,7 @@ public:
     std::size_t map_dimensions() const;
 
 private:
-    bool invariants_equal(int ch1, int ns1, int ch2, int ns2, int nex);
+    bool invariants_equal(int ch1, int ns1, int ch2, int ns2);
     bool processes_equal(int ch1, int ns1, int ch2, int ns2, int nex);
 
     std::vector<channel> channels_;
@@ -358,7 +353,7 @@ private:
 };
 
 template <typename T>
-bool lusifer_psg<T>::invariants_equal(int ch1, int ns1, int ch2, int ns2, int nex)
+bool lusifer_psg<T>::invariants_equal(int ch1, int ns1, int ch2, int ns2)
 {
     auto const& a = channels_.at(ch1).invariants.at(ns1);
     auto const& b = channels_.at(ch2).invariants.at(ns2);
@@ -466,8 +461,6 @@ lusifer_psg<T>::lusifer_psg(
         s[(1 << i) - 1] = m * m;
     }
 
-    std::vector<std::size_t> inv_lo;
-    std::vector<std::size_t> inv_hi;
     std::vector<std::size_t> stack;
 
     for (std::size_t i = 0; i != channels.size(); ++i)
@@ -581,7 +574,7 @@ lusifer_psg<T>::lusifer_psg(
             {
                 for (std::size_t d = 0; d != channels_.at(c).invariants.size(); ++d)
                 {
-                    if (invariants_equal(a, b, c, d, nex))
+                    if (invariants_equal(a, b, c, d))
                     {
                         index = channels_.at(c).invariants.at(d).index + 1;
 

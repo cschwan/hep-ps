@@ -53,7 +53,6 @@ ol_integrated_mes<T>::ol_integrated_mes(
     for (auto const& process : real_processes)
     {
         auto const& ids = ol_process_string_to_pdg_ids(process);
-        auto const& states = pdg_ids_to_states(ids);
 
         // construct all possible EW and QCD dipoles
         for (auto const type : correction_type_list())
