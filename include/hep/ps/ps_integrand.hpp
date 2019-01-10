@@ -63,10 +63,8 @@ public:
 
     /// Interface for the `hep-mc` Monte Carlo integration routines.
     template <typename P>
-    T operator()(
-        hep::multi_channel_point2<T, P> const& point,
-        hep::projector<T>& projector
-    ) {
+    T operator()(hep::multi_channel_point2<T, P> const& point, hep::projector<T>& projector)
+    {
         return eval(point.coordinates(), info(point), projector);
     }
 };

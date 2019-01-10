@@ -22,11 +22,7 @@ public:
 
     std::size_t dimensions() const override;
 
-    void generate(
-        std::vector<T> const&,
-        std::vector<T>& momenta,
-        std::size_t channel
-    ) override;
+    void generate(std::vector<T> const&, std::vector<T>& momenta, std::size_t channel) override;
 
     hep::luminosity_info<T> info() const override;
 

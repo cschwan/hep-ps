@@ -21,10 +21,8 @@ void print_summary_of_invariants(std::vector<T> const& phase_space)
     for (std::size_t i = 0; i != n; ++i)
     {
         std::cout << 'P' << i << " = {"
-            << phase_space.at(4 * i + 0) << ", "
-            << phase_space.at(4 * i + 1) << ", "
-            << phase_space.at(4 * i + 2) << ", "
-            << phase_space.at(4 * i + 3) << "}\n";
+            << phase_space.at(4 * i + 0) << ", " << phase_space.at(4 * i + 1) << ", "
+            << phase_space.at(4 * i + 2) << ", " << phase_space.at(4 * i + 3) << "}\n";
     }
 
     std::cout << '\n';
@@ -49,15 +47,11 @@ void print_summary_of_invariants(std::vector<T> const& phase_space)
             }
         }
 
-        invariants.emplace_back(i, sum[0] * sum[0]
-            - sum[1] * sum[1] - sum[2] * sum[2] - sum[3] * sum[3]);
+        invariants.emplace_back(i, sum[0]*sum[0] - sum[1]*sum[1] - sum[2]*sum[2] - sum[3]*sum[3]);
     }
 
-    std::sort(invariants.begin(), invariants.end(),
-        [](std::pair<std::size_t, T> const& a,
-        std::pair<std::size_t, T> const& b) {
-            return fabs(a.second) < fabs(b.second);
-    });
+    std::sort(invariants.begin(), invariants.end(), [](std::pair<std::size_t, T> const& a,
+        std::pair<std::size_t, T> const& b) { return fabs(a.second) < fabs(b.second); });
 
     std::cout << "SUMMARY OF INVARIANTS\n=====================\n"
         << 's' << invariants.at(0).first

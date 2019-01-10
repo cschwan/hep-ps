@@ -29,8 +29,7 @@ initial_state partons_to_initial_state(parton one, parton two)
     {
         for (auto state : initial_state_list())
         {
-            map.emplace(std::make_pair(state_parton_one(state),
-                state_parton_two(state)), state);
+            map.emplace(std::make_pair(state_parton_one(state), state_parton_two(state)), state);
         }
 
         initialized = true;

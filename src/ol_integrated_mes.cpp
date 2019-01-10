@@ -14,10 +14,8 @@
 namespace
 {
 
-bool same_process(
-    std::vector<int> process1,
-    std::vector<int> process2
-) {
+bool same_process(std::vector<int> process1, std::vector<int> process2)
+{
     // normal order initial and final state
     std::sort(process1.begin(), process1.begin() + 2);
     std::sort(process1.begin() + 2, process1.end());

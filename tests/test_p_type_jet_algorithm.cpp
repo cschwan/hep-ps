@@ -124,14 +124,10 @@ TEST_CASE("comparison against FastJet", "[p_type_jet_algorithm]")
 
                 for (std::size_t j = 0; j != ps_recombined_momenta.size(); ++j)
                 {
-                    CHECK( ps_recombined_momenta.at(j).e()  ==
-                        fj_recombined_momenta.at(j).e() );
-                    CHECK( ps_recombined_momenta.at(j).px() ==
-                        fj_recombined_momenta.at(j).px() );
-                    CHECK( ps_recombined_momenta.at(j).py() ==
-                        fj_recombined_momenta.at(j).py() );
-                    CHECK( ps_recombined_momenta.at(j).pz() ==
-                        fj_recombined_momenta.at(j).pz() );
+                    CHECK( ps_recombined_momenta.at(j).e()  == fj_recombined_momenta.at(j).e() );
+                    CHECK( ps_recombined_momenta.at(j).px() == fj_recombined_momenta.at(j).px() );
+                    CHECK( ps_recombined_momenta.at(j).py() == fj_recombined_momenta.at(j).py() );
+                    CHECK( ps_recombined_momenta.at(j).pz() == fj_recombined_momenta.at(j).pz() );
                 }
             }
         }

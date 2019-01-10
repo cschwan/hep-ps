@@ -7,8 +7,7 @@ bool operator<(insertion_term const& a, insertion_term const& b)
 {
     if (a.corr_type() != b.corr_type())
     {
-        return static_cast <int> (a.corr_type()) <
-            static_cast <int> (b.corr_type());
+        return static_cast <int> (a.corr_type()) < static_cast <int> (b.corr_type());
     }
 
     if (a.type() == insertion_term_type::born)

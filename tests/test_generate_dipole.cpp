@@ -40,8 +40,7 @@ TEST_CASE("test d d -> d d a")
     }
 
     dipoles = {
-        hep::dipole{0, 2, 1, f, f, f, ew},
-        hep::dipole{0, 2, 3, f, f, f, ew},
+        hep::dipole{0, 2, 1, f, f, f, ew}, hep::dipole{0, 2, 3, f, f, f, ew},
         hep::dipole{0, 2, 4, f, f, b, ew}
     };
 
@@ -55,8 +54,7 @@ TEST_CASE("test d d -> d d a")
     }
 
     dipoles = {
-        hep::dipole{1, 2, 0, f, f, f, ew},
-        hep::dipole{1, 2, 3, f, f, f, ew},
+        hep::dipole{1, 2, 0, f, f, f, ew}, hep::dipole{1, 2, 3, f, f, f, ew},
         hep::dipole{1, 2, 4, f, f, b, ew}
     };
 
@@ -86,8 +84,7 @@ TEST_CASE("test d d -> d d a")
     }
 
     dipoles = {
-        hep::dipole{0, 3, 1, f, f, f, ew},
-        hep::dipole{0, 3, 2, f, f, f, ew},
+        hep::dipole{0, 3, 1, f, f, f, ew}, hep::dipole{0, 3, 2, f, f, f, ew},
         hep::dipole{0, 3, 4, f, f, b, ew}
     };
 
@@ -101,8 +98,7 @@ TEST_CASE("test d d -> d d a")
     }
 
     dipoles = {
-        hep::dipole{1, 3, 0, f, f, f, ew},
-        hep::dipole{1, 3, 2, f, f, f, ew},
+        hep::dipole{1, 3, 0, f, f, f, ew}, hep::dipole{1, 3, 2, f, f, f, ew},
         hep::dipole{1, 3, 4, f, f, b, ew}
     };
 
@@ -198,12 +194,9 @@ TEST_CASE("test d~ d -> d d~ g")
 
     // non-existant dipoles
     dipoles = {
-        hep::dipole{0, 2, 1, f, f, f, qcd},
-        hep::dipole{0, 2, 3, f, f, f, qcd},
-        hep::dipole{0, 2, 4, f, f, b, qcd},
-        hep::dipole{1, 3, 0, f, f, f, qcd},
-        hep::dipole{1, 3, 2, f, f, f, qcd},
-        hep::dipole{1, 3, 4, f, f, b, qcd}
+        hep::dipole{0, 2, 1, f, f, f, qcd}, hep::dipole{0, 2, 3, f, f, f, qcd},
+        hep::dipole{0, 2, 4, f, f, b, qcd}, hep::dipole{1, 3, 0, f, f, f, qcd},
+        hep::dipole{1, 3, 2, f, f, f, qcd}, hep::dipole{1, 3, 4, f, f, b, qcd}
     };
 
     REQUIRE( dipoles.size() == 6 );
@@ -215,8 +208,7 @@ TEST_CASE("test d~ d -> d d~ g")
     }
 
     dipoles = {
-        hep::dipole{1, 2, 0, f, f, f, qcd},
-        hep::dipole{1, 2, 3, f, f, f, qcd},
+        hep::dipole{1, 2, 0, f, f, f, qcd}, hep::dipole{1, 2, 3, f, f, f, qcd},
         hep::dipole{1, 2, 4, f, f, b, qcd}
     };
 
@@ -229,8 +221,7 @@ TEST_CASE("test d~ d -> d d~ g")
     }
 
     dipoles = {
-        hep::dipole{0, 3, 1, f, f, f, qcd},
-        hep::dipole{0, 3, 2, f, f, f, qcd},
+        hep::dipole{0, 3, 1, f, f, f, qcd}, hep::dipole{0, 3, 2, f, f, f, qcd},
         hep::dipole{0, 3, 4, f, f, b, qcd}
     };
 

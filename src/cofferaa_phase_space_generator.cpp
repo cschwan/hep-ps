@@ -86,17 +86,7 @@ cofferaa_psg<T>::cofferaa_psg(
     double gt = constants.width_t;
 
     // set constants and the number of particles
-    cofferaa_extra_set(
-        &generator,
-        &mw,
-        &gw,
-        &mz,
-        &gz,
-        &mh,
-        &gh,
-        &mt,
-        &gt
-    );
+    cofferaa_extra_set(&generator, &mw, &gw, &mz, &gz, &mh, &gh, &mt, &gt);
 
     // only used for technical cuts
     double energy = 0.0;
@@ -162,12 +152,7 @@ T cofferaa_psg<T>::densities(std::vector<T>& densities)
     int generator = 1;
     int switch_ = 2;
 
-    cofferaa_density(
-        current_point_.data(),
-        densities.data(),
-        &generator,
-        &switch_
-    );
+    cofferaa_density(current_point_.data(), densities.data(), &generator, &switch_);
 
     return pow(T(0.5) / acos(T(-1.0)), T(3 * particles_ - 10));
 }
@@ -264,8 +249,7 @@ std::unique_ptr<phase_space_generator<T>> make_minimal_cofferaa_phase_space_gene
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
-template std::unique_ptr<phase_space_generator<double>>
-make_cofferaa_phase_space_generator(
+template std::unique_ptr<phase_space_generator<double>> make_cofferaa_phase_space_generator(
     double,
     double,
     std::vector<int> const&,
@@ -274,8 +258,7 @@ make_cofferaa_phase_space_generator(
     std::size_t
 );
 
-template std::unique_ptr<phase_space_generator<double>>
-make_minimal_cofferaa_phase_space_generator(
+template std::unique_ptr<phase_space_generator<double>> make_minimal_cofferaa_phase_space_generator(
     double,
     double,
     std::vector<int> const&,

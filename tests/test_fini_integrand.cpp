@@ -37,10 +37,7 @@ template <typename T>
 class test_fini_class
 {
 public:
-    test_fini_class(
-        std::size_t alphas_power,
-        T alphas
-    )
+    test_fini_class(std::size_t alphas_power, T alphas)
         : alphas_power_{alphas_power}
         , alphas_{alphas}
     {

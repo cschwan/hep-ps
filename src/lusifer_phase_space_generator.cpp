@@ -824,8 +824,7 @@ T lusifer_psg<T>::densities(std::vector<T>& densities)
         T const s1 = this->s[decay.out1];
         T const s2 = this->s[decay.out2];
 
-        T const jacobian = T(2.0) * s / (acos(T(-1.0)) *
-            hep::sqrt_kaellen(s, s1, s2));
+        T const jacobian = T(2.0) * s / (acos(T(-1.0)) * hep::sqrt_kaellen(s, s1, s2));
 
         decay_jacobians.push_back(jacobian);
     }
@@ -1062,8 +1061,7 @@ void lusifer_psg<T>::generate(
     cmf_energy_ = cmf_energy;
 
     // append the extra remaining random numbers to the end of `momenta`
-    std::copy_n(r, extra_random_numbers,
-        std::prev(momenta.end(), extra_random_numbers));
+    std::copy_n(r, extra_random_numbers, std::prev(momenta.end(), extra_random_numbers));
 }
 
 template <typename T>
@@ -1130,8 +1128,7 @@ std::unique_ptr<phase_space_generator<T>> make_lusifer_phase_space_generator(
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
-template std::unique_ptr<phase_space_generator<double>>
-make_lusifer_phase_space_generator(
+template std::unique_ptr<phase_space_generator<double>> make_lusifer_phase_space_generator(
     double,
     double,
     std::vector<ps_channel> const&,
@@ -1139,8 +1136,7 @@ make_lusifer_phase_space_generator(
     std::size_t
 );
 
-template std::unique_ptr<phase_space_generator<double>>
-make_lusifer_phase_space_generator(
+template std::unique_ptr<phase_space_generator<double>> make_lusifer_phase_space_generator(
     double,
     double,
     std::vector<std::string> const&,
@@ -1148,8 +1144,7 @@ make_lusifer_phase_space_generator(
     std::size_t
 );
 
-template std::unique_ptr<phase_space_generator<double>>
-make_lusifer_phase_space_generator(
+template std::unique_ptr<phase_space_generator<double>> make_lusifer_phase_space_generator(
     double,
     double,
     std::string const&,

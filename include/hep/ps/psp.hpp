@@ -35,12 +35,7 @@ class psp
 {
 public:
     /// Constructor.
-    psp(
-        std::vector<T>& cms_psp,
-        std::vector<recombined_state>& states,
-        T rap_shift,
-        psp_type type
-    );
+    psp(std::vector<T>& cms_psp, std::vector<recombined_state>& states, T rap_shift, psp_type type);
 
     /// Copy construction is not allowed.
     psp(psp<T> const&) = delete;

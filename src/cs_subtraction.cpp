@@ -284,7 +284,6 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
             phase_space.at(4 * i + 2) * zi - phase_space.at(4 * j + 2) * zj,
             phase_space.at(4 * i + 3) * zi - phase_space.at(4 * j + 3) * zj,
         };
-
     }
 
         break;
@@ -308,7 +307,6 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
             phase_space.at(4 * j + 2) * uk - phase_space.at(4 * k + 2) * uj,
             phase_space.at(4 * j + 3) * uk - phase_space.at(4 * k + 3) * uj,
         };
-
     }
 
         break;
@@ -316,7 +314,6 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
     default:
         assert( false );
     }
-
 
     return result;
 }

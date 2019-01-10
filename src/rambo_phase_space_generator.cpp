@@ -19,10 +19,7 @@ class rambo_psg
 public:
     using numeric_type = T;
 
-    rambo_psg(
-        std::size_t final_state_particles,
-        std::size_t extra_random_numbers
-    );
+    rambo_psg(std::size_t final_state_particles, std::size_t extra_random_numbers);
 
     std::size_t channels() const;
 
@@ -202,11 +199,6 @@ std::unique_ptr<phase_space_generator<T>> make_rambo_phase_space_generator(
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template std::unique_ptr<phase_space_generator<double>>
-make_rambo_phase_space_generator(
-    double,
-    double,
-    std::size_t,
-    std::size_t
-);
+make_rambo_phase_space_generator(double, double, std::size_t, std::size_t);
 
 }

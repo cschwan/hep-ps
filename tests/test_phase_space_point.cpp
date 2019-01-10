@@ -113,62 +113,34 @@ TEST_CASE("check phase_space_point functions", "[phase_space_point]")
     CHECK_THAT( ps1.cos_angle_neg(5, 7) , Catch::WithinULP(ot, 5) );
     CHECK_THAT( ps1.cos_angle_neg(6, 7) , Catch::WithinULP(ot, 5) );
 
-    CHECK_THAT( ps1.cos_angle_pos(0, 1) ,
-        Catch::WithinULP(ps1.cos_angle_neg(0, 1), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(0, 2) ,
-        Catch::WithinULP(ps1.cos_angle_neg(0, 2), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(0, 3) ,
-        Catch::WithinULP(ps1.cos_angle_neg(0, 3), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(0, 4) ,
-        Catch::WithinULP(ps1.cos_angle_neg(0, 4), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(0, 5) ,
-        Catch::WithinULP(ps1.cos_angle_neg(0, 5), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(0, 6) ,
-        Catch::WithinULP(ps1.cos_angle_neg(0, 6), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(0, 7) ,
-        Catch::WithinULP(ps1.cos_angle_neg(0, 7), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(1, 2) ,
-        Catch::WithinULP(ps1.cos_angle_neg(1, 2), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(1, 3) ,
-        Catch::WithinULP(ps1.cos_angle_neg(1, 3), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(1, 4) ,
-        Catch::WithinULP(ps1.cos_angle_neg(1, 4), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(1, 5) ,
-        Catch::WithinULP(ps1.cos_angle_neg(1, 5), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(1, 6) ,
-        Catch::WithinULP(ps1.cos_angle_neg(1, 6), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(1, 7) ,
-        Catch::WithinULP(ps1.cos_angle_neg(1, 7), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(2, 3) ,
-        Catch::WithinULP(ps1.cos_angle_neg(2, 3), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(2, 4) ,
-        Catch::WithinULP(ps1.cos_angle_neg(2, 4), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(2, 5) ,
-        Catch::WithinULP(ps1.cos_angle_neg(2, 5), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(2, 6) ,
-        Catch::WithinULP(ps1.cos_angle_neg(2, 6), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(2, 7) ,
-        Catch::WithinULP(ps1.cos_angle_neg(2, 7), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(3, 4) ,
-        Catch::WithinULP(ps1.cos_angle_neg(3, 4), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(3, 5) ,
-        Catch::WithinULP(ps1.cos_angle_neg(3, 5), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(3, 6) ,
-        Catch::WithinULP(ps1.cos_angle_neg(3, 6), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(3, 7) ,
-        Catch::WithinULP(ps1.cos_angle_neg(3, 7), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(4, 5) ,
-        Catch::WithinULP(ps1.cos_angle_neg(4, 5), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(4, 6) ,
-        Catch::WithinULP(ps1.cos_angle_neg(4, 6), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(4, 7) ,
-        Catch::WithinULP(ps1.cos_angle_neg(4, 7), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(5, 6) ,
-        Catch::WithinULP(ps1.cos_angle_neg(5, 6), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(5, 7) ,
-        Catch::WithinULP(ps1.cos_angle_neg(5, 7), 0) );
-    CHECK_THAT( ps1.cos_angle_pos(6, 7) ,
-        Catch::WithinULP(ps1.cos_angle_neg(6, 7), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(0, 1) , Catch::WithinULP(ps1.cos_angle_neg(0, 1), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(0, 2) , Catch::WithinULP(ps1.cos_angle_neg(0, 2), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(0, 3) , Catch::WithinULP(ps1.cos_angle_neg(0, 3), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(0, 4) , Catch::WithinULP(ps1.cos_angle_neg(0, 4), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(0, 5) , Catch::WithinULP(ps1.cos_angle_neg(0, 5), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(0, 6) , Catch::WithinULP(ps1.cos_angle_neg(0, 6), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(0, 7) , Catch::WithinULP(ps1.cos_angle_neg(0, 7), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(1, 2) , Catch::WithinULP(ps1.cos_angle_neg(1, 2), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(1, 3) , Catch::WithinULP(ps1.cos_angle_neg(1, 3), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(1, 4) , Catch::WithinULP(ps1.cos_angle_neg(1, 4), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(1, 5) , Catch::WithinULP(ps1.cos_angle_neg(1, 5), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(1, 6) , Catch::WithinULP(ps1.cos_angle_neg(1, 6), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(1, 7) , Catch::WithinULP(ps1.cos_angle_neg(1, 7), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(2, 3) , Catch::WithinULP(ps1.cos_angle_neg(2, 3), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(2, 4) , Catch::WithinULP(ps1.cos_angle_neg(2, 4), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(2, 5) , Catch::WithinULP(ps1.cos_angle_neg(2, 5), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(2, 6) , Catch::WithinULP(ps1.cos_angle_neg(2, 6), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(2, 7) , Catch::WithinULP(ps1.cos_angle_neg(2, 7), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(3, 4) , Catch::WithinULP(ps1.cos_angle_neg(3, 4), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(3, 5) , Catch::WithinULP(ps1.cos_angle_neg(3, 5), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(3, 6) , Catch::WithinULP(ps1.cos_angle_neg(3, 6), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(3, 7) , Catch::WithinULP(ps1.cos_angle_neg(3, 7), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(4, 5) , Catch::WithinULP(ps1.cos_angle_neg(4, 5), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(4, 6) , Catch::WithinULP(ps1.cos_angle_neg(4, 6), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(4, 7) , Catch::WithinULP(ps1.cos_angle_neg(4, 7), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(5, 6) , Catch::WithinULP(ps1.cos_angle_neg(5, 6), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(5, 7) , Catch::WithinULP(ps1.cos_angle_neg(5, 7), 0) );
+    CHECK_THAT( ps1.cos_angle_pos(6, 7) , Catch::WithinULP(ps1.cos_angle_neg(6, 7), 0) );
 
     // TODO: write checks for
     // - abs_phi_diff

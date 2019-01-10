@@ -56,8 +56,7 @@ void test_trivial_cutter_and_recombiner(
         Catch::WithinULP(T(0.0015980493564892501), 5) );
 }
 
-TEST_CASE("check trivial cutter and recombiner",
-    "[trivial_cutter],[trivial_recombiner]")
+TEST_CASE("check trivial cutter and recombiner", "[trivial_cutter],[trivial_recombiner]")
 {
     hep::initial_state_set set{hep::initial_state::cq_uq};
 
