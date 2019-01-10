@@ -25,6 +25,7 @@
 #include "nonstd/span.hpp"
 
 #include <cassert>
+#include <vector>
 
 namespace hep
 {
