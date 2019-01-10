@@ -34,6 +34,114 @@ struct invariant
     std::size_t index;
 };
 
+struct process
+{
+    process(
+        std::size_t in1,
+        std::size_t in2,
+        std::size_t out1,
+        std::size_t out2,
+        std::size_t in,
+        std::size_t virt,
+        std::size_t idhep
+    )
+        : in1(in1)
+        , in2(in2)
+        , out1(out1)
+        , out2(out2)
+        , in(in)
+        , virt(virt)
+        , idhep(idhep)
+    {
+    }
+
+    std::size_t in1;
+    std::size_t in2;
+    std::size_t out1;
+    std::size_t out2;
+    std::size_t in;
+    std::size_t virt;
+    std::size_t idhep;
+    std::size_t index;
+};
+
+struct decay
+{
+    decay(
+        std::size_t in,
+        std::size_t out1,
+        std::size_t out2
+    )
+        : in(in)
+        , out1(out1)
+        , out2(out2)
+    {
+    }
+
+    std::size_t in;
+    std::size_t out1;
+    std::size_t out2;
+    std::size_t index;
+};
+
+struct channel
+{
+    std::vector<invariant> invariants;
+    std::vector<process> processes;
+    std::vector<decay> decays;
+};
+
+struct invariant_info
+{
+    invariant_info(std::size_t index, std::size_t channel)
+        : index(index)
+        , channel(channel)
+    {
+    }
+
+    std::size_t index;
+    std::size_t channel;
+};
+
+struct process_info
+{
+    process_info(std::size_t index, std::size_t channel)
+        : index(index)
+        , channel(channel)
+    {
+    }
+
+    std::size_t index;
+    std::size_t channel;
+};
+
+struct decay_info
+{
+    decay_info(std::size_t index, std::size_t channel)
+        : index(index)
+        , channel(channel)
+    {
+    }
+
+    std::size_t index;
+    std::size_t channel;
+};
+
+template <typename T>
+struct particle
+{
+    particle(T power, T mass, T width)
+        : power(power)
+        , mass(mass)
+        , width(width)
+    {
+    }
+
+    T power;
+    T mass;
+    T width;
+};
+
 struct inequality
 {
     inequality(std::size_t lhs, std::size_t rhs1, std::size_t rhs2)
@@ -164,56 +272,6 @@ std::bitset<8 * 16> integral_bound(
     return bound;
 }
 
-struct process
-{
-    process(
-        std::size_t in1,
-        std::size_t in2,
-        std::size_t out1,
-        std::size_t out2,
-        std::size_t in,
-        std::size_t virt,
-        std::size_t idhep
-    )
-        : in1(in1)
-        , in2(in2)
-        , out1(out1)
-        , out2(out2)
-        , in(in)
-        , virt(virt)
-        , idhep(idhep)
-    {
-    }
-
-    std::size_t in1;
-    std::size_t in2;
-    std::size_t out1;
-    std::size_t out2;
-    std::size_t in;
-    std::size_t virt;
-    std::size_t idhep;
-    std::size_t index;
-};
-
-struct decay
-{
-    decay(
-        std::size_t in,
-        std::size_t out1,
-        std::size_t out2
-    )
-        : in(in)
-        , out1(out1)
-        , out2(out2)
-    {
-    }
-
-    std::size_t in;
-    std::size_t out1;
-    std::size_t out2;
-    std::size_t index;
-};
-
 bool operator==(decay const& a, decay const& b)
 {
     if (a.in != b.in)
@@ -228,64 +286,6 @@ bool operator==(decay const& a, decay const& b)
 
     return true;
 }
-
-struct channel
-{
-    std::vector<invariant> invariants;
-    std::vector<process> processes;
-    std::vector<decay> decays;
-};
-
-struct invariant_info
-{
-    invariant_info(std::size_t index, std::size_t channel)
-        : index(index)
-        , channel(channel)
-    {
-    }
-
-    std::size_t index;
-    std::size_t channel;
-};
-
-struct process_info
-{
-    process_info(std::size_t index, std::size_t channel)
-        : index(index)
-        , channel(channel)
-    {
-    }
-
-    std::size_t index;
-    std::size_t channel;
-};
-
-struct decay_info
-{
-    decay_info(std::size_t index, std::size_t channel)
-        : index(index)
-        , channel(channel)
-    {
-    }
-
-    std::size_t index;
-    std::size_t channel;
-};
-
-template <typename T>
-struct particle_info
-{
-    particle_info(T power, T mass, T width)
-        : power(power)
-        , mass(mass)
-        , width(width)
-    {
-    }
-
-    T power;
-    T mass;
-    T width;
-};
 
 template <typename T>
 void decay_momenta(
@@ -340,7 +340,7 @@ private:
     std::vector<invariant_info> invariants;
     std::vector<process_info> processes_;
     std::vector<decay_info> decays;
-    std::vector<particle_info<T>> particle_infos;
+    std::vector<particle<T>> particle_infos;
     std::vector<T> mcut;
     std::vector<T> invariant_jacobians;
     std::vector<T> process_jacobians;
