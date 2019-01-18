@@ -25,6 +25,7 @@ programs = [
     'test_list_phase_space_generator',
     'test_lusifer_phase_space_generator',
     'test_lusifer_ps_channels',
+    'test_nfpc',
     'test_ol_born_matrix_elements',
     'test_pdg_functions',
     'test_permutation',
