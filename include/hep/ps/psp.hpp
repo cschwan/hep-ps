@@ -73,6 +73,9 @@ public:
     /// Returns the invariant mass for four particles with indices `i`, `j`, 'k', 'l', and `m`.
     T m2(std::size_t i, std::size_t j, std::size_t k, std::size_t l, std::size_t m) const;
 
+    /// Returns the invariant mass for six particles with indices `i`, `j`, 'k', 'l', `m`, and `n`.
+    T m2(std::size_t i, std::size_t j, std::size_t k, std::size_t l, std::size_t m, std::size_t n) const;
+
     /// Returns the transverse mass for the particles with indices `i` and `j`.
     T mt(std::size_t i, std::size_t j) const;
 
