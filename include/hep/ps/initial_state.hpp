@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2018  Christopher Schwan
+ * Copyright (C) 2016-2019  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,11 +29,13 @@ namespace hep
 /// for the correspoding matrix elements, because of the PDFs. Initial states
 /// with transposed partons are automatically taken into account.
 HEP_ENUM(initial_state,
+    bq_bx, /*!< \f$ Q=0 \f$ bottom anti-bottom initial state. */
     bq_cq, /*!< \f$ Q=1/3 \f$ bottom charm initial state. */
     bq_dx, /*!< \f$ Q=0 \f$ bottom anti-down initial state. */
     bq_sx, /*!< \f$ Q=0 \f$ bottom anti-strange initial state. */
     bq_uq, /*!< \f$ Q=1/3 \f$ bottom up initial state. */
     bq_gl, /*!< \f$ Q=-1/3 \f$ bottom gluon initial state. */
+    bx_bq, /*!< \f$ Q=0 \f$ anti-bottom bottom initial state. */
     bx_cq, /*!< \f$ Q=1 \f$ anti-bottom charm initial state. */
     bx_dx, /*!< \f$ Q=2/3 \f$ anti-bottom anti-down initial state. */
     bx_sx, /*!< \f$ Q=2/3 \f$ anti-bottom anti-strange initial state. */
@@ -156,6 +158,7 @@ constexpr parton state_parton_one(initial_state state)
 {
     switch (state)
     {
+    case bq_bx:
     case bq_cq:
     case bq_dx:
     case bq_gl:
@@ -163,6 +166,7 @@ constexpr parton state_parton_one(initial_state state)
     case bq_uq:
         return parton::bottom;
 
+    case bx_bq:
     case bx_cq:
     case bx_dx:
     case bx_gl:
@@ -309,6 +313,7 @@ constexpr parton state_parton_two(initial_state state)
 {
     switch (state)
     {
+    case bx_bq:
     case gl_bq:
     case cq_bq:
     case dx_bq:
@@ -316,6 +321,7 @@ constexpr parton state_parton_two(initial_state state)
     case uq_bq:
         return parton::bottom;
 
+    case bq_bx:
     case gl_bx:
     case cq_bx:
     case dx_bx:
