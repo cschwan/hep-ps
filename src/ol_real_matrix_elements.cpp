@@ -27,8 +27,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 {
     auto& ol = ol_interface::instance();
 
-    ol_register_mode real_mode = ol_register_mode::set_qcd_order;
-    ol_register_mode dipole_mode = ol_register_mode::set_qcd_order;
+    ol_register_mode real_mode = ol_register_mode::set_ew_order;
+    ol_register_mode dipole_mode = ol_register_mode::set_ew_order;
 
     for (auto const& process : real_processes)
     {
@@ -120,7 +120,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
                 (order.alpha_power() - 1);
             int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
                 order.alphas_power();
-            int const dipole_id = register_process_try_hard(ol, process.c_str(), 1, order_qcd,
+            int const dipole_id = register_process_try_hard(ol, process.c_str(), 11, order_qcd,
                 order_ew, dipole_mode);
 
             int charge_table_index = -1;

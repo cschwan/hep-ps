@@ -117,7 +117,7 @@ ol_integrated_mes<T>::ol_integrated_mes(
                 (order.alpha_power() - 1);
             int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
                 order.alphas_power();
-            int const dipole_id = register_process_try_hard(ol, process.c_str(), 1, order_qcd,
+            int const dipole_id = register_process_try_hard(ol, process.c_str(), 11, order_qcd,
                 order_ew, dipole_mode);
 
             std::size_t charge_table_index = -1;
