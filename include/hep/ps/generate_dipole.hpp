@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2018  Christopher Schwan
+ * Copyright (C) 2018-2019  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "hep/ps/correction_type.hpp"
 #include "hep/ps/coupling_order.hpp"
 #include "hep/ps/dipole.hpp"
+#include "hep/ps/dipole_split.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -29,12 +30,13 @@
 namespace hep
 {
 
-/// Tries to generate a dipole process for the real process given by `process_pdg_ids` at the given
-/// coupling `order`. The parameter `dipole_info` determines the dipole. The result is either the
-/// PDG identifiers of the dipole process, or an empty vector, in which case the dipole process does
-/// not exist.
-std::vector<int> generate_dipole(
+/// Tries to generate the PDG ids for the dipole process for the real process given by
+/// `process_pdg_ids` at the given coupling `order`. The parameter `dipole_info` determines the
+/// dipole. The PDG ids are written into `dipole_pdg_ids` and the return value denotes the splitting
+/// used for this dipole.
+dipole_split generate_dipole(
     std::vector<int> const& process_pdg_ids,
+    std::vector<int>& dipole_pdg_ids,
     hep::coupling_order order,
     dipole const& dipole_info
 );

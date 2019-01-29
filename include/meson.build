@@ -12,6 +12,7 @@ headers1 = [
     'hep/ps/d_subtraction.hpp',
     'hep/ps/dipole.hpp',
     'hep/ps/dipole_invariants.hpp',
+    'hep/ps/dipole_split.hpp',
     'hep/ps/dipole_type.hpp',
     'hep/ps/dipole_veto.hpp',
     'hep/ps/enum.hpp',

@@ -48,9 +48,11 @@ ol_integrated_mes<T>::ol_integrated_mes(
     std::unordered_multimap<insertion_term, std::tuple<std::vector<int>, int,
         std::size_t>> mes;
 
-    for (auto const& process : real_processes)
+    std::vector<int> dipole_ids;
+
+    for (auto const& real_process : real_processes)
     {
-        auto const& ids = ol_process_string_to_pdg_ids(process);
+        auto const& ids = ol_process_string_to_pdg_ids(real_process);
 
         // construct all possible EW and QCD dipoles
         for (auto const type : correction_type_list())
@@ -71,7 +73,7 @@ ol_integrated_mes<T>::ol_integrated_mes(
             auto const type_k = pdg_id_to_particle_type(ids.at(k));
             auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
 
-            auto dipole_ids = generate_dipole(ids, order, dip);
+            auto splitting = generate_dipole(ids, dipole_ids, order, dip);
 
             if (dipole_ids.empty())
             {

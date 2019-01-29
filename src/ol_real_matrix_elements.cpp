@@ -30,6 +30,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
     ol_register_mode real_mode = ol_register_mode::set_ew_order;
     ol_register_mode dipole_mode = ol_register_mode::set_ew_order;
 
+    std::vector<int> dipole_ids;
+
     for (auto const& process : real_processes)
     {
         auto const& ids = ol_process_string_to_pdg_ids(process);
@@ -71,7 +73,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
             auto const type_k = pdg_id_to_particle_type(ids.at(k));
             auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
 
-            auto const& dipole_ids = generate_dipole(ids, order, dip);
+            generate_dipole(ids, dipole_ids, order, dip);
 
             if (dipole_ids.empty())
             {
