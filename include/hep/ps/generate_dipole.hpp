@@ -22,7 +22,7 @@
 #include "hep/ps/correction_type.hpp"
 #include "hep/ps/coupling_order.hpp"
 #include "hep/ps/dipole.hpp"
-#include "hep/ps/dipole_split.hpp"
+#include "hep/ps/dipole_vertex.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -32,9 +32,9 @@ namespace hep
 
 /// Tries to generate the PDG ids for the dipole process for the real process given by
 /// `process_pdg_ids` at the given coupling `order`. The parameter `dipole_info` determines the
-/// dipole. The PDG ids are written into `dipole_pdg_ids` and the return value denotes the splitting
+/// dipole. The PDG ids are written into `dipole_pdg_ids` and the return value denotes the vertex
 /// used for this dipole.
-dipole_split generate_dipole(
+dipole_vertex generate_dipole(
     std::vector<int> const& process_pdg_ids,
     std::vector<int>& dipole_pdg_ids,
     hep::coupling_order order,

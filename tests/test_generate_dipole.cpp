@@ -39,7 +39,7 @@ TEST_CASE("test d d -> d d a")
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{1, 1, 1, 1}) );
-        CHECK( splitting == hep::dipole_split::down_to_down_photon );
+        CHECK( splitting == hep::dipole_vertex(1, 1, 22) );
     }
 
     dipoles = {
@@ -54,7 +54,7 @@ TEST_CASE("test d d -> d d a")
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{22, 1, 1, 22}) );
-        CHECK( splitting == hep::dipole_split::photon_to_down_down );
+        CHECK( splitting == hep::dipole_vertex(22, 1, -1) );
     }
 
     dipoles = {
@@ -69,7 +69,7 @@ TEST_CASE("test d d -> d d a")
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{1, 22, 1, 22}) );
-        CHECK( splitting == hep::dipole_split::photon_to_down_down );
+        CHECK( splitting == hep::dipole_vertex(22, 1, -1) );
     }
 
     // non-existent dipoles
@@ -100,7 +100,7 @@ TEST_CASE("test d d -> d d a")
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{22, 1, 1, 22}) );
-        CHECK( splitting == hep::dipole_split::photon_to_down_down );
+        CHECK( splitting == hep::dipole_vertex(22, 1, -1) );
     }
 
     dipoles = {
@@ -115,7 +115,7 @@ TEST_CASE("test d d -> d d a")
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{1, 22, 1, 22}) );
-        CHECK( splitting == hep::dipole_split::photon_to_down_down );
+        CHECK( splitting == hep::dipole_vertex(22, 1, -1) );
     }
 
     // non-existent dipoles
@@ -183,24 +183,38 @@ TEST_CASE("test d~ d -> d d~ g")
 
     std::vector<int> result;
 
-    // all twelve dipoles where the gluon is unresolved
+    // six dipoles where the gluon is unresolved
     dipoles = {
         hep::dipole{0, 4, 1, f, b, f, qcd}, hep::dipole{0, 4, 2, f, b, f, qcd},
-        hep::dipole{0, 4, 3, f, b, f, qcd}, hep::dipole{1, 4, 0, f, b, f, qcd},
-        hep::dipole{1, 4, 2, f, b, f, qcd}, hep::dipole{1, 4, 3, f, b, f, qcd},
-        hep::dipole{2, 4, 0, f, b, f, qcd}, hep::dipole{2, 4, 1, f, b, f, qcd},
-        hep::dipole{2, 4, 3, f, b, f, qcd}, hep::dipole{3, 4, 0, f, b, f, qcd},
+        hep::dipole{0, 4, 3, f, b, f, qcd}, hep::dipole{3, 4, 0, f, b, f, qcd},
         hep::dipole{3, 4, 1, f, b, f, qcd}, hep::dipole{3, 4, 2, f, b, f, qcd}
     };
 
-    REQUIRE( dipoles.size() == 12 );
+    REQUIRE( dipoles.size() == 6 );
 
     for (auto const& dipole : dipoles)
     {
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{-1, 1, 1, -1}) );
-        CHECK( splitting == hep::dipole_split::quark_to_quark_gluon );
+        CHECK( splitting == hep::dipole_vertex(-1, -1, 21) );
+    }
+
+    // the remaining six dipoles where the gluon is unresolved
+    dipoles = {
+        hep::dipole{1, 4, 0, f, b, f, qcd}, hep::dipole{1, 4, 2, f, b, f, qcd},
+        hep::dipole{1, 4, 3, f, b, f, qcd}, hep::dipole{2, 4, 0, f, b, f, qcd},
+        hep::dipole{2, 4, 1, f, b, f, qcd}, hep::dipole{2, 4, 3, f, b, f, qcd}
+    };
+
+    REQUIRE( dipoles.size() == 6 );
+
+    for (auto const& dipole : dipoles)
+    {
+        auto const splitting = hep::generate_dipole(process, result, order, dipole);
+
+        CHECK_THAT( result, Catch::Equals(std::vector<int>{-1, 1, 1, -1}) );
+        CHECK( splitting == hep::dipole_vertex(1, 1, 21) );
     }
 
     // non-existant dipoles
@@ -231,7 +245,7 @@ TEST_CASE("test d~ d -> d d~ g")
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{-1, 21, -1, 21}) );
-        CHECK( splitting == hep::dipole_split::gluon_to_quark_quark );
+        CHECK( splitting == hep::dipole_vertex(21, 1, -1) );
     }
 
     dipoles = {
@@ -260,7 +274,7 @@ TEST_CASE("test d~ d -> d d~ g")
         auto const splitting = hep::generate_dipole(process, result, order, dipole);
 
         CHECK_THAT( result, Catch::Equals(std::vector<int>{-1, 1, 21, 21}) );
-        CHECK( splitting == hep::dipole_split::gluon_to_quark_quark );
+        CHECK( splitting == hep::dipole_vertex(21, 1, -1) );
     }
 
     // non-existent dipoles

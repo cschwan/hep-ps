@@ -24,6 +24,7 @@
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/insertion_term.hpp"
+#include "hep/ps/int_dipole.hpp"
 #include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/spin_correlation_matrix.hpp"

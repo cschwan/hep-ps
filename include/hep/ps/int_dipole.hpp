@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hep/ps/dipole_split.hpp"
+#include "hep/ps/dipole_vertex.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/particle_type.hpp"
 
@@ -34,10 +34,10 @@ class int_dipole
 {
 public:
     ///
-    int_dipole(std::size_t emitter, std::size_t spectator, dipole_split splitting)
+    int_dipole(std::size_t emitter, std::size_t spectator, dipole_vertex const& vertex)
         : emitter_{emitter}
         , spectator_{spectator}
-        , splitting_{splitting}
+        , vertex_{vertex}
     {
         int type = (emitter < 2) | ((spectator < 2) << 1);
 
@@ -62,11 +62,11 @@ public:
     }
 
     /// Constructor for `born` insertion terms.
-    int_dipole(std::size_t initial, dipole_split splitting)
+    int_dipole(std::size_t initial, dipole_vertex const& vertex)
         : type_{insertion_term_type::born}
         , emitter_{initial}
         , spectator_{0}
-        , splitting_{splitting}
+        , vertex_{vertex}
     {
     }
 
@@ -116,16 +116,16 @@ public:
     }
 
     /// Returns the splitting represented by this integrated dipole.
-    dipole_split splitting() const
+    dipole_vertex const& vertex() const
     {
-        return splitting_;
+        return vertex_;
     }
 
 private:
     insertion_term_type type_;
     std::size_t emitter_;
     std::size_t spectator_;
-    dipole_split splitting_;
+    dipole_vertex vertex_;
 };
 
 /// Comparison operator for two instances of \ref int_dipole `a` and `b`.

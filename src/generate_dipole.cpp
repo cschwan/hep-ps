@@ -7,7 +7,7 @@
 namespace hep
 {
 
-dipole_split generate_dipole(
+dipole_vertex generate_dipole(
     std::vector<int> const& process_pdg_ids,
     std::vector<int>& dipole_pdg_ids,
     coupling_order order,
@@ -23,7 +23,7 @@ dipole_split generate_dipole(
     int const id_k = process_pdg_ids.at(k);
     int const sign = ((i < 2) == (j < 2)) ? 1 : -1; // TODO: `j` should always be larger than 1
 
-    dipole_split result;
+    dipole_vertex result;
 
     if (type == correction_type::ew)
     {
@@ -37,28 +37,7 @@ dipole_split generate_dipole(
             dipole_pdg_ids = process_pdg_ids;
             dipole_pdg_ids.erase(dipole_pdg_ids.begin() + j);
 
-            // TODO: replace this with better code
-            switch (std::abs(id_i))
-            {
-            case 1:
-                result = dipole_split::down_to_down_photon;
-                break;
-
-            case 2:
-                result = dipole_split::up_to_up_photon;
-                break;
-
-            case 3:
-                result = dipole_split::strange_to_strange_photon;
-                break;
-
-            case 4:
-                result = dipole_split::charm_to_charm_photon;
-                break;
-
-            default:
-                assert( false );
-            }
+            result = dipole_vertex(id_i, id_i, id_j);
         }
         // fermion -> photon + fermion
         else if (pdg_id_is_photon(id_i) && charged_j && (i < 2))
@@ -73,28 +52,7 @@ dipole_split generate_dipole(
             dipole_pdg_ids.at(i) = pdg_id_of_photon();
             dipole_pdg_ids.erase(dipole_pdg_ids.begin() + j);
 
-            // TODO: replace this with better code
-            switch (std::abs(id_i))
-            {
-            case 1:
-                result = dipole_split::photon_to_down_down;
-                break;
-
-            case 2:
-                result = dipole_split::photon_to_up_up;
-                break;
-
-            case 3:
-                result = dipole_split::photon_to_strange_strange;
-                break;
-
-            case 4:
-                result = dipole_split::photon_to_charm_charm;
-                break;
-
-            default:
-                assert( false );
-            }
+            result = dipole_vertex(pdg_id_of_photon(), id_i, pdg_id_anti(id_i));
         }
         else
         {
@@ -111,14 +69,7 @@ dipole_split generate_dipole(
                 dipole_pdg_ids = process_pdg_ids;
                 dipole_pdg_ids.erase(dipole_pdg_ids.begin() + j);
 
-                if (pdg_id_is_gluon(id_i))
-                {
-                    result = dipole_split::gluon_to_gluon_gluon;
-                }
-                else
-                {
-                    result = dipole_split::quark_to_quark_gluon;
-                }
+                result = dipole_vertex(id_i, id_i, id_j);
             }
             // quark -> gluon + quark
             else if (pdg_id_is_gluon(id_i) && (i < 2))
@@ -127,7 +78,7 @@ dipole_split generate_dipole(
                 dipole_pdg_ids.at(i) = process_pdg_ids.at(j) * sign;
                 dipole_pdg_ids.erase(dipole_pdg_ids.begin() + j);
 
-                result = dipole_split::quark_to_quark_gluon;
+                result = dipole_vertex(pdg_id_of_gluon(), id_i, pdg_id_anti(id_i));
             }
             // gluon -> quark + antiquark
             else if ((((id_i + sign * id_j) == 0) && ((i < 2) || (id_i > 0))))
@@ -136,7 +87,7 @@ dipole_split generate_dipole(
                 dipole_pdg_ids.at(i) = pdg_id_of_gluon();
                 dipole_pdg_ids.erase(dipole_pdg_ids.begin() + j);
 
-                result = dipole_split::gluon_to_quark_quark;
+                result = dipole_vertex(pdg_id_of_gluon(), id_i, pdg_id_anti(id_i));
             }
             else
             {
