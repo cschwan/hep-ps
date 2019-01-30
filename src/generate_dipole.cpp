@@ -94,6 +94,10 @@ dipole_vertex generate_dipole(
                 dipole_pdg_ids.clear();
             }
         }
+        else
+        {
+            dipole_pdg_ids.clear();
+        }
     }
     else
     {
