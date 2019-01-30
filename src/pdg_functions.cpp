@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <stdexcept>
 #include <map>
 
@@ -316,6 +317,25 @@ bool pdg_id_is_quark(int id)
 bool pdg_id_is_photon(int id)
 {
     return id == pdg_id_of_photon();
+}
+
+int pdg_id_anti(int id)
+{
+    switch (std::abs(id))
+    {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        return -id;
+
+    case 21:
+    case 22:
+        return id;
+
+    default:
+        assert( false );
+    }
 }
 
 std::size_t final_state_symmetry_factor(std::vector<int> const& ids)

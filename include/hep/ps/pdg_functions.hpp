@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2018  Christopher Schwan
+ * Copyright (C) 2018-2019  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,9 @@ bool pdg_id_is_quark(int id);
 
 /// Returns `true` if `id` is the PDG identifier of the photon.
 bool pdg_id_is_photon(int id);
+
+/// Returns the PDG id of the corresponding anti-particle of the particle with `id`.
+int pdg_id_anti(int id);
 
 ///
 std::pair<initial_state, std::vector<final_state>> pdg_ids_to_states(
