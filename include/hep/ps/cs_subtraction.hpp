@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2016-2018  Christopher Schwan
+ * Copyright (C) 2016-2019  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +90,25 @@ public:
     /// insertion_terms.
     void insertion_terms2(
         insertion_term const& term,
+        nonstd::span<scales<T> const> scales,
+        std::vector<T> const& phase_space,
+        std::vector<T>& results
+    ) const;
+
+    /// Returns the finite part of the integrated dipoles together with the collinear counterterm.
+    void insertion_terms(
+        int_dipole const& term,
+        nonstd::span<scales<T> const> scales,
+        std::vector<T> const& phase_space,
+        T x,
+        T eta,
+        std::vector<ab_term<T>>& results
+    ) const;
+
+    /// Returns the finite part of the integrated dipoles not covered by the function \ref
+    /// insertion_terms.
+    void insertion_terms2(
+        int_dipole const& term,
         nonstd::span<scales<T> const> scales,
         std::vector<T> const& phase_space,
         std::vector<T>& results

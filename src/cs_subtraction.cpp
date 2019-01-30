@@ -1,6 +1,7 @@
 #include "hep/ps/cs_subtraction.hpp"
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/parton_type.hpp"
+#include "hep/ps/pdg_functions.hpp"
 #include "hep/ps/phase_space_point.hpp"
 
 #include <gsl/gsl_sf_dilog.h>
@@ -672,6 +673,380 @@ void cs_subtraction<T>::insertion_terms2(
             }
         }
         else if (term.corr_type() == correction_type::qcd)
+        {
+            T const ca = nc_;
+            T const trnfbca = tf_ * nf_ / ca;
+
+            for (auto const& mu : scales)
+            {
+                T const mu2 = mu.regularization() * mu.regularization();
+                T const logmubsij = log(mu2 / sij);
+
+                T result = T(223.0) / T(18.0) - T(16.0) / T(9.0) * trnfbca;
+                result += scheme_dep_factor * pi * pi;
+                result -= T(2.0) / T(3.0) * trnfbca * logmubsij;
+                result += T(0.5) * logmubsij * logmubsij;
+                result *= T(-0.5) / pi;
+
+                results.push_back(result);
+            }
+        }
+        else
+        {
+            assert( false );
+        }
+    }
+
+        break;
+
+    case particle_type::fermion:
+    {
+        for (auto const& mu : scales)
+        {
+            T const mu2 = mu.regularization() * mu.regularization();
+            T const logmubsij = log(mu2 / sij);
+
+            T result = T(5.0);
+            result += scheme_dep_factor * pi * pi;
+            result += T(1.5) * logmubsij;
+            result += T(0.5) * logmubsij * logmubsij;
+            result *= T(-0.5) / pi;
+
+            results.push_back(result);
+        }
+    }
+
+        break;
+
+    default:
+        // NYI
+        assert( false );
+    }
+}
+
+template <typename T>
+void cs_subtraction<T>::insertion_terms(
+    int_dipole const& term,
+    nonstd::span<scales<T> const> scales,
+    std::vector<T> const& phase_space,
+    T x,
+    T eta,
+    std::vector<ab_term<T>>& results
+) const {
+    using std::acos;
+    using std::log;
+
+//    parton_type const bo = (correction_type_of(term.vertex()) == correction_type::ew)
+//        ? parton_type::photon_
+//        : parton_type::gluon_;
+
+//    constexpr auto qq = parton_type::quark;
+//    constexpr auto aq = parton_type::anti_quark;
+
+    // TODO: DIS scheme is NYI
+    assert( fscheme_ == factorization_scheme::msbar );
+
+    T const pi = acos(T(-1.0));
+    T const color = (correction_type_of(term.vertex()) == correction_type::ew)
+        ? nc_
+        : (nc_ / (nc_ * nc_ - T(1.0))); // tf/cf
+
+    T const color2 = (correction_type_of(term.vertex()) == correction_type::ew)
+        ? T(1.0)
+        : tf_ * (T(1.0) - T(1.0) / nc_ / nc_); // cf/ca
+
+    results.clear();
+
+    auto const ex = pdg_id_to_particle_type(term.vertex().external());
+    auto const in = pdg_id_to_particle_type(term.vertex().internal());
+
+    switch (term.type())
+    {
+    case insertion_term_type::born:
+    {
+        T const omx = T(1.0) - x;
+        T const logomxbx = log(omx / x);
+        T const dilogome = gsl_sf_dilog(T(1.0) - eta);
+        T const logome = log(T(1.0) - eta);
+
+        T const value1 = T(0.5) * color / pi * ((x * x + omx * omx) * logomxbx + T(2.0) * x * omx);
+        T const value2 = T(0.5) / pi * (((T(1.0) + x * x) / omx) * logomxbx + omx);
+        T const value3 = T(0.5) / pi * (T(2.0) / omx) * logomxbx;
+        T const value4 = T(0.5) / pi * (T(2.0) / T(3.0) * pi * pi - T(5.0) + T(2.0) * dilogome +
+            logome * logome);
+        T const value5 = T(0.5) * color2 / pi * ((T(1.0) + omx * omx) / x * logomxbx + x);
+
+        ab_term<T> result = {};
+
+        if ((ex == particle_type::fermion) && (in == particle_type::fermion))
+        {
+            result.a = value2;
+            result.b = (eta - T(1.0)) * value3 + value4;
+        }
+        else if ((ex == particle_type::fermion) && (in == particle_type::boson))
+        {
+            result.a = value5;
+        }
+        else if ((ex == particle_type::boson) && (in == particle_type::fermion))
+        {
+            result.a = value1;
+        }
+        else if ((ex == particle_type::boson) && (in == particle_type::boson))
+        {
+            // TODO: NYI
+            assert( false );
+        }
+
+        results.assign(scales.size(), result);
+    }
+
+        break;
+
+    case insertion_term_type::final_initial:
+    {
+        T const ca = nc_;
+        T const gamma = (pdg_id_to_particle_type(term.vertex().internal()) == particle_type::fermion)
+            ? T(1.5)
+            // FIXME: the following branch has definitely the wrong factors
+            : T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * T(nf_);
+
+        T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
+        T const value2 = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
+
+        ab_term<T> result;
+
+        if ((ex == particle_type::fermion) && (in == particle_type::fermion))
+        {
+            result.a = value1;
+            result.b = (eta - T(1.0)) * value1 + value2;
+        }
+        else if ((ex == particle_type::fermion) && (in == particle_type::boson))
+        {
+            // TODO: NYI
+            assert( false );
+        }
+        else if ((ex == particle_type::boson) && (in == particle_type::fermion))
+        {
+            // implementation error
+            assert( false );
+        }
+        else if ((ex == particle_type::boson) && (in == particle_type::boson))
+        {
+            // TODO: NYI
+            assert( false );
+        }
+
+        results.assign(scales.size(), result);
+    }
+
+        break;
+
+    case insertion_term_type::initial_final:
+    {
+        phase_space_point<T> ps{phase_space};
+
+        T const omx = T(1.0) - x;
+        T const sai = ps.m2(term.emitter(), term.spectator());
+
+        T const value1 = T(0.5) * color / pi * (x * x + omx * omx);
+        T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
+        T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) + T(2.0) * log(T(1.0) - eta));
+        T const value4 = T(0.5) * color2 / pi * (T(1.0) + omx * omx) / x;
+
+        for (auto const& mu : scales)
+        {
+            T const mu2 = mu.factorization() * mu.factorization();
+            T const logmu2bsai = log(mu2 / sai);
+
+            T const result1 = logmu2bsai * value1;
+            T const result2 = logmu2bsai * value2;
+            T const result3 = logmu2bsai * ((eta - T(1.0)) * value2 + value3);
+            T const result4 = logmu2bsai * value4;
+
+            ab_term<T> result = {};
+
+            if ((ex == particle_type::fermion) && (in == particle_type::fermion))
+            {
+                result.a = result2;
+                result.b = result3;
+            }
+            else if ((ex == particle_type::fermion) && (in == particle_type::boson))
+            {
+                result.a = result4;
+
+                if (correction_type_of(term.vertex()) == correction_type::ew)
+                {
+                    T const q = T(pdg_id_to_charge_times_three(term.vertex().external())) / T(3.0);
+                    result.a *= q * q;
+                }
+            }
+            else if ((ex == particle_type::boson) && (in == particle_type::fermion))
+            {
+                result.a = result1;
+            }
+            else if ((ex == particle_type::boson) && (in == particle_type::boson))
+            {
+                if (correction_type_of(term.vertex()) == correction_type::ew)
+                {
+                    // implementation error
+                    assert( false );
+                }
+
+                // TODO: NYI
+                assert( false );
+            }
+
+            results.push_back(result);
+        }
+    }
+
+        break;
+
+    case insertion_term_type::initial_initial:
+    {
+        phase_space_point<T> ps{phase_space};
+
+        T const omx = T(1.0) - x;
+        T const sai = ps.m2(term.emitter(), term.spectator());
+        T const logomx = log(omx);
+        T const logome = log(T(1.0) - eta);
+
+        T const value1 = T(0.5) * color / pi * (x * x + omx * omx);
+        T const value2 = T(0.5) / pi * (T(1.0) + x * x) / omx;
+        T const value3 = T(0.5) / pi * (T(0.5) * eta * (T(2.0) + eta) + T(2.0) * logome);
+        T const value4 = T(0.5) / pi * T(2.0) * logomx / omx;
+        T const value5 = T(0.5) / pi * (pi*pi / T(3.0) - logome * logome);
+        T const value6 = T(0.5) * color2 / pi * (T(1.0) + omx * omx) / x;
+
+        for (auto const& mu : scales)
+        {
+            T const mu2 = mu.factorization() * mu.factorization();
+            T const logmu2bsai = log(mu2 / sai);
+
+            T const result1 = value1 * (logmu2bsai - logomx);
+            T const result2 = value2 * (logmu2bsai - logomx);
+            T const result3 = (eta - T(1.0)) * (value2 * logmu2bsai - value4) + value3 * logmu2bsai
+                + value5;
+            T const result4 = value6 * (logmu2bsai - logomx);
+
+            ab_term<T> result;
+
+            if ((ex == particle_type::fermion) && (in == particle_type::fermion))
+            {
+                result.a = result2;
+                result.b = result3;
+            }
+            else if ((ex == particle_type::fermion) && (in == particle_type::boson))
+            {
+                result.a = result4;
+
+                if (correction_type_of(term.vertex()) == correction_type::ew)
+                {
+                    T const q = T(pdg_id_to_charge_times_three(term.vertex().external())) / T(3.0);
+                    result.a *= q * q;
+                }
+            }
+            else if ((ex == particle_type::boson) && (in == particle_type::fermion))
+            {
+                result.a = result1;
+            }
+            else if ((ex == particle_type::boson) && (in == particle_type::boson))
+            {
+                // TODO: NYI
+                assert( false );
+            }
+
+            results.push_back(result);
+        }
+
+        break;
+    }
+
+    default:
+        // implementation error
+        assert( false );
+    }
+}
+
+template <typename T>
+void cs_subtraction<T>::insertion_terms2(
+    int_dipole const& term,
+    nonstd::span<scales<T> const> scales,
+    std::vector<T> const& phase_space,
+    std::vector<T>& results
+) const {
+    using std::acos;
+
+    if (term.type() == insertion_term_type::born)
+    {
+        // should not be called with this function
+        assert( false );
+    }
+
+    T scheme_dep_factor;
+
+    switch (rscheme_)
+    {
+    case regularization_scheme::dim_reg_blha:
+        scheme_dep_factor = T(-1.0) / T(2.0);
+        break;
+
+    case regularization_scheme::dim_reg_coli:
+        scheme_dep_factor = T(-2.0) / T(3.0);
+        break;
+
+    default:
+        assert( false );
+    }
+
+    results.clear();
+
+    phase_space_point<T> ps{phase_space};
+
+    T const pi = acos(T(-1.0));
+    T const sij = ps.m2(term.emitter(), term.spectator());
+
+    switch (pdg_id_to_particle_type(term.vertex().internal()))
+    {
+    case particle_type::boson:
+    {
+        // TODO: not yet tested
+        assert( false );
+
+        if (correction_type_of(term.vertex()) == correction_type::ew)
+        {
+            std::array<T, 6> const ncq2 = {
+                // up
+                nc_ * (T(0.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+                // up, down
+                nc_ * (T(1.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+                // up, down, strange
+                nc_ * (T(2.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
+                // up, down, strange, charm
+                nc_ * (T(2.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
+                // up, down, strange, charm, bottom
+                nc_ * (T(3.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
+                // up, down, strange, charm, bottom, top
+                nc_ * (T(3.0) * T(1.0) / T(9.0) + T(3.0) * T(4.0) / T(9.0))
+            };
+
+            T const gamma = T(-2.0) / T(3.0) * ncq2.at(nf_);
+
+            for (auto const& mu : scales)
+            {
+                T const mu2 = mu.regularization() * mu.regularization();
+                T const logmubsij = log(mu2 / sij);
+
+                // for photons there is no 1/eps^2 pole -> BHLA/COLI are equal
+                T result = T(8.0) / T(3.0) * gamma;
+                result += gamma * logmubsij;
+                // TODO: shouldn't this be -1/2?
+                result *= T(0.5) / pi;
+
+                results.push_back(result);
+            }
+        }
+        else if (correction_type_of(term.vertex()) == correction_type::qcd)
         {
             T const ca = nc_;
             T const trnfbca = tf_ * nf_ / ca;

@@ -22,6 +22,7 @@ programs = [
     'test_headers',
     'test_initial_state',
     'test_insertion_term',
+    'test_int_dipoles_integrand',
     'test_list_phase_space_generator',
     'test_lusifer_phase_space_generator',
     'test_lusifer_ps_channels',

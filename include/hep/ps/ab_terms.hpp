@@ -31,6 +31,14 @@ struct ab_terms
     parton_type_array<parton_type_array<T>> b;
 };
 
+///
+template <typename T>
+struct ab_term
+{
+    T a;
+    T b;
+};
+
 }
 
 #endif
