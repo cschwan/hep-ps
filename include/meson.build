@@ -26,6 +26,7 @@ headers1 = [
     'hep/ps/initial_state.hpp',
     'hep/ps/insertion_term.hpp',
     'hep/ps/insertion_term_type.hpp',
+    'hep/ps/int_dipole.hpp',
     'hep/ps/list_phase_space_generator.hpp',
     'hep/ps/luminosity_info.hpp',
     'hep/ps/lusifer_constants.hpp',

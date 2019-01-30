@@ -44,6 +44,7 @@
 #include "hep/ps/initial_state.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/insertion_term_type.hpp"
+#include "hep/ps/int_dipole.hpp"
 #include "hep/ps/list_phase_space_generator.hpp"
 #include "hep/ps/luminosity_info.hpp"
 #include "hep/ps/lusifer_constants.hpp"

@@ -32,6 +32,7 @@ sources = [
     'hadron_hadron_psg_adapter.hpp',
     'initial_state.cpp',
     'insertion_term.cpp',
+    'int_dipole.cpp',
     'list_phase_space_generator.cpp',
     'lusifer_constants.cpp',
     'lusifer_extra.f90',
