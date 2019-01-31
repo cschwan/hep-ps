@@ -113,12 +113,25 @@ ol_int_dipoles<T>::ol_int_dipoles(
                 }
             }
 
+            int ol_type = 0;
+
+            if (type == correction_type::qcd)
+            {
+                // color-correlated ME
+                ol_type = 2;
+            }
+            else
+            {
+                // normal Born ME
+                ol_type = 1;
+            }
+
             auto const process = pdg_ids_to_ol_process_string(dipole_ids);
             int const order_ew = (type == correction_type::qcd) ? order.alpha_power() :
                 (order.alpha_power() - 1);
             int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
                 order.alphas_power();
-            int const dipole_id = register_process_try_hard(ol, process.c_str(), 11, order_qcd,
+            int const dipole_id = register_process_try_hard(ol, process.c_str(), ol_type, order_qcd,
                 order_ew, dipole_mode);
 
             std::size_t charge_table_index = -1;
@@ -226,8 +239,11 @@ ol_int_dipoles<T>::ol_int_dipoles(
                         dipoles_.push_back(born);
                     }
 
+                    int const born_id = register_process_try_hard(ol, process.c_str(), 1, order_qcd,
+                        order_ew, dipole_mode);
+
                     auto const range = mes.equal_range(born);
-                    auto const tuple = std::make_tuple(dipole_ids, dipole_id, charge_table_index);
+                    auto const tuple = std::make_tuple(dipole_ids, born_id, charge_table_index);
                     bool exists = false;
 
                     for (auto i = range.first; i != range.second; ++i)

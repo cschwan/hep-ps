@@ -73,7 +73,7 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
             auto const type_k = pdg_id_to_particle_type(ids.at(k));
             auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
 
-            generate_dipole(ids, dipole_ids, order, dip);
+            auto const splitting = generate_dipole(ids, dipole_ids, order, dip);
 
             if (dipole_ids.empty())
             {
@@ -117,12 +117,30 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
                 }
             }
 
+            int ol_type = 0;
+
+            if (pdg_id_to_particle_type(splitting.internal()) == particle_type::boson)
+            {
+                // spin-correlated ME
+                ol_type = 3;
+            }
+            else if (type == correction_type::qcd)
+            {
+                // color-correlated ME
+                ol_type = 2;
+            }
+            else
+            {
+                // normal Born ME
+                ol_type = 1;
+            }
+
             auto const process = pdg_ids_to_ol_process_string(dipole_ids);
             int const order_ew = (type == correction_type::qcd) ? order.alpha_power() :
                 (order.alpha_power() - 1);
             int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
                 order.alphas_power();
-            int const dipole_id = register_process_try_hard(ol, process.c_str(), 11, order_qcd,
+            int const dipole_id = register_process_try_hard(ol, process.c_str(), ol_type, order_qcd,
                 order_ew, dipole_mode);
 
             int charge_table_index = -1;
