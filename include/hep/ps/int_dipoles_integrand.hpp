@@ -112,6 +112,68 @@ public:
         }
 
         pdfs_.register_partons(partons_in_initial_state_set(set));
+
+        for (auto const state : set)
+        {
+            me_set_.add(state);
+
+            auto const one = state_parton_one(state);
+            auto const two = state_parton_two(state);
+
+            switch (parton_type_of(one))
+            {
+            case parton_type::quark:
+            case parton_type::anti_quark:
+                me_set_.add(partons_to_initial_state(parton::photon, two));
+                me_set_.add(partons_to_initial_state(parton::gluon, two));
+
+                break;
+
+            case parton_type::gluon_:
+            case parton_type::photon_:
+                for (auto p : parton_list())
+                {
+                    if ((p == parton::gluon) || (p == parton::photon))
+                    {
+                        continue;
+                    }
+
+                    me_set_.add(partons_to_initial_state(p, two));
+                }
+
+                break;
+
+            default:
+                assert( false );
+            }
+
+            switch (parton_type_of(two))
+            {
+            case parton_type::quark:
+            case parton_type::anti_quark:
+                me_set_.add(partons_to_initial_state(one, parton::photon));
+                me_set_.add(partons_to_initial_state(one, parton::gluon));
+
+                break;
+
+            case parton_type::gluon_:
+            case parton_type::photon_:
+                for (auto p : parton_list())
+                {
+                    if ((p == parton::gluon) || (p == parton::photon))
+                    {
+                        continue;
+                    }
+
+                    me_set_.add(partons_to_initial_state(one, p));
+                }
+
+                break;
+
+            default:
+                assert( false );
+            }
+        }
     }
 
     T eval(
@@ -175,7 +237,7 @@ public:
         }
 
         // TODO: for the time being we assume that the matrix elements are independent of scales
-        matrix_elements_.correlated_me(phase_space, set_, corr_me_);
+        matrix_elements_.correlated_me(phase_space, me_set_, corr_me_);
         auto const factor = T(0.5) * hbarc2_ / info.energy_squared();
 
         T const eta[] = { info.x1(), info.x2() };
@@ -222,7 +284,7 @@ public:
                             (i == 0) ? eff_pdf                     : pdfsa_[1].at(j + neg_off_s),
                             (i == 0) ? pdfsa_[0].at(j + neg_off_s) : eff_pdf,
                             me,
-                            set_
+                            me_set_
                         );
                     }
 
@@ -241,7 +303,7 @@ public:
                             (i == 0) ? eff_pdf                         : pdf_pdfsa_[1].at(j + neg_off_p),
                             (i == 0) ? pdf_pdfsa_[0].at(j + neg_off_p) : eff_pdf,
                             me,
-                            set_
+                            me_set_
                         );
                     }
                 }
@@ -268,7 +330,7 @@ public:
                             (i == 0) ? eff_pdf                     : pdfsa_[0].at(j + pos_off_s),
                             (i == 0) ? pdfsa_[1].at(j + pos_off_s) : eff_pdf,
                             me,
-                            set_
+                            me_set_
                         );
                     }
 
@@ -287,7 +349,7 @@ public:
                             (i == 0) ? eff_pdf                         : pdf_pdfsa_[0].at(j + pos_off_p),
                             (i == 0) ? pdf_pdfsa_[1].at(j + pos_off_p) : eff_pdf,
                             me,
-                            set_
+                            me_set_
                         );
                     }
                 }
