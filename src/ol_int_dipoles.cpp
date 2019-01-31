@@ -216,50 +216,10 @@ ol_int_dipoles<T>::ol_int_dipoles(
 
                 mes.emplace(term, std::make_tuple(dipole_ids, dipole_id, charge_table_index));
 
-                if (((type == correction_type::ew) && (!pdg_id_is_gluon(dipole_ids.at(0)))) ||
-                    ((type == correction_type::qcd) && (!pdg_id_is_photon(dipole_ids.at(0)))))
+                if ((term.type() == insertion_term_type::initial_initial) ||
+                    (term.type() == insertion_term_type::initial_final))
                 {
-                    auto const born = int_dipole{0, splitting};
-
-                    if (std::find(dipoles_.begin(), dipoles_.end(), born) == dipoles_.end())
-                    {
-                        dipoles_.push_back(born);
-                    }
-
-                    auto const range = mes.equal_range(born);
-                    auto const tuple = std::make_tuple(dipole_ids, dipole_id, charge_table_index);
-                    bool exists = false;
-
-                    for (auto i = range.first; i != range.second; ++i)
-                    {
-                        if (std::get<1>(i->second) != std::get<1>(tuple) ||
-                            (std::get<2>(i->second) != std::get<2>(tuple)))
-                        {
-                            continue;
-                        }
-
-                        if (!std::equal(std::get<0>(tuple).begin(),
-                            std::get<0>(tuple).end(),
-                            std::get<0>(i->second).begin()))
-                        {
-                            continue;
-                        }
-
-                        // the term that we try to add already exists
-                        exists = true;
-                        break;
-                    }
-
-                    if (!exists)
-                    {
-                        mes.emplace(born, tuple);
-                    }
-                }
-
-                if (((type == correction_type::ew) && (!pdg_id_is_gluon(dipole_ids.at(1)))) ||
-                    ((type == correction_type::qcd) && (!pdg_id_is_photon(dipole_ids.at(1)))))
-                {
-                    auto const born = int_dipole{1, splitting};
+                    auto const born = int_dipole{term.initial_particle(), splitting};
 
                     if (std::find(dipoles_.begin(), dipoles_.end(), born) == dipoles_.end())
                     {
