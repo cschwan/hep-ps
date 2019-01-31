@@ -323,10 +323,18 @@ int pdg_id_anti(int id)
 {
     switch (std::abs(id))
     {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
+    case  1:
+    case  2:
+    case  3:
+    case  4:
+    case  5:
+    case  6:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
         return -id;
 
     case 21:
