@@ -78,7 +78,7 @@ dipole_vertex generate_dipole(
                 dipole_pdg_ids.at(i) = process_pdg_ids.at(j) * sign;
                 dipole_pdg_ids.erase(dipole_pdg_ids.begin() + j);
 
-                result = dipole_vertex(pdg_id_of_gluon(), id_i, pdg_id_anti(id_i));
+                result = dipole_vertex(dipole_pdg_ids.at(i), id_i, id_j);
             }
             // gluon -> quark + antiquark
             else if ((((id_i + sign * id_j) == 0) && ((i < 2) || (id_i > 0))))
