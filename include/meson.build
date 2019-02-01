@@ -33,6 +33,7 @@ headers1 = [
     'hep/ps/lusifer_phase_space_generator.hpp',
     'hep/ps/lusifer_ps_channels.hpp',
     'hep/ps/lusifer_ps_functions.hpp',
+    'hep/ps/me_type.hpp',
     'hep/ps/nfpc.hpp',
     'hep/ps/non_zero_dipole.hpp',
     'hep/ps/ol_born_matrix_elements.hpp',

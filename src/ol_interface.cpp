@@ -62,6 +62,7 @@ bool ol_interface::enabled()
 
 ol_interface::ol_interface()
     : started_(false)
+    , set_order_qcd_{false}
 {
 #ifdef HAVE_OPENLOOPS
     if (suppress_banners())
@@ -315,64 +316,72 @@ void ol_interface::evaluate_full(
 #endif
 }
 
-int register_process_try_hard(
-    ol_interface& ol,
-    char const* process,
-    int amptype,
-    int order_qcd,
-    int order_ew,
-    ol_register_mode& mode
-) {
+int ol_interface::register_process(char const* process, me_type type, int order_qcd, int order_ew)
+{
     int result;
 
-    switch (mode)
+    if (set_order_qcd_)
     {
-    case ol_register_mode::set_qcd_order:
-        ol.setparameter_int("order_qcd", order_qcd);
+        setparameter_int("order_qcd", order_qcd);
+    }
+    else
+    {
+        setparameter_int("order_ew", order_ew);
+    }
+
+    // silence OpenLoops until we know how to correctly set the coupling order
+    int verbose = 0;
+    getparameter_int("verbose", &verbose);
+    setparameter_int("verbose", -1);
+
+    int amptype = 1;
+
+    switch (type)
+    {
+    case me_type::born:
+        amptype = 1;
         break;
 
-    case ol_register_mode::set_ew_order:
-        ol.setparameter_int("order_ew", order_ew);
+    case me_type::color_correlated:
+        amptype = 2;
+        break;
+
+    case me_type::spin_correlated:
+        amptype = 3;
+        break;
+
+    case me_type::loop:
+        amptype = 11;
         break;
 
     default:
         assert( false );
     }
 
-    // silence OpenLoops until we know how to correctly set the coupling order
-    int verbose = 0;
-    ol.getparameter_int("verbose", &verbose);
-    ol.setparameter_int("verbose", -1);
-
-    result = ol.register_process(process, amptype);
+    result = register_process(process, amptype);
 
     if (result == -1)
     {
         std::cout << "trying very hard...\n";
 
-        mode = (mode == ol_register_mode::set_ew_order) ?
-            ol_register_mode::set_qcd_order : ol_register_mode::set_ew_order;
+        set_order_qcd_ = !set_order_qcd_;
 
-        switch (mode)
+        if (set_order_qcd_)
         {
-        case ol_register_mode::set_qcd_order:
-            ol.setparameter_int("order_qcd", order_qcd);
-            break;
-
-        case ol_register_mode::set_ew_order:
-            ol.setparameter_int("order_ew", order_ew);
-            break;
-
-        default:
-            assert( false );
+            setparameter_int("order_qcd", order_qcd);
+        }
+        else
+        {
+            setparameter_int("order_ew", order_ew);
         }
 
-        result = ol.register_process(process, amptype);
+        result = register_process(process, amptype);
     }
 
-    // set `verbose` to default level and potentially print messages
-    ol.setparameter_int("verbose", verbose);
-    result = ol.register_process(process, amptype);
+    setparameter_int("verbose", verbose);
+
+    // run again to print potentially suppressed messages
+    result = register_process(process, amptype);
 
     return result;
 }

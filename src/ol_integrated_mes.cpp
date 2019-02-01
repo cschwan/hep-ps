@@ -43,7 +43,6 @@ ol_integrated_mes<T>::ol_integrated_mes(
 {
     auto& ol = ol_interface::instance();
 
-    ol_register_mode dipole_mode = ol_register_mode::set_qcd_order;
 
     std::unordered_multimap<insertion_term, std::tuple<std::vector<int>, int,
         std::size_t>> mes;
@@ -73,7 +72,7 @@ ol_integrated_mes<T>::ol_integrated_mes(
             auto const type_k = pdg_id_to_particle_type(ids.at(k));
             auto const dip = dipole(i, j, k, type_i, type_j, type_k, type);
 
-            auto splitting = generate_dipole(ids, dipole_ids, order, dip);
+            generate_dipole(ids, dipole_ids, order, dip);
 
             if (dipole_ids.empty())
             {
@@ -114,26 +113,16 @@ ol_integrated_mes<T>::ol_integrated_mes(
                 }
             }
 
-            int ol_type = 0;
-
-            if (type == correction_type::qcd)
-            {
-                // color-correlated ME
-                ol_type = 2;
-            }
-            else
-            {
-                // normal Born ME
-                ol_type = 1;
-            }
+            auto const ol_type = (type == correction_type::qcd) ?
+                me_type::color_correlated : me_type::born;
 
             auto const process = pdg_ids_to_ol_process_string(dipole_ids);
             int const order_ew = (type == correction_type::qcd) ? order.alpha_power() :
                 (order.alpha_power() - 1);
             int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
                 order.alphas_power();
-            int const dipole_id = register_process_try_hard(ol, process.c_str(), ol_type, order_qcd,
-                order_ew, dipole_mode);
+            int const dipole_id = ol.register_process(process.c_str(), ol_type, order_qcd,
+                order_ew);
 
             std::size_t charge_table_index = -1;
 
@@ -245,8 +234,8 @@ ol_integrated_mes<T>::ol_integrated_mes(
                         dipoles_.push_back(born);
                     }
 
-                    int const born_id = register_process_try_hard(ol, process.c_str(), 1, order_qcd,
-                        order_ew, dipole_mode);
+                    int const born_id = ol.register_process(process.c_str(), me_type::born,
+                        order_qcd, order_ew);
 
                     auto const range = mes.equal_range(born);
                     auto const tuple = std::make_tuple(dipole_ids, born_id, charge_table_index);
@@ -288,8 +277,8 @@ ol_integrated_mes<T>::ol_integrated_mes(
                         dipoles_.push_back(born);
                     }
 
-                    int const born_id = register_process_try_hard(ol, process.c_str(), 1, order_qcd,
-                        order_ew, dipole_mode);
+                    int const born_id = ol.register_process(process.c_str(), me_type::born,
+                        order_qcd, order_ew);
 
                     auto const range = mes.equal_range(born);
                     auto const tuple = std::make_tuple(dipole_ids, born_id, charge_table_index);

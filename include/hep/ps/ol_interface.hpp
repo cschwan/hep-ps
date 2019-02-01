@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2018  Christopher Schwan
+ * Copyright (C) 2018-2019  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hep/ps/me_type.hpp"
+
 namespace hep
 {
 
 /// Singleton for accessing the OpenLoops Matrix elements. If support for OpenLoops in this library
 /// wasn't activated, some of the methods frow an exception. Currently this interface is only a thin
 /// wrapper which automatically calls `ol_start` and `ol_finish`.
-class ol_interface
+class ol_interface final
 {
 public:
     /// Returns the singleton instance.
@@ -89,28 +91,17 @@ public:
         double* acc
     );
 
+    /// Register a matrix element for the process represented by `process`, of the given `type` and
+    /// coupling orders given by `order_qcd` and `order_ew`. The return value denotes an ID which is
+    /// needed as an argument for other functions.
+    int register_process(char const* process, me_type type, int order_qcd, int order_ew);
+
 private:
     bool started_;
+    bool set_order_qcd_;
 
     ol_interface();
 };
-
-///
-enum class ol_register_mode
-{
-    set_ew_order,
-    set_qcd_order
-};
-
-///
-int register_process_try_hard(
-    ol_interface& ol,
-    char const* process,
-    int amptype,
-    int order_qcd,
-    int order_ew,
-    ol_register_mode& mode
-);
 
 }
 

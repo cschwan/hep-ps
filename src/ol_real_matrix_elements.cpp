@@ -1,5 +1,6 @@
 #include "hep/ps/correction_type.hpp"
 #include "hep/ps/generate_dipole.hpp"
+#include "hep/ps/me_type.hpp"
 #include "hep/ps/ol_interface.hpp"
 #include "hep/ps/ol_real_matrix_elements.hpp"
 #include "hep/ps/pdg_functions.hpp"
@@ -27,9 +28,6 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 {
     auto& ol = ol_interface::instance();
 
-    ol_register_mode real_mode = ol_register_mode::set_ew_order;
-    ol_register_mode dipole_mode = ol_register_mode::set_ew_order;
-
     std::vector<int> dipole_ids;
 
     for (auto const& process : real_processes)
@@ -50,8 +48,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
             }
         }
 
-        int const real_id = register_process_try_hard(ol, process.c_str(), 1,
-            order.alphas_power(), order.alpha_power(), real_mode);
+        int const real_id = ol.register_process(process.c_str(), me_type::born,
+            order.alphas_power(), order.alpha_power());
         ids_reals_.emplace(states.first, real_id);
 
         // construct all possible EW and QCD dipoles
@@ -117,22 +115,17 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
                 }
             }
 
-            int ol_type = 0;
+            me_type ol_type = me_type::born;
 
             if (pdg_id_to_particle_type(splitting.internal()) == particle_type::boson)
             {
                 // spin-correlated ME
-                ol_type = 3;
+                ol_type = me_type::spin_correlated;
             }
             else if (type == correction_type::qcd)
             {
                 // color-correlated ME
-                ol_type = 2;
-            }
-            else
-            {
-                // normal Born ME
-                ol_type = 1;
+                ol_type = me_type::color_correlated;
             }
 
             auto const process = pdg_ids_to_ol_process_string(dipole_ids);
@@ -140,8 +133,8 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
                 (order.alpha_power() - 1);
             int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
                 order.alphas_power();
-            int const dipole_id = register_process_try_hard(ol, process.c_str(), ol_type, order_qcd,
-                order_ew, dipole_mode);
+            int const dipole_id = ol.register_process(process.c_str(), ol_type, order_qcd,
+                order_ew);
 
             int charge_table_index = -1;
 

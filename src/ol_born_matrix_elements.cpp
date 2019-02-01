@@ -1,3 +1,4 @@
+#include "hep/ps/me_type.hpp"
 #include "hep/ps/ol_born_matrix_elements.hpp"
 #include "hep/ps/ol_interface.hpp"
 #include "hep/ps/pdg_functions.hpp"
@@ -19,8 +20,6 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
     , loop_mes_(loop_mes)
 {
     auto& ol = ol_interface::instance();
-
-    ol_register_mode mode = ol_register_mode::set_qcd_order;
 
     if (loop_mes)
     {
@@ -61,9 +60,9 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
             }
         }
 
-        int const amptype = loop_mes ? 11 : 1;
-        ids_.emplace(states.first, register_process_try_hard(ol, process.c_str(), amptype,
-            order.alphas_power(), order.alpha_power(), mode));
+        auto amptype = loop_mes ? me_type::loop : me_type::born;
+        ids_.emplace(states.first, ol.register_process(process.c_str(), amptype,
+            order.alphas_power(), order.alpha_power()));
     }
 
     final_states_.shrink_to_fit();
