@@ -1010,27 +1010,15 @@ void cs_subtraction<T>::insertion_terms2(
     {
     case particle_type::boson:
     {
-        // TODO: not yet tested
-        assert( false );
-
         if (correction_type_of(term.vertex()) == correction_type::ew)
         {
-            std::array<T, 6> const ncq2 = {
-                // up
-                nc_ * (T(0.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
-                // up, down
-                nc_ * (T(1.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
-                // up, down, strange
-                nc_ * (T(2.0) * T(1.0) / T(9.0) + T(1.0) * T(4.0) / T(9.0)),
-                // up, down, strange, charm
-                nc_ * (T(2.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
-                // up, down, strange, charm, bottom
-                nc_ * (T(3.0) * T(1.0) / T(9.0) + T(2.0) * T(4.0) / T(9.0)),
-                // up, down, strange, charm, bottom, top
-                nc_ * (T(3.0) * T(1.0) / T(9.0) + T(3.0) * T(4.0) / T(9.0))
-            };
+            // there are no photon -> photon + X vertices
+            assert( pdg_id_to_particle_type(term.vertex().external()) == particle_type::fermion );
 
-            T const gamma = T(-2.0) / T(3.0) * ncq2.at(nf_);
+            T const q = pdg_id_to_charge_times_three(term.vertex().external()) / T(3.0);
+            T const ncq2 = nc_ * q * q;
+
+            T const gamma = T(-2.0) / T(3.0) * ncq2;
 
             for (auto const& mu : scales)
             {
@@ -1040,14 +1028,16 @@ void cs_subtraction<T>::insertion_terms2(
                 // for photons there is no 1/eps^2 pole -> BHLA/COLI are equal
                 T result = T(8.0) / T(3.0) * gamma;
                 result += gamma * logmubsij;
-                // TODO: shouldn't this be -1/2?
-                result *= T(0.5) / pi;
+                result *= T(-0.5) / pi;
 
                 results.push_back(result);
             }
         }
         else if (correction_type_of(term.vertex()) == correction_type::qcd)
         {
+            // TODO: not yet tested and probably wrong
+            assert( false );
+
             T const ca = nc_;
             T const trnfbca = tf_ * nf_ / ca;
 
