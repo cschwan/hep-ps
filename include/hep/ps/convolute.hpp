@@ -3,7 +3,7 @@
 
 /*
  * hep-ps - A C++ Library of Phase Space Integrands for High Energy Physics
- * Copyright (C) 2017-2018  Christopher Schwan
+ * Copyright (C) 2017-2019  Christopher Schwan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,8 +72,8 @@ inline void convolute_mes_with_pdfs(
     nonstd::span<T const> alphas_factors,
     T global_factor
 ) {
-    std::ptrdiff_t const scales = scale_uncertainty_pdfs_one.size();
-    std::ptrdiff_t const pdfs = pdf_uncertainty_pdfs_one.size();
+    std::size_t const scales = scale_uncertainty_pdfs_one.size();
+    std::size_t const pdfs = pdf_uncertainty_pdfs_one.size();
 
     assert( scale_uncertainty_pdfs_one.size() == scales );
     assert( scale_uncertainty_pdfs_two.size() == scales );
@@ -84,7 +84,7 @@ inline void convolute_mes_with_pdfs(
 
     scale_results.clear();
 
-    for (std::ptrdiff_t i = 0; i != scales; ++i)
+    for (std::size_t i = 0; i != scales; ++i)
     {
         scale_results.push_back(global_factor * alphas_factors[i] * convolute(
             scale_uncertainty_pdfs_one[i],
@@ -96,7 +96,7 @@ inline void convolute_mes_with_pdfs(
 
     pdf_results.clear();
 
-    for (std::ptrdiff_t i = 0; i != pdfs; ++i)
+    for (std::size_t i = 0; i != pdfs; ++i)
     {
         pdf_results.push_back(global_factor * alphas_factors[0] * convolute(
             pdf_uncertainty_pdfs_one[i],
