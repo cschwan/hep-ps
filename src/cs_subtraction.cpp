@@ -813,7 +813,7 @@ void cs_subtraction<T>::insertion_terms(
         T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
         T const value2 = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
 
-        ab_term<T> result;
+        ab_term<T> result = {};
 
         if ((ex == particle_type::fermion) && (in == particle_type::fermion))
         {
@@ -929,7 +929,7 @@ void cs_subtraction<T>::insertion_terms(
                 + value5;
             T const result4 = value6 * (logmu2bsai - logomx);
 
-            ab_term<T> result;
+            ab_term<T> result = {};
 
             if ((ex == particle_type::fermion) && (in == particle_type::fermion))
             {
