@@ -35,15 +35,16 @@
 namespace hep
 {
 
-inline std::size_t lsb_position(std::bitset<128> x)
+inline std::size_t lsb_position(std::bitset<256> x)
 {
-    x |= (x <<  1);
-    x |= (x <<  2);
-    x |= (x <<  4);
-    x |= (x <<  8);
-    x |= (x << 16);
-    x |= (x << 32);
-    x |= (x << 64);
+    x |= (x <<   1);
+    x |= (x <<   2);
+    x |= (x <<   4);
+    x |= (x <<   8);
+    x |= (x <<  16);
+    x |= (x <<  32);
+    x |= (x <<  64);
+    x |= (x << 128);
     x.flip();
 
     return x.count();
@@ -124,7 +125,7 @@ inline std::size_t lsb_position(std::bitset<128> x)
     class name ## _set                                                                             \
     {                                                                                              \
     private:                                                                                       \
-        using bitset = std::bitset<128>;                                                           \
+        using bitset = std::bitset<256>;                                                           \
                                                                                                    \
     public:                                                                                        \
         class const_iterator                                                                       \
