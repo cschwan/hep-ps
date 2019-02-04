@@ -804,37 +804,41 @@ void cs_subtraction<T>::insertion_terms(
 
     case insertion_term_type::final_initial:
     {
-        T const ca = nc_;
-        T const gamma = (pdg_id_to_particle_type(term.vertex().internal()) == particle_type::fermion)
-            ? T(1.5)
-            // FIXME: the following branch has definitely the wrong factors
-            : T(11.0) / T(6.0) * ca - T(2.0) / T(3.0) * tf_ * T(nf_);
-
-        T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
-        T const value2 = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
-
+        T gamma = T();
         ab_term<T> result = {};
 
         if ((ex == particle_type::fermion) && (in == particle_type::fermion))
         {
-            result.a = value1;
-            result.b = (eta - T(1.0)) * value1 + value2;
+            gamma = T(1.5);
         }
         else if ((ex == particle_type::fermion) && (in == particle_type::boson))
         {
-            // TODO: NYI
-            assert( false );
-        }
-        else if ((ex == particle_type::boson) && (in == particle_type::fermion))
-        {
-            // implementation error
-            assert( false );
+            gamma = T(2.0) / T(3.0);
+
+            if (correction_type_of(term.vertex()) == correction_type::ew)
+            {
+                T const q = T(pdg_id_to_charge_times_three(term.vertex().external())) / T(3.0);
+                result.a *= q * q;
+            }
+            else if (correction_type_of(term.vertex()) == correction_type::qcd)
+            {
+                result.a *= tf_ / nf_;
+            }
         }
         else if ((ex == particle_type::boson) && (in == particle_type::boson))
         {
-            // TODO: NYI
+            gamma = T(11.0) / T(6.0);
+        }
+        else
+        {
             assert( false );
         }
+
+        T const value1 = T(0.5) * gamma / pi / (T(1.0) - x);
+        T const value2 = T(0.5) * gamma / pi * (T(1.0) + log(T(1.0) - eta));
+
+        result.a = value1;
+        result.b = (eta - T(1.0)) * value1 + value2;
 
         results.assign(scales.size(), result);
     }
@@ -984,6 +988,9 @@ void cs_subtraction<T>::insertion_terms2(
     }
 
     T scheme_dep_factor;
+    T coli = T();
+
+    T const pi = acos(T(-1.0));
 
     switch (rscheme_)
     {
@@ -993,6 +1000,7 @@ void cs_subtraction<T>::insertion_terms2(
 
     case regularization_scheme::dim_reg_coli:
         scheme_dep_factor = T(-2.0) / T(3.0);
+        coli = T(-1.0) / T(6.0) * pi * pi;
         break;
 
     default:
@@ -1003,7 +1011,6 @@ void cs_subtraction<T>::insertion_terms2(
 
     phase_space_point<T> ps{phase_space};
 
-    T const pi = acos(T(-1.0));
     T const sij = ps.m2(term.emitter(), term.spectator());
 
     switch (pdg_id_to_particle_type(term.vertex().external()))
@@ -1035,21 +1042,38 @@ void cs_subtraction<T>::insertion_terms2(
         }
         else if (correction_type_of(term.vertex()) == correction_type::qcd)
         {
-            // TODO: not yet tested and probably wrong
-            assert( false );
+            T gamma;
+            T k;
 
-            T const ca = nc_;
-            T const trnfbca = tf_ * nf_ / ca;
+            if (pdg_id_to_particle_type(term.vertex().external()) == particle_type::boson)
+            {
+                gamma = T(11.0) / T(6.0);
+                k     = T(67.0) / (18.0) - pi * pi / T(6.0);
+            }
+            else
+            {
+                // T_F divided by C_A
+                T const tfbyca = tf_ / nf_;
+
+                gamma = tfbyca * T( -2.0) / T(3.0);
+                k     = tfbyca * T(-10.0) / T(9.0);
+            }
 
             for (auto const& mu : scales)
             {
                 T const mu2 = mu.regularization() * mu.regularization();
                 T const logmubsij = log(mu2 / sij);
 
-                T result = T(223.0) / T(18.0) - T(16.0) / T(9.0) * trnfbca;
-                result += scheme_dep_factor * pi * pi;
-                result -= T(2.0) / T(3.0) * trnfbca * logmubsij;
-                result += T(0.5) * logmubsij * logmubsij;
+                T result = T();
+
+                // double-pole
+                result += T(0.5) * logmubsij * logmubsij + coli;
+                // single-pole
+                result += gamma * logmubsij;
+                // finite part
+                result += T(2.0) * gamma + k;
+                result -= pi * pi / T(3.0);
+                // overall factor
                 result *= T(-0.5) / pi;
 
                 results.push_back(result);
