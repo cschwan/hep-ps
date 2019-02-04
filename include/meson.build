@@ -9,6 +9,7 @@ headers1 = [
     'hep/ps/correction_type.hpp',
     'hep/ps/coupling_order.hpp',
     'hep/ps/cs_subtraction.hpp',
+    'hep/ps/d_subtraction.hpp',
     'hep/ps/dipole.hpp',
     'hep/ps/dipole_invariants.hpp',
     'hep/ps/dipole_type.hpp',

@@ -27,6 +27,7 @@
 #include "hep/ps/correction_type.hpp"
 #include "hep/ps/coupling_order.hpp"
 #include "hep/ps/cs_subtraction.hpp"
+#include "hep/ps/d_subtraction.hpp"
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/dipole_type.hpp"

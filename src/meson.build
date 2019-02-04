@@ -22,6 +22,7 @@ sources = [
     'cofferaa_interfaces.hpp',
     'cofferaa_phase_space_generator.cpp',
     'cs_subtraction.cpp',
+    'd_subtraction.cpp',
     'dipole.cpp',
     'dipole_veto.cpp',
     'find_hep_ps.cpp',
