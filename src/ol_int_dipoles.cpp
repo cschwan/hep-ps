@@ -59,6 +59,9 @@ ol_int_dipoles<T>::ol_int_dipoles(
         {
         for (std::size_t j = 2; j != ids.size(); ++j)
         {
+            bool is_photon_dipole = false;
+            bool photon_dipole_selected;
+
         for (std::size_t k = 0; k != ids.size(); ++k)
         {
             if ((i == j) || (i == k) || (j == k))
@@ -84,7 +87,7 @@ ol_int_dipoles<T>::ol_int_dipoles(
                 continue;
             }
 
-            bool photon_dipole_selected = false;
+            photon_dipole_selected = false;
 
             if (type == correction_type::ew)
             {
@@ -100,6 +103,8 @@ ol_int_dipoles<T>::ol_int_dipoles(
                     {
                         continue;
                     }
+
+                    is_photon_dipole = true;
 
                     if (selector(dipole_ids, i, j, k))
                     {
@@ -267,6 +272,18 @@ ol_int_dipoles<T>::ol_int_dipoles(
                 break;
             }
         }
+
+            if (is_photon_dipole)
+            {
+                if (photon_dipole_selected)
+                {
+                    is_photon_dipole = false;
+                }
+                else
+                {
+                    throw std::runtime_error("dipole veto vetoes all photon dipoles");
+                }
+            }
         }
         }
         }
