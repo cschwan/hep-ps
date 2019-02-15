@@ -467,8 +467,8 @@ protected:
 
             T actual_factor = T(1.0);
 
-            if (((term.initial_particle() == 0) && (state_parton_one(me_in_state) == ap)) ||
-                ((term.initial_particle() == 1) && (state_parton_two(me_in_state) == ap)))
+            if (((term.initial_particle() == 0) && (state_parton_two(me_in_state) == ap)) ||
+                ((term.initial_particle() == 1) && (state_parton_one(me_in_state) == ap)))
             {
                 actual_factor = T(0.5);
             }
