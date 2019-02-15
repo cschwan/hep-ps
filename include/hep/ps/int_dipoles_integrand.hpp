@@ -275,6 +275,7 @@ public:
                     for (std::size_t j = 0; j != scales; ++j)
                     {
                         auto const eff_pdf = effective_pdf(
+                            me.at(0).first,
                             ab_terms_.at(j),
                             term,
                             xprime[1 - i],
@@ -294,6 +295,7 @@ public:
                     for (std::size_t j = 0; j != pdfs; ++j)
                     {
                         auto const eff_pdf = effective_pdf(
+                            me.at(0).first,
                             ab_terms_.front(),
                             term,
                             xprime[1 - i],
@@ -321,6 +323,7 @@ public:
                     for (std::size_t j = 0; j != scales; ++j)
                     {
                         auto const eff_pdf = effective_pdf(
+                            me.at(0).first,
                             ab_terms_.at(j),
                             term,
                             xprime[i],
@@ -340,6 +343,7 @@ public:
                     for (std::size_t j = 0; j != pdfs; ++j)
                     {
                         auto const eff_pdf = effective_pdf(
+                            me.at(0).first,
                             ab_terms_.front(),
                             term,
                             xprime[i],
@@ -438,6 +442,7 @@ public:
 
 protected:
     parton_array<T> effective_pdf(
+        initial_state me_in_state,
         ab_term<T> const& ab,
         int_dipole const& term,
         T xprime,
@@ -452,8 +457,21 @@ protected:
             auto a = pdg_id_to_parton(term.vertex().internal());
             auto ap = pdg_id_to_parton(term.vertex().external());
 
-            pdf[a]  = pdfb[ap] * ab.a * (T(1.0) - eta) / xprime;
-            pdf[a] += pdfa[ap] * ab.b;
+            T const convolute_factor =
+                (state_parton_one(me_in_state) == state_parton_two(me_in_state)) ? T(0.5) : T(1.0);
+
+            T actual_factor = T(1.0);
+
+            if (((term.initial_particle() == 0) && (state_parton_one(me_in_state) == ap)) ||
+                ((term.initial_particle() == 1) && (state_parton_two(me_in_state) == ap)))
+            {
+                actual_factor = T(0.5);
+            }
+
+            T const correction = actual_factor / convolute_factor;
+
+            pdf[a]  = correction * pdfb[ap] * ab.a * (T(1.0) - eta) / xprime;
+            pdf[a] += correction * pdfa[ap] * ab.b;
         }
         else
         {
