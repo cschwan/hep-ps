@@ -257,6 +257,11 @@ public:
             auto const& me = corr_me_.at(index);
             auto const& term = insertion_terms_.at(index);
 
+            if (me.empty())
+            {
+                continue;
+            }
+
             // TODO: change interface of `correlated_me` based on the following assumption
             assert( me.size() == 1 );
 
