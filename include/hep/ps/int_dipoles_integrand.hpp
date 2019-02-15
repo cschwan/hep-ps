@@ -254,8 +254,11 @@ public:
         // loop over all Born, FI, IF, II, and FF
         for (std::size_t index = 0; index != insertion_terms_.size(); ++index)
         {
-            auto const me = corr_me_.at(index);
+            auto const& me = corr_me_.at(index);
             auto const& term = insertion_terms_.at(index);
+
+            // TODO: change interface of `correlated_me` based on the following assumption
+            assert( me.size() == 1 );
 
             if ((parts_ != finite_parts::insertion_term2) &&
                 (term.type() != insertion_term_type::final_final))
