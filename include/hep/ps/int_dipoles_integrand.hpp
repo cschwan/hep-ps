@@ -262,9 +262,6 @@ public:
                 continue;
             }
 
-            // TODO: change interface of `correlated_me` based on the following assumption
-            assert( me.size() == 1 );
-
             if ((parts_ != finite_parts::insertion_term2) &&
                 (term.type() != insertion_term_type::final_final))
             {
@@ -279,42 +276,70 @@ public:
 
                     for (std::size_t j = 0; j != scales; ++j)
                     {
-                        auto const eff_pdf = effective_pdf(
-                            me.at(0).first,
-                            ab_terms_.at(j),
-                            term,
-                            xprime[1 - i],
-                            eta[1 - i],
-                            pdfsa_[1 - i].at(j + neg_off_s),
-                            pdfsb_[1 - i].at(j + neg_off_s)
-                        );
+                        for (std::size_t k = 0; k != me.size(); ++k)
+                        {
+                            auto const eff_pdf = effective_pdf(
+                                me.at(k).first,
+                                ab_terms_.at(j),
+                                term,
+                                xprime[1 - i],
+                                eta[1 - i],
+                                pdfsa_[1 - i].at(j + neg_off_s),
+                                pdfsb_[1 - i].at(j + neg_off_s)
+                            );
 
-                        neg_.results.at(j) += factors_.at(j) * factor * convolute(
-                            (i == 0) ? eff_pdf                     : pdfsa_[1].at(j + neg_off_s),
-                            (i == 0) ? pdfsa_[0].at(j + neg_off_s) : eff_pdf,
-                            me,
-                            me_set_
-                        );
+                            auto const& pdfa = (i == 0) ? eff_pdf : pdfsa_[1].at(j + neg_off_s);
+                            auto const& pdfb = (i == 0) ? pdfsa_[0].at(j + neg_off_s) : eff_pdf;
+
+                            auto const state = me.at(k).first;
+
+                            if (!me_set_.includes(state))
+                            {
+                                continue;
+                            }
+
+                            auto const one = state_parton_one(state);
+                            auto const two = state_parton_two(state);
+                            auto const sym = (one == two) ? T(0.5) : T(1.0);
+                            auto const mel = me.at(k).second;
+
+                            neg_.results.at(j) += factors_.at(j) * factor * sym * pdfa[one] *
+                                pdfb[two] * mel;
+                        }
                     }
 
                     for (std::size_t j = 0; j != pdfs; ++j)
                     {
-                        auto const eff_pdf = effective_pdf(
-                            me.at(0).first,
-                            ab_terms_.front(),
-                            term,
-                            xprime[1 - i],
-                            eta[1 - i],
-                            pdf_pdfsa_[1 - i].at(j + neg_off_p),
-                            pdf_pdfsb_[1 - i].at(j + neg_off_p)
-                        );
+                        for (std::size_t k = 0; k != me.size(); ++k)
+                        {
+                            auto const eff_pdf = effective_pdf(
+                                me.at(k).first,
+                                ab_terms_.front(),
+                                term,
+                                xprime[1 - i],
+                                eta[1 - i],
+                                pdf_pdfsa_[1 - i].at(j + neg_off_p),
+                                pdf_pdfsb_[1 - i].at(j + neg_off_p)
+                            );
 
-                        neg_.pdf_results.at(j) += factors_.at(0) * factor * convolute(
-                            (i == 0) ? eff_pdf                         : pdf_pdfsa_[1].at(j + neg_off_p),
-                            (i == 0) ? pdf_pdfsa_[0].at(j + neg_off_p) : eff_pdf,
-                            me,
-                            me_set_
-                        );
+                            auto const& pdfa = (i == 0) ? eff_pdf : pdf_pdfsa_[1].at(j + neg_off_p);
+                            auto const& pdfb = (i == 0) ? pdf_pdfsa_[0].at(j + neg_off_p) : eff_pdf;
+
+                            auto const state = me.at(k).first;
+
+                            if (!me_set_.includes(state))
+                            {
+                                continue;
+                            }
+
+                            auto const one = state_parton_one(state);
+                            auto const two = state_parton_two(state);
+                            auto const sym = (one == two) ? T(0.5) : T(1.0);
+                            auto const mel = me.at(k).second;
+
+                            neg_.pdf_results.at(j) += factors_.at(0) * factor * sym * pdfa[one] *
+                                pdfb[two] * mel;
+                        }
                     }
                 }
 
@@ -327,42 +352,70 @@ public:
 
                     for (std::size_t j = 0; j != scales; ++j)
                     {
-                        auto const eff_pdf = effective_pdf(
-                            me.at(0).first,
-                            ab_terms_.at(j),
-                            term,
-                            xprime[i],
-                            eta[i],
-                            pdfsa_[i].at(j + pos_off_s),
-                            pdfsb_[i].at(j + pos_off_s)
-                        );
+                        for (std::size_t k = 0; k != me.size(); ++k)
+                        {
+                            auto const eff_pdf = effective_pdf(
+                                me.at(k).first,
+                                ab_terms_.at(j),
+                                term,
+                                xprime[i],
+                                eta[i],
+                                pdfsa_[i].at(j + pos_off_s),
+                                pdfsb_[i].at(j + pos_off_s)
+                            );
 
-                        pos_.results.at(j) += factors_.at(j + neg_off_s) * factor * convolute(
-                            (i == 0) ? eff_pdf                     : pdfsa_[0].at(j + pos_off_s),
-                            (i == 0) ? pdfsa_[1].at(j + pos_off_s) : eff_pdf,
-                            me,
-                            me_set_
-                        );
+                            auto const& pdfa = (i == 0) ? eff_pdf : pdfsa_[0].at(j + pos_off_s);
+                            auto const& pdfb = (i == 0) ? pdfsa_[1].at(j + pos_off_s) : eff_pdf;
+
+                            auto const state = me.at(k).first;
+
+                            if (!me_set_.includes(state))
+                            {
+                                continue;
+                            }
+
+                            auto const one = state_parton_one(state);
+                            auto const two = state_parton_two(state);
+                            auto const sym = (one == two) ? T(0.5) : T(1.0);
+                            auto const mel = me.at(k).second;
+
+                            pos_.results.at(j) += factors_.at(j + neg_off_s) * factor * sym *
+                                pdfa[one] * pdfb[two] * mel;
+                        }
                     }
 
                     for (std::size_t j = 0; j != pdfs; ++j)
                     {
-                        auto const eff_pdf = effective_pdf(
-                            me.at(0).first,
-                            ab_terms_.front(),
-                            term,
-                            xprime[i],
-                            eta[i],
-                            pdf_pdfsa_[i].at(j + pos_off_p),
-                            pdf_pdfsb_[i].at(j + pos_off_p)
-                        );
+                        for (std::size_t k = 0; k != me.size(); ++k)
+                        {
+                            auto const eff_pdf = effective_pdf(
+                                me.at(k).first,
+                                ab_terms_.front(),
+                                term,
+                                xprime[i],
+                                eta[i],
+                                pdf_pdfsa_[i].at(j + pos_off_p),
+                                pdf_pdfsb_[i].at(j + pos_off_p)
+                            );
 
-                        pos_.pdf_results.at(j) += factors_.at(0 + neg_off_s) * factor * convolute(
-                            (i == 0) ? eff_pdf                         : pdf_pdfsa_[0].at(j + pos_off_p),
-                            (i == 0) ? pdf_pdfsa_[1].at(j + pos_off_p) : eff_pdf,
-                            me,
-                            me_set_
-                        );
+                            auto const& pdfa = (i == 0) ? eff_pdf : pdf_pdfsa_[0].at(j + pos_off_p);
+                            auto const& pdfb = (i == 0) ? pdf_pdfsa_[1].at(j + pos_off_p) : eff_pdf;
+
+                            auto const state = me.at(k).first;
+
+                            if (!me_set_.includes(state))
+                            {
+                                continue;
+                            }
+
+                            auto const one = state_parton_one(state);
+                            auto const two = state_parton_two(state);
+                            auto const sym = (one == two) ? T(0.5) : T(1.0);
+                            auto const mel = me.at(k).second;
+
+                            pos_.pdf_results.at(j) += factors_.at(0 + neg_off_s) * factor * sym *
+                                pdfa[one] * pdfb[two] * mel;
+                        }
                     }
                 }
             }
