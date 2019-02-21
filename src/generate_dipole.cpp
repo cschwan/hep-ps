@@ -40,10 +40,13 @@ dipole_vertex generate_dipole(
             result = dipole_vertex(id_i, id_i, id_j);
         }
         // fermion -> photon + fermion
-        else if (pdg_id_is_photon(id_i) && charged_j && (i < 2))
+        else if (pdg_id_is_photon(id_i) && charged_j && pdg_id_has_color(id_j) && (i < 2))
         {
-            // TODO: NYI
-            assert( false );
+            dipole_pdg_ids = process_pdg_ids;
+            dipole_pdg_ids.at(i) = process_pdg_ids.at(j) * sign;
+            dipole_pdg_ids.erase(dipole_pdg_ids.begin() + j);
+
+            result = dipole_vertex(dipole_pdg_ids.at(i), id_i, id_j);
         }
         // photon -> fermion + antifermion
         else if (charged_j && ((id_i + sign * id_j) == 0) && ((i < 2) || (id_i > 0)))
