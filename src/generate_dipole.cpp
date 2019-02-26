@@ -40,7 +40,7 @@ dipole_vertex generate_dipole(
             result = dipole_vertex(id_i, id_i, id_j);
         }
         // fermion -> photon + fermion
-        else if (pdg_id_is_photon(id_i) && charged_j && pdg_id_has_color(id_j) && (i < 2))
+        else if (pdg_id_is_photon(id_i) && (i < 2) && charged_j && pdg_id_has_color(id_j) && charged_k)
         {
             dipole_pdg_ids = process_pdg_ids;
             dipole_pdg_ids.at(i) = process_pdg_ids.at(j) * sign;
