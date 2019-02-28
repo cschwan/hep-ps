@@ -75,12 +75,8 @@ ol_int_dipoles<T>::ol_int_dipoles(
 
             if (type == correction_type::ew)
             {
-                int const id_i = ids.at(i);
-                int const id_j = ids.at(j);
-                int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
-
-                // check if this is a photon dipole
-                if (id_i + sign * id_j == 0)
+                // if the unresolved particle is not a final-state photon, we only need one dipole
+                if (ids.at(j) != pdg_id_of_photon())
                 {
                     // do not consider (j,i;k) if we already have (i,j;k)
                     if (i > j)
@@ -361,24 +357,38 @@ void ol_int_dipoles<T>::correlated_me(
 
                     if (dipole.type() == insertion_term_type::born)
                     {
-                        T charge = charge_table_.at(index).at(dipole.initial_particle());
+                        T charge;
 
-                        // if the initial state is a photon the charge factor
-                        // of the quark is multiplied somewhere else
-                        if (charge == T())
+                        if (dipole.vertex().unresolved() != pdg_id_of_photon())
                         {
+                            // TODO: sign should not matter, because only the square is used
                             charge = T(-1.0);
+                        }
+                        else
+                        {
+                            charge = charge_table_.at(index).at(dipole.initial_particle());
                         }
 
                         results.at(me).emplace_back(state, charge * charge * T(alpha) * T(m2tree));
                     }
                     else
                     {
-                        auto const em = dipole.emitter();
-                        auto const sp = dipole.spectator();
-                        T const charge_em = charge_table_.at(index).at(em);
-                        T const charge_sp = charge_table_.at(index).at(sp);
-                        T const charges = (charge_em == T()) ? T(-1.0) : (charge_em * charge_sp);
+                        T charges;
+
+                        if (dipole.vertex().unresolved() != pdg_id_of_photon())
+                        {
+                            charges = T(-1.0);
+                        }
+                        else
+                        {
+                            auto const em = dipole.emitter();
+                            auto const sp = dipole.spectator();
+                            T const charge_em = charge_table_.at(index).at(em);
+                            T const charge_sp = charge_table_.at(index).at(sp);
+
+                            charges = charge_em * charge_sp;
+                        }
+
                         T const result = charges * alpha * T(m2tree);
 
                         results.at(me).emplace_back(state, result);
