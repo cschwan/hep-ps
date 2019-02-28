@@ -361,8 +361,8 @@ void ol_int_dipoles<T>::correlated_me(
 
                         if (dipole.vertex().unresolved() != pdg_id_of_photon())
                         {
-                            // TODO: sign should not matter, because only the square is used
-                            charge = T(-1.0);
+                            charge = T(pdg_id_to_charge_times_three(dipole.vertex().unresolved()))
+                                / T(3.0);
                         }
                         else
                         {
@@ -377,7 +377,9 @@ void ol_int_dipoles<T>::correlated_me(
 
                         if (dipole.vertex().unresolved() != pdg_id_of_photon())
                         {
-                            charges = T(-1.0);
+                            charges = T(pdg_id_to_charge_times_three(dipole.vertex().unresolved()))
+                                / T(3.0);
+                            charges *= -charges;
                         }
                         else
                         {

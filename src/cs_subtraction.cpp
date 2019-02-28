@@ -815,12 +815,7 @@ void cs_subtraction<T>::insertion_terms(
         {
             gamma = T(2.0) / T(3.0);
 
-            if (correction_type_of(term.vertex()) == correction_type::ew)
-            {
-                T const q = T(pdg_id_to_charge_times_three(term.vertex().external())) / T(3.0);
-                result.a *= q * q;
-            }
-            else if (correction_type_of(term.vertex()) == correction_type::qcd)
+            if (correction_type_of(term.vertex()) == correction_type::qcd)
             {
                 result.a *= tf_ / nf_;
             }
@@ -877,12 +872,6 @@ void cs_subtraction<T>::insertion_terms(
             else if ((ex == particle_type::fermion) && (in == particle_type::boson))
             {
                 result.a = result4;
-
-                if (correction_type_of(term.vertex()) == correction_type::ew)
-                {
-                    T const q = T(pdg_id_to_charge_times_three(term.vertex().external())) / T(3.0);
-                    result.a *= q * q;
-                }
             }
             else if ((ex == particle_type::boson) && (in == particle_type::fermion))
             {
@@ -943,12 +932,6 @@ void cs_subtraction<T>::insertion_terms(
             else if ((ex == particle_type::fermion) && (in == particle_type::boson))
             {
                 result.a = result4;
-
-                if (correction_type_of(term.vertex()) == correction_type::ew)
-                {
-                    T const q = T(pdg_id_to_charge_times_three(term.vertex().external())) / T(3.0);
-                    result.a *= q * q;
-                }
             }
             else if ((ex == particle_type::boson) && (in == particle_type::fermion))
             {
@@ -1022,10 +1005,7 @@ void cs_subtraction<T>::insertion_terms2(
             // there are no photon -> photon + X vertices
             assert( pdg_id_to_particle_type(term.vertex().external()) == particle_type::fermion );
 
-            T const q = pdg_id_to_charge_times_three(term.vertex().external()) / T(3.0);
-            T const ncq2 = nc_ * q * q;
-
-            T const gamma = T(-2.0) / T(3.0) * ncq2;
+            T const gamma = T(-2.0) / T(3.0) * nc_;
 
             for (auto const& mu : scales)
             {
