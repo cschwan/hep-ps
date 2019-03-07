@@ -78,12 +78,6 @@ ol_int_dipoles<T>::ol_int_dipoles(
                 // if the unresolved particle is not a final-state photon, we only need one dipole
                 if (ids.at(j) != pdg_id_of_photon())
                 {
-                    // do not consider (j,i;k) if we already have (i,j;k)
-                    if (i > j)
-                    {
-                        continue;
-                    }
-
                     is_photon_dipole = true;
 
                     if (selector(dipole_ids, i, j, k))
