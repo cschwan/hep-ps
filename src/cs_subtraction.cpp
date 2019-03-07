@@ -996,7 +996,7 @@ void cs_subtraction<T>::insertion_terms2(
 
     T const sij = ps.m2(term.emitter(), term.spectator());
 
-    switch (pdg_id_to_particle_type(term.vertex().external()))
+    switch (pdg_id_to_particle_type(term.vertex().internal()))
     {
     case particle_type::boson:
     {
