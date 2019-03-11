@@ -94,18 +94,10 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
 
             if (type == correction_type::ew)
             {
-                int const id_i = ids.at(i);
-                int const id_j = ids.at(j);
-                int const sign = ((i < 2) == (j < 2)) ? 1 : -1;
-
-                // check if this is a photon dipole
-                if (id_i + sign * id_j == 0)
+                // if the unresolved particle is not a final-state photon, we only need one dipole
+                if (ids.at(j) != pdg_id_of_photon())
                 {
-                    // do not consider (j,i;k) if we already have (i,j;k)
-                    if (i > j)
-                    {
-                        continue;
-                    }
+                    is_photon_dipole = true;
 
                     if (selector(dipole_ids, i, j, k))
                     {
@@ -332,9 +324,23 @@ void ol_real_matrix_elements<T>::dipole_me(
                 double m2tree;
                 ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
 
-                T const charge_em = charge_table_.at(index).at(em_real);
-                T const charge_sp = charge_table_.at(index).at(sp_real);
-                T const result = final_state_factor * charge_em * charge_sp * alpha * T(m2tree);
+                T const charge_un = charge_table_.at(index).at(dipole.unresolved());
+
+                T charges;
+
+                if (charge_un != T())
+                {
+                    charges = -charge_un * charge_un;
+                }
+                else
+                {
+                    T const charge_em = charge_table_.at(index).at(em_real);
+                    T const charge_sp = charge_table_.at(index).at(sp_real);
+
+                    charges = charge_em * charge_sp;
+                }
+
+                T const result = final_state_factor * charges * alpha * T(m2tree);
 
                 results.front().emplace_back(state, result);
             }
