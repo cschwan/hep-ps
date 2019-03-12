@@ -162,6 +162,12 @@ void ol_born_matrix_elements<T>::borns(
             for (auto const state : set)
             {
                 auto const range = ids_.equal_range(state);
+
+                if (range.first == range.second)
+                {
+                    continue;
+                }
+
                 T value = T();
 
                 for (auto i = range.first; i != range.second; ++i)
@@ -181,6 +187,12 @@ void ol_born_matrix_elements<T>::borns(
         for (auto const state : set)
         {
             auto const range = ids_.equal_range(state);
+
+            if (range.first == range.second)
+            {
+                continue;
+            }
+
             T value = T();
 
             for (auto i = range.first; i != range.second; ++i)
