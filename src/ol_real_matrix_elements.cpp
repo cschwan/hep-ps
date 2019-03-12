@@ -325,16 +325,22 @@ void ol_real_matrix_elements<T>::dipole_me(
                 ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
 
                 T const charge_un = charge_table_.at(index).at(dipole.unresolved());
+                T const charge_em = charge_table_.at(index).at(em_real);
 
                 T charges;
 
                 if (charge_un != T())
                 {
                     charges = -charge_un * charge_un;
+
+                    if (charge_em == T())
+                    {
+                        // multiply with the number of colors
+                        charges *= T(3.0);
+                    }
                 }
                 else
                 {
-                    T const charge_em = charge_table_.at(index).at(em_real);
                     T const charge_sp = charge_table_.at(index).at(sp_real);
 
                     charges = charge_em * charge_sp;
