@@ -168,7 +168,7 @@ std::unique_ptr<phase_space_generator<T>> make_list_phase_space_generator(std::i
         while (tokens.good());
 
         // if theres more than one number on a line, count it towards the phase space point
-        if ((numbers.size() == 4) && read_point)
+        if ((numbers.size() >= 4) && read_point)
         {
             phase_space_point.insert(phase_space_point.end(), numbers.begin(), numbers.end());
             numbers.clear();
