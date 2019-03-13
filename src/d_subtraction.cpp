@@ -1,5 +1,7 @@
 #include "hep/ps/cs_subtraction.hpp"
 #include "hep/ps/d_subtraction.hpp"
+#include "hep/ps/insertion_term_type.hpp"
+#include "hep/ps/pdg_functions.hpp"
 
 #include <cmath>
 
@@ -60,6 +62,72 @@ T d_subtraction<T>::fermion_function(
     // FI, IF, and II dipoles are exactly the same
 
     return result;
+}
+
+template <typename T>
+void d_subtraction<T>::insertion_terms(
+    int_dipole const& term,
+    nonstd::span<scales<T> const> scales,
+    std::vector<T> const& phase_space,
+    T x,
+    T eta,
+    std::vector<ab_term<T>>& results
+) const {
+    subtraction_.insertion_terms(term, scales, phase_space, x, eta, results);
+
+    auto const ex = pdg_id_to_particle_type(term.vertex().external());
+    auto const in = pdg_id_to_particle_type(term.vertex().internal());
+
+    if ((term.type() == insertion_term_type::born) && (ex == particle_type::fermion) &&
+        (in == particle_type::fermion))
+    {
+        using std::acos;
+
+        T const pi = acos(T(-1.0));
+
+        for (std::size_t i = 0; i != scales.size(); ++i)
+        {
+            results.at(i).b -= T(0.5) / pi * (T(1.0) / T(3.0) * pi * pi - T(1.0));
+        }
+    }
+}
+
+template <typename T>
+void d_subtraction<T>::insertion_terms2(
+    int_dipole const& term,
+    nonstd::span<scales<T> const> scales,
+    std::vector<T> const& phase_space,
+    std::vector<T>& results
+) const {
+    subtraction_.insertion_terms2(term, scales, phase_space, results);
+
+    auto const ex = pdg_id_to_particle_type(term.vertex().external());
+    auto const in = pdg_id_to_particle_type(term.vertex().internal());
+
+    if ((term.type() == insertion_term_type::initial_initial) && (ex == particle_type::fermion) &&
+        (in == particle_type::fermion))
+    {
+        using std::acos;
+
+        T const pi = acos(T(-1.0));
+
+        for (std::size_t i = 0; i != scales.size(); ++i)
+        {
+            results.at(i) -= T(-0.5) / pi * (T(1.0) - pi * pi / T(3.0));
+        }
+    }
+    else if ((term.type() == insertion_term_type::final_final) && (ex == particle_type::fermion) &&
+        (in == particle_type::fermion))
+    {
+        using std::acos;
+
+        T const pi = acos(T(-1.0));
+
+        for (std::size_t i = 0; i != scales.size(); ++i)
+        {
+            results.at(i) -= T(-0.5) / pi * (T(1.5) - pi * pi / T(3.0));
+        }
+    }
 }
 
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------

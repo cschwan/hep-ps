@@ -23,8 +23,11 @@
 #include "hep/ps/dipole.hpp"
 #include "hep/ps/dipole_invariants.hpp"
 #include "hep/ps/factorization_scheme.hpp"
+#include "hep/ps/int_dipole.hpp"
 #include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/spin_correlation_matrix.hpp"
+
+#include "nonstd/span.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -61,6 +64,24 @@ public:
 
     ///
     T fermion_function(dipole const& dipole_info, dipole_invariants<T> const& invariants);
+
+    ///
+    void insertion_terms(
+        int_dipole const& term,
+        nonstd::span<scales<T> const> scales,
+        std::vector<T> const& phase_space,
+        T x,
+        T eta,
+        std::vector<ab_term<T>>& results
+    ) const;
+
+    ///
+    void insertion_terms2(
+        int_dipole const& term,
+        nonstd::span<scales<T> const> scales,
+        std::vector<T> const& phase_space,
+        std::vector<T>& results
+    ) const;
 
 private:
     cs_subtraction<T> subtraction_;
