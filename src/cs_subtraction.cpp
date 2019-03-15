@@ -19,13 +19,15 @@ cs_subtraction<T>::cs_subtraction(
     T tf,
     std::size_t nf,
     factorization_scheme fscheme,
-    regularization_scheme rscheme
+    regularization_scheme rscheme,
+    T photon_to_jet_conversion_scale
 )
     : nc_{nc}
     , tf_{tf}
     , nf_{nf}
     , fscheme_{fscheme}
     , rscheme_{rscheme}
+    , photon_to_jet_conversion_scale_{photon_to_jet_conversion_scale}
 {
 }
 
@@ -1009,13 +1011,28 @@ void cs_subtraction<T>::insertion_terms2(
 
             for (auto const& mu : scales)
             {
-                T const mu2 = mu.regularization() * mu.regularization();
-                T const logmubsij = log(mu2 / sij);
-
                 // for photons there is no 1/eps^2 pole -> BHLA/COLI are equal
-                T result = T(8.0) / T(3.0) * gamma;
-                result += gamma * logmubsij;
-                result *= T(-0.5) / pi;
+
+                T result = T();
+
+                if (photon_to_jet_conversion_scale_ != T())
+                {
+                    T const logmubsij = log(photon_to_jet_conversion_scale_ *
+                        photon_to_jet_conversion_scale_ / sij);
+
+                    result += T(1.0);
+                    result += logmubsij;
+                    result *= nc_ / (T(3.0) * pi);
+                }
+                else
+                {
+                    T const mu2 = mu.regularization() * mu.regularization();
+                    T const logmubsij = log(mu2 / sij);
+
+                    result  = T(8.0) / T(3.0) * gamma;
+                    result += gamma * logmubsij;
+                    result *= T(-0.5) / pi;
+                }
 
                 results.push_back(result);
             }

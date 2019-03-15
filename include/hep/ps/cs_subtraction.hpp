@@ -51,7 +51,8 @@ public:
         T tf,
         std::size_t nf,
         factorization_scheme fscheme,
-        regularization_scheme rscheme
+        regularization_scheme rscheme,
+        T photon_to_jet_conversion_scale = T()
     );
 
     /// Returns `true` if \ref map_phase_space returns the same phase space for both dipoles `a` and
@@ -120,6 +121,7 @@ private:
     std::size_t nf_;
     factorization_scheme fscheme_;
     regularization_scheme rscheme_;
+    T photon_to_jet_conversion_scale_;
 };
 
 }
