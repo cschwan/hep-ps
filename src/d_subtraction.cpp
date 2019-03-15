@@ -1,6 +1,7 @@
 #include "hep/ps/cs_subtraction.hpp"
 #include "hep/ps/d_subtraction.hpp"
 #include "hep/ps/insertion_term_type.hpp"
+#include "hep/ps/phase_space_point.hpp"
 #include "hep/ps/pdg_functions.hpp"
 
 #include <cmath>
@@ -99,34 +100,61 @@ void d_subtraction<T>::insertion_terms2(
     std::vector<T> const& phase_space,
     std::vector<T>& results
 ) const {
-    subtraction_.insertion_terms2(term, scales, phase_space, results);
+    using std::acos;
+    using std::log;
 
-    auto const ex = pdg_id_to_particle_type(term.vertex().external());
-    auto const in = pdg_id_to_particle_type(term.vertex().internal());
+    results.clear();
 
-    if ((term.type() == insertion_term_type::initial_initial) && (ex == particle_type::fermion) &&
-        (in == particle_type::fermion))
+    // TODO: the other cases are NYI
+    assert( pdg_id_to_particle_type(term.vertex().unresolved()) == particle_type::boson );
+
+    // TODO: QCD?
+    assert( correction_type_of(term.vertex()) == correction_type::ew );
+
+    T const sij = hep::phase_space_point<T>{phase_space}.m2(term.emitter(), term.spectator());
+    T const pi = acos(T(-1.0));
+
+    T dipole_dependent_factor = T();
+
+    switch (term.type())
     {
-        using std::acos;
+    case insertion_term_type::initial_initial:
+        dipole_dependent_factor -= pi * pi / T(3.0);
+        dipole_dependent_factor += T(2.0);
+        break;
 
-        T const pi = acos(T(-1.0));
+    case insertion_term_type::initial_final:
+        dipole_dependent_factor += pi * pi / T(6.0);
+        dipole_dependent_factor -= T(1.0);
+        break;
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
-        {
-            results.at(i) -= T(-0.5) / pi * (T(1.0) - pi * pi / T(3.0));
-        }
+    case insertion_term_type::final_initial:
+        dipole_dependent_factor -= pi * pi / T(2.0);
+        dipole_dependent_factor += T(3.0) / T(2.0);
+        break;
+
+    case insertion_term_type::final_final:
+        dipole_dependent_factor -= pi * pi / T(3.0);
+        dipole_dependent_factor += T(3.0) / T(2.0);
+        break;
+
+    default:
+        // implementation error
+        assert( false );
     }
-    else if ((term.type() == insertion_term_type::final_final) && (ex == particle_type::fermion) &&
-        (in == particle_type::fermion))
+
+    for (auto const& scale : scales)
     {
-        using std::acos;
+        T const mu2 = scale.regularization() * scale.regularization();
+        T const logmubsij = log(mu2 / sij);
 
-        T const pi = acos(T(-1.0));
+        T result = T(2.0);
+        result += T(0.5) * logmubsij * logmubsij;
+        result += T(1.5) * logmubsij;
+        result += dipole_dependent_factor;
+        result *= T(-0.5) / pi;
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
-        {
-            results.at(i) -= T(-0.5) / pi * (T(1.5) - pi * pi / T(3.0));
-        }
+        results.push_back(result);
     }
 }
 
