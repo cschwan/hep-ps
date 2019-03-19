@@ -815,11 +815,16 @@ void cs_subtraction<T>::insertion_terms(
         }
         else if ((ex == particle_type::fermion) && (in == particle_type::boson))
         {
-            gamma = T(2.0) / T(3.0);
+            gamma = T(-2.0) / T(3.0);
 
             if (correction_type_of(term.vertex()) == correction_type::qcd)
             {
-                result.a *= tf_ / nf_;
+                // this path isn't tested yet
+                assert( false );
+            }
+            else
+            {
+                gamma *= nc_;
             }
         }
         else if ((ex == particle_type::boson) && (in == particle_type::boson))
