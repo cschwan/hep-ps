@@ -25,6 +25,7 @@
 #include "hep/ps/factorization_scheme.hpp"
 #include "hep/ps/insertion_term.hpp"
 #include "hep/ps/int_dipole.hpp"
+#include "hep/ps/photon_to_jet_conversion.hpp"
 #include "hep/ps/regularization_scheme.hpp"
 #include "hep/ps/scales.hpp"
 #include "hep/ps/spin_correlation_matrix.hpp"
@@ -52,7 +53,7 @@ public:
         std::size_t nf,
         factorization_scheme fscheme,
         regularization_scheme rscheme,
-        T photon_to_jet_conversion_scale = T()
+        photon_to_jet_conversion<T> conversion = photon_to_jet_conversion<T>()
     );
 
     /// Returns `true` if \ref map_phase_space returns the same phase space for both dipoles `a` and
@@ -121,7 +122,7 @@ private:
     std::size_t nf_;
     factorization_scheme fscheme_;
     regularization_scheme rscheme_;
-    T photon_to_jet_conversion_scale_;
+    photon_to_jet_conversion<T> conversion_;
 };
 
 }

@@ -20,14 +20,14 @@ cs_subtraction<T>::cs_subtraction(
     std::size_t nf,
     factorization_scheme fscheme,
     regularization_scheme rscheme,
-    T photon_to_jet_conversion_scale
+    photon_to_jet_conversion<T> conversion
 )
     : nc_{nc}
     , tf_{tf}
     , nf_{nf}
     , fscheme_{fscheme}
     , rscheme_{rscheme}
-    , photon_to_jet_conversion_scale_{photon_to_jet_conversion_scale}
+    , conversion_{conversion}
 {
 }
 
@@ -1016,27 +1016,21 @@ void cs_subtraction<T>::insertion_terms2(
 
             for (auto const& mu : scales)
             {
+                T const mu2 = mu.regularization() * mu.regularization();
+                T const logmubsij = log(mu2 / sij);
+
                 // for photons there is no 1/eps^2 pole -> BHLA/COLI are equal
 
-                T result = T();
+                T result = T(8.0) / T(3.0) * gamma;
+                result += gamma * logmubsij;
+                result *= T(-0.5) / pi;
 
-                if (photon_to_jet_conversion_scale_ != T())
+                if (conversion_.active())
                 {
-                    T const logmubsij = log(photon_to_jet_conversion_scale_ *
-                        photon_to_jet_conversion_scale_ / sij);
+                    T charge = T(pdg_id_to_charge_times_three(term.vertex().external())) / T(3.0);
+                    T non_pertubative_factor = T(-1.0) / charge / charge;
 
-                    result += T(1.0);
-                    result += logmubsij;
-                    result *= nc_ / (T(3.0) * pi);
-                }
-                else
-                {
-                    T const mu2 = mu.regularization() * mu.regularization();
-                    T const logmubsij = log(mu2 / sij);
-
-                    result  = T(8.0) / T(3.0) * gamma;
-                    result += gamma * logmubsij;
-                    result *= T(-0.5) / pi;
+                    result += conversion_.eval(mu.regularization(), non_pertubative_factor);
                 }
 
                 results.push_back(result);
