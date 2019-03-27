@@ -28,7 +28,7 @@ ol_int_dipoles<T>::ol_int_dipoles(
 {
     auto& ol = ol_interface::instance();
 
-    std::unordered_multimap<int_dipole, std::tuple<std::vector<int>, int, std::size_t>> mes;
+    std::unordered_multimap<int_dipole, std::tuple<std::vector<int>, int, std::size_t, T>> mes;
 
     std::vector<int> dipole_ids;
 
@@ -70,6 +70,9 @@ ol_int_dipoles<T>::ol_int_dipoles(
             {
                 continue;
             }
+
+            T const factor = T(final_state_symmetry_factor(dipole_ids)) /
+                T(final_state_symmetry_factor(ids));
 
             photon_dipole_selected = false;
 
@@ -144,70 +147,53 @@ ol_int_dipoles<T>::ol_int_dipoles(
 
             auto const term = int_dipole(ins_i, ins_k, splitting);
 
-            auto range = mes.equal_range(term);
-            bool found = false;
-
-            for (auto i = range.first; i != range.second; ++i)
+            // add a dipole if it doesn't exist yet
+            if (std::find(dipoles_.begin(), dipoles_.end(), term) == dipoles_.end())
             {
-                // if there are indistinguishable final states, remove the symmetry factor by not
-                // counting the same (integrated) matrix element again
-                if (dipole_ids == std::get<0>(i->second))
-                {
-                    found = true;
-                    break;
-                }
+                dipoles_.push_back(term);
             }
 
-            if (!found)
+            mes.emplace(term, std::make_tuple(dipole_ids, dipole_id, charge_table_index, factor));
+
+            if ((term.type() == insertion_term_type::initial_initial) ||
+                (term.type() == insertion_term_type::initial_final))
             {
-                // add a dipole if it doesn't exist yet
-                if (std::find(dipoles_.begin(), dipoles_.end(), term) == dipoles_.end())
+                auto const born = int_dipole{term.initial_particle(), splitting};
+
+                if (std::find(dipoles_.begin(), dipoles_.end(), born) == dipoles_.end())
                 {
-                    dipoles_.push_back(term);
+                    dipoles_.push_back(born);
                 }
 
-                mes.emplace(term, std::make_tuple(dipole_ids, dipole_id, charge_table_index));
+                int const born_id = ol.register_process(process.c_str(), me_type::born,
+                    order_qcd, order_ew);
 
-                if ((term.type() == insertion_term_type::initial_initial) ||
-                    (term.type() == insertion_term_type::initial_final))
+                auto const range = mes.equal_range(born);
+                auto const tuple = std::make_tuple(dipole_ids, born_id, charge_table_index, T(1.0));
+                bool exists = false;
+
+                for (auto i = range.first; i != range.second; ++i)
                 {
-                    auto const born = int_dipole{term.initial_particle(), splitting};
-
-                    if (std::find(dipoles_.begin(), dipoles_.end(), born) == dipoles_.end())
+                    if (std::get<1>(i->second) != std::get<1>(tuple) ||
+                        (std::get<2>(i->second) != std::get<2>(tuple)))
                     {
-                        dipoles_.push_back(born);
+                        continue;
                     }
 
-                    int const born_id = ol.register_process(process.c_str(), me_type::born,
-                        order_qcd, order_ew);
-
-                    auto const range = mes.equal_range(born);
-                    auto const tuple = std::make_tuple(dipole_ids, born_id, charge_table_index);
-                    bool exists = false;
-
-                    for (auto i = range.first; i != range.second; ++i)
+                    if (!std::equal(std::get<0>(tuple).begin(), std::get<0>(tuple).end(),
+                        std::get<0>(i->second).begin()))
                     {
-                        if (std::get<1>(i->second) != std::get<1>(tuple) ||
-                            (std::get<2>(i->second) != std::get<2>(tuple)))
-                        {
-                            continue;
-                        }
-
-                        if (!std::equal(std::get<0>(tuple).begin(), std::get<0>(tuple).end(),
-                            std::get<0>(i->second).begin()))
-                        {
-                            continue;
-                        }
-
-                        // the term that we try to add already exists
-                        exists = true;
-                        break;
+                        continue;
                     }
 
-                    if (!exists)
-                    {
-                        mes.emplace(born, tuple);
-                    }
+                    // the term that we try to add already exists
+                    exists = true;
+                    break;
+                }
+
+                if (!exists)
+                {
+                    mes.emplace(born, tuple);
                 }
             }
 
@@ -243,7 +229,7 @@ ol_int_dipoles<T>::ol_int_dipoles(
     for (auto const& me : mes)
     {
         mes_.emplace(me.first, std::make_tuple(pdg_ids_to_states(std::get<0>(me.second)).first,
-            std::get<1>(me.second), std::get<2>(me.second)));
+            std::get<1>(me.second), std::get<2>(me.second), std::get<3>(me.second)));
     }
 
     final_states_.shrink_to_fit();
@@ -303,6 +289,7 @@ void ol_int_dipoles<T>::correlated_me(
             {
                 auto const state = std::get<0>(i->second);
                 auto const id = std::get<1>(i->second);
+                T const factor = std::get<3>(i->second);
 
                 if (set.includes(state))
                 {
@@ -313,7 +300,7 @@ void ol_int_dipoles<T>::correlated_me(
                     if (dipole.type() == insertion_term_type::born)
                     {
                         T const casimir = casimir_operator<T>(state, dipole.initial_particle());
-                        T const result = casimir * alphas * T(m2tree);
+                        T const result = casimir * alphas * factor * T(m2tree);
 
                         results.at(me).emplace_back(state, result);
                     }
@@ -325,7 +312,7 @@ void ol_int_dipoles<T>::correlated_me(
                         auto const l = std::max(em, sp);
                         auto const index = k + l * (l - 1) / 2;
 
-                        T const result = alphas * T(ol_m2_.at(index));
+                        T const result = alphas * factor * T(ol_m2_.at(index));
 
                         results.at(me).emplace_back(state, result);
                     }
@@ -343,6 +330,7 @@ void ol_int_dipoles<T>::correlated_me(
                 auto const state = std::get<0>(i->second);
                 auto const id = std::get<1>(i->second);
                 auto const index = std::get<2>(i->second);
+                T const factor = std::get<3>(i->second);
 
                 if (set.includes(state))
                 {
@@ -363,7 +351,7 @@ void ol_int_dipoles<T>::correlated_me(
                             charge = charge_table_.at(index).at(dipole.initial_particle());
                         }
 
-                        results.at(me).emplace_back(state, charge * charge * T(alpha) * T(m2tree));
+                        results.at(me).emplace_back(state, charge * charge * factor * T(alpha) * T(m2tree));
                     }
                     else
                     {
@@ -385,7 +373,7 @@ void ol_int_dipoles<T>::correlated_me(
                             charges = charge_em * charge_sp;
                         }
 
-                        T const result = charges * alpha * T(m2tree);
+                        T const result = charges * alpha * factor * T(m2tree);
 
                         results.at(me).emplace_back(state, result);
                     }

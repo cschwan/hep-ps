@@ -64,7 +64,7 @@ public:
 private:
     std::size_t alphas_power_;
     std::vector<std::vector<T>> charge_table_;
-    std::unordered_multimap<int_dipole, std::tuple<initial_state, int, std::size_t>> mes_;
+    std::unordered_multimap<int_dipole, std::tuple<initial_state, int, std::size_t, T>> mes_;
     std::vector<int_dipole> dipoles_;
     std::vector<final_state> final_states_;
     std::vector<double> ol_m2_;
