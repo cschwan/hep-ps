@@ -1,7 +1,7 @@
 #include "hep/ps/lusifer_constants.hpp"
 #include "hep/ps/lusifer_ps_channels.hpp"
 
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 
 #include <string>
 #include <vector>

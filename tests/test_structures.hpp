@@ -10,7 +10,7 @@
 #include "hep/ps/recombined_state.hpp"
 #include "hep/ps/scales.hpp"
 
-#include <catch.hpp>
+#include "catch2/catch.hpp"
 
 #include "nonstd/span.hpp"
 

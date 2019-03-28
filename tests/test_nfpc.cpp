@@ -1,6 +1,6 @@
 #include "hep/ps/nfpc.hpp"
 
-#include <catch.hpp>
+#include "catch2/catch.hpp"
 
 using T = HEP_TYPE_T;
 

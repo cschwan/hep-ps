@@ -3,7 +3,7 @@
 #include "hep/ps/insertion_term_type.hpp"
 #include "hep/ps/particle_type.hpp"
 
-#include <catch.hpp>
+#include "catch2/catch.hpp"
 
 TEST_CASE("test insertion_term members", "[insertion_term]")
 {

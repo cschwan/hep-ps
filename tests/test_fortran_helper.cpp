@@ -1,6 +1,6 @@
 #include "hep/ps/fortran_helper.hpp"
 
-#include <catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <vector>
 

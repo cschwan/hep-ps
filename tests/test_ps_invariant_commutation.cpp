@@ -2,7 +2,7 @@
 #include "hep/ps/lusifer_ps_channels.hpp"
 #include "hep/ps/ps_invariant.hpp"
 
-#include <catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <algorithm>
 //#include <iomanip>

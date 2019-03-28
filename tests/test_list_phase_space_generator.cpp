@@ -1,7 +1,7 @@
 #include "hep/ps/list_phase_space_generator.hpp"
 #include "hep/ps/luminosity_info.hpp"
 
-#include <catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <vector>
 
