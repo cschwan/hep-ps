@@ -63,5 +63,5 @@ TEST_CASE("non-factorizable photonic corrections", "")
     T const result = T(0.0075553042564088764) / acos(T(-1.0)) *
         hep::nfpc(on_shell_momenta, virtualities, info);
 
-    CHECK_THAT( result, Catch::WithinULP(T(1.50109542892689555e-03), 4) );
+    CHECK_THAT( result, Catch::WithinULP(T(1.50109542892689555e-03), 256) );
 }

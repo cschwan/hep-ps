@@ -4414,13 +4414,13 @@ TEST_CASE("W+W+ scattering phase space", "")
         for (std::size_t j = 0; j != momenta.at(channel).size(); ++j)
         {
             CAPTURE( j );
-            CHECK_THAT( p.at(j) , Catch::WithinULP(momenta.at(channel).at(j), 5) );
+            CHECK_THAT( p.at(j) , Catch::WithinULP(momenta.at(channel).at(j), 64) );
         }
 
         for (std::size_t j = 0; j != densities.at(channel).size(); ++j)
         {
             CAPTURE( j );
-            CHECK_THAT( d.at(j) , Catch::WithinULP(densities.at(channel).at(j), 5) );
+            CHECK_THAT( d.at(j) , Catch::WithinULP(densities.at(channel).at(j), 64) );
         }
     }
 }

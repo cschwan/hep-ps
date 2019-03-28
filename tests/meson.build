@@ -31,7 +31,6 @@ programs = [
     'test_pdg_functions',
     'test_permutation',
     'test_phase_space_point',
-    'test_phase_space_quality',
     'test_psg_channel',
     'test_rambo_phase_space_generator',
     'test_real_integrand',
