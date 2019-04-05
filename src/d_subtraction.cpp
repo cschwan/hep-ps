@@ -74,22 +74,56 @@ void d_subtraction<T>::insertion_terms(
     T eta,
     std::vector<ab_term<T>>& results
 ) const {
-    subtraction_.insertion_terms(term, scales, phase_space, x, eta, results);
+    using std::acos;
+    using std::log;
 
-    auto const ex = pdg_id_to_particle_type(term.vertex().external());
-    auto const in = pdg_id_to_particle_type(term.vertex().internal());
+    // TODO: the other cases are NYI
+    assert( pdg_id_to_particle_type(term.vertex().unresolved()) == particle_type::boson );
 
-    if ((term.type() == insertion_term_type::born) && (ex == particle_type::fermion) &&
-        (in == particle_type::fermion))
+    // TODO: QCD NYI and probably not needed
+    assert( correction_type_of(term.vertex()) == correction_type::ew );
+
+    T const pi = acos(T(-1.0));
+
+    results.clear();
+
+    switch (term.type())
     {
-        using std::acos;
+    case insertion_term_type::born:
+    {
+        T const omx = T(1.0) - x;
+        T const opxs = T(1.0) + x * x;
+        T const logomx = log(omx);
+        T const logome = log(T(1.0) - eta);
+        T const s = phase_space_point<T>{phase_space}.m2(0, 1);
 
-        T const pi = acos(T(-1.0));
+        ab_term<T> result = {};
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (auto const& mu : scales)
         {
-            results.at(i).b -= T(0.5) / pi * (T(1.0) / T(3.0) * pi * pi - T(1.0));
+            T const muf = mu.factorization();
+            T const logmuf2bs = log(muf * muf / s);
+
+            T const value1 = opxs / omx * (logmuf2bs - T(2.0) * logomx + T(1.0));
+            T const value2 = T(2.0) * eta - logome * (eta * (T(2.0) + eta) - T(1.0)
+                + T(2.0) * logome) + T(0.5) * (eta * (T(2.0) + eta) + T(4.0) * logome) * logmuf2bs;
+
+            result.a = T(-0.5) / pi *  value1;
+            result.b = T(-0.5) / pi * (value1 + (eta - T(1.0)) * value2);
+
+            results.push_back(result);
         }
+    }
+
+        break;
+
+    case insertion_term_type::final_initial:
+    case insertion_term_type::initial_final:
+    case insertion_term_type::initial_initial:
+        break;
+
+    default:
+        assert( false );
     }
 }
 
