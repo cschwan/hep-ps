@@ -110,8 +110,8 @@ void d_subtraction<T>::insertion_terms(
             T const value2 = T(2.0) * eta - logome * (eta * (T(2.0) + eta) - T(1.0)
                 + T(2.0) * logome) + T(0.5) * (eta * (T(2.0) + eta) + T(4.0) * logome) * logmuf2bs;
 
-            result.a = T(-0.5) / pi *  value1;
-            result.b = T(-0.5) / pi * (value1 + (eta - T(1.0)) * value2);
+            result.a = T(-0.5) / pi * value1;
+            result.b = T(-0.5) / pi * ((eta - T(1.0)) * value1 + value2);
 
             results.push_back(result);
         }
@@ -134,7 +134,7 @@ void d_subtraction<T>::insertion_terms(
             - T(2.0) * dilogemo;
 
         result.a = T(-0.5) / pi * value1;
-        result.b = result.a + (eta - T(1.0)) *T(-0.5) / pi *  value2;
+        result.b = T(-0.5) / pi * ((eta - T(1.0)) * value1 + value2);
 
         results.assign(scales.size(), result);
     }
@@ -157,7 +157,7 @@ void d_subtraction<T>::insertion_terms(
         T const value2 = T();
 
         result.a = T(-0.5) / pi * value1;
-        result.b = result.a + (eta - T(1.0)) * T(-0.5) / pi * value2;
+        result.b = T(-0.5) / pi * ((eta - T(1.0)) * value1 + value2);
 
         results.assign(scales.size(), result);
     }
@@ -182,7 +182,7 @@ void d_subtraction<T>::insertion_terms(
             * (T(2.0) * logome + eta + T(0.5) * eta * eta);
 
         result.a = T(-0.5) / pi * value1;
-        result.b = result.a + (eta - T(1.0)) * T(-0.5) / pi * value2;
+        result.b = T(-0.5) / pi * ((eta - T(1.0)) * value1 + value2);
 
         results.assign(scales.size(), result);
     }
