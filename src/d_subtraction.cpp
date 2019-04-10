@@ -106,7 +106,7 @@ void d_subtraction<T>::insertion_terms(
             T const muf = mu.factorization();
             T const logmuf2bs = log(muf * muf / s);
 
-            T const value1 = opxs / omx * (logmuf2bs - T(2.0) * logomx + T(1.0));
+            T const value1 = opxs / omx * (logmuf2bs - T(2.0) * logomx - T(1.0));
             T const value2 = T(2.0) * eta - logome * (eta * (T(2.0) + eta) - T(1.0)
                 + T(2.0) * logome) + T(0.5) * (eta * (T(2.0) + eta) + T(4.0) * logome) * logmuf2bs;
 
@@ -147,6 +147,9 @@ void d_subtraction<T>::insertion_terms(
         T const pff = (T(1.0) + x * x) / omx;
         T const logomx = log(omx);
         T const logtmx = log(T(2.0) - x);
+        T const logome = log(T(1.0) - eta);
+        T const loge = log(eta);
+        T const dilog = gsl_sf_dilog((T(1.0) - eta) * (T(1.0) - eta));
         T const s = phase_space_point<T>{phase_space}.m2(0, 1);
         T const sia = phase_space_point<T>{phase_space}.m2(term.emitter(), term.spectator());
 
@@ -154,7 +157,9 @@ void d_subtraction<T>::insertion_terms(
 
         T const value1 = pff * (log(sia / (s * x)) - T(1.0)) - T(2.0) / omx * logtmx
             + (T(1.0) + x) * logomx + omx;
-        T const value2 = T();
+        T const value2 = (-pi * pi + T(3.0) * eta * (T(1.0) + eta) - T(3.0) * logome
+            + T(3.0) * log(sia / s) * (eta * (T(2.0) + eta) + T(4.0) * logome)
+            - T(3.0) * eta * (T(2.0) + eta) * (loge + logome)) / T(6.0) + dilog;
 
         result.a = T(-0.5) / pi * value1;
         result.b = T(-0.5) / pi * ((eta - T(1.0)) * value1 + value2);
@@ -168,24 +173,22 @@ void d_subtraction<T>::insertion_terms(
     {
         T const omx = T(1.0) - x;
         T const pff = (T(1.0) + x * x) / omx;
-        T const s = phase_space_point<T>{phase_space}.m2(0, 1);
-        T const sia = phase_space_point<T>{phase_space}.m2(term.emitter(), term.spectator());
 
         T const dilogome = gsl_sf_dilog(T(1.0) - eta);
         T const logome = log(T(1.0) - eta);
 
         ab_term<T> result = {};
 
-        T const value1 = pff * (log(T(1.0) / x) - T(1.0)) - omx;
-        T const value2 = pi * pi / T(3.0) - T(2.0) * dilogome - eta * (T(0.25) * eta
-            + T(0.5) * (T(2.0) + eta) * log(eta)) + T(2.0) * logome - log(sia / s)
-            * (T(2.0) * logome + eta + T(0.5) * eta * eta);
+        T const value1 = pff * (log(T(1.0) / x) - T(1.0)) + omx;
+        T const value2 = -pff + omx;
+        T const value3 = T(-2.0) * (eta + logome);
 
         result.a = T(-0.5) / pi * value1;
-        result.b = T(-0.5) / pi * ((eta - T(1.0)) * value1 + value2);
+        result.b = T(-0.5) / pi * ((eta - T(1.0)) * value2 + value3);
 
         results.assign(scales.size(), result);
     }
+
         break;
 
     default:
