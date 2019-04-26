@@ -52,6 +52,10 @@ public:
     /// Calculates the difference of the azimuthal angles of two particles with indices `i` and `j`.
     T abs_phi_diff(std::size_t i, std::size_t j) const;
 
+    /// Calculates the difference of the azimuthal angles of the vectorial sum of the momenta `i1`,
+    /// `i2`, and `i3`, and the sum of `j1`, `j2`, and `j3`.
+    T abs_phi_diff33(std::size_t i1, std::size_t i2, std::size_t i3, std::size_t j1, std::size_t j2, std::size_t j3) const;
+
     /// Returns the cosine of the angle between two particles with indices `i` and `j`.
     T cos_angle(std::size_t i, std::size_t j) const;
 

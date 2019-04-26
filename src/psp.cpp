@@ -33,6 +33,31 @@ T psp<T>::abs_phi_diff(std::size_t i, std::size_t j) const
 }
 
 template <typename T>
+T psp<T>::abs_phi_diff33(
+    std::size_t i1,
+    std::size_t i2,
+    std::size_t i3,
+    std::size_t j1,
+    std::size_t j2,
+    std::size_t j3
+) const {
+    using std::acos;
+    using std::atan2;
+    using std::fabs;
+
+    T const pi1 = p_[4*i1+1] + p_[4*i2+1] + p_[4*i3+1];
+    T const pi2 = p_[4*i1+2] + p_[4*i2+2] + p_[4*i3+2];
+    T const phi1 = atan2(pi2, pi1);
+    T const pj1 = p_[4*j1+1] + p_[4*j2+1] + p_[4*j3+1];
+    T const pj2 = p_[4*j1+2] + p_[4*j2+2] + p_[4*j3+2];
+    T const phi2 = atan2(pj2, pj1);
+    T const pi = acos(T(-1.0));
+    T const result = fabs(phi1 - phi2);
+
+    return (result > pi) ? (T(2.0) * pi - result) : result;
+}
+
+template <typename T>
 T psp<T>::cos_angle(std::size_t i, std::size_t j) const
 {
     using std::cosh;
