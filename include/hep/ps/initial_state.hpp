@@ -29,7 +29,9 @@ namespace hep
 /// for the correspoding matrix elements, because of the PDFs. Initial states
 /// with transposed partons are automatically taken into account.
 HEP_ENUM(initial_state,
+    bq_bq, /*!< \f$ Q=-2/3 \f$ bottom bottom initial state. */
     bq_bx, /*!< \f$ Q=0 \f$ bottom anti-bottom initial state. */
+    bx_bx, /*!< \f$ Q=2/3 \f$ anti-bottom anti-bottom initial state. */
     bq_cq, /*!< \f$ Q=1/3 \f$ bottom charm initial state. */
     bq_cx, /*!< \f$ Q=-1 \f$ bottom anti-charm initial state. */
     bq_dq,
@@ -114,11 +116,15 @@ HEP_ENUM(initial_state,
     ph_bq,
     ph_bx,
     ph_cq, /*!< \f$ Q=2/3 \f$ photon charm initial state. */
+    ph_cx, /*!< \f$ Q=-2/3 \f$ photon anti-charm initial state. */
+    ph_dq, /*!< \f$ Q=-1/3 \f$ photon down initial state. */
     ph_dx, /*!< \f$ Q=1/3 \f$ photon anti-down initial state. */
     ph_gl, /*!< \f$ Q=0 \f$ photon gluon initial state. */
     ph_ph, /*!< \f$ Q=0 \f$ photon photon initial state. */
+    ph_sq, /*!< \f$ Q=-1/3 \f$ photon strange initial state. */
     ph_sx, /*!< \f$ Q=1/3 \f$ photon anti-strange initial state. */
     ph_uq, /*!< \f$ Q=2/3 \f$ photon up initial state. */
+    ph_ux, /*!< \f$ Q=-2/3 \f$ photon anti-up initial state. */
     sq_bq,
     sq_bx,
     sq_cq, /*!< \f$ Q=1/3 \f$ strange charm initial state. */
@@ -178,6 +184,7 @@ constexpr parton state_parton_one(initial_state state)
 {
     switch (state)
     {
+    case bq_bq:
     case bq_bx:
     case bq_cq:
     case bq_cx:
@@ -192,6 +199,7 @@ constexpr parton state_parton_one(initial_state state)
         return parton::bottom;
 
     case bx_bq:
+    case bx_bx:
     case bx_cq:
     case bx_cx:
     case bx_dq:
@@ -277,11 +285,15 @@ constexpr parton state_parton_one(initial_state state)
     case ph_bq:
     case ph_bx:
     case ph_cq:
+    case ph_cx:
+    case ph_dq:
     case ph_dx:
     case ph_gl:
     case ph_ph:
+    case ph_sq:
     case ph_sx:
     case ph_uq:
+    case ph_ux:
         return parton::photon;
 
     case sq_bq:
@@ -353,6 +365,7 @@ constexpr parton state_parton_two(initial_state state)
 {
     switch (state)
     {
+    case bq_bq:
     case bx_bq:
     case gl_bq:
     case cq_bq:
@@ -366,6 +379,7 @@ constexpr parton state_parton_two(initial_state state)
     case ux_bq:
         return parton::bottom;
 
+    case bx_bx:
     case bq_bx:
     case gl_bx:
     case cq_bx:
@@ -402,6 +416,7 @@ constexpr parton state_parton_two(initial_state state)
     case cq_cx:
     case dx_cx:
     case gl_cx:
+    case ph_cx:
     case sx_cx:
     case uq_cx:
         return parton::anti_charm;
@@ -413,6 +428,7 @@ constexpr parton state_parton_two(initial_state state)
     case dq_dq:
     case dx_dq:
     case gl_dq:
+    case ph_dq:
     case sq_dq:
     case sx_dq:
     case uq_dq:
@@ -468,6 +484,7 @@ constexpr parton state_parton_two(initial_state state)
     case dq_sq:
     case dx_sq:
     case gl_sq:
+    case ph_sq:
     case sq_sq:
     case sx_sq:
     case uq_sq:
@@ -509,6 +526,7 @@ constexpr parton state_parton_two(initial_state state)
     case dq_ux:
     case dx_ux:
     case gl_ux:
+    case ph_ux:
     case sq_ux:
     case sx_ux:
     case uq_ux:
