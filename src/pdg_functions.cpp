@@ -44,7 +44,8 @@ final_state pdg_id_to_final_state(int id)
     case  16:
         return final_state::neutrino;
 
-    case 22:
+    case  22:
+    case -22: // OpenLoops quirk
         return final_state::photon;
 
     default:
@@ -69,6 +70,7 @@ parton pdg_id_to_parton(int id)
     case   5: return parton::bottom;
     case  21: return parton::gluon;
     case  22: return parton::photon;
+    case -22: return parton::photon; // OpenLoops quirk
 
     default:
         // TODO: NYI
@@ -107,6 +109,7 @@ particle_type pdg_id_to_particle_type(int id)
         return particle_type::fermion;
 
     case  22:
+    case -22: // OpenLoops quirk
     case  21:
         return particle_type::boson;
 
@@ -173,6 +176,7 @@ bool pdg_id_has_color(int id)
     case  14:
     case  16:
     case  22:
+    case -22: // OpenLoops quirk
         return false;
 
     default:
@@ -214,6 +218,7 @@ bool pdg_id_has_charge(int id)
     case  16:
     case  21:
     case  22:
+    case -22: // OpenLoops quirk
         return false;
 
     default:
@@ -418,6 +423,7 @@ int pdg_id_to_charge_times_three(int id)
     case  21:
     // photon
     case  22:
+    case -22: // OpenLoops quirk
         return 0;
 
     default:
