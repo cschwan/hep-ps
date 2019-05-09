@@ -147,6 +147,11 @@ private:
     T sign_;
 };
 
+/// Converts the given phase space point in the CMS frame, `point.cms_psp()`, into the LAB frame by
+/// properly boosting it along the beam axis.
+template <typename T>
+void convert_to_lab_frame(std::vector<T> const& cms_psp, T rap_shift, std::vector<T>& buffer);
+
 }
 
 #endif

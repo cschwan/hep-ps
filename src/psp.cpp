@@ -1,5 +1,6 @@
 #include "hep/ps/psp.hpp"
 
+#include <cassert>
 #include <cmath>
 #include <iterator>
 
@@ -336,8 +337,30 @@ std::vector<recombined_state> const& psp<T>::states() const
     return states_;
 }
 
+template <typename T>
+void convert_to_lab_frame(std::vector<T> const& cms_psp, T rap_shift, std::vector<T>& buffer)
+{
+    using std::cosh;
+    using std::sinh;
+
+    buffer = cms_psp;
+
+    std::size_t const n = buffer.size() / 4;
+
+    T const coshy = cosh(rap_shift);
+    T const sinhy = sinh(rap_shift);
+
+    for (std::size_t i = 0; i != n; ++i)
+    {
+        buffer.at(4 * i + 0) = coshy * cms_psp.at(4 * i + 0) + sinhy * cms_psp.at(4 * i + 3);
+        buffer.at(4 * i + 3) = sinhy * cms_psp.at(4 * i + 0) + coshy * cms_psp.at(4 * i + 3);
+    }
+}
+
 // -------------------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------
 
 template class psp<double>;
+
+template void convert_to_lab_frame(std::vector<double> const&, double, std::vector<double>&);
 
 }
