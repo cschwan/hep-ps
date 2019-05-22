@@ -281,6 +281,17 @@ T psp<T>::rap(std::size_t i) const
 }
 
 template <typename T>
+T psp<T>::rap(std::size_t i, std::size_t j) const
+{
+    using std::atanh;
+
+    T const p0 = p_[4*i+0] + p_[4*j+0];
+    T const p3 = p_[4*i+3] + p_[4*j+3];
+
+    return rap_shift_ + sign_ * atanh(p3 / p0);
+}
+
+template <typename T>
 T psp<T>::prap(std::size_t i) const
 {
     using std::atanh;

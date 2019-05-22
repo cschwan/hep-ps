@@ -119,6 +119,9 @@ public:
     /// Calculates the rapidity of the particle with index `i`.
     T rap(std::size_t i) const;
 
+    /// Calculates the rapidity of the sum of particles with indices `i` and `j`.
+    T rap(std::size_t i, std::size_t j) const;
+
     /// Calculate the pseudo-rapidity of the particle with index `i`.
     T prap(std::size_t i) const;
 
