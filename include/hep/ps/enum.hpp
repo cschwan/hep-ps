@@ -258,6 +258,17 @@ inline std::size_t lsb_position(std::bitset<256> x)
             : set_(set)                                                                            \
         {                                                                                          \
         }                                                                                          \
-    }
+    };                                                                                             \
+    inline name ## _set full_ ## name ## _set()                                                    \
+    {                                                                                              \
+        auto all = name ## _list();                                                                \
+        name ## _set set;                                                                          \
+        for (auto item : all)                                                                      \
+        {                                                                                          \
+            set.add(item);                                                                         \
+        }                                                                                          \
+        return set;                                                                                \
+    }                                                                                              \
+    class name ## _set
 
 #endif
