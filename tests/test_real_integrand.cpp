@@ -229,9 +229,9 @@ public:
 
     void eval_alphas(nonstd::span<hep::scales<T> const> scales, std::vector<T>& alphas)
     {
-        CHECK( alphas.capacity() == scales.size() );
+        CHECK( alphas.capacity() == size(scales) );
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             std::size_t const index = i % global_scales.size();
 
@@ -266,7 +266,7 @@ public:
         scale_pdfs.resize(scales.size());
         uncertainty_pdfs.resize(central_scales * count());
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             for (auto const parton : hep::parton_list())
             {
@@ -323,7 +323,7 @@ public:
             }
         }
 
-        REQUIRE( scales.size() == global_scales.size() );
+        REQUIRE( size(scales) == global_scales.size() );
 
         std::copy(global_scales.begin(), global_scales.end(), scales.begin());
     }

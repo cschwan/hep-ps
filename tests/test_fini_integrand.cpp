@@ -57,7 +57,7 @@ public:
 
         CHECK( term.type() == hep::insertion_term_type::born );
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             constexpr auto quark = hep::parton_type::quark;
             hep::ab_terms<T> term;
@@ -195,7 +195,7 @@ public:
         scale_pdfs.resize(scales.size());
         uncertainty_pdfs.resize(central_scales * count());
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             for (auto const parton : hep::parton_list())
             {

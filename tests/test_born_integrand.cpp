@@ -94,7 +94,7 @@ public:
     ) const {
         using std::pow;
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             T const mur = scales[i].renormalization();
 
@@ -156,7 +156,7 @@ public:
         scale_pdfs.resize(scales.size());
         uncertainty_pdfs.resize(central_scales * count());
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             for (auto const parton : hep::parton_list())
             {

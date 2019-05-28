@@ -366,7 +366,7 @@ void ol_real_matrix_elements<T>::dipole_me(
         assert( false );
     }
 
-    for (std::size_t i = 1; i != scales.size(); ++i)
+    for (std::size_t i = 1; i != size(scales); ++i)
     {
         results.at(i) = results.front();
     }
@@ -496,7 +496,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
         assert( false );
     }
 
-    for (std::size_t i = 1; i != scales.size(); ++i)
+    for (std::size_t i = 1; i != size(scales); ++i)
     {
         results_one.at(i) = results_one.front();
         results_two.at(i) = results_two.front();
@@ -568,7 +568,7 @@ void ol_real_matrix_elements<T>::reals(
         results.front().emplace_back(state, value);
     }
 
-    for (std::size_t i = 1; i != scales.size(); ++i)
+    for (std::size_t i = 1; i != size(scales); ++i)
     {
         results.at(i) = results.front();
     }

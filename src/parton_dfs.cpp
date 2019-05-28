@@ -113,7 +113,7 @@ void parton_dfs<T>::eval(
         uncertainty_pdfs.resize(central_scales * pdf_count);
     }
 
-    for (std::size_t i = 0; i != scales.size(); ++i)
+    for (std::size_t i = 0; i != size(scales); ++i)
     {
         // check if we already calculated the central PDF for the current factorization scale
         auto const end = std::next(scales.begin(), i);

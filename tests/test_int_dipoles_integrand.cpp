@@ -57,7 +57,7 @@ public:
 
         CHECK( term.type() == hep::insertion_term_type::born );
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             hep::ab_term<T> term;
             term.a = T(1.0);
@@ -194,7 +194,7 @@ public:
         scale_pdfs.resize(scales.size());
         uncertainty_pdfs.resize(central_scales * count());
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             for (auto const parton : hep::parton_list())
             {

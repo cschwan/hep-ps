@@ -82,7 +82,7 @@ public:
         scale_pdfs.clear();
         scale_pdfs.resize(scales.size());
 
-        for (std::size_t i = 0; i != scales.size(); ++i)
+        for (std::size_t i = 0; i != size(scales); ++i)
         {
             scale_pdfs.at(i)[hep::parton::anti_up]      = T(1.0);
             scale_pdfs.at(i)[hep::parton::anti_down]    = T(1.0);
@@ -139,11 +139,11 @@ public:
     ) const {
         CHECK( phase_space.size() == 4 * (final_states_ + 2) );
         CHECK( set == set_ );
-        CHECK( scales.size() == me.size() );
+        CHECK( size(scales) == me.size() );
 
         for (auto const process : set)
         {
-            for (std::size_t i = 0; i != scales.size(); ++i)
+            for (std::size_t i = 0; i != size(scales); ++i)
             {
                 me.at(i).emplace_back(process, T(1.0));
             }

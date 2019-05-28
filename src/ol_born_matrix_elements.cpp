@@ -139,13 +139,13 @@ void ol_born_matrix_elements<T>::borns(
                 value += T(m2loop[0]);
             }
 
-            for (std::size_t i = 0; i != scales.size(); ++i)
+            for (std::size_t i = 0; i != size(scales); ++i)
             {
                 results.at(i).emplace_back(state, value);
             }
         }
 
-        for (std::size_t j = 0; j != scales.size(); ++j)
+        for (std::size_t j = 0; j != size(scales); ++j)
         {
             if (scales[j].regularization() != scales[0].regularization())
             {
@@ -203,7 +203,7 @@ void ol_born_matrix_elements<T>::borns(
             result.emplace_back(state, value);
         }
 
-        for (std::size_t i = 1; i != scales.size(); ++i)
+        for (std::size_t i = 1; i != size(scales); ++i)
         {
             results.at(i) = results.front();
         }

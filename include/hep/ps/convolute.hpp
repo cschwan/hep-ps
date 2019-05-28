@@ -75,12 +75,12 @@ inline void convolute_mes_with_pdfs(
     std::size_t const scales = scale_uncertainty_pdfs_one.size();
     std::size_t const pdfs = pdf_uncertainty_pdfs_one.size();
 
-    assert( scale_uncertainty_pdfs_one.size() == scales );
-    assert( scale_uncertainty_pdfs_two.size() == scales );
-    assert( matrix_elements.size() == scales );
-    assert( alphas_factors.size() == scales );
-    assert( pdf_uncertainty_pdfs_one.size() == pdfs );
-    assert( pdf_uncertainty_pdfs_two.size() == pdfs );
+    assert( size(scale_uncertainty_pdfs_one) == scales );
+    assert( size(scale_uncertainty_pdfs_two) == scales );
+    assert( size(matrix_elements) == scales );
+    assert( size(alphas_factors) == scales );
+    assert( size(pdf_uncertainty_pdfs_one) == pdfs );
+    assert( size(pdf_uncertainty_pdfs_two) == pdfs );
 
     scale_results.clear();
 
