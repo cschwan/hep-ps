@@ -50,7 +50,7 @@ void test_trivial_cutter_and_recombiner(
             test_distribution_parameters<T>()
         ),
         std::vector<std::size_t>{1}
-    );
+    ).results();
 
     CHECK_THAT( result.front().value() ,
         Catch::WithinULP(T(0.0015980493564892501), 5) );
