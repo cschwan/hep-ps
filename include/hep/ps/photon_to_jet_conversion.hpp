@@ -39,11 +39,15 @@ public:
         T delta_alpha_hadr,
         T conversion_scale,
         T nc,
-        std::size_t nf
+        std::size_t nf,
+        bool only = false
     );
 
     ///
     bool active() const;
+
+    ///
+    bool only() const;
 
     ///
     T eval(T regularization_scale, T non_perturbative_factor) const;
@@ -54,6 +58,7 @@ private:
     T conversion_scale_;
     T nc_;
     T nf_;
+    bool only_;
 };
 
 }

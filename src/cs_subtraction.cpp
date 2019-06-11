@@ -738,6 +738,13 @@ void cs_subtraction<T>::insertion_terms(
     using std::acos;
     using std::log;
 
+    if (conversion_.only())
+    {
+        ab_term<T> const zero = {};
+        results.assign(scales.size(), zero);
+        return;
+    }
+
 //    parton_type const bo = (correction_type_of(term.vertex()) == correction_type::ew)
 //        ? parton_type::photon_
 //        : parton_type::gluon_;
@@ -977,6 +984,13 @@ void cs_subtraction<T>::insertion_terms2(
         assert( false );
     }
 
+    if (conversion_.only() && !((pdg_id_to_particle_type(term.vertex().internal()) ==
+        particle_type::boson) && (correction_type_of(term.vertex()) == correction_type::ew)))
+    {
+        results.assign(scales.size(), T());
+        return;
+    }
+
     T scheme_dep_factor;
     T coli = T();
 
@@ -1021,9 +1035,14 @@ void cs_subtraction<T>::insertion_terms2(
 
                 // for photons there is no 1/eps^2 pole -> BHLA/COLI are equal
 
-                T result = T(8.0) / T(3.0) * gamma;
-                result += gamma * logmubsij;
-                result *= T(-0.5) / pi;
+                T result = T();
+
+                if (!conversion_.only())
+                {
+                    result = T(8.0) / T(3.0) * gamma;
+                    result += gamma * logmubsij;
+                    result *= T(-0.5) / pi;
+                }
 
                 if (conversion_.active())
                 {

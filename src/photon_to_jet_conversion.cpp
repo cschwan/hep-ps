@@ -18,13 +18,15 @@ photon_to_jet_conversion<T>::photon_to_jet_conversion(
     T delta_alpha_hadr,
     T conversion_scale,
     T nc,
-    std::size_t nf
+    std::size_t nf,
+    bool only
 )
     : alpha_{alpha}
     , delta_alpha_hadr_{delta_alpha_hadr}
     , conversion_scale_{conversion_scale}
     , nc_{nc}
     , nf_{T(nf)}
+    , only_{only}
 {
     if (nf_ == 0)
     {
@@ -36,6 +38,12 @@ template <typename T>
 bool photon_to_jet_conversion<T>::active() const
 {
     return nf_ != 0;
+}
+
+template <typename T>
+bool photon_to_jet_conversion<T>::only() const
+{
+    return only_;
 }
 
 template <typename T>
