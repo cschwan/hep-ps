@@ -73,6 +73,7 @@
 #include "hep/ps/phase_space_generator.hpp"
 #include "hep/ps/phase_space_point.hpp"
 #include "hep/ps/phase_space_tools.hpp"
+#include "hep/ps/photon_cone_recombiner.hpp"
 #include "hep/ps/photon_dipole_selector.hpp"
 #include "hep/ps/photon_to_jet_conversion.hpp"
 #include "hep/ps/ps_channel.hpp"

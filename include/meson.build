@@ -54,6 +54,7 @@ headers1 = [
     'hep/ps/phase_space_generator.hpp',
     'hep/ps/phase_space_point.hpp',
     'hep/ps/phase_space_tools.hpp',
+    'hep/ps/photon_cone_recombiner.hpp',
     'hep/ps/photon_dipole_selector.hpp',
     'hep/ps/ps_channel.hpp',
     'hep/ps/ps_decay.hpp',

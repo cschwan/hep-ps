@@ -56,6 +56,7 @@ sources = [
     'phase_space_generator.cpp',
     'phase_space_point.cpp',
     'phase_space_tools.cpp',
+    'photon_cone_recombiner.cpp',
     'photon_to_jet_conversion.cpp',
     'ps_functions.cpp',
     'psp.cpp',
