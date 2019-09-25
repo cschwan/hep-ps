@@ -63,16 +63,8 @@ std::vector<ps_channel> lusifer_ps_channels(
         int lightfermions = 0;
         // do not include cuts in the phase space generation
         int includecuts = 0;
-        // do not print channel information
-        int sout = 0;
 
-        lusifer_initphasespace(
-            process0.c_str(),
-            g,
-            lightfermions,
-            includecuts,
-            sout
-        );
+        lusifer_initphasespace(process0.c_str(), g, lightfermions, includecuts);
     }
 
     int channel_count;

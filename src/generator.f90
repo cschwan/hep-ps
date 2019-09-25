@@ -6,18 +6,18 @@
 !                                                                 c
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine lusifer_initphasespace(c_name,generator,lightfermions, &
-        includecuts,sout) bind(c)
+        includecuts) bind(c)
       use, intrinsic :: iso_c_binding
       implicit none
       character(kind=c_char), intent(in), dimension(*) :: c_name
-      integer(kind=c_int), value :: generator,lightfermions,includecuts,sout
+      integer(kind=c_int), value :: generator,lightfermions,includecuts
 ! local variables
       integer maxe,maxch,maxg,maxv
       parameter(maxe=9,maxch=20000,maxg=1,maxv=40)
       real*8 power(maxv),m2,m3,e2,e3,scutinv
       integer idhep(maxe,maxe),binary(maxe,maxe),idhep2,idhep3
       integer i1,i2,i3,ns,nt,maxns,maxnt,binary1,binary2,binary3
-      integer in1(maxe),in2(maxe),out1(maxe),out2(maxe),lusifer_id
+      integer in1(maxe),in2(maxe),out1(maxe),out2(maxe)
       integer virt(maxe),channel
       integer prop2,prop3
       character*3 gname(-maxv:maxv),name(maxe)
@@ -491,33 +491,6 @@
         enddo
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !                                                                 c
-!     output                                                      c
-!                                                                 c
-!cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-        if(sout.eq.2)then
-          write(nout,*)'channel=',channel
-          do i2=1,maxns
-            write(nout,*)'s channel: ', &
-              lusifer_id(binary(out1(i2),i2)),lusifer_id( &
-              binary(out2(i2),i2)),' ->', &
-              lusifer_id(binary(out2(i2),i2+1)),'   ', &
-              gname(-idhep(out1(i2),i2)), &
-              gname(-idhep(out2(i2),i2)),' -> ', &
-              gname(-idhep(out2(i2),i2+1))
-          enddo
-          do i2=maxns+1,maxnt
-            write(nout,*)'t channel: ', &
-              lusifer_id(binary(in1(i2),i2)),lusifer_id( &
-              binary(out1(i2),i2)),' ->', &
-              lusifer_id(binary(in1(i2),i2+1)),'   ', &
-              gname(idhep(in1(i2),i2)), &
-              gname(-idhep(out1(i2),i2)),' -> ', &
-              gname(idhep(in1(i2),i2+1))
-          enddo
-          write(nout,'(a)')'   '
-        endif
-!cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!                                                                 c
 !     end of loops                                                c
 !                                                                 c
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -607,18 +580,6 @@
         endif
       enddo
       enddo
-      if(sout.ne.0)then
-        write(nout,'(a)')' '
-        write(nout,'(a)')' Phase-space generator:'
-        write(nout,'(" number of channels            =",i6)') &
-          nchannel(generator)
-        write(nout,'(" calculation of invariants     =",i6)') &
-          maxinv(generator)
-        write(nout,'(" calculation of 2->2 processes =",i6)') &
-          maxprocess(generator)
-        write(nout,'(" calculation of 1->2 decays    =",i6)') &
-          maxdecay(generator)
-      endif
       end
 
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -910,27 +871,4 @@
       if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'v3 ')return
       if(p1.eq.'gl '.and.p2.eq.'gl '.and.p3.eq.'v3~')return
       lusifer_vertexg=.false.
-      end
-
-!cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!                                                                 c
-!     identifying particles                                       c
-!                                                                 c
-!     written by Markus Roth                                      c
-!                                                                 c
-!cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      function lusifer_id(binary)
-      implicit none
-! local variables
-      integer lusifer_id,binary,i1,i2,i3,nexternal
-      i3=1
-      nexternal=30
-      lusifer_id=0
-      do i1=nexternal,1,-1
-        i2=binary/2**(i1-1)
-        if((i2/2)*2.ne.i2)then
-          lusifer_id=lusifer_id+i1*i3
-          i3=10*i3
-        endif
-      enddo
       end

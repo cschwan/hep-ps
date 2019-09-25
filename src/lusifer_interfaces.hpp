@@ -10,8 +10,7 @@ void lusifer_initphasespace(
     char const* name,
     int generator,
     int lightfermions,
-    int includecuts,
-    int sout
+    int includecuts
 );
 
 void lusifer_extra_max(
