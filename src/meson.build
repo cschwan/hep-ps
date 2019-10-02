@@ -70,6 +70,7 @@ sources = [
 
 deps += dependency('gsl')
 deps += dependency('lhapdf', version : '>=6')
+deps += dependency('span-lite', method : 'cmake', modules : 'nonstd::span-lite')
 
 libhep_ps = library(
     'hep-ps',
