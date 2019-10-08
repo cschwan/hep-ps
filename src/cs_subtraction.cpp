@@ -258,64 +258,154 @@ spin_correlation_matrix<T> cs_subtraction<T>::boson_function(
 
     T const factor = T(8.0) * acos(T(-1.0));
 
-    // FIXME: color is probably missing in the QCD case
-
-    // TODO: gluon splitting into gluons NYI
-    assert( (dipole_info.emitter_type() == particle_type::fermion) &&
-        (dipole_info.unresolved_type() == particle_type::fermion) );
-
-    switch (dipole_info.type())
+    if ((dipole_info.emitter_type() == particle_type::fermion) &&
+        (dipole_info.unresolved_type() == particle_type::fermion))
     {
-    case dipole_type::final_final:
-    case dipole_type::final_initial:
+        switch (dipole_info.type())
+        {
+        case dipole_type::final_final:
+        case dipole_type::final_initial:
+        {
+            T const zi = invariants.two;
+            T const zj = T(1.0) - zi;
+
+            result.a = factor * T(-1.0) / invariants.sij;
+            result.b = factor * T(-1.0) / invariants.sij * T(4.0) * zi * zj;
+
+            if (dipole_info.type() == dipole_type::final_initial)
+            {
+                result.a /= invariants.one;
+                result.b /= invariants.one;
+            }
+
+            result.p = {
+                phase_space.at(4 * i + 0) * zi - phase_space.at(4 * j + 0) * zj,
+                phase_space.at(4 * i + 1) * zi - phase_space.at(4 * j + 1) * zj,
+                phase_space.at(4 * i + 2) * zi - phase_space.at(4 * j + 2) * zj,
+                phase_space.at(4 * i + 3) * zi - phase_space.at(4 * j + 3) * zj,
+            };
+        }
+
+            break;
+
+        case dipole_type::initial_final:
+        case dipole_type::initial_initial:
+        {
+            T const x = invariants.one;
+
+            result.a = factor * T(-1.0) / invariants.sij;
+            result.b = factor * T(-1.0) / invariants.sij * T(4.0) * (x - T(1.0)) /
+                (x * x);
+
+            T const uj = invariants.two;
+            T const uk = (dipole_info.type() == dipole_type::initial_initial)
+                ? T(1.0) : (T(1.0) - uj);
+
+            result.p = {
+                phase_space.at(4 * j + 0) * uk - phase_space.at(4 * k + 0) * uj,
+                phase_space.at(4 * j + 1) * uk - phase_space.at(4 * k + 1) * uj,
+                phase_space.at(4 * j + 2) * uk - phase_space.at(4 * k + 2) * uj,
+                phase_space.at(4 * j + 3) * uk - phase_space.at(4 * k + 3) * uj,
+            };
+        }
+
+            break;
+
+        default:
+            assert( false );
+        }
+
+        // TODO: Test the following case
+        if (dipole_info.corr_type() == correction_type::qcd)
+        {
+            result.a *= tf_ / nc_;
+            result.b *= tf_ / nc_;
+        }
+    }
+    else
     {
-        T const zi = invariants.two;
-        T const zj = T(1.0) - zi;
+        // this would signal a photon splitting into two photons
+        assert( dipole_info.corr_type() == correction_type::qcd );
 
-        result.a = factor * T(-1.0) / invariants.sij;
-        result.b = factor * T(-1.0) / invariants.sij * T(4.0) * zi * zj;
+        switch (dipole_info.type())
+        {
+        case dipole_type::final_final:
+        case dipole_type::final_initial:
+        {
+            T const zi = invariants.two;
+            T const zj = T(1.0) - zi;
 
-        if (dipole_info.type() == dipole_type::final_initial)
+            T const deni = (dipole_info.type() == dipole_type::final_final)
+                ? (T(1.0) - zi * (T(1.0) - invariants.one))
+                : (T(1.0) - zi + (T(1.0) - invariants.one));
+            T const denj = (dipole_info.type() == dipole_type::final_final)
+                ? (T(1.0) - zj * (T(1.0) - invariants.one))
+                : (T(1.0) - zj + (T(1.0) - invariants.one));
+
+            result.a = T( 2.0) * factor * T(-1.0) / invariants.sij
+                * (T(1.0) / deni + T(1.0) / denj - T(2.0));
+            result.b = T(-2.0) * factor * T(-1.0) / invariants.sij * T(4.0) * zi * zj;
+
+            result.p = {
+                phase_space.at(4 * i + 0) * zi - phase_space.at(4 * j + 0) * zj,
+                phase_space.at(4 * i + 1) * zi - phase_space.at(4 * j + 1) * zj,
+                phase_space.at(4 * i + 2) * zi - phase_space.at(4 * j + 2) * zj,
+                phase_space.at(4 * i + 3) * zi - phase_space.at(4 * j + 3) * zj,
+            };
+
+            break;
+        }
+
+        case dipole_type::initial_final:
+        {
+            T const x  = invariants.one;
+            T const ui = invariants.two;
+            T const uk = T(1.0) - ui;
+
+            result.a = T( 2.0) * factor * T(-1.0) / invariants.sij
+                * (T(1.0) / (T(1.0) - x + ui) - T(1.0) + x * (T(1.0) - x));
+            result.b = T(-2.0) * factor * T(-1.0) / invariants.sij
+                * T(2.0) * (T(1.0) - x) / x;
+
+            result.p = {
+                phase_space.at(4 * i + 0) / ui - phase_space.at(4 * k + 0) / uk,
+                phase_space.at(4 * i + 1) / ui - phase_space.at(4 * k + 1) / uk,
+                phase_space.at(4 * i + 2) / ui - phase_space.at(4 * k + 2) / uk,
+                phase_space.at(4 * i + 3) / ui - phase_space.at(4 * k + 3) / uk,
+            };
+
+            break;
+        }
+
+        case dipole_type::initial_initial:
+        {
+            T const x  = invariants.one;
+            T const vi = invariants.two;
+
+            result.a = T( 2.0) * factor * T(-1.0) / invariants.sij
+                * (x / (T(1.0) - x) + x * (T(1.0) - x));
+            result.b = T(-2.0) * factor * T(-1.0) / invariants.sij
+                * T(2.0) * (T(1.0) - x) / x;
+
+            result.p = {
+                phase_space.at(4 * i + 0) - phase_space.at(4 * k + 0) * vi,
+                phase_space.at(4 * i + 1) - phase_space.at(4 * k + 1) * vi,
+                phase_space.at(4 * i + 2) - phase_space.at(4 * k + 2) * vi,
+                phase_space.at(4 * i + 3) - phase_space.at(4 * k + 3) * vi,
+            };
+
+            break;
+        }
+
+        default:
+            assert( false );
+        }
+
+        if (dipole_info.type() != dipole_type::final_final)
         {
             result.a /= invariants.one;
             result.b /= invariants.one;
         }
-
-        result.p = {
-            phase_space.at(4 * i + 0) * zi - phase_space.at(4 * j + 0) * zj,
-            phase_space.at(4 * i + 1) * zi - phase_space.at(4 * j + 1) * zj,
-            phase_space.at(4 * i + 2) * zi - phase_space.at(4 * j + 2) * zj,
-            phase_space.at(4 * i + 3) * zi - phase_space.at(4 * j + 3) * zj,
-        };
-    }
-
-        break;
-
-    case dipole_type::initial_final:
-    case dipole_type::initial_initial:
-    {
-        T const x = invariants.one;
-
-        result.a = factor * T(-1.0) / invariants.sij;
-        result.b = factor * T(-1.0) / invariants.sij * T(4.0) * (x - T(1.0)) /
-            (x * x);
-
-        T const uj = invariants.two;
-        T const uk = (dipole_info.type() == dipole_type::initial_initial)
-            ? T(1.0) : (T(1.0) - uj);
-
-        result.p = {
-            phase_space.at(4 * j + 0) * uk - phase_space.at(4 * k + 0) * uj,
-            phase_space.at(4 * j + 1) * uk - phase_space.at(4 * k + 1) * uj,
-            phase_space.at(4 * j + 2) * uk - phase_space.at(4 * k + 2) * uj,
-            phase_space.at(4 * j + 3) * uk - phase_space.at(4 * k + 3) * uj,
-        };
-    }
-
-        break;
-
-    default:
-        assert( false );
     }
 
     return result;
