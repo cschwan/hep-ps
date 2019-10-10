@@ -852,7 +852,7 @@ void cs_subtraction<T>::insertion_terms(
 
     T const color2 = (correction_type_of(term.vertex()) == correction_type::ew)
         ? T(1.0)
-        : tf_ * (T(1.0) - T(1.0) / nc_ / nc_); // cf/ca
+        : tf_ * (T(1.0) - T(1.0) / nc_ / nc_); // cf/ca TODO: test it
 
     results.clear();
 
@@ -892,6 +892,8 @@ void cs_subtraction<T>::insertion_terms(
         }
         else if ((ex == particle_type::boson) && (in == particle_type::boson))
         {
+            assert( correction_type_of(term.vertex()) == correction_type::qcd );
+
             // TODO: NYI
             assert( false );
         }
@@ -916,8 +918,8 @@ void cs_subtraction<T>::insertion_terms(
 
             if (correction_type_of(term.vertex()) == correction_type::qcd)
             {
-                // this path isn't tested yet
-                assert( false );
+                // TODO: this path isn't tested yet
+                gamma *= tf_ / nc_;
             }
             else
             {
@@ -983,11 +985,7 @@ void cs_subtraction<T>::insertion_terms(
             }
             else if ((ex == particle_type::boson) && (in == particle_type::boson))
             {
-                if (correction_type_of(term.vertex()) == correction_type::ew)
-                {
-                    // implementation error
-                    assert( false );
-                }
+                assert( correction_type_of(term.vertex()) == correction_type::qcd );
 
                 // TODO: NYI
                 assert( false );
@@ -1043,6 +1041,8 @@ void cs_subtraction<T>::insertion_terms(
             }
             else if ((ex == particle_type::boson) && (in == particle_type::boson))
             {
+                assert( correction_type_of(term.vertex()) == correction_type::qcd );
+
                 // TODO: NYI
                 assert( false );
             }
@@ -1150,10 +1150,12 @@ void cs_subtraction<T>::insertion_terms2(
             T gamma;
             T k;
 
+            // TODO: test the following code
+
             if (pdg_id_to_particle_type(term.vertex().external()) == particle_type::boson)
             {
                 gamma = T(11.0) / T(6.0);
-                k     = T(67.0) / (18.0) - pi * pi / T(6.0);
+                k     = T(67.0) / T(18.0) - pi * pi / T(6.0);
             }
             else
             {
