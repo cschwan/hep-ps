@@ -92,14 +92,15 @@ ol_int_dipoles<T>::ol_int_dipoles(
                         continue;
                     }
 
-                    // OpenLoops quirk: a -> ff~ without alpha(0)/alpha by using `-22` for the
-                    // photon
                     auto const photon_index = dip.emitter()
                         - ((dip.unresolved() < dip.emitter()) ? 1 : 0);
 
-                    assert( dipole_ids.at(photon_index) == pdg_id_of_photon() );
-
-                    dipole_ids.at(photon_index) = -pdg_id_of_photon();
+                    // OpenLoops quirk: a -> ff~ without alpha(0)/alpha by using `-22` for the
+                    // photon
+                    if (dipole_ids.at(photon_index) == pdg_id_of_photon())
+                    {
+                        dipole_ids.at(photon_index) = -pdg_id_of_photon();
+                    }
                 }
             }
 
