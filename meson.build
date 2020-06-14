@@ -14,6 +14,14 @@ hep_mc_dep = dependency(
     version : '>=0.7'
 )
 
+span_lite_dep = dependency(
+    'span-lite',
+    method : 'cmake',
+    modules : 'nonstd::span-lite',
+    fallback : ['nonstd-span-lite', 'nonstd_span_lite_dep'],
+    version : '>=0.5.0'
+)
+
 subdir('include')
 
 if get_option('doxygen')

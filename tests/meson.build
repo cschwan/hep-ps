@@ -42,7 +42,7 @@ foreach p : programs
         p,
         p + '.cpp',
         cpp_args : '-DHEP_TYPE_T=double',
-        dependencies : [ libcatch_dep, hep_mc_dep, hep_ps_dep ]
+        dependencies : [ libcatch_dep, hep_mc_dep, hep_ps_dep, span_lite_dep ]
     )
 
     test(p, exe, timeout : 60)
@@ -56,7 +56,7 @@ if get_option('additional-tests')
         'test_p_type_jet_algorithm',
         'test_p_type_jet_algorithm.cpp',
         cpp_args : '-DHEP_TYPE_T=double',
-        dependencies : [ fastjet_dep, libcatch_dep, hep_mc_dep, hep_ps_dep ]
+        dependencies : [ fastjet_dep, libcatch_dep, hep_mc_dep, hep_ps_dep, span_lite_dep ]
     )
 
     test('test_p_type_jet_algorithm', test_p_type_jet_algorithm)
