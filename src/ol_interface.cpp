@@ -318,15 +318,18 @@ void ol_interface::evaluate_full(
 
 int ol_interface::register_process(char const* process, me_type type, int order_qcd, int order_ew)
 {
+    char const* key_ew = (type == me_type::loop) ? "loop_order_ew" : "order_ew";
+    char const* key_qcd = (type == me_type::loop) ? "loop_order_qcd" : "order_qcd";
+
     int result;
 
     if (set_order_qcd_)
     {
-        setparameter_int("order_qcd", order_qcd);
+        setparameter_int(key_qcd, order_qcd);
     }
     else
     {
-        setparameter_int("order_ew", order_ew);
+        setparameter_int(key_ew, order_ew);
     }
 
     int amptype = 1;
@@ -363,11 +366,11 @@ int ol_interface::register_process(char const* process, me_type type, int order_
 
         if (set_order_qcd_)
         {
-            setparameter_int("order_qcd", order_qcd);
+            setparameter_int(key_qcd, order_qcd);
         }
         else
         {
-            setparameter_int("order_ew", order_ew);
+            setparameter_int(key_ew, order_ew);
         }
 
         result = register_process(process, amptype);
