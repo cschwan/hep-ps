@@ -329,11 +329,6 @@ int ol_interface::register_process(char const* process, me_type type, int order_
         setparameter_int("order_ew", order_ew);
     }
 
-    // silence OpenLoops until we know how to correctly set the coupling order
-    int verbose = 0;
-    getparameter_int("verbose", &verbose);
-    setparameter_int("verbose", -1);
-
     int amptype = 1;
 
     switch (type)
@@ -377,11 +372,6 @@ int ol_interface::register_process(char const* process, me_type type, int order_
 
         result = register_process(process, amptype);
     }
-
-    setparameter_int("verbose", verbose);
-
-    // run again to print potentially suppressed messages
-    result = register_process(process, amptype);
 
     return result;
 }
