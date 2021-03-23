@@ -341,11 +341,11 @@ int ol_interface::register_process(char const* process, me_type type, int order_
         break;
 
     case me_type::color_correlated:
-        amptype = 2;
+        amptype = 1;
         break;
 
     case me_type::spin_correlated:
-        amptype = 3;
+        amptype = 1;
         break;
 
     case me_type::loop:
