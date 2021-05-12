@@ -4,6 +4,9 @@
 #include "hep/ps/pdg_functions.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <iomanip>
+#include <iostream>
 #include <stdexcept>
 
 namespace hep
@@ -26,7 +29,7 @@ ol_born_matrix_elements<T>::ol_born_matrix_elements(
         // TODO: if we calculate EW corrections, set `ew_renorm` to `1`
 
         // we will calculate the counterterms separately
-        ol.setparameter_int("CT_on", 0);
+        //ol.setparameter_int("CT_on", 0);
 
         if (scheme == regularization_scheme::dim_reg_blha)
         {
@@ -136,6 +139,37 @@ void ol_born_matrix_elements<T>::borns(
                 // renormalization scale, for example through MSBar masses
 
                 ol.evaluate_loop(i->second, ol_phase_space_.data(), &m2tree, m2loop, &acc);
+
+                double const k = std::fabs(m2loop[0] / m2tree);
+
+                if (k > 1000.0)
+                {
+                    auto const flags = std::cout.flags();
+                    auto const precision = std::cout.precision();
+
+                    std::cout << "virtual PS cut (K=" << k << "): ";
+                    std::cout << std::scientific << std::setprecision(17)
+                        << ol_phase_space_[ 0] << ", " << ol_phase_space_[ 1] << ", " << ol_phase_space_[ 2] << ", " << ol_phase_space_[ 3] << ", "
+                        << ol_phase_space_[ 4] << ", " << ol_phase_space_[ 5] << ", " << ol_phase_space_[ 6] << ", " << ol_phase_space_[ 7] << ", "
+                        << ol_phase_space_[ 8] << ", " << ol_phase_space_[ 9] << ", " << ol_phase_space_[10] << ", " << ol_phase_space_[11] << ", "
+                        << ol_phase_space_[12] << ", " << ol_phase_space_[13] << ", " << ol_phase_space_[14] << ", " << ol_phase_space_[15] << ", "
+                        << ol_phase_space_[16] << ", " << ol_phase_space_[17] << ", " << ol_phase_space_[18] << ", " << ol_phase_space_[19] << ", "
+                        << ol_phase_space_[20] << ", " << ol_phase_space_[21] << ", " << ol_phase_space_[22] << ", " << ol_phase_space_[23] << ", "
+                        << ol_phase_space_[24] << ", " << ol_phase_space_[25] << ", " << ol_phase_space_[26] << ", " << ol_phase_space_[27] << ", "
+                        << ol_phase_space_[28] << ", " << ol_phase_space_[29] << ", " << ol_phase_space_[30] << ", " << ol_phase_space_[31] << std::endl;
+
+                    std::cout.flags(flags);
+                    std::cout.precision(precision);
+
+                    // cut the entire PS point
+                    for (std::size_t i = 0; i != size(scales); ++i)
+                    {
+                        results.at(i).clear();
+                    }
+
+                    return;
+                }
+
                 value += T(m2loop[0]);
             }
 
@@ -152,9 +186,7 @@ void ol_born_matrix_elements<T>::borns(
                 throw std::runtime_error("regularization scales must be the same");
             }
 
-            double const muren = static_cast <double> (scales[j].renormalization());
-
-            ol.setparameter_double("muren", muren);
+            double muren = 0.0;
 
             std::size_t k = 0;
 
@@ -171,8 +203,17 @@ void ol_born_matrix_elements<T>::borns(
 
                 for (auto i = range.first; i != range.second; ++i)
                 {
+                    muren = static_cast <double> (scales[j].renormalization());
+                    ol.setparameter_double("muren", muren);
                     ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree, m2loop);
                     value += T(m2loop[0]);
+
+                    double m2loop0[3];
+
+                    muren = static_cast <double> (scales[0].renormalization());
+                    ol.setparameter_double("muren", muren);
+                    ol.evaluate_ct(i->second, ol_phase_space_.data(), &m2tree, m2loop0);
+                    value -= T(m2loop0[0]);
                 }
 
                 results.at(j).at(k++).second += value;
