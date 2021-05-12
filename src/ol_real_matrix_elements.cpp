@@ -133,10 +133,15 @@ ol_real_matrix_elements<T>::ol_real_matrix_elements(
                 ol_type = me_type::color_correlated;
             }
 
+            // if the dipole is a charge-correlator, we construct it from a Born matrix element; in
+            // that case we have to modify the coupling orders; if it's a colour correlator instead
+            // we get it from a loop matrix element for which we use the coupling order of the real
+            // matrix element
+
             auto const process = pdg_ids_to_ol_process_string(dipole_ids);
             int const order_ew = (type == correction_type::qcd) ? order.alpha_power() :
                 (order.alpha_power() - 1);
-            int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
+            int const order_qcd = (type == correction_type::qcd) ? order.alphas_power() :
                 order.alphas_power();
             int const dipole_id = ol.register_process(process.c_str(), ol_type, order_qcd,
                 order_ew);

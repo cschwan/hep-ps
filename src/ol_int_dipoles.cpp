@@ -112,8 +112,12 @@ ol_int_dipoles<T>::ol_int_dipoles(
                 (order.alpha_power() - 1);
             int const order_qcd = (type == correction_type::qcd) ? (order.alphas_power() - 1) :
                 order.alphas_power();
-            int const dipole_id = ol.register_process(process.c_str(), ol_type, order_qcd,
-                order_ew);
+            int const dipole_id = ol.register_process(
+                process.c_str(),
+                ol_type,
+                (ol_type == me_type::color_correlated) ? order.alphas_power() : order_qcd,
+                (ol_type == me_type::color_correlated) ? order.alpha_power() : order_ew
+            );
 
             std::size_t charge_table_index = -1;
 

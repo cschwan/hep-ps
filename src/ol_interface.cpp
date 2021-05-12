@@ -4,6 +4,7 @@
 #include "config.hpp"
 
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
@@ -318,62 +319,50 @@ void ol_interface::evaluate_full(
 
 int ol_interface::register_process(char const* process, me_type type, int order_qcd, int order_ew)
 {
-    char const* key_ew = (type == me_type::loop) ? "loop_order_ew" : "order_ew";
-    char const* key_qcd = (type == me_type::loop) ? "loop_order_qcd" : "order_qcd";
-
-    int result;
-
-    if (set_order_qcd_)
-    {
-        setparameter_int(key_qcd, order_qcd);
-    }
-    else
-    {
-        setparameter_int(key_ew, order_ew);
-    }
-
     int amptype = 1;
 
     switch (type)
     {
     case me_type::born:
+        setparameter_int("loop_order_ew", -1);
+        setparameter_int("loop_order_qcd", -1);
+
+        if (set_order_qcd_)
+        {
+            setparameter_int("order_qcd", order_qcd);
+        }
+        else
+        {
+            setparameter_int("order_ew", order_ew);
+        }
+
         amptype = 1;
+
         break;
 
     case me_type::color_correlated:
-        amptype = 1;
-        break;
-
     case me_type::spin_correlated:
-        amptype = 1;
-        break;
-
     case me_type::loop:
+        setparameter_int("loop_order_ew", order_ew);
+        setparameter_int("loop_order_qcd", order_qcd);
+
         amptype = 11;
+
         break;
 
     default:
         assert( false );
     }
 
-    result = register_process(process, amptype);
+    int const result = register_process(process, amptype);
 
     if (result == -1)
     {
-        std::cout << "trying very hard...\n";
-
-        set_order_qcd_ = !set_order_qcd_;
-
-        if (set_order_qcd_)
-        {
-            setparameter_int(key_qcd, order_qcd);
-        }
-        else
-        {
-            setparameter_int(key_ew, order_ew);
-        }
-
-        result = register_process(process, amptype);
+        std::cerr << "couldn't find process: " << process << '\n';
+        std::cerr << "amptype: " << amptype << '\n';
+        std::cerr << "qcd: " << order_qcd << '\n';
+        std::cerr << "ew: " << order_ew << '\n';
+        std::exit(1);
     }
 
     return result;
