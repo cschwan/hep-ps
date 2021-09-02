@@ -362,7 +362,7 @@ int ol_interface::register_process(char const* process, me_type type, int order_
         std::cerr << "amptype: " << amptype << '\n';
         std::cerr << "qcd: " << order_qcd << '\n';
         std::cerr << "ew: " << order_ew << '\n';
-        std::exit(1);
+        //std::exit(1);
     }
 
     return result;

@@ -307,6 +307,12 @@ void ol_int_dipoles<T>::correlated_me(
 
                 if (set.includes(state))
                 {
+                    if (id == -1)
+                    {
+                        results.at(me).emplace_back(state, T());
+                        continue;
+                    }
+
                     double m2tree;
                     double m2ew;
                     ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree, ol_m2_.data(), &m2ew);
@@ -348,6 +354,12 @@ void ol_int_dipoles<T>::correlated_me(
 
                 if (set.includes(state))
                 {
+                    if (id == -1)
+                    {
+                        results.at(me).emplace_back(state, T());
+                        continue;
+                    }
+
                     double m2tree;
                     ol.evaluate_tree(id, ol_phase_space_.data(), &m2tree);
 
