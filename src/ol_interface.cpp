@@ -3,6 +3,7 @@
 
 #include "config.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
@@ -64,6 +65,8 @@ bool ol_interface::enabled()
 ol_interface::ol_interface()
     : started_(false)
     , set_order_qcd_{false}
+    , replacement_rules_()
+    , zero_rules_()
 {
 #ifdef HAVE_OPENLOOPS
     if (suppress_banners())
@@ -165,7 +168,14 @@ void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
         ol_start();
     }
 
-    ol_evaluate_tree(id, pp, m2tree);
+    if (id == 0)
+    {
+        *m2tree = 0.0;
+    }
+    else
+    {
+        ol_evaluate_tree(id, pp, m2tree);
+    }
 #else
     ignore(started_);
     ignore(id);
@@ -185,7 +195,16 @@ void ol_interface::evaluate_cc(int id, double* pp, double* m2tree, double* m2cc,
         ol_start();
     }
 
-    ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
+    if (id == 0)
+    {
+        *m2tree = 0.0;
+        *m2cc = 0.0;
+        *m2ew = 0.0;
+    }
+    else
+    {
+        ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
+    }
 #else
     ignore(started_);
     ignore(id);
@@ -207,7 +226,14 @@ void ol_interface::evaluate_sc(int id, double* pp, int emitter, double* polvect,
         ol_start();
     }
 
-    ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
+    if (id == 0)
+    {
+        *m2sc = 0.0;
+    }
+    else
+    {
+        ol_evaluate_sc(id, pp, emitter, polvect, m2sc);
+    }
 #else
     ignore(started_);
     ignore(id);
@@ -229,7 +255,16 @@ void ol_interface::evaluate_loop(int id, double* pp, double* m2tree, double* m2l
         ol_start();
     }
 
-    ol_evaluate_loop(id, pp, m2tree, m2loop, acc);
+    if (id == 0)
+    {
+        *m2tree = 0.0;
+        *m2loop = 0.0;
+        *acc = 0.0;
+    }
+    else
+    {
+        ol_evaluate_loop(id, pp, m2tree, m2loop, acc);
+    }
 #else
     ignore(started_);
     ignore(id);
@@ -251,7 +286,15 @@ void ol_interface::evaluate_loop2(int id, double* pp, double* m2loop2, double* a
         ol_start();
     }
 
-    ol_evaluate_loop2(id, pp, m2loop2, acc);
+    if (id == 0)
+    {
+        *m2loop2 = 0.0;
+        *acc = 0.0;
+    }
+    else
+    {
+        ol_evaluate_loop2(id, pp, m2loop2, acc);
+    }
 #else
     ignore(started_);
     ignore(id);
@@ -272,7 +315,15 @@ void ol_interface::evaluate_ct(int id, double* pp, double* m2_tree, double* m2_c
         ol_start();
     }
 
-    ol_evaluate_ct(id, pp, m2_tree, m2_ct);
+    if (id == 0)
+    {
+        *m2_tree = 0.0;
+        *m2_ct = 0.0;
+    }
+    else
+    {
+        ol_evaluate_ct(id, pp, m2_tree, m2_ct);
+    }
 #else
     ignore(started_);
     ignore(id);
@@ -301,7 +352,19 @@ void ol_interface::evaluate_full(
         ol_start();
     }
 
-    ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
+    if (id == 0)
+    {
+        *m2tree = 0.0;
+        *m2loop = 0.0;
+        *m2ir1 = 0.0;
+        *m2loop2 = 0.0;
+        *m2ir2 = 0.0;
+        *acc = 0.0;
+    }
+    else
+    {
+        ol_evaluate_full(id, pp, m2tree, m2loop, m2ir1, m2loop2, m2ir2, acc);
+    }
 #else
     ignore(started_);
     ignore(id);
@@ -319,6 +382,33 @@ void ol_interface::evaluate_full(
 
 int ol_interface::register_process(char const* process, me_type type, int order_qcd, int order_ew)
 {
+    if (std::any_of(zero_rules_.begin(), zero_rules_.end(),
+        [=](std::pair<std::string, int> const& rule) {
+            return (process == rule.first) && (order_qcd == rule.second);
+        }))
+    {
+        //std::cout << ">>> replaced process: " << process << " at order O(as^" << order_qcd
+        //    << ") with zero\n";
+
+        return 0;
+    }
+
+    auto const& rule = replacement_rules_.find(std::make_pair(process, order_qcd));
+
+    std::string p = process;
+
+    if (rule != replacement_rules_.end())
+    {
+        p = rule->second;
+        //std::cout << ">>> replaced process: " << process << " with " << p << " at order O(as^"
+        //    << order_qcd << ")\n";
+    }
+    else
+    {
+        //std::cout << ">>> didn't replace process: " << process << " at order O(as^" << order_qcd
+        //    << ")\n";
+    }
+
     int amptype = 1;
 
     switch (type)
@@ -354,11 +444,14 @@ int ol_interface::register_process(char const* process, me_type type, int order_
         assert( false );
     }
 
-    int const result = register_process(process, amptype);
+    int const result = register_process(p.c_str(), amptype);
+
+    // we'll reserve ID=0 for zero matrix elements
+    assert( result != 0 );
 
     if (result == -1)
     {
-        std::cerr << "couldn't find process: " << process << '\n';
+        std::cerr << "couldn't find process: " << p << '\n';
         std::cerr << "amptype: " << amptype << '\n';
         std::cerr << "qcd: " << order_qcd << '\n';
         std::cerr << "ew: " << order_ew << '\n';
@@ -366,6 +459,23 @@ int ol_interface::register_process(char const* process, me_type type, int order_
     }
 
     return result;
+}
+
+void ol_interface::register_replacement_rule(
+    char const* process,
+    char const* replacement,
+    int order_qcd,
+    int
+) {
+    replacement_rules_.emplace(std::make_pair(process, order_qcd), replacement);
+}
+
+void ol_interface::register_zero_rule(
+    char const* process,
+    int order_qcd,
+    int
+) {
+    zero_rules_.emplace_back(process, order_qcd);
 }
 
 }

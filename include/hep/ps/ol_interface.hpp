@@ -19,6 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstddef>
+#include <unordered_map>
+#include <string>
+#include <vector>
+
 #include "hep/ps/me_type.hpp"
 
 namespace hep
@@ -96,9 +101,32 @@ public:
     /// needed as an argument for other functions.
     int register_process(char const* process, me_type type, int order_qcd, int order_ew);
 
+    /// Future calls to `register_process` with the specied parameters `process`, `order_qcd` and
+    /// `order_ew` will instead register the process `replacement`.
+    void register_replacement_rule(
+        char const* process,
+        char const* replacement,
+        int order_qcd,
+        int order_ew
+    );
+
+    /// Future calls to `register_process` with the specied parameters `process`, `order_qcd` and
+    /// `order_ew` will instead register the process that will return zero.
+    void register_zero_rule(char const* process, int order_qcd, int order_ew);
+
 private:
+    struct key_hasher
+    {
+        std::size_t operator()(std::pair<std::string, int> const& key) const
+        {
+            return std::hash<std::string>()(key.first) ^ (std::hash<int>()(key.second) << 1);
+        }
+    };
+
     bool started_;
     bool set_order_qcd_;
+    std::unordered_map<std::pair<std::string, int>, std::string, key_hasher> replacement_rules_;
+    std::vector<std::pair<std::string, int>> zero_rules_;
 
     ol_interface();
 };
