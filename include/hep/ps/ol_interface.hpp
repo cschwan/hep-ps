@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "hep/ps/me_type.hpp"
@@ -117,16 +118,18 @@ public:
 private:
     struct key_hasher
     {
-        std::size_t operator()(std::pair<std::string, int> const& key) const
+        std::size_t operator()(std::tuple<std::string, int, int> const& key) const
         {
-            return std::hash<std::string>()(key.first) ^ (std::hash<int>()(key.second) << 1);
+            return (std::hash<std::string>()(std::get<0>(key))
+                ^ (std::hash<int>()(std::get<1>(key)) << 1))
+                ^ (std::hash<int>()(std::get<2>(key)) << 2);
         }
     };
 
     bool started_;
     bool set_order_qcd_;
-    std::unordered_map<std::pair<std::string, int>, std::string, key_hasher> replacement_rules_;
-    std::vector<std::pair<std::string, int>> zero_rules_;
+    std::unordered_map<std::tuple<std::string, int, int>, std::string, key_hasher> replacement_rules_;
+    std::vector<std::tuple<std::string, int, int>> zero_rules_;
 
     ol_interface();
 };

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 #ifdef HAVE_OPENLOOPS
@@ -40,6 +41,28 @@ namespace
 template <typename T>
 void ignore(T const&)
 {
+}
+
+std::string normalize_string(char const* string)
+{
+    std::stringstream ss(string);
+    std::string result;
+    std::string s;
+
+    while (std::getline(ss, s, ' '))
+    {
+        //std::cout << "}}} " << s << '\n';
+
+        if (!s.empty())
+        {
+            result.append(s);
+            result.append(" ");
+        }
+    }
+
+    //std::cout << "normalize " << string << " to " << result << '\n';
+
+    return result;
 }
 
 }
@@ -382,9 +405,12 @@ void ol_interface::evaluate_full(
 
 int ol_interface::register_process(char const* process, me_type type, int order_qcd, int order_ew)
 {
+    std::string p = normalize_string(process);
+
     if (std::any_of(zero_rules_.begin(), zero_rules_.end(),
-        [=](std::pair<std::string, int> const& rule) {
-            return (process == rule.first) && (order_qcd == rule.second);
+        [=](std::tuple<std::string, int, int> const& rule) {
+            return (p == std::get<0>(rule)) && (order_qcd == std::get<1>(rule)) &&
+                (order_ew == std::get<2>(rule));
         }))
     {
         //std::cout << ">>> replaced process: " << process << " at order O(as^" << order_qcd
@@ -393,9 +419,8 @@ int ol_interface::register_process(char const* process, me_type type, int order_
         return 0;
     }
 
-    auto const& rule = replacement_rules_.find(std::make_pair(process, order_qcd));
-
-    std::string p = process;
+    auto const& tuple = std::make_tuple(p, order_qcd, order_ew);
+    auto const& rule = replacement_rules_.find(tuple);
 
     if (rule != replacement_rules_.end())
     {
@@ -465,17 +490,18 @@ void ol_interface::register_replacement_rule(
     char const* process,
     char const* replacement,
     int order_qcd,
-    int
+    int order_ew
 ) {
-    replacement_rules_.emplace(std::make_pair(process, order_qcd), replacement);
+    replacement_rules_.emplace(std::make_tuple(normalize_string(process), order_qcd, order_ew),
+        normalize_string(replacement));
 }
 
 void ol_interface::register_zero_rule(
     char const* process,
     int order_qcd,
-    int
+    int order_ew
 ) {
-    zero_rules_.emplace_back(process, order_qcd);
+    zero_rules_.emplace_back(std::make_tuple(normalize_string(process), order_qcd, order_ew));
 }
 
 }
