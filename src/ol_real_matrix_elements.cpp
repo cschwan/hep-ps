@@ -309,7 +309,7 @@ void ol_real_matrix_elements<T>::dipole_me(
             {
                 double m2tree;
                 double m2ew;
-                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree, ol_m2_.data(), &m2ew);
+                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree, ol_m2_, &m2ew);
 
                 auto const k = std::min(em_born, sp_born);
                 auto const l = std::max(em_born, sp_born);
@@ -437,7 +437,7 @@ void ol_real_matrix_elements<T>::dipole_sc(
             {
                 double m2tree;
                 double m2ew;
-                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree, ol_m2_.data(), &m2ew);
+                ol.evaluate_cc(id, ol_phase_space_.data(), &m2tree, ol_m2_, &m2ew);
 
                 auto const k = std::min(em_born, sp_born);
                 auto const l = std::max(em_born, sp_born);

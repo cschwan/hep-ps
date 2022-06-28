@@ -209,8 +209,13 @@ void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 #endif
 }
 
-void ol_interface::evaluate_cc(int id, double* pp, double* m2tree, double* m2cc, double* m2ew)
-{
+void ol_interface::evaluate_cc(
+    int id,
+    double* pp,
+    double* m2tree,
+    std::vector<double>& m2cc,
+    double* m2ew
+) {
 #ifdef HAVE_OPENLOOPS
     if (!started_)
     {
@@ -221,12 +226,12 @@ void ol_interface::evaluate_cc(int id, double* pp, double* m2tree, double* m2cc,
     if (id == 0)
     {
         *m2tree = 0.0;
-        *m2cc = 0.0;
+        std::fill(m2cc.begin(), m2cc.end(), 0.0);
         *m2ew = 0.0;
     }
     else
     {
-        ol_evaluate_cc(id, pp, m2tree, m2cc, m2ew);
+        ol_evaluate_cc(id, pp, m2tree, m2cc.data(), m2ew);
     }
 #else
     ignore(started_);

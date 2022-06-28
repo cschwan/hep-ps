@@ -71,7 +71,7 @@ public:
     void evaluate_tree(int id, double* pp, double* m2tree);
 
     /// Evaluate a color-correlated matrix element.
-    void evaluate_cc(int id, double* pp, double* m2tree, double* m2cc, double* m2ew);
+    void evaluate_cc(int id, double* pp, double* m2tree, std::vector<double>& m2cc, double* m2ew);
 
     /// Evaluate a spin-correlated matrix element.
     void evaluate_sc(int id, double* pp, int emitter, double* polvect, double* m2sc);
