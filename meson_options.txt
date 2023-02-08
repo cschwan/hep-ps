@@ -1,3 +1,4 @@
 option('additional-tests', type : 'boolean', value : false, description : 'Enable additional unit tests requiring more external dependencies.')
 option('doxygen',          type : 'boolean', value : false, description : 'Use Doxygen to generate source documentation.')
 option('openloops',        type : 'boolean', value : false, description : 'Build interface for OpenLoops matrix elements')
+option('recola',           type : 'boolean', value : false, description : 'Build interface for Recola matrix elements')

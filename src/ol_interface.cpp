@@ -10,7 +10,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
 extern "C"
 {
 
@@ -78,7 +78,7 @@ ol_interface& ol_interface::instance()
 
 bool ol_interface::enabled()
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     return true;
 #else
     return false;
@@ -91,7 +91,7 @@ ol_interface::ol_interface()
     , replacement_rules_()
     , zero_rules_()
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (suppress_banners())
     {
         ol_setparameter_int("nosplash", 1);
@@ -101,7 +101,7 @@ ol_interface::ol_interface()
 
 ol_interface::~ol_interface()
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (started_)
     {
         ol_finish();
@@ -111,7 +111,7 @@ ol_interface::~ol_interface()
 
 void ol_interface::setparameter_int(char const* param, int val)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     ol_setparameter_int(param, val);
 #else
     ignore(param);
@@ -121,7 +121,7 @@ void ol_interface::setparameter_int(char const* param, int val)
 
 void ol_interface::setparameter_double(char const* param, double val)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     ol_setparameter_double(param, val);
 #else
     ignore(param);
@@ -131,7 +131,7 @@ void ol_interface::setparameter_double(char const* param, double val)
 
 void ol_interface::setparameter_string(char const* param, char* val)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     ol_setparameter_string(param, val);
 #else
     ignore(param);
@@ -141,7 +141,7 @@ void ol_interface::setparameter_string(char const* param, char* val)
 
 void ol_interface::getparameter_int(char const* param, int* val)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     ol_getparameter_int(param, val);
 #else
     ignore(param);
@@ -151,7 +151,7 @@ void ol_interface::getparameter_int(char const* param, int* val)
 
 void ol_interface::getparameter_double(char const* param, double* val)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     ol_getparameter_double(param, val);
 #else
     ignore(param);
@@ -161,7 +161,7 @@ void ol_interface::getparameter_double(char const* param, double* val)
 
 int ol_interface::register_process(char const* process, int amptype)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     return ol_register_process(process, amptype);
 #else
     ignore(process);
@@ -173,7 +173,7 @@ int ol_interface::register_process(char const* process, int amptype)
 
 int ol_interface::n_external(int id)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     return ol_n_external(id);
 #else
     ignore(id);
@@ -184,7 +184,7 @@ int ol_interface::n_external(int id)
 
 void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (!started_)
     {
         started_ = true;
@@ -198,6 +198,7 @@ void ol_interface::evaluate_tree(int id, double* pp, double* m2tree)
     else
     {
         ol_evaluate_tree(id, pp, m2tree);
+        assert( (id != -1) || (*m2tree == 0.0) );
     }
 #else
     ignore(started_);
@@ -216,7 +217,7 @@ void ol_interface::evaluate_cc(
     std::vector<double>& m2cc,
     double* m2ew
 ) {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (!started_)
     {
         started_ = true;
@@ -247,7 +248,7 @@ void ol_interface::evaluate_cc(
 
 void ol_interface::evaluate_sc(int id, double* pp, int emitter, double* polvect, double* m2sc)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (!started_)
     {
         started_ = true;
@@ -276,7 +277,7 @@ void ol_interface::evaluate_sc(int id, double* pp, int emitter, double* polvect,
 
 void ol_interface::evaluate_loop(int id, double* pp, double* m2tree, double* m2loop, double* acc)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (!started_)
     {
         started_ = true;
@@ -307,7 +308,7 @@ void ol_interface::evaluate_loop(int id, double* pp, double* m2tree, double* m2l
 
 void ol_interface::evaluate_loop2(int id, double* pp, double* m2loop2, double* acc)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (!started_)
     {
         started_ = true;
@@ -336,7 +337,7 @@ void ol_interface::evaluate_loop2(int id, double* pp, double* m2loop2, double* a
 
 void ol_interface::evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct)
 {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (!started_)
     {
         started_ = true;
@@ -373,7 +374,7 @@ void ol_interface::evaluate_full(
     double* m2ir2,
     double* acc
 ) {
-#ifdef HAVE_OPENLOOPS
+#if defined(HAVE_OPENLOOPS) || defined(HAVE_RECOLA)
     if (!started_)
     {
         started_ = true;

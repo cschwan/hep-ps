@@ -8,13 +8,13 @@ if get_option('openloops')
     conf.set('HAVE_OPENLOOPS', '1')
 endif
 
+if get_option('recola')
+    conf.set('HAVE_RECOLA', '1')
+endif
+
 configure_file(output : 'config.hpp', configuration : conf)
 
 deps = [ hep_mc_dep ]
-
-if get_option('openloops')
-    deps += [ meson.get_compiler('cpp').find_library('openloops') ]
-endif
 
 sources = [
     'cofferaa_generator.f90',
@@ -67,6 +67,15 @@ sources = [
     'trivial_cutter.cpp',
     'trivial_recombiner.cpp'
 ]
+
+# TODO: make openloops and recola incompatible with each other
+if get_option('recola')
+    add_project_arguments(['-DGNU_NAME_MANGLING'], language: 'cpp')
+    deps += [ meson.get_compiler('cpp').find_library('recola') ]
+    sources += [ 'recola_openloops_bridge.cpp' ]
+elif get_option('openloops')
+    deps += [ meson.get_compiler('cpp').find_library('openloops') ]
+endif
 
 deps += dependency('gsl')
 deps += dependency('lhapdf', version : '>=6')
