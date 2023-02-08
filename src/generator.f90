@@ -291,7 +291,9 @@
         if(virt(nt).lt.0.and. &
           gname(virt(nt)).eq.gname(-virt(nt)))goto 900
 ! avoid doube counting of diagrams
-        if(nt.ge.2.and.in1(nt-1).eq.in1(nt))goto 1300
+        if(nt.ge.2) then
+          if (in1(nt-1) == in1(nt))goto 1300
+        endif
 ! checking whether 3-particle vertex exists
         if(.not.lusifer_vertex(gname(idhep(in1(nt),nt)), &
           gname(idhep(out1(nt),nt)),gname(virt(nt)), &
