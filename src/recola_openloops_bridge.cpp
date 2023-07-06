@@ -13,10 +13,15 @@ namespace
 {
 
 std::string const LO = "LO";
+std::string const NLO = "NLO";
 
 std::unordered_map<std::string, int> recola_process_list;
+std::vector<int> recola_alphas_powers;
 std::vector<int> recola_process_sizes;
 std::vector<double> last_phase_space_point;
+
+double muren = -1.0;
+double alphas = -1.0;
 
 template <typename T>
 void ignore(T const&)
@@ -25,20 +30,22 @@ void ignore(T const&)
 
 }
 
-extern "C" 
+extern "C"
 {
 
 int order_ew = -1;
-int loop_order_ew = -1;
+int loop_order_qcd = -1;
 
 void ol_setparameter_int(const char* param, int val)
 {
     if (std::strcmp(param, "ew_scheme") == 0)
     {
+        // set alpha from Gmu, MW and MZ
         assert(val == 1);
     }
     else if (std::strcmp(param, "ew_renorm_scheme") == 0)
     {
+        assert(val == 1);
     }
     else if (std::strcmp(param, "ew_renorm") == 0)
     {
@@ -48,6 +55,22 @@ void ol_setparameter_int(const char* param, int val)
         assert(val == 2);
 
         Recola::set_complex_mass_scheme_rcl();
+    }
+    else if (std::strcmp(param, "polenorm") == 0)
+    {
+        if (val == 0)
+        {
+            // TODO: NYI
+            assert( false );
+        }
+        else if (val == 1)
+        {
+            // here there's nothing to do
+        }
+        else
+        {
+            assert( false );
+        }
     }
     else if (std::strcmp(param, "preset") == 0)
     {
@@ -66,11 +89,11 @@ void ol_setparameter_int(const char* param, int val)
     }
     else if (std::strcmp(param, "loop_order_ew") == 0)
     {
-        loop_order_ew = val;
+        // here we have nothing to do
     }
     else if (std::strcmp(param, "loop_order_qcd") == 0)
     {
-        //assert( val == -1 );
+        loop_order_qcd = val;
     }
     else if (std::strcmp(param, "order_ew") == 0)
     {
@@ -185,11 +208,36 @@ void ol_setparameter_double(const char* param, double val)
     }
     else if (std::strcmp(param, "gmu") == 0)
     {
-        Recola::use_gfermi_scheme_and_set_gfermi_rcl(val);
+        Recola::use_gfermi_scheme_real_and_set_gfermi_rcl(val);
     }
     else if (std::strcmp(param, "alphas") == 0)
     {
-        Recola::set_alphas_rcl(val, 100.0, 5);
+        alphas = val;
+
+        if (muren != -1.0)
+        {
+            Recola::set_alphas_rcl(alphas, muren, 5);
+        }
+        else
+        {
+            Recola::set_alphas_rcl(alphas, -1.0, 5);
+        }
+    }
+    else if (std::strcmp(param, "mureg") == 0)
+    {
+        Recola::set_mu_ir_rcl(val);
+        Recola::set_mu_uv_rcl(val);
+    }
+    else if (std::strcmp(param, "muren") == 0)
+    {
+        muren = val;
+
+        if (alphas != -1.0 && muren != -1.0)
+        {
+            Recola::set_alphas_rcl(alphas, muren, 5);
+            alphas = -1.0;
+            muren = -1.0;
+        }
     }
     else
     {
@@ -238,8 +286,7 @@ int ol_register_process(const char* process, int amptype)
         break;
 
     case 11:
-        //recola_amptype = "NLO";
-        recola_amptype = "LO";
+        recola_amptype = "NLO";
         break;
 
     default:
@@ -331,10 +378,58 @@ int ol_register_process(const char* process, int amptype)
         int process_id = recola_process_list.size() + 1;
 
         Recola::define_process_rcl(process_id, recola_process.c_str(), recola_amptype.c_str());
-        //Recola::unselect_all_gs_powers_BornAmpl_rcl(process_id);
-        //Recola::select_gs_power_BornAmpl_rcl(process_id, recola_gs_power);
+
+        int as_power = -1;
+
+        if (recola_amptype == NLO)
+        {
+            Recola::unselect_all_gs_powers_LoopAmpl_rcl(process_id);
+            Recola::unselect_all_gs_powers_BornAmpl_rcl(process_id);
+
+            // Recola::select_gs_power_BornAmpl_rcl(1, alphas);
+
+            // TODO: this is process-specific information
+            std::array<int, 2> born_gs = { 0, 2 };
+            std::array<int, 3> loop_gs = { 0, 2, 4 };
+
+            as_power = loop_order_qcd;
+
+            for (int born : born_gs)
+            {
+                for (int loop : loop_gs)
+                {
+                    if ((born + loop) == 2 * loop_order_qcd)
+                    {
+                        Recola::select_gs_power_LoopAmpl_rcl(process_id, loop);
+                        Recola::select_gs_power_BornAmpl_rcl(process_id, born);
+                    }
+                }
+            }
+        }
+        else
+        {
+            Recola::unselect_all_gs_powers_BornAmpl_rcl(process_id);
+
+            // TODO: this is process-specific information
+            std::array<int, 2> born_gs = { 0, 2 };
+
+            as_power = final_states - order_ew;
+
+            for (int born1 : born_gs)
+            {
+                for (int born2 : born_gs)
+                {
+                    if ((born1 + born2) == 2 * as_power)
+                    {
+                        Recola::select_gs_power_BornAmpl_rcl(process_id, born1);
+                        Recola::select_gs_power_BornAmpl_rcl(process_id, born2);
+                    }
+                }
+            }
+        }
 
         recola_process_list.emplace(recola_process, process_id);
+        recola_alphas_powers.push_back(as_power);
         recola_process_sizes.push_back(final_states + 2);
 
         return process_id++;
@@ -381,9 +476,8 @@ void ol_evaluate_tree(int id, double* pp, double* m2tree)
     auto mom = reinterpret_cast <double (*) [4]> (last_phase_space_point.data());
 
     Recola::compute_process_rcl(id, mom, LO);
-
-    // TODO: correct the power of alphas
-    Recola::get_squared_amplitude_rcl(id, 2, LO, *m2tree);
+    int alphas = recola_alphas_powers.at(id - 1);
+    Recola::get_squared_amplitude_rcl(id, alphas, LO, *m2tree);
 }
 
 void ol_evaluate_cc(int id, double* pp, double* m2tree, double* m2cc, double* m2ew)
@@ -437,13 +531,32 @@ void ol_evaluate_sc(int id, double* pp, int emitter, double* polvect, double* m2
 
 void ol_evaluate_loop(int id, double* pp, double* m2tree, double* m2loop, double* acc)
 {
-    ignore(id);
-    ignore(pp);
-    ignore(m2tree);
-    ignore(m2loop);
-    ignore(acc);
+    int n = recola_process_sizes.at(id - 1);
 
-    assert(false);
+    last_phase_space_point.resize(4 * n);
+
+    for (int i = 0; i != n; ++i)
+    {
+        last_phase_space_point.at(4 * i + 0) = pp[5 * i + 0];
+        last_phase_space_point.at(4 * i + 1) = pp[5 * i + 1];
+        last_phase_space_point.at(4 * i + 2) = pp[5 * i + 2];
+        last_phase_space_point.at(4 * i + 3) = pp[5 * i + 3];
+        // ignore mass
+    }
+
+    auto mom = reinterpret_cast <double (*) [4]> (last_phase_space_point.data());
+
+    double result[2] = {};
+    Recola::compute_process_rcl(id, mom, "NLO", result);
+    int alphas = recola_alphas_powers.at(id - 1);
+    Recola::get_squared_amplitude_rcl(id, alphas, "NLO", result[1]);
+
+    m2loop[0] = result[1];
+    m2loop[1] = -1.0;
+    m2loop[2] = -1.0;
+
+    // TODO: this isn't the tree-level result, but we need to escape the k-factor tech cut
+    *m2tree = result[1];
 }
 
 void ol_evaluate_loop2(int id, double* pp, double* m2loop2, double* acc)
@@ -463,7 +576,8 @@ void ol_evaluate_ct(int id, double* pp, double* m2_tree, double* m2_ct)
     ignore(m2_tree);
     ignore(m2_ct);
 
-    assert(false);
+    // TODO: for the time being we don't need scale variations
+    *m2_ct = 0.0;
 }
 
 void ol_evaluate_full(int id, double* pp, double* m2tree, double* m2loop, double* m2ir, double* m2loop2, double* m2iop, double* acc)
